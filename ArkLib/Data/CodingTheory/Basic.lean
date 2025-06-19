@@ -4,15 +4,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Quang Dao, Katerina Hristova, František Silváši, Julian Sutherland, Ilia Vlasov
 -/
 
+import ArkLib.Data.Fin.Basic
 import ArkLib.Data.CodingTheory.Prelims
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Data.ENat.Lattice
 import Mathlib.InformationTheory.Hamming
-import Mathlib.Topology.MetricSpace.Infsep
 import Mathlib.Tactic.Qify
+import Mathlib.Topology.MetricSpace.Infsep
 
-import ArkLib.Data.Fin.Basic
 
 /-!
   # Basics of Coding Theory
@@ -441,7 +441,7 @@ def possibleRelHammingDists (C : Set (ι → F)) : Set ℚ≥0 :=
   possibleDists C relHammingDist
 
 /-- The set of possible distances between distinct codewords in a code is a subset of the range of
-  the relative Hamming distance function.
+ the relative Hamming distance function.
 -/
 @[simp]
 lemma possibleRelHammingDists_subset_relHammingDistRange :
@@ -467,8 +467,7 @@ def minRelHammingDistCode (C : Set (ι → F)) : ℚ≥0 :=
 
 end
 
-/--
-  `δᵣ C` denotes the minimum relative Hamming distance of a code `C`.
+/-- `δᵣ C` denotes the minimum relative Hamming distance of a code `C`.
 -/
 notation "δᵣ" C => minRelHammingDistCode C
 
@@ -503,8 +502,7 @@ def relHammingDistToCode [Nonempty ι] [DecidableEq F] (w : ι → F) (C : Set (
           rw [WithTop.none_eq_top, Finset.min_eq_top, Set.toFinset_eq_empty] at c
           simp_all
 
-/--
-  `δᵣ(w,C)` denotes the relative Hamming distance between a vector `w` and a code `C`.
+/-- `δᵣ(w,C)` denotes the relative Hamming distance between a vector `w` and a code `C`.
 -/
 notation "δᵣ(" w ", " C ")" => relHammingDistToCode w C
 
@@ -695,8 +693,8 @@ variable {F : Type*}
          {ι : Type*} [Fintype ι]
          {κ : Type*} [Fintype κ]
 
-/--
-Linear code defined by left multiplication by its generator matrix.
+
+/-- Linear code defined by left multiplication by its generator matrix.
 -/
 noncomputable def fromRowGenMat [Semiring F] (G : Matrix κ ι F) : LinearCode ι F :=
   LinearMap.range G.vecMulLinear
@@ -772,7 +770,11 @@ noncomputable def rate [Semiring F] (LC : LinearCode ι F) : ℚ≥0 :=
 /--
   `ρ LC` is the rate of the linear code `LC`.
 -/
-notation "ρ" LC => rate LC
+
+syntax &"ρ" term : term
+
+macro_rules
+   | `(ρ $t:term) => `(LinearCode.rate $t)
 
 end
 
@@ -792,8 +794,7 @@ The Hamming distance between codewords equals to the weight of their difference.
 lemma hammingDist_eq_wt_sub [CommRing F] {u v : ι → F} : hammingDist u v = Code.wt (u - v) := by
   aesop (add simp [hammingDist, Code.wt, sub_eq_zero])
 
-/--
-The min distance of a linear code equals the minimum of the weights of non-zero codewords.
+/-- The min distance of a linear code equals the minimum of the weights of non-zero codewords.
 -/
 lemma dist_eq_minWtCodewords [CommRing F] {LC : LinearCode ι F} :
   Code.minDist (LC : Set (ι → F)) = minWtCodewords LC := by

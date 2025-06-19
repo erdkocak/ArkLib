@@ -48,7 +48,7 @@ syntax (name := prStx) "Pr_{" doSeq "}[" term "]" : term
 /--
   Elaboration into `term` of the `prStx`.
 
-  We handle both `doSeqBracketed` and `doSeqIndent` in isolation, as per `doSeq`.
+  We handle both `doSeqBracketed` and `doSeqIndentuniformOfFinset` in isolation, as per `doSeq`.
   Currently the implementations coincide.
 
   - Pr_{e₁; e₂; ...; e₃}[eᵣ] = (do e₁; e₂; ...; e₃; return eᵣ).val True
@@ -56,10 +56,10 @@ syntax (name := prStx) "Pr_{" doSeq "}[" term "]" : term
 scoped macro_rules (kind := prStx)
   -- `doSeqBracketed`
   | `(Pr_{{$items*}}[$t]) => `((((do $items:doSeqItem*
-                                     return $t:term).val True) : ENNReal))
+                                     return ULift.up ($t:term)).val (ULift.up True)) : ENNReal))
   -- `doSeqIndent`
   | `(Pr_{$items*}[$t]) => `((((do $items:doSeqItem*
-                                     return $t:term).val True) : ENNReal))
+                                     return ULift.up ($t:term)).val (ULift.up True)) : ENNReal))
 
 end ProbabilityTheory
 
@@ -68,7 +68,7 @@ example {F} [Fintype F] [Nonempty F] :
   (do let x ← PMF.uniformOfFintype F
       let y ← PMF.uniformOfFintype F
       let z ← PMF.uniformOfFintype (F × F)
-      return z = (x, y)).val True := rfl
+      return ULift.up (z = (x, y))).val (ULift.up True) := rfl
 
 section
 
@@ -94,6 +94,7 @@ example :
     let x ← $ᵖ F
     let y ← $ᵖ F
     let z ← $ᵖ (F × F)
-    return z = (x, y)).val True = ((1 : ℝ≥0∞) / Fintype.card (F × F)) := by rfl
+    return ULift.up (z = (x, y))).val (ULift.up True) = ((1 : ℝ≥0∞) / Fintype.card (F × F)) := by
+  rfl
 
 end
