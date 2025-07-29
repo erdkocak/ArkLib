@@ -2314,6 +2314,12 @@ def getBTFResult (k : ℕ) : ConcreteBTFStepResult k :=
 instance instFieldConcrete {k : ℕ} : Field (ConcreteBTField k) :=
   mkFieldInstance (getBTFResult k).toConcreteBTFieldProps
 
+instance instCharP2 {k : ℕ} : CharP (ConcreteBTField k) 2 :=
+  charP_eq_2_of_add_self_eq_zero (F:=(ConcreteBTField k)) (sumZeroIffEq:=by
+    exact fun x y ↦ add_eq_zero_iff_eq x y)
+
+instance (k : ℕ) : Fintype (ConcreteBTField k) := (getBTFResult k).instFintype
+
 /-- adjoined root of poly k, generator of successor field BTField (k + 1) -/
 @[simp]
 def 𝕏 (k : ℕ) : ConcreteBTField (k + 1) := Z (k + 1)
