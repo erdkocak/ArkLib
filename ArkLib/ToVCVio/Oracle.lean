@@ -202,9 +202,9 @@ theorem randomOracle_cache_neverFails_iff_runWithOracle_neverFails {β}
       Oracle.containsCache f preexisting_cache →
       (runWithOracle f oa).isSome) := by
   haveI : (i : ι) → Inhabited (OracleSpec.range spec i) := by
-
     sorry
-  -- todo ((oa.simulateQ randomOracle).run preexisting_cache).neverFails ↔ never fails for any supercache
+  -- todo
+  -- ((oa.simulateQ randomOracle).run preexisting_cache).neverFails ↔ never fails for any supercache
   induction oa using OracleComp.inductionOn with
   | pure x =>
     simp_all
@@ -225,12 +225,7 @@ theorem randomOracle_cache_neverFails_iff_runWithOracle_neverFails {β}
     | some val => sorry
   | failure =>
     simp_all
-    apply?
-
-
-
-
-
+    exact Oracle.containsCache_of_cache preexisting_cache
 
 /--
 For a particular oracle function, the computation succeeds with that oracle function
@@ -252,7 +247,8 @@ theorem randomOracle_neverFails_iff_runWithOracle_neverFails {β}
     [DecidableEq ι] [spec.DecidableEq] [(i : ι) → SelectableType (OracleSpec.range spec i)]
     (oa : OracleComp (spec) β)
     :
-    (∀ (preexisting_cache : spec.QueryCache), ((oa.simulateQ randomOracle).run preexisting_cache).neverFails)
+    (∀ (preexisting_cache : spec.QueryCache),
+      ((oa.simulateQ randomOracle).run preexisting_cache).neverFails)
     ↔
     (∀ (f : spec.FunctionType),
       (runWithOracle f oa).isSome) := by
