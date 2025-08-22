@@ -173,6 +173,21 @@ def Oracle.containsCache {ι : Type} {spec : OracleSpec ι}
     Prop :=
   ∀ i q r, cache i q = some r → f i q = r
 
+/-- For any cache, there is a function to contain it -/
+lemma Oracle.containsCache_of_cache {ι : Type} {spec : OracleSpec ι}
+    [(i : ι) → Inhabited (OracleSpec.range spec i)]
+    (cache : spec.QueryCache) :
+    ∃ (f : spec.FunctionType), Oracle.containsCache f cache := by
+  use fun i q =>
+    match cache i q with
+    | none => default
+    | some r => r
+  unfold Oracle.containsCache
+  intro i q r h
+  cases cache i q with
+  | none => simp_all
+  | some val => simp_all
+
 /--
 For a particular cache, the oracle never fails on that cache
 iff it never fails when run with any oracle function that is compatible with the cache.
@@ -186,6 +201,9 @@ theorem randomOracle_cache_neverFails_iff_runWithOracle_neverFails {β}
     (∀ (f : spec.FunctionType),
       Oracle.containsCache f preexisting_cache →
       (runWithOracle f oa).isSome) := by
+  haveI : (i : ι) → Inhabited (OracleSpec.range spec i) := by
+
+    sorry
   -- todo ((oa.simulateQ randomOracle).run preexisting_cache).neverFails ↔ never fails for any supercache
   induction oa using OracleComp.inductionOn with
   | pure x =>
@@ -196,10 +214,18 @@ theorem randomOracle_cache_neverFails_iff_runWithOracle_neverFails {β}
     clear_value pre
     cases pre with
     | none =>
-      simp_all [ih]
-      sorry
+      simp_all only [StateT.run_bind, StateT.run_monadLift, monadLift_self, bind_pure_comp,
+        StateT.run_modifyGet, Functor.map_map, neverFails_map_iff, neverFails_uniformOfFintype,
+        support_map, support_uniformOfFintype, Set.image_univ, Set.mem_range, Prod.mk.injEq,
+        exists_eq_left, forall_eq', true_and]
+      constructor
+      · intro h f hf
+        sorry
+      · sorry
     | some val => sorry
-  | failure => sorry
+  | failure =>
+    simp_all
+    apply?
 
 
 

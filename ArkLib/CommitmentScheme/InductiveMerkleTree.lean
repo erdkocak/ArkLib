@@ -5,10 +5,9 @@ Authors: Quang Dao
 -/
 
 import VCVio
-import ArkLib.Data.Math.Basic
+import ArkLib.ToMathlib.Data.IndexedBinaryTree.Basic
 import ArkLib.CommitmentScheme.Basic
 import Mathlib.Data.Vector.Snoc
-import ArkLib.CommitmentScheme.BinaryTree
 import ArkLib.ToVCVio.Oracle
 
 /-!
@@ -17,21 +16,34 @@ import ArkLib.ToVCVio.Oracle
 This file implements Merkle Trees. In contrast to the other Merkle tree implementation in
 `ArkLib.CommitmentScheme.MerkleTree`, this one is defined inductively.
 
-## Notes & TODOs
+## Implementation Notes
 
-### More Things needed for basic Merkle Trees
+This works with trees that are indexed inductive binary trees,
+(i.e. indexed in that their definitions and methods carry parameters regarding their structure)
+as defined in `ArkLib.Data.IndexedBinaryTree`.
 
-- Collision Lemma (See SNARGs book 18.3)
+* We found that the inductive definition seems likely to be convenient for a few reasons:
+  * It allows us to handle non-perfect trees.
+  * It can allow us to use trees of arbitrary structure in the extractor.
+* I considered the indexed type useful because the completeness theorem and extractibility theorems
+  take indices or sets of indices as parameters,
+  and because we are working with trees of arbitrary structure,
+  this lets us avoid having to check that these indices are valid.
+
+## Plan/TODOs
+
+- [x] Basic Merkle tree API
+  - [x] `buildMerkleTree`
+  - [x] `generateProof`
+  - [x] `getPutativeRoot`
+  - [x] `verifyProof`
+- [x] Completeness theorem
+- [ ] Collision Lemma (See SNARGs book 18.3)
   - (this is really not a lemma about oracles, so it could go with the binary tree API)
-
-### More Complicated Merkle Trees
-
-We want this treatment to be as comprehensive as possible. In particular, our formalization
-should (eventually) include all complexities such as the following:
-
-- Multi-instance extraction & simulation
-- Dealing with arbitrary trees (may have arity > 2, or is not complete)
-- Path pruning optimization for multi-leaf proofs
+- [ ] Extractibility (See SNARGs book 18.5)
+- [ ] Multi-leaf proofs
+- [ ] Arbirary arity trees
+- [ ] Multi-instance
 
 -/
 
@@ -39,6 +51,8 @@ should (eventually) include all complexities such as the following:
 namespace InductiveMerkleTree
 
 open List OracleSpec OracleComp BinaryTree
+
+section spec
 
 variable (α : Type)
 
@@ -56,60 +70,58 @@ lemma domain_def : (spec α).domain () = (α × α) := rfl
 @[simp]
 lemma range_def : (spec α).range () = α := rfl
 
-section
+end spec
 
-variable [DecidableEq α] [Inhabited α] [Fintype α]
+
+variable {α : Type}
 
 /-- Example: a single hash computation -/
 def singleHash (left : α) (right : α) : OracleComp (spec α) α := do
   let out ← query (spec := spec α) () ⟨left, right⟩
   return out
 
-variable {α : Type}
-
-
 /-- Build the full Merkle tree, returning the tree populated with data on all its nodes -/
-def buildMerkleTree {s} (leaf_tree : LeafDataTree α s) : OracleComp (spec α) (FullDataTree α s) :=
+def buildMerkleTree {s} (leaf_tree : LeafData α s) : OracleComp (spec α) (FullData α s) :=
   match leaf_tree with
-  | LeafDataTree.leaf a => do return (FullDataTree.leaf a)
-  | LeafDataTree.internal left right => do
+  | LeafData.leaf a => do return (FullData.leaf a)
+  | LeafData.internal left right => do
     let leftTree ← buildMerkleTree left
     let rightTree ← buildMerkleTree right
-    let rootHash ← singleHash α leftTree.getRootValue rightTree.getRootValue
-    return FullDataTree.internal rootHash leftTree rightTree
+    let rootHash ← singleHash leftTree.getRootValue rightTree.getRootValue
+    return FullData.internal rootHash leftTree rightTree
 
 /--
 A functional form of merkle tree construction, that doesn't depend on the monad.
 This receives an explicit hash function
 -/
-def buildMerkleTree_with_hash {s} (leaf_tree : LeafDataTree α s) (hashFn : α → α → α) :
-    (FullDataTree α s) :=
+def buildMerkleTree_with_hash {s} (leaf_tree : LeafData α s) (hashFn : α → α → α) :
+    (FullData α s) :=
   match leaf_tree with
-  | LeafDataTree.leaf a => FullDataTree.leaf a
-  | LeafDataTree.internal left right =>
+  | LeafData.leaf a => FullData.leaf a
+  | LeafData.internal left right =>
     let leftTree := buildMerkleTree_with_hash left hashFn
     let rightTree := buildMerkleTree_with_hash right hashFn
     let rootHash := hashFn (leftTree.getRootValue) (rightTree.getRootValue)
-    FullDataTree.internal rootHash leftTree rightTree
+    FullData.internal rootHash leftTree rightTree
 
 /--
 Running the monadic version of `buildMerkleTree` with an oracle function `f`
 is equivalent to running the functional version of `buildMerkleTree_with_hash`
 with the same oracle function.
 -/
-lemma runWithOracle_buildMerkleTree {s} (leaf_data_tree : LeafDataTree α s) (f) :
+lemma runWithOracle_buildMerkleTree {s} (leaf_data_tree : LeafData α s) (f) :
     (runWithOracle f (buildMerkleTree leaf_data_tree))
     = buildMerkleTree_with_hash leaf_data_tree fun (left right : α) =>
       (f () ⟨left, right⟩) := by
   induction s with
   | leaf =>
     match leaf_data_tree with
-    | LeafDataTree.leaf a =>
+    | LeafData.leaf a =>
       unfold buildMerkleTree
       simp only [runWithOracle_pure, buildMerkleTree_with_hash]
   | internal s_left s_right left_ih right_ih =>
     match leaf_data_tree with
-    | LeafDataTree.internal left right =>
+    | LeafData.internal left right =>
       unfold buildMerkleTree
       simp [left_ih, right_ih, runWithOracle_bind]
       rfl
@@ -117,44 +129,41 @@ lemma runWithOracle_buildMerkleTree {s} (leaf_data_tree : LeafDataTree α s) (f)
 /--
 Generate a Merkle proof for a leaf at a given idx
 The proof consists of the sibling hashes needed to recompute the root.
+
+TODO rename this to copath and move to BinaryTree?
 -/
-def generateProof {s} (cache_tree : FullDataTree α s) :
+def generateProof {s} (cache_tree : FullData α s) :
     BinaryTree.SkeletonLeafIndex s → List α
   | .ofLeaf => []
   | .ofLeft idxLeft =>
-    (cache_tree.getRightSubtree).getRootValue ::
-      (generateProof cache_tree.getLeftSubtree idxLeft)
+    (cache_tree.rightSubtree).getRootValue ::
+      (generateProof cache_tree.leftSubtree idxLeft)
   | .ofRight idxRight =>
-    (cache_tree.getLeftSubtree).getRootValue ::
-      (generateProof cache_tree.getRightSubtree idxRight)
+    (cache_tree.leftSubtree).getRootValue ::
+      (generateProof cache_tree.rightSubtree idxRight)
 
 @[simp]
-theorem generateProof_ofLeaf {α : Type} (cache_tree : FullDataTree α Skeleton.leaf) :
-    generateProof cache_tree SkeletonLeafIndex.ofLeaf = [] := by
-  rfl
-
-@[simp]
-theorem generateProof_leaf {α : Type} (a : α) (idx) :
-    generateProof (FullDataTree.leaf a) idx = [] := by
+theorem generateProof_leaf (a : α) (idx) :
+    generateProof (FullData.leaf a) idx = [] := by
   cases idx with
   | ofLeaf => rfl
 
 @[simp]
-theorem generateProof_ofLeft {α : Type} {sleft sright : Skeleton}
-    (cache_tree : FullDataTree α (Skeleton.internal sleft sright))
+theorem generateProof_ofLeft {sleft sright : Skeleton}
+    (cache_tree : FullData α (Skeleton.internal sleft sright))
     (idxLeft : SkeletonLeafIndex sleft) :
     generateProof cache_tree (BinaryTree.SkeletonLeafIndex.ofLeft idxLeft) =
-      (cache_tree.getRightSubtree).getRootValue ::
-        (generateProof cache_tree.getLeftSubtree idxLeft) := by
+      (cache_tree.rightSubtree).getRootValue ::
+        (generateProof cache_tree.leftSubtree idxLeft) := by
   rfl
 
 @[simp]
-theorem generateProof_ofRight {α : Type} {sleft sright : Skeleton}
-    (cache_tree : FullDataTree α (Skeleton.internal sleft sright))
+theorem generateProof_ofRight {sleft sright : Skeleton}
+    (cache_tree : FullData α (Skeleton.internal sleft sright))
     (idxRight : SkeletonLeafIndex sright) :
     generateProof cache_tree (BinaryTree.SkeletonLeafIndex.ofRight idxRight) =
-      (cache_tree.getLeftSubtree).getRootValue ::
-        (generateProof cache_tree.getRightSubtree idxRight) := by
+      (cache_tree.leftSubtree).getRootValue ::
+        (generateProof cache_tree.rightSubtree idxRight) := by
   rfl
 
 /--
@@ -177,11 +186,11 @@ def getPutativeRoot {s} (idx : BinaryTree.SkeletonLeafIndex s) (leafValue : α)
     | BinaryTree.SkeletonLeafIndex.ofLeft idxLeft =>
       -- Recursively get the hash of the ancestor of the leaf which is just below the root
       let ancestorBelowRootHash ← getPutativeRoot idxLeft leafValue restProof
-      singleHash α ancestorBelowRootHash siblingBelowRootHash
+      singleHash ancestorBelowRootHash siblingBelowRootHash
     | BinaryTree.SkeletonLeafIndex.ofRight idxRight =>
       -- Recursively get the hash of the ancestor of the leaf which is just below the root
       let ancestorBelowRootHash ← getPutativeRoot idxRight leafValue restProof
-      singleHash α siblingBelowRootHash ancestorBelowRootHash
+      singleHash siblingBelowRootHash ancestorBelowRootHash
 
 /--
 A functional version of `getPutativeRoot` that does not depend on the monad.
@@ -213,8 +222,8 @@ it is equivalent to running the functional version of `getPutativeRoot_with_hash
 lemma runWithOracle_getPutativeRoot {s} (idx : BinaryTree.SkeletonLeafIndex s)
     (leafValue : α) (proof : List α) (f) :
     (runWithOracle f (getPutativeRoot idx leafValue proof))
-    = getPutativeRoot_with_hash idx leafValue proof fun (left right : α) =>
-      (f () ⟨left, right⟩) := by
+      =
+    getPutativeRoot_with_hash idx leafValue proof fun (left right : α) => (f () ⟨left, right⟩) := by
   induction proof generalizing s with
   | nil =>
     unfold getPutativeRoot
@@ -235,8 +244,6 @@ lemma runWithOracle_getPutativeRoot {s} (idx : BinaryTree.SkeletonLeafIndex s)
         simp only [runWithOracle_bind, ih]
         rfl
 
-end
-
 /--
 Verify a Merkle proof `proof` that a given `leaf` at index `i` is in the Merkle tree with given
 `root`.
@@ -255,11 +262,11 @@ This references the functional versions of `getPutativeRoot` and `buildMerkleTre
 -/
 theorem functional_completeness (α : Type) {s : Skeleton}
   (idx : SkeletonLeafIndex s)
-  (leaf_data_tree : LeafDataTree α s)
+  (leaf_data_tree : LeafData α s)
   (hash : α → α → α) :
   (getPutativeRoot_with_hash
     idx
-    (leaf_data_tree.getValueAtIndex idx)
+    (leaf_data_tree.get idx)
     (generateProof
       (buildMerkleTree_with_hash leaf_data_tree hash) idx)
     (hash)) =
@@ -267,23 +274,23 @@ theorem functional_completeness (α : Type) {s : Skeleton}
   induction s with
   | leaf =>
     match leaf_data_tree with
-    | LeafDataTree.leaf a =>
-      simp
-      unfold buildMerkleTree_with_hash
-      simp
-      unfold getPutativeRoot_with_hash
-      rfl
+    | LeafData.leaf a =>
+      cases idx with
+      | ofLeaf =>
+        simp [buildMerkleTree_with_hash, getPutativeRoot_with_hash]
   | internal s_left s_right left_ih right_ih =>
     match leaf_data_tree with
-    | LeafDataTree.internal left right =>
-      unfold buildMerkleTree_with_hash
+    | LeafData.internal left right =>
       cases idx with
       | ofLeft idxLeft =>
-        unfold getPutativeRoot_with_hash
-        simp [left_ih]
+        simp_rw [LeafData.get_ofLeft, LeafData.leftSubtree_internal, buildMerkleTree_with_hash,
+          generateProof_ofLeft, FullData.rightSubtree, FullData.leftSubtree,
+          getPutativeRoot_with_hash, left_ih, FullData.internal_getRootValue]
       | ofRight idxRight =>
-        unfold getPutativeRoot_with_hash
-        simp [right_ih]
+        simp_rw [LeafData.get_ofRight, LeafData.rightSubtree_internal, buildMerkleTree_with_hash,
+          generateProof_ofRight, FullData.leftSubtree, FullData.rightSubtree,
+          getPutativeRoot_with_hash, right_ih, FullData.internal_getRootValue]
+
 
 /--
 Completeness theorem for Merkle trees.
@@ -293,15 +300,15 @@ the OracleComp monad,
 and then applying the functional version of the completeness theorem.
 -/
 theorem completeness [DecidableEq α] [SelectableType α] {s}
-    (leaf_data_tree : LeafDataTree α s) (idx : BinaryTree.SkeletonLeafIndex s)
+    (leaf_data_tree : LeafData α s) (idx : BinaryTree.SkeletonLeafIndex s)
     (preexisting_cache : (spec α).QueryCache) :
     (((do
       let cache ← buildMerkleTree leaf_data_tree
       let proof := generateProof cache idx
-      let _ ← verifyProof idx (leaf_data_tree.getValueAtIndex idx) (cache.getRootValue) proof
+      let _ ← verifyProof idx (leaf_data_tree.get idx) (cache.getRootValue) proof
       ).simulateQ (randomOracle)).run preexisting_cache).neverFails := by
   -- An OracleComp is never failing on any preexisting cache
-  -- if i never fails when run with any oracle function.
+  -- if it never fails when run with any oracle function.
   revert preexisting_cache
   rw [randomOracle_neverFails_iff_runWithOracle_neverFails]
   -- Call this hash function `f`
