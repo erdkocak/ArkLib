@@ -227,44 +227,73 @@ def test : HList [Nat, String, Nat] :=
 
 end HList
 
+-- The indexed HList below is equivalent to `List.TProd`
 
-inductive HList' {α : Type v} (β : α → Type u) : List α → Type (max u v)
-  | nil  : HList' β []
-  | cons : β i → HList' β is → HList' β (i :: is)
+inductive HList {ι : Type v} (α : ι → Type u) : List ι → Type (max u v)
+  | nil : HList α []
+  | cons {i : ι} {is : List ι} : α i → HList α is → HList α (i :: is)
 
-namespace HList'
+namespace HList
 
-variable {α : Type v} (β : α → Type u)
+variable {ι : Type v} (α : ι → Type u)
 
-inductive member (a : α) : List α → Type v where
-  | first : member a (a :: is)
-  | next : member a is → member a (b :: is)
+inductive member (a : ι) : List ι → Type v where
+  | first (ls : List ι) : member a (a :: ls)
+  | next (i : ι) (ls : List ι) : member a ls → member a (i :: ls)
 
-def length : HList' β ls → Nat
-  | nil => 0
-  | cons _ xs => xs.length + 1
+-- The length of an `HList α ls` is just the length of its index list `ls`.
+def length (ls : List ι) (_ : HList α ls) : Nat := ls.length
 
+def get {ls : List ι} (hs : HList α ls) {i : ι} (h : member i ls) : α i :=
+  match hs, h with
+  | nil, h => nomatch h
+  | cons a _, member.first _ => a
+  | cons _ as, member.next _ _ h' => get as h'
 
-def get (mls : HList' β ls) : member a ls → β a := match mls with
-  | nil => fun h => nomatch h
-  | cons x xs => fun h => match h with
-    | member.first => x
-    | member.next h => get xs h
+def toTProd : (ls : List ι) → (hs : HList α ls) → List.TProd α ls
+  | [], _ => PUnit.unit
+  | _ :: is, cons a as => (a, toTProd is as)
 
-#check HList'.get
+@[simp]
+lemma toTProd_nil {hs : HList α []} : toTProd α [] hs = PUnit.unit := rfl
 
-def someTypes : List Type := [Nat, String, Nat]
+@[simp]
+lemma toTProd_cons {i : ι} {is : List ι} {a : α i} {as : HList α is} :
+    toTProd α (i :: is) (HList.cons a as) = (a, toTProd α is as) := rfl
 
-def someValues : HList' (fun x => x) someTypes :=
-  HList'.cons 1 (HList'.cons "bad" (HList'.cons 3 HList'.nil))
+/-- Convert a `List.TProd` back into an `HList`. -/
+def ofTProd : (ls : List ι) → List.TProd α ls → HList α ls
+  | [], _ => HList.nil
+  | _ :: is, (a, as) => HList.cons a (ofTProd is as)
 
-#eval HList'.get (fun x => x) someValues HList'.member.first
+@[simp]
+lemma ofTProd_nil : ofTProd α [] PUnit.unit = HList.nil := rfl
 
-def somePairs : HList' (fun x => x × x) someTypes :=
-  HList'.cons (1, 1) (HList'.cons ("good", "bad") (HList'.cons (5, 3) HList'.nil))
+@[simp]
+lemma ofTProd_cons {i : ι} {is : List ι} {a : α i} {as : List.TProd α is} :
+    ofTProd α (i :: is) (a, as) = HList.cons a (ofTProd α is as) := rfl
 
-#eval HList'.get (fun x => x × x) somePairs (HList'.member.next HList'.member.first)
+@[simp]
+theorem toTProd_ofTProd (ls : List ι) (t : List.TProd α ls) :
+      HList.toTProd α ls (ofTProd α ls t) = t := by
+  induction ls with
+  | nil => cases t; rfl
+  | cons i is ih => cases t; simp [ih]
 
-end HList'
+@[simp]
+theorem ofTProd_toTProd (ls : List ι) (hs : HList α ls) :
+      ofTProd α ls (HList.toTProd α ls hs) = hs := by
+  induction ls with
+  | nil => cases hs; rfl
+  | cons i is ih => cases hs; simp [ih]
+
+/-- `HList α ls` is equivalent to `List.TProd α ls`. -/
+def equivTProd (ls : List ι) : HList α ls ≃ List.TProd α ls where
+  toFun := HList.toTProd α ls
+  invFun := ofTProd α ls
+  left_inv := by intro _; simp [ofTProd_toTProd]
+  right_inv := by intro _; simp [toTProd_ofTProd]
+
+end HList
 
 -/
