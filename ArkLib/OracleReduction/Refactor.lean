@@ -5,15 +5,10 @@ import ArkLib.Data.Fin.Fold
 
 universe u v
 
-def List.TProd.get {ι : Type u} {α : ι → Type v} {l : List ι}
-    (t : l.TProd α) (n : Nat) {i : ι} (hi : l[n]? = some i) : α i :=
-  match l, t, n, hi with
-  | _ :: _, (a, _), 0, rfl => a
-  | _ :: _, (_, as), n + 1, hi => List.TProd.get as n hi
-
-example {ι : Type*} {α : ι → Type*} {v : List.TProd α []} : v = PUnit.unit := rfl
-
 namespace List
+
+-- Given a list, needs a list of types with the same length (for `PrvState` construction)
+def TypeList {α : Type u} (l : List α) : Type (v + 1) := l.TProd (fun _ => Type v)
 
 variable {ι : Type v}
 
@@ -68,7 +63,15 @@ namespace TProd
 variable {ι : Type v} {α : ι → Type u}
 
 @[simp]
+lemma nil_eq {ι : Type*} {α : ι → Type*} {v : List.TProd α []} : v = PUnit.unit := rfl
+
+@[simp]
 lemma cons_eq {i : ι} {is : List ι} : TProd α (i :: is) = ((α i) × TProd α is) := rfl
+
+def get {l : List ι} (t : l.TProd α) (n : Nat) {i : ι} (hi : l[n]? = some i) : α i :=
+  match l, t, n, hi with
+  | _ :: _, (a, _), 0, rfl => a
+  | _ :: _, (_, as), n + 1, hi => get as n hi
 
 /-- Project a component from `t : TProd α l` using an occurrence witness `m : Member i l`. -/
 def getMember {l : List ι} (t : TProd α l) {i : ι} : Member i l → α i :=
@@ -338,9 +341,6 @@ end ProtocolSpec
 
 open ProtocolSpec
 
--- structure Prover (pSpec : ProtocolSpec) (StmtIn WitIn StmtOut WitOut : Type) where
---   PrvState : Fin (pSpec.length + 1) → Type
-
 /-- The type of a prover interacting according to `pSpec`, with possible side effect defined by `m`,
   and output of type `Output`. -/
 def InteractOutputProver (m : Type → Type) (Output : Type) (pSpec : ProtocolSpec) : Type :=
@@ -348,6 +348,26 @@ def InteractOutputProver (m : Type → Type) (Output : Type) (pSpec : ProtocolSp
   | [] => Output
   | ⟨.P_to_V, MsgType⟩ :: tl => MsgType × m (InteractOutputProver m Output tl)
   | ⟨.V_to_P, ChalType⟩ :: tl => ChalType → m (InteractOutputProver m Output tl)
+
+/-- Recreating the old prover - not very nice -/
+structure StatefulInteractOutputProver (m : Type → Type u) (Output : Type)
+    (pSpec : ProtocolSpec) where
+  PrvState : Fin (pSpec.length + 1) → Type
+  nextStep (i : Fin pSpec.length) (prvState : PrvState i.castSucc) :
+    match (pSpec.get i).1 with
+    | Direction.P_to_V => m ((pSpec.get i).2 × PrvState (i.succ))
+    | Direction.V_to_P => m ((pSpec.get i).2 → PrvState (i.succ))
+  output : PrvState (Fin.last pSpec.length) → Output
+
+-- def StatefulInteractOutputProver (m : Type → Type u) (Output : Type)
+--     (pSpec : ProtocolSpec) (States : List.TypeList.{1, 0} pSpec) : Type :=
+--   match pSpec with
+--   | [] => Output
+--   | ⟨.P_to_V, MsgType⟩ :: tl => by
+--     dsimp [List.TypeList] at States
+--     exact (States.1 → (MsgType × m (StatefulInteractOutputProver m Output tl States.2)))
+--   | ⟨.V_to_P, ChalType⟩ :: tl =>
+--     ChalType → m (StatefulInteractOutputProver m Output tl StateList)
 
 namespace InteractOutputProver
 
@@ -481,7 +501,21 @@ protected def id [Pure m] : Verifier m StmtIn StmtIn [] := fun x _ => pure x
 
 end Verifier
 
--- Here we need `OracleComp`
-def OracleVerifier (m : Type → Type) (StmtIn StmtOut : Type)
-    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] : Type :=
-  StmtIn → Transcript pSpec → m StmtOut
+def OracleSpec.ofList (l : List (Type × Type)) : OracleSpec (Fin l.length) :=
+  l.get
+
+def ProtocolSpec.MessageOracleSpec (pSpec : ProtocolSpec)
+    [inst : ∀ i, OracleInterface (pSpec.messageTypes.get i)] :
+    OracleSpec (Fin pSpec.messageTypes.length) :=
+  fun i => ((inst i).Query, (inst i).Response)
+
+-- Here we need `OracleComp`. TODO: reconcile `m` which is unused here
+-- (perhaps we can allow for different `m` for prover and verifier? also, different `m` per round?)
+-- (needs very good monad lifting infrastructure)
+def OracleVerifier (_m : Type → Type) (StmtIn StmtOut : Type)
+    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] : Type _ :=
+  StmtIn → pSpec.Challenge → OracleComp (pSpec.MessageOracleSpec) StmtOut
+
+namespace OracleVerifier
+
+end OracleVerifier
