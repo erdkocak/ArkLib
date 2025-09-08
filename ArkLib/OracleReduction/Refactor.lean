@@ -327,23 +327,42 @@ def ProtocolSpec := List (Direction × Type)
 
 namespace ProtocolSpec
 
-def flip (pSpec : ProtocolSpec) : ProtocolSpec :=
+/-- Flip the direction of each element in the protocol spec -/
+def flipDir (pSpec : ProtocolSpec) : ProtocolSpec :=
   pSpec.map (fun x => (x.fst.swap, x.snd))
 
 -- def «Type» : (pSpec : ProtocolSpec) → Type
 --   | [] => Unit
 --   | (_, t) :: ps => t × «Type» ps
 
-def Transcript : (pSpec : ProtocolSpec) → Type
-  | [] => Unit
-  | (_, t) :: ps => t × Transcript ps
+/-- List of types of a protocol spec where the direction is `P_to_V` (message types).
+Obtained via `filterMap`. -/
+def MessageTypeList (pSpec : ProtocolSpec) : List Type :=
+  pSpec.filterMap (fun ⟨dir, T⟩ => match dir with
+  | Direction.P_to_V => some T
+  | Direction.V_to_P => none)
 
-def Transcript' (pSpec : ProtocolSpec) : Type := pSpec.TProd Prod.snd
+/-- List of types of a protocol spec where the direction is `V_to_P` (challenge types).
+Obtained via `filterMap`. -/
+def ChallengeTypeList (pSpec : ProtocolSpec) : List Type :=
+  pSpec.filterMap (fun ⟨dir, T⟩ => match dir with
+  | Direction.P_to_V => none
+  | Direction.V_to_P => some T)
 
-theorem transcript_eq {pSpec : ProtocolSpec} : Transcript pSpec = Transcript' pSpec := by
-  induction pSpec with
-  | nil => rfl
-  | cons hd tl ih => simp [Transcript, Transcript', List.foldr_cons, ih]
+/-- Message type for a protocol spec, with length equal to the protocol spec length
+(replacing each verifier's challenge type with `Unit`) -/
+def Message (pSpec : ProtocolSpec) : Type := pSpec.TProd (fun ⟨dir, T⟩ => match dir with
+  | Direction.P_to_V => T
+  | Direction.V_to_P => Unit)
+
+/-- Challenge type for a protocol spec, with length equal to the protocol spec length
+(replacing each prover's message type with `Unit`) -/
+def Challenge (pSpec : ProtocolSpec) : Type := pSpec.TProd (fun ⟨dir, T⟩ => match dir with
+  | Direction.P_to_V => Unit
+  | Direction.V_to_P => T)
+
+@[reducible]
+def Transcript (pSpec : ProtocolSpec) : Type := pSpec.TProd Prod.snd
 
 def testPSpec : ProtocolSpec :=
   [(Direction.P_to_V, Nat), (Direction.V_to_P, Bool)]
@@ -351,6 +370,7 @@ def testPSpec : ProtocolSpec :=
 def testTranscript : Transcript testPSpec :=
   (0, true, ())
 
+/-- Append two protocol specs. Wrapper around `List.append` -/
 def append (pSpec₁ pSpec₂ : ProtocolSpec) : ProtocolSpec :=
   pSpec₁ ++ pSpec₂
 
@@ -358,8 +378,10 @@ namespace Transcript
 
 variable {pSpec pSpec₁ pSpec₂ : ProtocolSpec}
 
-def append (tSpec₁ : Transcript pSpec₁) (tSpec₂ : Transcript pSpec₂) :
-    Transcript (append pSpec₁ pSpec₂) := sorry
+/-- Append two transcripts. Wrapper around `List.TProd.append` -/
+def append {pSpec₁ pSpec₂ : ProtocolSpec}
+    (tSpec₁ : Transcript pSpec₁) (tSpec₂ : Transcript pSpec₂) : Transcript (append pSpec₁ pSpec₂) :=
+  List.TProd.append tSpec₁ tSpec₂
 
 end Transcript
 
@@ -402,7 +424,8 @@ protected def id : HonestProver m StmtIn WitIn StmtIn WitIn [] := id
 
 variable [Monad m]
 
-/-- Compose an output-only prover with an IO prover (where prev output match next input) -/
+/-- Sequentially compose an output-only prover with an IO prover
+(where prev output match next input) -/
 def comp' {Stmt₂ Wit₂ Stmt₃ Wit₃ : Type} {pSpec₁ pSpec₂ : ProtocolSpec}
     (prover₁ : InteractOutputProver m (Stmt₂ × Wit₂) pSpec₁)
     (prover₂ : HonestProver m Stmt₂ Wit₂ Stmt₃ Wit₃ pSpec₂) :
@@ -412,18 +435,19 @@ def comp' {Stmt₂ Wit₂ Stmt₃ Wit₃ : Type} {pSpec₁ pSpec₂ : ProtocolSp
   | ⟨.P_to_V, _⟩ :: _ => ⟨prover₁.1, prover₁.2 >>= (fun mid => pure (comp' mid prover₂))⟩
   | ⟨.V_to_P, _⟩ :: _ => fun chal => (prover₁ chal) >>= (fun mid => pure (comp' mid prover₂))
 
-/-- Compose two IO provers (where prev output match next input) -/
+/-- Sequentially compose two IO provers (where prev output match next input) -/
 def comp {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type} {pSpec₁ pSpec₂ : ProtocolSpec}
     (prover₁ : HonestProver m Stmt₁ Wit₁ Stmt₂ Wit₂ pSpec₁)
     (prover₂ : HonestProver m Stmt₂ Wit₂ Stmt₃ Wit₃ pSpec₂) :
     HonestProver m Stmt₁ Wit₁ Stmt₃ Wit₃ (append pSpec₁ pSpec₂) :=
   fun ctxIn => comp' (prover₁ ctxIn) prover₂
 
-/-- Compose many provers in sequence (where prev output match next input)
+/-- Sequentially compose many provers in sequence (where prev output match next input)
 
 What behavior do we want?
 - `compNth (n := 0) ... = HonestProver.id`
-- `compNth (n := 1) ... = comp HonestProver.id (prover 0)` -/
+- `compNth (n := 1) ... = comp HonestProver.id (prover 0)`
+... -/
 def compNth (n : ℕ) (Stmt : Fin (n + 1) → Type) (Wit : Fin (n + 1) → Type)
     (pSpec : Fin n → ProtocolSpec)
     (prover : (i : Fin n) →
@@ -456,12 +480,16 @@ def compNth (n : ℕ) (Stmt : Fin (n + 1) → Type) (Wit : Fin (n + 1) → Type)
 
 end HonestProver
 
+/-- Just like prover but flipped direction.
+May want to abstract this out into generic `two-party' computation
+(enum would be `send/receive` instead of `P_to_V/V_to_P`) -/
 def InteractOutputVerifier (m : Type → Type) (Output : Type) (pSpec : ProtocolSpec) : Type :=
   match pSpec with
   | [] => Output
   | ⟨.P_to_V, _⟩ :: tl => Output × m (InteractOutputVerifier m Output tl)
   | ⟨.V_to_P, _⟩ :: tl => Output → m (InteractOutputVerifier m Output tl)
 
+/-- A public-coin verifier -/
 def Verifier (m : Type → Type) (StmtIn StmtOut : Type) (pSpec : ProtocolSpec) : Type :=
   StmtIn → Transcript pSpec → m StmtOut
 
@@ -474,7 +502,6 @@ protected def id [Pure m] : Verifier m StmtIn StmtIn [] := fun x _ => pure x
 end Verifier
 
 -- Here we need `OracleComp`
-def OracleVerifier (pSpec : ProtocolSpec)
-    [∀ i : Fin pSpec.length, OracleInterface (pSpec[i]).2]
-    (m : Type → Type) (StmtIn StmtOut : Type) : Type :=
+def OracleVerifier (m : Type → Type) (StmtIn StmtOut : Type)
+    (pSpec : ProtocolSpec) [∀ i, OracleInterface ((MessageTypeList pSpec).get i)] : Type :=
   StmtIn → Transcript pSpec → m StmtOut
