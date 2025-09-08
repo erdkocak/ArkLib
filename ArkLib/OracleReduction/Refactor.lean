@@ -150,6 +150,9 @@ namespace TProd
 
 variable {ι : Type v} {α : ι → Type u}
 
+@[simp]
+lemma cons_eq {i : ι} {is : List ι} : TProd α (i :: is) = ((α i) × TProd α is) := rfl
+
 /-- Project a component from `t : TProd α l` using an occurrence witness `m : Member i l`. -/
 def getMember {l : List ι} (t : TProd α l) {i : ι} : Member i l → α i :=
   match l, t with
@@ -335,31 +338,39 @@ def flipDir (pSpec : ProtocolSpec) : ProtocolSpec :=
 --   | [] => Unit
 --   | (_, t) :: ps => t × «Type» ps
 
+-- def MessageTypeList (pSpec : ProtocolSpec) : List Type :=
+--   pSpec.filterMap (fun ⟨dir, T⟩ => match dir with
+--   | Direction.P_to_V => some T
+--   | Direction.V_to_P => none)
+
+-- def ChallengeTypeList (pSpec : ProtocolSpec) : List Type :=
+--   pSpec.filterMap (fun ⟨dir, T⟩ => match dir with
+--   | Direction.P_to_V => none
+--   | Direction.V_to_P => some T)
+
 /-- List of types of a protocol spec where the direction is `P_to_V` (message types).
-Obtained via `filterMap`. -/
-def MessageTypeList (pSpec : ProtocolSpec) : List Type :=
-  pSpec.filterMap (fun ⟨dir, T⟩ => match dir with
-  | Direction.P_to_V => some T
-  | Direction.V_to_P => none)
+Could have been defined using `List.filterMap` but it is not as nice definitionally. -/
+def messageTypes : (pSpec : ProtocolSpec) → List Type
+  | [] => []
+  | (dir, MsgType) :: tl => match dir with
+    | Direction.P_to_V => MsgType :: messageTypes tl
+    | Direction.V_to_P => messageTypes tl
 
 /-- List of types of a protocol spec where the direction is `V_to_P` (challenge types).
-Obtained via `filterMap`. -/
-def ChallengeTypeList (pSpec : ProtocolSpec) : List Type :=
-  pSpec.filterMap (fun ⟨dir, T⟩ => match dir with
-  | Direction.P_to_V => none
-  | Direction.V_to_P => some T)
+Could have been defined using `List.filterMap` but it is not as nice definitionally. -/
+def challengeTypes : (pSpec : ProtocolSpec) → List Type
+  | [] => []
+  | (dir, ChalType) :: tl => match dir with
+    | Direction.P_to_V => challengeTypes tl
+    | Direction.V_to_P => ChalType :: challengeTypes tl
 
 /-- Message type for a protocol spec, with length equal to the protocol spec length
 (replacing each verifier's challenge type with `Unit`) -/
-def Message (pSpec : ProtocolSpec) : Type := pSpec.TProd (fun ⟨dir, T⟩ => match dir with
-  | Direction.P_to_V => T
-  | Direction.V_to_P => Unit)
+def Message (pSpec : ProtocolSpec) : Type := pSpec.messageTypes.TProd id
 
 /-- Challenge type for a protocol spec, with length equal to the protocol spec length
 (replacing each prover's message type with `Unit`) -/
-def Challenge (pSpec : ProtocolSpec) : Type := pSpec.TProd (fun ⟨dir, T⟩ => match dir with
-  | Direction.P_to_V => Unit
-  | Direction.V_to_P => T)
+def Challenge (pSpec : ProtocolSpec) : Type := pSpec.challengeTypes.TProd id
 
 @[reducible]
 def Transcript (pSpec : ProtocolSpec) : Type := pSpec.TProd Prod.snd
@@ -374,6 +385,24 @@ def testTranscript : Transcript testPSpec :=
 def append (pSpec₁ pSpec₂ : ProtocolSpec) : ProtocolSpec :=
   pSpec₁ ++ pSpec₂
 
+@[simp]
+lemma nil_append {pSpec : ProtocolSpec} : append [] pSpec = pSpec := rfl
+
+@[simp]
+lemma append_nil {pSpec : ProtocolSpec} : append pSpec [] = pSpec := by
+  simp [append]
+
+@[simp]
+lemma append_eq_cons {pSpec : ProtocolSpec} {dir : Direction} {T : Type} :
+    append [(dir, T)] pSpec = (dir, T) :: pSpec := rfl
+
+lemma append_assoc {pSpec₁ pSpec₂ pSpec₃ : ProtocolSpec} :
+    append (append pSpec₁ pSpec₂) pSpec₃ = append pSpec₁ (append pSpec₂ pSpec₃) := by
+  simp [append]
+
+/-- Take the first `k` message of a protocol spec -/
+def take (k : Nat) (pSpec : ProtocolSpec) : ProtocolSpec := List.take k pSpec
+
 namespace Transcript
 
 variable {pSpec pSpec₁ pSpec₂ : ProtocolSpec}
@@ -382,6 +411,9 @@ variable {pSpec pSpec₁ pSpec₂ : ProtocolSpec}
 def append {pSpec₁ pSpec₂ : ProtocolSpec}
     (tSpec₁ : Transcript pSpec₁) (tSpec₂ : Transcript pSpec₂) : Transcript (append pSpec₁ pSpec₂) :=
   List.TProd.append tSpec₁ tSpec₂
+
+def cast {pSpec₁ pSpec₂ : ProtocolSpec} (h : pSpec₁ = pSpec₂)
+    (tr : Transcript pSpec₁) : Transcript pSpec₂ := h ▸ tr
 
 end Transcript
 
@@ -404,9 +436,32 @@ namespace InteractOutputProver
 
 variable {m : Type → Type} {Output : Type} {pSpec : ProtocolSpec}
 
--- /-- Run an interactive prover given challenge values -/
--- def run (prover : InteractOutputProver m Output pSpec) (challenge : Challenge pSpec) :
---     Transcript pSpec × Output := sorry
+@[simp]
+lemma nil_eq : InteractOutputProver m Output [] = Output := rfl
+
+@[simp]
+lemma cons_P_to_V_eq {MsgType : Type} :
+    InteractOutputProver m Output (⟨.P_to_V, MsgType⟩ :: pSpec) =
+    (MsgType × m (InteractOutputProver m Output pSpec)) := rfl
+
+@[simp]
+lemma cons_V_to_P_eq {ChalType : Type} :
+    InteractOutputProver m Output (⟨.V_to_P, ChalType⟩ :: pSpec) =
+    (ChalType → m (InteractOutputProver m Output pSpec)) := rfl
+
+/-- Run an interactive prover given challenge values -/
+def run [Monad m] {pSpec : ProtocolSpec}
+    (prover : InteractOutputProver m Output pSpec) (challenges : Challenge pSpec) :
+    m (Transcript pSpec × Output) := match pSpec with
+  | [] => pure ((), prover)
+  | ⟨.P_to_V, _⟩ :: _ => do
+    let proverRest ← prover.2
+    let outputRest ← run proverRest challenges
+    return ((prover.1, outputRest.1), outputRest.2)
+  | ⟨.V_to_P, _⟩ :: _ => do
+    let proverRest ← prover challenges.1
+    let outputRest ← run proverRest challenges.2
+    return ((challenges.1, outputRest.1), outputRest.2)
 
 end InteractOutputProver
 
@@ -414,13 +469,29 @@ end InteractOutputProver
   interaction protocol. -/
 def HonestProver (m : Type → Type) (StmtIn WitIn StmtOut WitOut : Type)
     (pSpec : ProtocolSpec) : Type :=
-  StmtIn × WitIn → InteractOutputProver m (StmtOut × WitOut) pSpec
+  StmtIn × WitIn → m (InteractOutputProver m (StmtOut × WitOut) pSpec)
 
 namespace HonestProver
 
 variable {m : Type → Type} {StmtIn WitIn StmtOut WitOut : Type} {pSpec : ProtocolSpec}
 
-protected def id : HonestProver m StmtIn WitIn StmtIn WitIn [] := id
+@[simp]
+lemma nil_eq : HonestProver m StmtIn WitIn StmtOut WitOut [] =
+  ((StmtIn × WitIn) → m (StmtOut × WitOut)) := rfl
+
+@[simp]
+lemma cons_P_to_V_eq {MsgType : Type} :
+    HonestProver m StmtIn WitIn StmtOut WitOut (⟨.P_to_V, MsgType⟩ :: pSpec) =
+    ((StmtIn × WitIn) → m (MsgType × m (InteractOutputProver m (StmtOut × WitOut) pSpec))) := by
+  rfl
+
+@[simp]
+lemma cons_V_to_P_eq {ChalType : Type} :
+    HonestProver m StmtIn WitIn StmtOut WitOut (⟨.V_to_P, ChalType⟩ :: pSpec) =
+    ((StmtIn × WitIn) → m (ChalType → m (InteractOutputProver m (StmtOut × WitOut) pSpec))) := by
+  rfl
+
+protected def id [Pure m] : HonestProver m StmtIn WitIn StmtIn WitIn [] := pure
 
 variable [Monad m]
 
@@ -429,18 +500,18 @@ variable [Monad m]
 def comp' {Stmt₂ Wit₂ Stmt₃ Wit₃ : Type} {pSpec₁ pSpec₂ : ProtocolSpec}
     (prover₁ : InteractOutputProver m (Stmt₂ × Wit₂) pSpec₁)
     (prover₂ : HonestProver m Stmt₂ Wit₂ Stmt₃ Wit₃ pSpec₂) :
-    InteractOutputProver m (Stmt₃ × Wit₃) (append pSpec₁ pSpec₂) :=
+    m (InteractOutputProver m (Stmt₃ × Wit₃) (append pSpec₁ pSpec₂)) :=
   match pSpec₁ with
   | [] => prover₂ prover₁
-  | ⟨.P_to_V, _⟩ :: _ => ⟨prover₁.1, prover₁.2 >>= (fun mid => pure (comp' mid prover₂))⟩
-  | ⟨.V_to_P, _⟩ :: _ => fun chal => (prover₁ chal) >>= (fun mid => pure (comp' mid prover₂))
+  | ⟨.P_to_V, _⟩ :: _ => pure ⟨prover₁.1, do comp' (← prover₁.2) prover₂⟩
+  | ⟨.V_to_P, _⟩ :: _ => pure fun chal => do comp' (← prover₁ chal) prover₂
 
 /-- Sequentially compose two IO provers (where prev output match next input) -/
 def comp {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type} {pSpec₁ pSpec₂ : ProtocolSpec}
     (prover₁ : HonestProver m Stmt₁ Wit₁ Stmt₂ Wit₂ pSpec₁)
     (prover₂ : HonestProver m Stmt₂ Wit₂ Stmt₃ Wit₃ pSpec₂) :
     HonestProver m Stmt₁ Wit₁ Stmt₃ Wit₃ (append pSpec₁ pSpec₂) :=
-  fun ctxIn => comp' (prover₁ ctxIn) prover₂
+  fun ctxIn => do comp' (← (prover₁ ctxIn)) prover₂
 
 /-- Sequentially compose many provers in sequence (where prev output match next input)
 
@@ -462,21 +533,13 @@ def compNth (n : ℕ) (Stmt : Fin (n + 1) → Type) (Wit : Fin (n + 1) → Type)
         (fun i => prover (i.castSucc)))
       (prover (Fin.last m))
 
--- /-- Run an IO prover given an input and all challenge values, returning a transcript and output
--- -/
--- def run (prover : HonestProver m StmtIn WitIn StmtOut WitOut pSpec)
---     (ctxIn : StmtIn × WitIn) (challenge : Challenge pSpec) :
---     m (Transcript pSpec × StmtOut × WitOut) :=
---   match pSpec with
---   | [] => pure ((), prover ctxIn)
---   | ⟨.P_to_V, _⟩ :: _ => by
---     dsimp [Transcript]
---     dsimp [HonestProver, InteractOutputProver] at prover
---     exact (do
---       -- let result ← (prover ctxIn).2
---       let result' ← run (prover ctxIn).2 (ctxIn)
---       return ((prover ctxIn).1,))
---   | ⟨.V_to_P, _⟩ :: _ => sorry
+/-- Run an IO prover given an input and all challenge values, returning a transcript and output
+-/
+def run (prover : HonestProver m StmtIn WitIn StmtOut WitOut pSpec)
+    (ctxIn : StmtIn × WitIn) (challenge : Challenge pSpec) :
+    m (Transcript pSpec × StmtOut × WitOut) := do
+  let proverInteractOutput ← prover ctxIn
+  InteractOutputProver.run proverInteractOutput challenge
 
 end HonestProver
 
@@ -489,7 +552,7 @@ def InteractOutputVerifier (m : Type → Type) (Output : Type) (pSpec : Protocol
   | ⟨.P_to_V, _⟩ :: tl => Output × m (InteractOutputVerifier m Output tl)
   | ⟨.V_to_P, _⟩ :: tl => Output → m (InteractOutputVerifier m Output tl)
 
-/-- A public-coin verifier -/
+/-- A public-coin verifier (rather, just the decision part, not the random sampling part) -/
 def Verifier (m : Type → Type) (StmtIn StmtOut : Type) (pSpec : ProtocolSpec) : Type :=
   StmtIn → Transcript pSpec → m StmtOut
 
@@ -503,5 +566,5 @@ end Verifier
 
 -- Here we need `OracleComp`
 def OracleVerifier (m : Type → Type) (StmtIn StmtOut : Type)
-    (pSpec : ProtocolSpec) [∀ i, OracleInterface ((MessageTypeList pSpec).get i)] : Type :=
+    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] : Type :=
   StmtIn → Transcript pSpec → m StmtOut
