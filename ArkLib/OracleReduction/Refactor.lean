@@ -2,30 +2,69 @@ import Mathlib
 import ArkLib.OracleReduction.OracleInterface
 import ArkLib.OracleReduction.Prelude
 import ArkLib.Data.Fin.Fold
+import ArkLib.Data.Fin.Tuple.Lemmas
+
+/-!
+# (Ongoing) Refactor of `ProtocolSpec` to be `List` rather than `Fin`-indexed vectors
+
+There are pros and cons:
+
+Pros:
+- One fewer layer of dependency - no need to have number of messages exchanged as an explicit
+  parameter, allowing more things to be of the same type
+- `List.TProd` for transcript is nice that we can pattern-match into iterated product type
+- Defining interactive prover & sequential composition is much easier, does not require much (if at
+  all) casting
+
+Cons:
+- There are still many cases where we want to index into `Fin pSpec.length` or similar things. This
+  indexing doesn't behave as nicely (i.e. with respect to appends, etc)
+- One particular problem with that is the semantics of partial protocols - `PartialTranscript`, etc.
+  We don't enjoy the nice definitional equality that `Fin.take n (le_refl _) v = v`. This spills
+  over into appending messages into `PartialTranscript`, indexing for message and challenge indices,
+  oracle indexing for oracle verifier, etc.
+
+-/
 
 universe u v
 
--- def Fin.vtake {α : Sort u} {n : ℕ} (v : Fin n → α) (k : ℕ) (h : k ≤ n) : Fin k → α :=
---   match n with
---   | 0 => fun _ => nomatch
---   | n + 1 => Fin.vcons (v 0) (Fin.vtake (v ∘ Fin.succ) )
-
+@[simp]
+lemma howisthisnotalemma {n : ℕ} : 0 % (n + 1) = 0 := rfl
 
 namespace List
 
 -- Given a list, needs a list of types with the same length (for `PrvState` construction)
 def TypeList {α : Type u} (l : List α) : Type (v + 1) := l.TProd (fun _ => Type v)
 
-def take' {α : Type*} (l : List α) (n : ℕ) (h : n ≤ l.length) : List α :=
-  match l, n with
-  | [], _ => []
-  | x :: xs, 0 => []
-  | x :: xs, n + 1 => x :: take' xs n (by simp_all only [length_cons, add_le_add_iff_right])
+-- Ideally, we want `take (n + 1)` to be `take n ++ [l[n]]`.
 
--- def take : (n : Nat) → (xs : List α) → List α
---   | 0,   _     => []
---   | _+1, []    => []
---   | n+1, a::as => a :: take n as
+-- Can we achieve this?
+
+-- Define: `take 0 = []` no matter what
+-- `take (n + 1) = take n ++ [l[n]]`
+
+def takeChecked {α : Type*} (n : ℕ) (l : List α) (h : n ≤ l.length) : List α :=
+  match n with
+  | 0 => []
+  | n + 1 => takeChecked n l (Nat.le_of_succ_le h) ++ [l[n]]
+
+@[simp]
+lemma takeChecked_zero {α : Type*} (l : List α) :
+    takeChecked 0 l (zero_le _) = [] := rfl
+
+@[simp]
+lemma takeChecked_succ {α : Type*} (n : ℕ) (l : List α) (h : n + 1 ≤ l.length) :
+    takeChecked (n + 1) l h = takeChecked n l (Nat.le_of_succ_le h) ++ [l[n]] := rfl
+
+lemma takeChecked_eq_take {α : Type*} (n : ℕ) (l : List α) (h : n ≤ l.length) :
+    takeChecked n l h = take n l := by
+  induction n with
+  | zero => rfl
+  | succ n ih => simp [take_succ, ih]
+
+@[simp]
+lemma takeChecked_length {α : Type*} (l : List α) : takeChecked l.length l (le_refl _) = l := by
+  simp [takeChecked_eq_take]
 
 variable {ι : Type v}
 
@@ -122,19 +161,25 @@ def append {l₁ l₂ : List ι} (t₁ : TProd α l₁) (t₂ : TProd α l₂) :
 
 /-- Append a single component at the end, corresponding to `l ++ [i]`. -/
 def concat {l : List ι} (t : TProd α l) {i : ι} (a : α i) : TProd α (l ++ [i]) :=
-  match l, t with
-  | [], _ => (a, PUnit.unit)
-  | _ :: _, (a₀, as) => (a₀, concat as a)
+  append t (a, PUnit.unit)
 
 @[simp] theorem concat_nil {i : ι} (a : α i) :
     concat (α:=α) (l:=[]) (t:=PUnit.unit) a = (a, PUnit.unit) := rfl
-
-#check List.take_succ
 
 @[simp]
 theorem concat_cons {i : ι} {is : List ι} (a₀ : α i) (as : TProd α is)
     {j : ι} (a : α j) :
     concat (α:=α) (l:=i :: is) (t:=(a₀, as)) a = (a₀, concat (α:=α) (l:=is) (t:=as) a) := rfl
+
+-- Missing definition: given a partial transcript (defined as the transcript of the protocol cut off
+-- by some index), append a message of the next round's type to it
+
+-- Can't think of a way for this _not_ to use some kind of casting...
+
+def concatNext {l : List ι} (n : ℕ) (h : n < l.length)
+    (t : TProd α (l.takeChecked n (by omega))) (a : α l[n]) :
+    TProd α (l.takeChecked (n + 1) (by omega)) :=
+  concat t a
 
 /-- The first half of a `TProd` of an appended list -/
 def fst {l₁ l₂ : List ι} (t : TProd α (l₁ ++ l₂)) : TProd α l₁ :=
@@ -147,6 +192,15 @@ def snd {l₁ l₂ : List ι} (t : TProd α (l₁ ++ l₂)) : TProd α l₂ :=
   match l₁ with
   | [] => t
   | _ :: _ => snd t.2
+
+-- TODO: figure out better way to define the cast (cast element-wise?)
+def cast {l l' : List ι} (h : l = l') (t : TProd α l) : TProd α l' := h ▸ t
+
+def cast' {l l' : List ι} (hLen : l.length = l'.length) (h : ∀ i : Fin l.length, l[i] = l'[i])
+    (t : TProd α l) : TProd α l' :=
+  match l, t with
+  | [], _ => ((by grind [List.length_eq_zero_iff]) : l' = []) ▸ PUnit.unit
+  | _ :: _, (a, as) => by simp_all; sorry
 
 /-! #### Membership transport for cons/append/concat, and projection lemmas -/
 
@@ -236,8 +290,7 @@ theorem getMember_concat_left {l : List ι}
       | _ => rfl
   | tail k is m ih =>
       intro t; cases t with
-      | _ a₀ as =>
-        simpa [concat, getMember] using ih as
+      | _ a₀ as => simp [concat, getMember]
 
 @[simp]
 theorem getMember_concat_right {l : List ι}
@@ -266,8 +319,7 @@ theorem concat_eq_append_singleton {l : List ι} {i : ι}
   | nil => intro t; cases t; rfl
   | cons j js ih =>
       intro t; cases t with
-      | _ a₀ as =>
-        simpa [concat, append] using congrArg (Prod.mk a₀) (ih as)
+      | _ a₀ as => simp [concat, append]
 
 end TProd
 end List
@@ -329,16 +381,24 @@ def Challenge (pSpec : ProtocolSpec) : Type := pSpec.challengeTypes.TProd id
 @[reducible]
 def Transcript (pSpec : ProtocolSpec) : Type := pSpec.TProd Prod.snd
 
-def PartialTranscript (pSpec : ProtocolSpec) (n : ℕ) (h : n ≤ pSpec.length) : Type :=
-  match pSpec, n with
-  | [], _ => Unit
-  | (_, T) :: tl, 0 => Unit
-  | (_, T) :: tl, n + 1 =>
-    T × PartialTranscript tl n (by simp_all only [List.length_cons, add_le_add_iff_right])
+def PartialTranscript (pSpec : List (Direction × Type)) (n : Fin (pSpec.length + 1)) : Type :=
+  Transcript (pSpec.takeChecked n (by omega))
 
--- lemma PartialTranscript.full_eq_transcript {pSpec : ProtocolSpec} :
---     PartialTranscript pSpec pSpec.length (le_refl _) = Transcript pSpec :=
---   by dsimp [PartialTranscript, Transcript, List.take']
+namespace PartialTranscript
+
+/-- Concatenate a partial transcript with an element (assuming this doesn't overflow the protocol
+  spec) -/
+def concat {pSpec : List (Direction × Type)} {n : Fin pSpec.length}
+    (t : PartialTranscript pSpec n.castSucc) (a : (pSpec.get n).2) :
+    PartialTranscript pSpec n.succ :=
+  List.TProd.concat t a
+
+/-- Convert a full partial transcript to a transcript, via casting the protocol spec -/
+def toFull {pSpec : List (Direction × Type)} (t : PartialTranscript pSpec (Fin.last pSpec.length)) :
+    Transcript pSpec :=
+  List.TProd.cast (List.takeChecked_length pSpec) t
+
+end PartialTranscript
 
 def testPSpec : ProtocolSpec :=
   [(Direction.P_to_V, Nat), (Direction.V_to_P, Bool)]
@@ -366,7 +426,8 @@ lemma append_assoc {pSpec₁ pSpec₂ pSpec₃ : ProtocolSpec} :
   simp [append]
 
 /-- Take the first `k` message of a protocol spec -/
-def take (k : Nat) (pSpec : ProtocolSpec) : ProtocolSpec := List.take k pSpec
+def take (k : ℕ) (pSpec : ProtocolSpec) (h : k ≤ pSpec.length) : ProtocolSpec :=
+  List.takeChecked k pSpec h
 
 namespace Transcript
 
@@ -397,10 +458,45 @@ end Transcript
 --     OracleSpec (Fin pSpec.messageTypes.length) :=
 --   fun i => (Query (pSpec.messageTypes.get i), Response (pSpec.messageTypes.get i))
 
-instance : ∀ i, OracleInterface ((messageTypes []).get i) := fun i => nomatch i
+instance : ∀ i, OracleInterface ((messageTypes []).get i) := fun i => Fin.elim0 i
 
 instance {α : Type} : ∀ i, OracleInterface ((messageTypes [(⟨.V_to_P, α⟩)]).get i) :=
   fun i => nomatch i
+
+def appendOracleInterfaceMessage {pSpec pSpec' : ProtocolSpec}
+    (Oₘ : ∀ i, OracleInterface (pSpec.messageTypes.get i))
+    (Oₘ' : ∀ i, OracleInterface (pSpec'.messageTypes.get i)) :
+    ∀ i, OracleInterface ((pSpec ++ pSpec').messageTypes.get i) :=
+  match pSpec with
+  | [] => Oₘ'
+  | (.P_to_V, T) :: tl =>
+    Fin.cons (Oₘ ⟨0, by simp [messageTypes]⟩)
+      (appendOracleInterfaceMessage (fun i => Oₘ i.succ) Oₘ')
+  | (.V_to_P, T) :: tl => by
+    dsimp [messageTypes] at Oₘ ⊢
+    exact appendOracleInterfaceMessage Oₘ Oₘ'
+
+instance {pSpec pSpec' : ProtocolSpec} [Oₘ : ∀ i, OracleInterface (pSpec.messageTypes.get i)]
+    [Oₘ' : ∀ i, OracleInterface (pSpec'.messageTypes.get i)] :
+    ∀ i, OracleInterface ((pSpec ++ pSpec').messageTypes.get i) :=
+  appendOracleInterfaceMessage Oₘ Oₘ'
+
+def foldOracleInterfaceMessage (n : ℕ) (pSpec : Fin n → ProtocolSpec)
+    (Oₘ : ∀ k, ∀ i, OracleInterface ((pSpec k).messageTypes.get i)) :
+    ∀ i, OracleInterface
+      ((Fin.foldl' n (fun i acc => append acc (pSpec i)) []).messageTypes.get i) :=
+  match n with
+  | 0 => fun i => Fin.elim0 i
+  | m + 1 => by
+    dsimp [messageTypes] at Oₘ ⊢
+    refine appendOracleInterfaceMessage ?_ (Oₘ (Fin.last _))
+    exact foldOracleInterfaceMessage m (pSpec ∘ Fin.castSucc) (fun k => Oₘ k.castSucc)
+
+instance {n : ℕ} {pSpec : Fin n → ProtocolSpec}
+    [Oₘ : ∀ k, ∀ i, OracleInterface ((pSpec k).messageTypes.get i)] :
+    ∀ i, OracleInterface
+      ((Fin.foldl' n (fun i acc => append acc (pSpec i)) []).messageTypes.get i) :=
+  foldOracleInterfaceMessage n pSpec Oₘ
 
 end ProtocolSpec
 
@@ -590,15 +686,29 @@ open OracleInterface in
 -- Here we need `OracleComp`. TODO: reconcile `m` which is unused here
 -- (perhaps we can allow for different `m` for prover and verifier? also, different `m` per round?)
 -- (needs very good monad lifting infrastructure)
-def OracleVerifier (_m : Type → Type)
+structure OracleVerifier (_m : Type → Type)
     (StmtIn : Type) (OStmtIn : List Type) [∀ i, OracleInterface (OStmtIn.get i)]
     (StmtOut : Type) (OStmtOut : List Type) [∀ i, OracleInterface (OStmtOut.get i)]
-    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] : Type _ :=
-  -- Missing handling of `OStmtOut`
-  StmtIn → pSpec.Challenge →
+    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] where
+  -- Return the output statement
+  verify : StmtIn → pSpec.Challenge →
     OracleComp
-      (toOracleSpecOfList pSpec.messageTypes ++ₒ toOracleSpecOfList OStmtIn)
-      (StmtOut × QueryImpl (toOracleSpecOfList OStmtOut) (OracleComp (toOracleSpecOfList OStmtIn)))
+      (toOracleSpecOfList pSpec.messageTypes ++ₒ toOracleSpecOfList OStmtIn) StmtOut
+
+  -- Return the output oracle statement implicitly, via specifying an oracle simulation
+  simulate : StmtIn → pSpec.Challenge →
+    QueryImpl (toOracleSpecOfList OStmtOut)
+      (OracleComp (toOracleSpecOfList OStmtIn ++ₒ toOracleSpecOfList pSpec.messageTypes))
+
+open OracleSpec OracleQuery in
+def QueryImpl.inl {ι ι' : Type u} {spec : OracleSpec ι} {spec' : OracleSpec ι'} :
+    QueryImpl spec (OracleComp (spec ++ₒ spec')) where
+  impl | query i t => query (spec := spec ++ₒ spec') (Sum.inl i) t
+
+open OracleSpec OracleQuery in
+def QueryImpl.inr {ι ι' : Type u} {spec : OracleSpec ι} {spec' : OracleSpec ι'} :
+    QueryImpl spec (OracleComp (spec' ++ₒ spec)) where
+  impl | query i t => query (spec := spec' ++ₒ spec) (Sum.inr i) t
 
 namespace OracleVerifier
 
@@ -607,17 +717,69 @@ variable {m : Type → Type}
     {StmtOut : Type} {OStmtOut : List Type} [∀ i, OracleInterface (OStmtOut.get i)]
     {pSpec : ProtocolSpec}
 
--- protected def id [Pure m] : OracleVerifier m StmtIn OStmtIn StmtIn OStmtIn [] :=
---   fun x _ => by
---     dsimp [messageTypes]
---     refine (do return (x, ?_))
+/-- The identity oracle verifier -/
+protected def id [Pure m] (StmtIn : Type)
+    (OStmtIn : List Type) [∀ i, OracleInterface (OStmtIn.get i)] :
+    OracleVerifier m StmtIn OStmtIn StmtIn OStmtIn [] where
+  verify := fun x _ => pure x
+  simulate := fun _ _ => QueryImpl.inl
+
+/-- Sequential composition of two oracle verifiers, where oracle interfaces are explicit -/
+def comp' [Monad m] {Stmt₁ Stmt₂ Stmt₃ : Type}
+    {OStmt₁ OStmt₂ OStmt₃ : List Type}
+    {Oₛ₁ : ∀ i, OracleInterface (OStmt₁.get i)}
+    {Oₛ₂ : ∀ i, OracleInterface (OStmt₂.get i)}
+    {Oₛ₃ : ∀ i, OracleInterface (OStmt₃.get i)}
+    {pSpec₁ pSpec₂ : ProtocolSpec}
+    {Oₘ₁ : ∀ i, OracleInterface (pSpec₁.messageTypes.get i)}
+    {Oₘ₂ : ∀ i, OracleInterface (pSpec₂.messageTypes.get i)}
+    (verifier₁ : OracleVerifier m Stmt₁ OStmt₁ Stmt₂ OStmt₂ pSpec₁)
+    (verifier₂ : OracleVerifier m Stmt₂ OStmt₂ Stmt₃ OStmt₃ pSpec₂) :
+    OracleVerifier m Stmt₁ OStmt₁ Stmt₃ OStmt₃ (pSpec₁ ++ pSpec₂) :=
+  sorry
+
+/-- Sequential composition of two oracle verifiers -/
+def comp [Monad m] {Stmt₁ Stmt₂ Stmt₃ : Type}
+    {OStmt₁ OStmt₂ OStmt₃ : List Type}
+    [Oₛ₁ : ∀ i, OracleInterface (OStmt₁.get i)]
+    [Oₛ₂ : ∀ i, OracleInterface (OStmt₂.get i)]
+    [Oₛ₃ : ∀ i, OracleInterface (OStmt₃.get i)]
+    {pSpec₁ pSpec₂ : ProtocolSpec}
+    [Oₘ₁ : ∀ i, OracleInterface (pSpec₁.messageTypes.get i)]
+    [Oₘ₂ : ∀ i, OracleInterface (pSpec₂.messageTypes.get i)]
+    (verifier₁ : OracleVerifier m Stmt₁ OStmt₁ Stmt₂ OStmt₂ pSpec₁)
+    (verifier₂ : OracleVerifier m Stmt₂ OStmt₂ Stmt₃ OStmt₃ pSpec₂) :
+    OracleVerifier m Stmt₁ OStmt₁ Stmt₃ OStmt₃ (pSpec₁ ++ pSpec₂) :=
+  comp' verifier₁ verifier₂
+
+/-- Sequential composition of many oracle verifiers in sequence. Version with explicit oracle
+  interfaces. -/
+def compNth' [Monad m] (n : ℕ) (Stmt : Fin (n + 1) → Type)
+    (OStmt : Fin (n + 1) → List Type) {Oₛ : ∀ k, ∀ i, OracleInterface ((OStmt k).get i)}
+    (pSpec : Fin n → ProtocolSpec) {Oₘ : ∀ k, ∀ i, OracleInterface ((pSpec k).messageTypes.get i)}
+    (verifier : (i : Fin n) → OracleVerifier m (Stmt i.castSucc) (OStmt i.castSucc)
+      (Stmt i.succ) (OStmt i.succ) (pSpec i)) :
+    OracleVerifier m (Stmt 0) (OStmt 0) (Stmt (Fin.last n)) (OStmt (Fin.last n))
+      (Fin.foldl' n (fun i acc => append acc (pSpec i)) []) :=
+  match n with
+  | 0 => OracleVerifier.id (Stmt 0) (OStmt 0)
+  | n + 1 => OracleVerifier.comp'
+    (compNth' n (Stmt ∘ Fin.castSucc) (fun i => OStmt i.castSucc) (pSpec ∘ Fin.castSucc)
+      (fun i => verifier i.castSucc))
+    (verifier (Fin.last n))
+
+def compNth [Monad m] (n : ℕ) (Stmt : Fin (n + 1) → Type)
+    (OStmt : Fin (n + 1) → List Type) [Oₛ : ∀ k, ∀ i, OracleInterface ((OStmt k).get i)]
+    (pSpec : Fin n → ProtocolSpec) [Oₘ : ∀ k, ∀ i, OracleInterface ((pSpec k).messageTypes.get i)]
+    (verifier : (i : Fin n) → OracleVerifier m (Stmt i.castSucc) (OStmt i.castSucc)
+      (Stmt i.succ) (OStmt i.succ) (pSpec i)) :
+    OracleVerifier m (Stmt 0) (OStmt 0) (Stmt (Fin.last n)) (OStmt (Fin.last n))
+      (Fin.foldl' n (fun i acc => append acc (pSpec i)) []) :=
+  compNth' n Stmt OStmt pSpec verifier
 
 end OracleVerifier
 
-@[simp]
-lemma howisthisnotalemma {n : ℕ} : 0 % (n + 1) = 0 := rfl
-
-variable {m : Type → Type} {StmtIn StmtOut : Type} {pSpec : ProtocolSpec}
+variable {m : Type → Type} [Monad m] [HasEvalDist m] {StmtIn StmtOut : Type} {pSpec : ProtocolSpec}
 
 /-- A (deterministic) state function for a verifier, with respect to input language `langIn` and
   output language `langOut`. This is used to define round-by-round soundness. -/
@@ -625,7 +787,7 @@ structure StateFunction
     (langIn : Set StmtIn) (langOut : Set StmtOut)
     (verifier : Verifier m StmtIn StmtOut pSpec)
     where
-  toFun : (m : Fin (pSpec.length + 1)) → StmtIn → Transcript (pSpec.take m) → Prop
+  toFun : (m : Fin (pSpec.length + 1)) → StmtIn → PartialTranscript pSpec m → Prop
   /-- For all input statement not in the language, the state function is false for that statement
     and the empty transcript -/
   toFun_empty : ∀ stmt, stmt ∈ langIn ↔ toFun 0 stmt ()
@@ -637,5 +799,5 @@ structure StateFunction
     ∀ msg, ¬ toFun m.succ stmt (tr.concat msg)
   /-- If the state function is false for a full transcript, the verifier will not output a statement
     in the output language -/
-  toFun_full : ∀ stmt tr, ¬ toFun (.last n) stmt tr →
-    [(· ∈ langOut) | do (simulateQ impl (verifier.run stmt tr)).run' (← init)] = 0
+  toFun_full : ∀ stmt tr, ¬ toFun (.last _) stmt tr →
+    Pr[(· ∈ langOut) | verifier stmt tr.toFull] = 0
