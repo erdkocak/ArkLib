@@ -24,6 +24,8 @@ Cons:
   over into appending messages into `PartialTranscript`, indexing for message and challenge indices,
   oracle indexing for oracle verifier, etc.
 
+Update: many of the not-so-nice things have been fixed!
+
 -/
 
 universe u v
@@ -453,10 +455,20 @@ def cast {pSpec₁ pSpec₂ : ProtocolSpec} (h : pSpec₁ = pSpec₂)
 
 end Transcript
 
--- open OracleInterface in
--- def MessageOracleSpec (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] :
---     OracleSpec (Fin pSpec.messageTypes.length) :=
---   fun i => (Query (pSpec.messageTypes.get i), Response (pSpec.messageTypes.get i))
+/-! Transcript trees for special soundness -/
+
+/-- The arity of a protocol specification -/
+def TreeArity (pSpec : ProtocolSpec) := List.TProd (fun _ => ℕ) pSpec
+
+def ChallengeArity (pSpec : ProtocolSpec) := pSpec.challengeTypes.TProd (fun _ => ℕ)
+
+/-- The transcript tree for a protocol specification. Assume only challenges are branching, not
+  messages. -/
+def TranscriptTree (pSpec : ProtocolSpec) (arity : ChallengeArity pSpec) (Output : Type) : Type :=
+  match pSpec with
+  | [] => Output
+  | (.P_to_V, T) :: tl => T × TranscriptTree tl arity Output
+  | (.V_to_P, T) :: tl => Fin arity.1 → (T × TranscriptTree tl arity.2 Output)
 
 instance : ∀ i, OracleInterface ((messageTypes []).get i) := fun i => Fin.elim0 i
 
@@ -476,7 +488,8 @@ def appendOracleInterfaceMessage {pSpec pSpec' : ProtocolSpec}
     dsimp [messageTypes] at Oₘ ⊢
     exact appendOracleInterfaceMessage Oₘ Oₘ'
 
-instance {pSpec pSpec' : ProtocolSpec} [Oₘ : ∀ i, OracleInterface (pSpec.messageTypes.get i)]
+instance instAppendOracleInterfaceMessage {pSpec pSpec' : ProtocolSpec}
+    [Oₘ : ∀ i, OracleInterface (pSpec.messageTypes.get i)]
     [Oₘ' : ∀ i, OracleInterface (pSpec'.messageTypes.get i)] :
     ∀ i, OracleInterface ((pSpec ++ pSpec').messageTypes.get i) :=
   appendOracleInterfaceMessage Oₘ Oₘ'
@@ -492,7 +505,7 @@ def foldOracleInterfaceMessage (n : ℕ) (pSpec : Fin n → ProtocolSpec)
     refine appendOracleInterfaceMessage ?_ (Oₘ (Fin.last _))
     exact foldOracleInterfaceMessage m (pSpec ∘ Fin.castSucc) (fun k => Oₘ k.castSucc)
 
-instance {n : ℕ} {pSpec : Fin n → ProtocolSpec}
+instance instFoldOracleInterfaceMessage {n : ℕ} {pSpec : Fin n → ProtocolSpec}
     [Oₘ : ∀ k, ∀ i, OracleInterface ((pSpec k).messageTypes.get i)] :
     ∀ i, OracleInterface
       ((Fin.foldl' n (fun i acc => append acc (pSpec i)) []).messageTypes.get i) :=
@@ -724,7 +737,8 @@ protected def id [Pure m] (StmtIn : Type)
   verify := fun x _ => pure x
   simulate := fun _ _ => QueryImpl.inl
 
-/-- Sequential composition of two oracle verifiers, where oracle interfaces are explicit -/
+/-- Sequential composition of two oracle verifiers, where oracle interfaces are explicit
+(needed for pattern matching on `pSpec`) -/
 def comp' [Monad m] {Stmt₁ Stmt₂ Stmt₃ : Type}
     {OStmt₁ OStmt₂ OStmt₃ : List Type}
     {Oₛ₁ : ∀ i, OracleInterface (OStmt₁.get i)}
@@ -752,8 +766,8 @@ def comp [Monad m] {Stmt₁ Stmt₂ Stmt₃ : Type}
     OracleVerifier m Stmt₁ OStmt₁ Stmt₃ OStmt₃ (pSpec₁ ++ pSpec₂) :=
   comp' verifier₁ verifier₂
 
-/-- Sequential composition of many oracle verifiers in sequence. Version with explicit oracle
-  interfaces. -/
+/-- Sequential composition of many oracle verifiers in sequence.
+Version with explicit oracle interfaces (needed for pattern matching on `n`). -/
 def compNth' [Monad m] (n : ℕ) (Stmt : Fin (n + 1) → Type)
     (OStmt : Fin (n + 1) → List Type) {Oₛ : ∀ k, ∀ i, OracleInterface ((OStmt k).get i)}
     (pSpec : Fin n → ProtocolSpec) {Oₘ : ∀ k, ∀ i, OracleInterface ((pSpec k).messageTypes.get i)}
