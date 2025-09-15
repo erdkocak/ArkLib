@@ -196,13 +196,33 @@ def snd {l₁ l₂ : List ι} (t : TProd α (l₁ ++ l₂)) : TProd α l₂ :=
   | _ :: _ => snd t.2
 
 -- TODO: figure out better way to define the cast (cast element-wise?)
-def cast {l l' : List ι} (h : l = l') (t : TProd α l) : TProd α l' := h ▸ t
+-- Seems like this is fine, we just need simp lemmas to push the cast inside once we know
+-- more structure about the list
 
-def cast' {l l' : List ι} (hLen : l.length = l'.length) (h : ∀ i : Fin l.length, l[i] = l'[i])
-    (t : TProd α l) : TProd α l' :=
+@[simp]
+lemma eqRec_nil {l : List ι} (h : l = []) (t : TProd α l) :
+    (h ▸ t : TProd α []) = PUnit.unit := by
+  cases h; simp
+
+-- @[simp]
+-- lemma eqRec_cons {l l' : List ι} {i : ι} (h : l = i :: l') (t : TProd α l) :
+--     (h ▸ t : TProd α (i :: l')) = (t.1, eqRec_cons (l:=l') (l' := l') (h := h ▸ t.2)) := by
+--   cases h; simp
+
+/-- Simpler version of `List.ext_getElem` that doesn't require `i < l₂.length` (which can be
+  automatically derived) -/
+lemma List.ext_getElem' {α : Type*} {l₁ l₂ : List α} (hl : l₁.length = l₂.length)
+  (h : ∀ (i : ℕ) (hi : i < l₁.length), l₁[i] = l₂[i]) : l₁ = l₂ :=
+    List.ext_getElem hl (fun i hi _ => h i hi)
+
+def cast' {l l' : List ι} (hl : l.length = l'.length)
+    (h : ∀ (i : ℕ) (hi : i < l.length), l[i] = l'[i]) (t : TProd α l) : TProd α l' :=
   match l, t with
-  | [], _ => ((by grind [List.length_eq_zero_iff]) : l' = []) ▸ PUnit.unit
-  | _ :: _, (a, as) => by simp_all; sorry
+  | [], _ => (List.length_eq_zero_iff.mp hl.symm) ▸ PUnit.unit
+  | hd :: tl, t => by
+    haveI : l' = hd :: tl := List.ext_getElem' hl.symm (fun i hi => (h i ((hl.symm) ▸ hi)).symm)
+    rw [this]
+    exact t
 
 /-! #### Membership transport for cons/append/concat, and projection lemmas -/
 
@@ -398,7 +418,7 @@ def concat {pSpec : List (Direction × Type)} {n : Fin pSpec.length}
 /-- Convert a full partial transcript to a transcript, via casting the protocol spec -/
 def toFull {pSpec : List (Direction × Type)} (t : PartialTranscript pSpec (Fin.last pSpec.length)) :
     Transcript pSpec :=
-  List.TProd.cast (List.takeChecked_length pSpec) t
+  (List.takeChecked_length pSpec) ▸ t
 
 end PartialTranscript
 
@@ -545,7 +565,7 @@ structure StatefulInteractOutputProver (m : Type → Type u) (Output : Type)
 
 namespace InteractOutputProver
 
-variable {m : Type → Type} {Output : Type} {pSpec : ProtocolSpec}
+variable {m : Type → Type} {Output : Type} {pSpec pSpec' : ProtocolSpec}
 
 @[simp]
 lemma nil_eq : InteractOutputProver m Output [] = Output := rfl
@@ -574,6 +594,13 @@ def run [Monad m] {pSpec : ProtocolSpec}
     let outputRest ← run proverRest challenges.2
     return ((challenges.1, outputRest.1), outputRest.2)
 
+def cast (h : pSpec = pSpec') (prover : InteractOutputProver m Output pSpec) :
+    InteractOutputProver m Output pSpec' :=
+  match pSpec with
+  | [] => h ▸ prover
+  | ⟨.P_to_V, _⟩ :: _ => h ▸ prover
+  | ⟨.V_to_P, _⟩ :: _ => h ▸ prover
+
 end InteractOutputProver
 
 /-- The type of an honest prover, which takes in a pair `(stmtIn, witIn)` and runs a prover
@@ -584,7 +611,7 @@ def HonestProver (m : Type → Type) (StmtIn WitIn StmtOut WitOut : Type)
 
 namespace HonestProver
 
-variable {m : Type → Type} {StmtIn WitIn StmtOut WitOut : Type} {pSpec : ProtocolSpec}
+variable {m : Type → Type} {StmtIn WitIn StmtOut WitOut : Type} {pSpec pSpec' : ProtocolSpec}
 
 @[simp]
 lemma nil_eq : HonestProver m StmtIn WitIn StmtOut WitOut [] =
@@ -603,6 +630,14 @@ lemma cons_V_to_P_eq {ChalType : Type} :
   rfl
 
 protected def id [Pure m] : HonestProver m StmtIn WitIn StmtIn WitIn [] := pure
+
+def cast (h : pSpec = pSpec') (prover : HonestProver m StmtIn WitIn StmtOut WitOut pSpec) :
+    HonestProver m StmtIn WitIn StmtOut WitOut pSpec' :=
+  fun ctxIn => h ▸ prover ctxIn
+
+lemma cast_eq1 (h : pSpec = pSpec') (prover : HonestProver m StmtIn WitIn StmtOut WitOut pSpec) :
+    h ▸ prover = fun ctxIn => h ▸ prover ctxIn := by
+  cases h; simp only
 
 variable [Monad m]
 
@@ -654,6 +689,13 @@ def run (prover : HonestProver m StmtIn WitIn StmtOut WitOut pSpec)
 
 end HonestProver
 
+def InteractOutputVerifier' (Output : Type) (pSpec : ProtocolSpec)
+    (ms : pSpec.TProd (fun _ => Type → Type)) : Type :=
+  match pSpec with
+  | [] => Output
+  | ⟨.P_to_V, _⟩ :: tl => Output × ms.1 (InteractOutputVerifier' Output tl ms.2)
+  | ⟨.V_to_P, _⟩ :: tl => Output → ms.1 (InteractOutputVerifier' Output tl ms.2)
+
 /-- Just like prover but flipped direction.
 May want to abstract this out into generic `two-party' computation
 (enum would be `send/receive` instead of `P_to_V/V_to_P`) -/
@@ -669,7 +711,7 @@ def Verifier (m : Type → Type) (StmtIn StmtOut : Type) (pSpec : ProtocolSpec) 
 
 namespace Verifier
 
-variable {m : Type → Type} {StmtIn StmtOut : Type} {pSpec : ProtocolSpec}
+variable {m : Type → Type} {StmtIn StmtOut : Type} {pSpec pSpec' : ProtocolSpec}
 
 /-- The identity verifier -/
 protected def id [Pure m] : Verifier m StmtIn StmtIn [] := fun x _ => pure x
@@ -693,20 +735,31 @@ def compNth [Monad m] (n : ℕ) (Stmt : Fin (n + 1) → Type) (pSpec : Fin n →
     (compNth m (Stmt ∘ Fin.castSucc) (pSpec ∘ Fin.castSucc) (fun i => verifier i.castSucc))
     (verifier (Fin.last m))
 
+def cast (h : pSpec = pSpec') (verifier : Verifier m StmtIn StmtOut pSpec) :
+    Verifier m StmtIn StmtOut pSpec' :=
+  fun stmtIn transcript => verifier stmtIn (transcript.cast h.symm)
+
+lemma cast_eq_eqRec (h : pSpec = pSpec') (verifier : Verifier m StmtIn StmtOut pSpec) :
+    cast h verifier = h ▸ verifier := by
+  induction pSpec with
+  | nil => cases h; dsimp; funext st tr; dsimp [cast]
+  | cons hd tl ih => cases h; dsimp; funext st tr; dsimp [cast, Transcript.cast]
+
 end Verifier
 
 open OracleInterface in
 -- Here we need `OracleComp`. TODO: reconcile `m` which is unused here
 -- (perhaps we can allow for different `m` for prover and verifier? also, different `m` per round?)
 -- (needs very good monad lifting infrastructure)
-structure OracleVerifier (_m : Type → Type)
+structure OracleVerifier (m : Type → Type)
     (StmtIn : Type) (OStmtIn : List Type) [∀ i, OracleInterface (OStmtIn.get i)]
     (StmtOut : Type) (OStmtOut : List Type) [∀ i, OracleInterface (OStmtOut.get i)]
-    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)] where
+    (pSpec : ProtocolSpec) [∀ i, OracleInterface (pSpec.messageTypes.get i)]
+    [MonadLiftT
+      (OracleComp (toOracleSpecOfList OStmtIn ++ₒ toOracleSpecOfList pSpec.messageTypes)) m]
+    where
   -- Return the output statement
-  verify : StmtIn → pSpec.Challenge →
-    OracleComp
-      (toOracleSpecOfList pSpec.messageTypes ++ₒ toOracleSpecOfList OStmtIn) StmtOut
+  verify : StmtIn → pSpec.Challenge → m StmtOut
 
   -- Return the output oracle statement implicitly, via specifying an oracle simulation
   simulate : StmtIn → pSpec.Challenge →
@@ -728,11 +781,14 @@ namespace OracleVerifier
 variable {m : Type → Type}
     {StmtIn : Type} {OStmtIn : List Type} [∀ i, OracleInterface (OStmtIn.get i)]
     {StmtOut : Type} {OStmtOut : List Type} [∀ i, OracleInterface (OStmtOut.get i)]
-    {pSpec : ProtocolSpec}
 
+open OracleInterface in
 /-- The identity oracle verifier -/
 protected def id [Pure m] (StmtIn : Type)
-    (OStmtIn : List Type) [∀ i, OracleInterface (OStmtIn.get i)] :
+    (OStmtIn : List Type) [∀ i, OracleInterface (OStmtIn.get i)]
+    [MonadLiftT
+      (OracleComp (toOracleSpecOfList OStmtIn ++ₒ toOracleSpecOfList (messageTypes [])))
+      m] :
     OracleVerifier m StmtIn OStmtIn StmtIn OStmtIn [] where
   verify := fun x _ => pure x
   simulate := fun _ _ => QueryImpl.inl
