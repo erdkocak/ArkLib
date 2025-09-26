@@ -7,6 +7,7 @@ Authors: Quang Dao
 import Mathlib.RingTheory.Polynomial.Basic
 import Mathlib.RingTheory.MvPolynomial.Basic
 import ArkLib.ToMathlib.MvPolynomial.Equiv
+import ArkLib.Data.Polynomial.Bivariate
 
 /-!
   # Useful Notation
@@ -18,6 +19,18 @@ import ArkLib.ToMathlib.MvPolynomial.Equiv
 -/
 
 noncomputable section
+
+namespace Polynomial.Bivariate
+
+variable (R : Type*) [Semiring R]
+
+/-- Bivariate polynomials with both X and Y degrees strictly less than `d`. -/
+def degreeLT (d : ℕ) := {f : R[X][Y] // degreeX f < d ∧ degreeY f < d}
+
+/-- Bivariate polynomials with both X and Y degrees at most `d`. -/
+def degreeLE (d : ℕ) := {f : R[X][Y] // degreeX f ≤ d ∧ degreeY f ≤ d}
+
+end Polynomial.Bivariate
 
 -- TODO: Upstream these to `Mathlib.Algebra.MvPolynomial.Equiv`
 namespace MvPolynomial
@@ -40,6 +53,12 @@ open MvPolynomial
 
 @[inherit_doc] scoped[Polynomial] notation:9000 R "⦃< " d "⦄[X]" => Polynomial.degreeLT R d
 @[inherit_doc] scoped[Polynomial] notation:9000 R "⦃≤ " d "⦄[X]" => Polynomial.degreeLE R d
+
+@[inherit_doc] scoped[Polynomial.Bivariate]
+notation:9000 R "⦃< " d "⦄[X][Y]" => Polynomial.Bivariate.degreeLT R d
+
+@[inherit_doc] scoped[Polynomial.Bivariate]
+notation:9000 R "⦃≤ " d "⦄[X][Y]" => Polynomial.Bivariate.degreeLE R d
 
 @[inherit_doc] scoped[MvPolynomial] notation:9000 R "[X " σ "]"  => MvPolynomial σ R
 @[inherit_doc] scoped[MvPolynomial] notation:9000

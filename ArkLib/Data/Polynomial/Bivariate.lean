@@ -17,7 +17,7 @@ namespace Bivariate
 
 noncomputable section
 
-variable {F : Type} [Semiring F]
+variable {F : Type*} [Semiring F]
          (a : F)
          (f g : F[X][Y])
 
@@ -38,6 +38,8 @@ def coeff_Y_n (n : ℕ) : F[X] := f.coeff n
 The `Y`-degree of a bivariate polynomial, as a natural number.
 -/
 def natDegreeY : ℕ := Polynomial.natDegree f
+
+alias degreeY := natDegreeY
 
 /-- `(u,v)`-weighted degree of a polynomial.
   The maximal `u * i + v * j` such that the polynomial `p`
@@ -71,13 +73,13 @@ def rootMultiplicity₀ [DecidableEq F] : Option ℕ :=
     w.r.t. the polynomial `f(X + x, Y + y)`.
 -/
 def rootMultiplicity
-  {F : Type}
+  {F : Type*}
   [CommSemiring F]
   [DecidableEq F] (f : F[X][Y]) (x y : F) : Option ℕ :=
   let X := (Polynomial.X : Polynomial F)
   rootMultiplicity₀ (F := F) ((f.comp (Y + (C (C y)))).map (Polynomial.compRingHom (X + C x)))
 
-lemma rootMultiplicity_some_implies_root {F : Type} [CommSemiring F]
+lemma rootMultiplicity_some_implies_root {F : Type*} [CommSemiring F]
   [DecidableEq F]
   {x y : F} (f : F[X][Y])
   (h : some 0 < (rootMultiplicity (f := f) x y))
@@ -97,7 +99,6 @@ lemma degreesYFinset_nonempty (hf : f ≠ 0) : (degreesYFinset f).Nonempty := by
   intro h
   apply hf
   exact Polynomial.ext (fun n => by rw [← Polynomial.toFinsupp_apply, h]; rfl)
-
 
 def degreeY' (hf : f ≠ 0) : ℕ :=
   f.toFinsupp.support.max' (degreesYFinset_nonempty f hf)
@@ -324,5 +325,11 @@ theorem totalDegree_prod (hf : f ≠ 0) (hg : g ≠ 0) :
 
 end
 end Bivariate
+
+-- Note: need to put these outside the Bivariate namespace so that we can use dot notation
+-- e.g. `p.evalXY 0 0`
+noncomputable alias evalXY := evalEval
+noncomputable alias evalX := Bivariate.evalX
+noncomputable alias evalY := Bivariate.evalY
 
 end Polynomial
