@@ -133,12 +133,10 @@ theorem correlatedAgreement_affine_curves [DecidableEq ι] {k : ℕ} {u : Fin k 
 
 open Affine in
 /-- `Theorem 1.6` (Correlated agreement over affine spaces) in [BCIKS20]. -/
-theorem correlatedAgreement_affine_spaces {k : ℕ} [NeZero k] {u : Fin k → ι → F}
-  [Fintype (affineSpan F (toSet (finsetOfVectors u)))]
-  [Nonempty (affineSpan F (toSet (finsetOfVectors u)))]
+theorem correlatedAgreement_affine_spaces {k : ℕ} [NeZero k] {u : Fin (k + 1) → ι → F}
   {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0} (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain))
   (hproximity :
-    Pr_{let y ← $ᵖ (affineSpan F (Affine.finsetOfVectors u).toSet)}[
+    Pr_{let y ← $ᵖ (u 0 +ᵥ affineSpan F (Affine.finsetOfVectors (Fin.tail u)).toSet)}[
         Code.relHammingDistToCode (ι := ι) (F := F) y (ReedSolomon.code domain deg) ≤ δ
     ] > errorBound δ deg domain) :
   correlatedAgreement (ReedSolomon.code domain deg) δ u := by sorry

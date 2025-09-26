@@ -16,7 +16,7 @@ open NNReal ProximityGap
   # Definitions and Theorems about Divergence of Sets
 
   [BCIKS20] refers to the paper "Proximity Gaps for Reed-Solomon Codes" by Eli Ben-Sasson,
-  Dan Carmon, Yuval Ishai† Swastik Kopparty, and Shubhangi Saraf.
+  Dan Carmon, Yuval Ishai, Swastik Kopparty, and Shubhangi Saraf.
 -/
 
 namespace DivergenceOfSets

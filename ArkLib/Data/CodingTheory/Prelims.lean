@@ -8,6 +8,7 @@ import ArkLib.Data.Fin.Basic
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Data.Matrix.Rank
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
+import Mathlib.LinearAlgebra.AffineSpace.Pointwise
 
 noncomputable section
 
@@ -89,33 +90,32 @@ lemma Nonempty_finsetOfVector [NeZero k]
 instance [NeZero k] {U : Fin k → ι → F} : Nonempty (finsetOfVectors U) :=
   Nonempty_finsetOfVector.to_subtype
 
-noncomputable def affineSpan_Fintype [Field F] [Fintype F]
-  {U : Fin k → ι → F} : Fintype ↥(affineSpan F (finsetOfVectors U).toSet) := Fintype.ofFinite _
+variable [Field F] [Fintype F]
 
-section
+instance : VAdd (ι → F) (AffineSubspace F (ι → F)) := AffineSubspace.pointwiseVAdd
 
-variable [Field F]
+noncomputable instance {v : ι → F} {s : AffineSubspace F (ι → F)} [Fintype s] :
+    Fintype (v +ᵥ s) := Fintype.ofFinite ↥(v +ᵥ s)
 
-private lemma affineSpan_nonempty'' [NeZero k] {U : Fin k → ι → F} :
-  Set.Nonempty (affineSpan F (finsetOfVectors U).toSet : Set (ι → F)) := by simp
+noncomputable instance {s : Set (ι → F)} : Fintype (affineSpan F s) :=
+  Fintype.ofFinite ↥(affineSpan F s)
 
-lemma affineSpan_nonempty' [NeZero k] {U : Fin k → ι → F} :
-  Nonempty ↥(affineSpan F (finsetOfVectors U).toSet) := affineSpan_nonempty''.to_subtype
-
-variable [Fintype F]
+noncomputable instance {v : ι → F} {s : AffineSubspace F (ι → F)} [inst : Nonempty s] :
+    Nonempty (v +ᵥ s) := by
+  apply nonempty_subtype.mpr
+  rcases inst with ⟨p, h⟩
+  exists (v +ᵥ p)
+  rw [AffineSubspace.vadd_mem_pointwise_vadd_iff]
+  exact h
 
 abbrev AffSpanSet [NeZero k] (U : Fin k → ι → F) : Set (ι → F) :=
   (affineSpan F (finsetOfVectors U)).carrier
 
-lemma AffSpanFinite {k : ℕ} [NeZero k] (u : Fin k → ι → F) : (AffSpanSet u).Finite := by
+lemma AffSpanFinite [NeZero k] (u : Fin k → ι → F) : (AffSpanSet u).Finite := by
   unfold AffSpanSet
   exact Set.toFinite _
 
-noncomputable def affineSpanSet_Fintype [NeZero k] {U : Fin k → ι → F} : Fintype (AffSpanSet U) :=
-  Fintype.ofFinite _
-
-noncomputable def AffSpanSetFinset [Field F] [Fintype F] [DecidableEq F]
-  {k : ℕ} [NeZero k] (U : Fin k → ι → F) : Finset (ι → F) :=
+noncomputable def AffSpanSetFinset [NeZero k] (U : Fin k → ι → F) : Finset (ι → F) :=
   (AffSpanFinite U).toFinset
 
 /-- A collection of affine subspaces in `F^ι`. -/
@@ -123,7 +123,10 @@ noncomputable def AffSpanSetFinsetCol {t : ℕ} [NeZero k] [NeZero t]
   (C : Fin t → (Fin k → (ι → F))) : Set (Finset (ι → F)) :=
   Set.range (fun i => AffSpanSetFinset (C i))
 
-end
+instance {α : Type*} {s : Finset α} [inst : Nonempty s] : Nonempty (s.toSet) := by
+    rcases inst with ⟨w, h⟩
+    refine nonempty_subtype.mpr ?_
+    exists w
 
 end
 end Affine
