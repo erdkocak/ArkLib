@@ -294,6 +294,7 @@ instance instDCast : DCast Nat Fin where
 
 theorem cast_eq_dcast {m n : ℕ} (h : m = n) (a : Fin m) :
     Fin.cast h a = dcast h a := by
-  simp only [cast_eq_cast, dcast]
+    subst h
+    simp_all only [cast_eq_self, dcast_eq]
 
 end Fin

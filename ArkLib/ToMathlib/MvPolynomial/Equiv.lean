@@ -1,5 +1,6 @@
 
 import Mathlib.Algebra.MvPolynomial.Equiv
+import Mathlib.Tactic.Cases
 import ArkLib.ToMathlib.Finsupp.Fin
 
 namespace MvPolynomial

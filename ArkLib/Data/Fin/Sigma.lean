@@ -5,6 +5,7 @@ Authors: Quang Dao
 -/
 
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Tactic.Cases
 import ArkLib.Data.Fin.Basic
 import ArkLib.Data.Fin.Fold
 import ArkLib.Data.Fin.Tuple.Lemmas
@@ -33,7 +34,7 @@ The definitional equality we want is that:
 `vprod a = a 0 * (a 1 * (... * (a (n-1) * 1)))`
 -/
 @[to_additive vsum
-"Version of summing over `Fin` vectors with good definitional equalities, using `dfoldl'`.
+/-- Version of summing over `Fin` vectors with good definitional equalities, using `dfoldl'`.
 
 The definitional equality we want is that: `vsum a = a 0 + (a 1 + (... + (a (n-1) + 0)))`.
 
@@ -42,8 +43,7 @@ When `x + 0 = x` definitionally in `α`, we have the following definitional equa
 - `vsum !v[a] = a`
 - `vsum !v[a, b] = a + b`
 - `vsum !v[a, b, c] = a + (b + c)`
-- and so on
-"]
+- and so on -/]
 def vprod [CommMonoid α] {n : ℕ} (a : Fin n → α) : α :=
   Fin.dfoldr' n (fun _ => α) (fun i acc => a i * acc) 1
 
@@ -517,10 +517,10 @@ def finSigmaFinEquiv' {m : ℕ} {n : Fin m → ℕ} : (i : Fin m) × Fin (n i) �
     (by
       intro a
       induction n using Fin.consInduction with
-      | h0 =>
+      | elim0 =>
         simp only [univ_eq_empty, sum_empty] at a
         exact Fin.elim0 a
-      | h =>
+      | cons n ih =>
         ext
         exact Nat.add_sub_cancel' (Fin.sum_le_of_divSum?_eq_some (Option.some_get _).symm))
 

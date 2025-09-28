@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Katerina Hristova, František Silváši, Julian Sutherland
 -/
 
-import Mathlib.Algebra.Lie.OfAssociative
-import Mathlib.Data.Matrix.Rank
+import Mathlib.LinearAlgebra.Matrix.Rank
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
 import ArkLib.Data.Fin.Basic
 
@@ -22,20 +21,21 @@ def neqCols [DecidableEq F] (U V : Matrix ι ι' F) : Finset ι' :=
   {j | ∃ i : ι, V i j ≠ U i j}
 
 section
+open Module Submodule
 
 variable [Semiring F] (U : Matrix ι ι' F)
 
 def rowSpan : Submodule F (ι' → F) :=
-  Submodule.span F {U i | i : ι}
+  span F {U i | i : ι}
 
 def rowRank : ℕ :=
-  Module.finrank F (rowSpan U)
+  finrank F (rowSpan U)
 
 def colSpan : Submodule F (ι → F) :=
-  Submodule.span F {Matrix.transpose U i | i : ι'}
+  span F {transpose U i | i : ι'}
 
 def colRank : ℕ :=
-  Module.finrank F (colSpan U)
+  finrank F (colSpan U)
 
 end
 

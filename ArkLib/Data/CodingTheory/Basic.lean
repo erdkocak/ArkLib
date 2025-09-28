@@ -421,7 +421,10 @@ lemma finite_relHammingDistRange [Nonempty ι] : (relHammingDistRange ι).Finite
         ⟨⟨
         fun ⟨s, _⟩ ↦ ⟨(s * Fintype.card ι).num, by aesop (add safe (by omega))⟩,
         fun n ↦ ⟨n / Fintype.card ι, by use n; simp [Nat.le_of_lt_add_one n.2]⟩,
-        fun ⟨_, _, _, h₂⟩ ↦ by field_simp [h₂],
+        fun ⟨_, _, _, h₂⟩ ↦ by
+        subst h₂
+        simp_all only [isUnit_iff_ne_zero, ne_eq, Nat.cast_eq_zero, Fintype.card_ne_zero,
+                      not_false_eq_true, IsUnit.div_mul_cancel, NNRat.num_natCast],
         fun _ ↦ by simp
         ⟩⟩
       ⟩
@@ -718,7 +721,7 @@ noncomputable def disFromHammingNorm [Semiring F] [DecidableEq F] (LC : LinearCo
 theorem dist_eq_dist_from_HammingNorm [CommRing F] [DecidableEq F] (LC : LinearCode ι F) :
     Code.dist LC.carrier = disFromHammingNorm LC := by
   simp [Code.dist, disFromHammingNorm]
-  congr; unfold setOf; funext d
+  congr; funext d
   apply propext
   constructor
   · intro h

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Bolton Bailey
 -/
 import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.Cases
 import Mathlib.NumberTheory.LucasPrimality
 
 /-!

@@ -99,7 +99,7 @@ noncomputable def qMap (i : Fin r) : L[X] :=
   C constMultiplier * ∏ c: 𝔽q, (X - C (algebraMap 𝔽q L c))
 
 omit [DecidableEq L] in
-theorem qMap_eval_𝔽q_eq_0 (i : Fin r):
+theorem qMap_eval_𝔽q_eq_0 (i : Fin r) :
   ∀ c: 𝔽q, (qMap 𝔽q β i).eval (algebraMap 𝔽q L c) = 0 := by
   intro u
   rw [qMap]
@@ -119,9 +119,9 @@ theorem qMap_eval_𝔽q_eq_0 (i : Fin r):
 /-- **Lemma 4.2.** The quotient maps compose with the `Ŵ` polynomials.
 `q⁽ⁱ⁾ ∘ Ŵᵢ = Ŵᵢ₊₁, ∀ i ∈ {0, ..., r-2}`. -/
 lemma qMap_comp_normalizedW
-  (h_Fq_card_gt_1: Fintype.card 𝔽q > 1)
-  (h_Fq_char_prime: Fact (Nat.Prime (ringChar 𝔽q)))
-  (hβ_lin_indep : LinearIndependent (R:=𝔽q) (M:=L) (v:=β)) (i : Fin r) (h_i_add_1 : i + 1 < r):
+  (h_Fq_card_gt_1 : Fintype.card 𝔽q > 1)
+  (h_Fq_char_prime : Fact (Nat.Prime (ringChar 𝔽q)))
+  (hβ_lindep : LinearIndependent (R := 𝔽q) (M := L) (v := β)) (i : Fin r) (h_i_add_1 : i + 1 < r) :
   (qMap 𝔽q β i).comp (normalizedW 𝔽q β i) = normalizedW 𝔽q β (i + 1) := by
   let q := Fintype.card 𝔽q
   -- `q⁽ⁱ⁾ ∘ Ŵᵢ = ((Wᵢ(βᵢ)^q / Wᵢ₊₁(βᵢ₊₁)) * ∏_{c ∈ 𝔽q} (X - c)) ∘ Ŵᵢ`
@@ -143,9 +143,9 @@ lemma qMap_comp_normalizedW
 
   -- Establish that the denominators in the definitions are non-zero
   have h_val_i_ne_zero : val_i ≠ 0 :=
-    AdditiveNTT.Wᵢ_eval_βᵢ_neq_zero 𝔽q β hβ_lin_indep i
+    AdditiveNTT.Wᵢ_eval_βᵢ_neq_zero 𝔽q β hβ_lindep i
   have h_val_i_plus_1_ne_zero : val_i_plus_1 ≠ 0 :=
-    AdditiveNTT.Wᵢ_eval_βᵢ_neq_zero 𝔽q β hβ_lin_indep (i + 1)
+    AdditiveNTT.Wᵢ_eval_βᵢ_neq_zero 𝔽q β hβ_lindep (i + 1)
 
   -- The proof proceeds by a chain of equalities
   calc
@@ -182,7 +182,7 @@ lemma qMap_comp_normalizedW
       rw [h_mul_2, C_pow]
     _ = C (1 / val_i_plus_1) * W_i_plus_1 := by -- `W_i^q - C(val_i^(q-1)) * W_i` = `W_{i+1}`
       have W_linear := AdditiveNTT.W_linear_comp_decomposition 𝔽q β h_Fq_card_gt_1
-        h_Fq_char_prime hβ_lin_indep i (p:=X)
+        h_Fq_char_prime hβ_lindep i (p:=X)
       simp_rw [comp_X] at W_linear
       simp_rw [q, val_i, W_i, W_i_plus_1]
       rw [W_linear]
@@ -197,7 +197,7 @@ omit [DecidableEq L] in
 theorem qMap_is_linear_map
   (h_Fq_card_gt_1 : Fintype.card 𝔽q > 1)
   (h_Fq_char_prime : Fact (Nat.Prime (ringChar 𝔽q)))
-  (i : Fin r):
+  (i : Fin r) :
   IsLinearMap 𝔽q (f:=fun inner_p ↦ (qMap 𝔽q β i).comp inner_p) := by
   set q := Fintype.card 𝔽q
   set constMultiplier := ((W 𝔽q β i).eval (β i))^q / ((W 𝔽q β (i + 1)).eval (β (i + 1)))
@@ -357,8 +357,8 @@ lemma normalizedW_eq_qMap_composition
   (h_W₀_eq_X : W 𝔽q β 0 = X)
   (h_β₀_eq_1 : β 0 = 1)
   -- We also need the hypotheses for qMap_comp_normalizedW
-  (h_Fq_card_gt_1: Fintype.card 𝔽q > 1)
-  (h_Fq_char_prime: Fact (Nat.Prime (ringChar 𝔽q)))
+  (h_Fq_card_gt_1 : Fintype.card 𝔽q > 1)
+  (h_Fq_char_prime : Fact (Nat.Prime (ringChar 𝔽q)))
   (hβ_lin_indep : LinearIndependent 𝔽q β)
   (ℓ R_rate : ℕ)
   (i : Fin r) :
@@ -399,8 +399,8 @@ noncomputable def sDomainBasisVectors (i : Fin r) : Fin (ℓ + R_rate - i) → L
 /-- The vectors `sDomainBasisVectors` are indeed elements of the subspace `sDomain`,
   `∀ i ∈ {0, ..., r-1}`. -/
 lemma sDomainBasisVectors_mem_sDomain
-    (h_Fq_card_gt_1: Fintype.card 𝔽q > 1)
-    (h_Fq_char_prime: Fact (Nat.Prime (ringChar 𝔽q)))
+    (h_Fq_card_gt_1 : Fintype.card 𝔽q > 1)
+    (h_Fq_char_prime : Fact (Nat.Prime (ringChar 𝔽q)))
     (hβ_lin_indep : LinearIndependent 𝔽q β)
     (ℓ R_rate : ℕ) (h_ℓ_add_R_rate : ℓ + R_rate < r)
     (i : Fin r) (k : Fin (ℓ + R_rate - i)) :
@@ -423,11 +423,11 @@ lemma sDomainBasisVectors_mem_sDomain
   exact Submodule.subset_span h_β_i_in_U
 
 /-- The S basis -/
-def sBasis (i : Fin r) (h_i : i < ℓ + R_rate): Fin (ℓ + R_rate - i) → L :=
+def sBasis (i : Fin r) (h_i : i < ℓ + R_rate) : Fin (ℓ + R_rate - i) → L :=
   fun k => β ⟨i + k.val, by omega⟩
 
 omit [NeZero r] [Field L] [Fintype L] [DecidableEq L] [Field 𝔽q] [Algebra 𝔽q L] in
-lemma sBasis_range_eq (i : Fin r) (h_i : i < ℓ + R_rate):
+lemma sBasis_range_eq (i : Fin r) (h_i : i < ℓ + R_rate) :
     β '' Set.Ico i ⟨ℓ + R_rate, h_ℓ_add_R_rate⟩
     = Set.range (sBasis 𝔽q β ℓ R_rate h_ℓ_add_R_rate i h_i):= by
   ext x
@@ -470,7 +470,7 @@ lemma sBasis_range_eq (i : Fin r) (h_i : i < ℓ + R_rate):
 
 /-- S⁽ⁱ⁾ is the image over `Wᵢ(X)` of the the subspace spanned by `{βᵢ, ..., β_{ℓ+R-1}}`.
   Usable range is `∀ i ∈ {0, ..., ℓ+R-1}`. -/
-lemma sDomain_eq_image_of_upper_span (i: Fin r) (h_i: i < ℓ + R_rate):
+lemma sDomain_eq_image_of_upper_span (i : Fin r) (h_i : i < ℓ + R_rate) :
     let V_i := Submodule.span 𝔽q (Set.range (sBasis 𝔽q β ℓ R_rate h_ℓ_add_R_rate i h_i))
     let W_i_map := polyEvalLinearMap (normalizedW 𝔽q β i)
       (normalizedW_is_additive 𝔽q β h_Fq_card_gt_1 h_Fq_char_prime hβ_lin_indep i)
@@ -1955,9 +1955,7 @@ lemma NTTStage_correctness
             simp only [h_k, ↓reduceIte]
         rw [h_get_lsb_eq]
         apply Nat.sum_of_and_eq_zero_is_or h_lsb_and_two_pow_eq_zero
-
       congr
-      simp_rw [h_v_eq]
 
     rw [h_even_split, h_odd_split]
     rw [h_P_i_split_even_odd]
@@ -2099,7 +2097,6 @@ lemma NTTStage_correctness
           simp only [beq_iff_eq, h_ne_i_eq_k, ↓reduceIte, Nat.xor_zero]
         else
           simp only [h_k, ↓reduceIte]
-
       simp_rw [h_v_eq]
 
     have h_odd_split: input_buffer j = eval x1
@@ -2180,7 +2177,7 @@ lemma foldl_NTTStage_inductive_aux
     (h_Fq_card_gt_1 : Fintype.card 𝔽q > 1) (h_Fq_char_prime : Fact (Nat.Prime (ringChar 𝔽q)))
     (hβ_lin_indep : LinearIndependent 𝔽q β)
     (h_ℓ : ℓ ≤ r) (k : Fin (ℓ + 1))
-    (original_coeffs : Fin (2 ^ ℓ) → L):
+    (original_coeffs : Fin (2 ^ ℓ) → L) :
     additiveNTTInvariant 𝔽q β ℓ R_rate h_ℓ_add_R_rate
     (Fin.foldl k (fun current_b i ↦ NTTStage 𝔽q β ℓ R_rate h_ℓ_add_R_rate
       ⟨ℓ - i -1, by omega⟩ current_b) (tileCoeffs ℓ R_rate original_coeffs))

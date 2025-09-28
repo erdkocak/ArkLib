@@ -45,15 +45,16 @@ lemma cons_get_eq {α} {n : ℕ} (hd : α) (tl : Vector α n) (i : Fin (n + 1)) 
     subst h_i
     simp only [h_i_val, beq_iff_eq, ↓reduceDIte]
     simp only [cons, get, insertIdx] -- unfold everything
-    simp only [Array.insertIdx_zero, Fin.coe_cast, Fin.coe_ofNat_eq_mod, Nat.zero_mod,
-      List.size_toArray, List.length_cons, List.length_nil, zero_add, zero_lt_one,
-      Array.getElem_append_left, List.getElem_toArray, List.getElem_cons_zero]
+    simp_all only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, Array.insertIdx_zero, Fin.coe_cast,
+                  List.size_toArray, List.length_cons, List.length_nil, _root_.zero_add,
+                  zero_lt_one, Array.getElem_append_left, List.getElem_toArray,
+                  List.getElem_cons_zero]
   else
     simp only [h_i_val, beq_iff_eq, ↓reduceDIte]
     simp only [cons, get, insertIdx] -- unfold everything
     simp only [Array.insertIdx_zero, Fin.coe_cast, Fin.cast_mk, getElem_toArray]
     apply Array.getElem_append_right -- key counterpart for cons_get_eq in `Array` realm
-    simp only [List.size_toArray, List.length_cons, List.length_nil, zero_add]
+    simp only [List.size_toArray, List.length_cons, List.length_nil]
     omega
 
 @[simp]
@@ -74,7 +75,7 @@ theorem tail_cons {α} {n : ℕ} (hd : α) (tl : Vector α n) : (cons hd tl).tai
   simp only [Nat.add_one_sub_one, Array.insertIdx_zero, tail_eq_cast_extract, extract_mk,
     Array.extract_append, List.extract_toArray, List.extract_eq_drop_take, add_tsub_cancel_right,
     List.drop_succ_cons, List.drop_nil, List.take_nil, List.size_toArray, List.length_cons,
-    List.length_nil, zero_add, tsub_self, Array.take_eq_extract, Array.empty_append, cast_mk, mk_eq,
+    List.length_nil, tsub_self, Array.take_eq_extract, Array.empty_append, cast_mk, mk_eq,
     Array.extract_eq_self_iff, size_toArray, le_refl, and_self, or_true]
 
 @[simp]
@@ -167,7 +168,7 @@ lemma dotProduct_cons [AddCommMonoid R] [Mul R] (a : R) (b : Vector R n) (c : R)
   simp_rw [foldl_eq_toList_foldl]
   rw [cons_toList_eq_List_cons]
   rw [List.foldl_eq_of_comm' (hf:=by exact fun a b c ↦ add_right_comm a b c)]
-  rw [add_comm]
+  rw [@AddCommMonoid.add_comm]
 
 /-- A matrix represented as iterated vectors in row-major order.
 `m` is the number of rows, and `n` is the number of columns -/
@@ -229,8 +230,9 @@ lemma dotProduct_cons (a : R) (b : Vector R n) (c : R) (d : Vector R n) :
   if h_n: n = 0 then
     subst h_n
     simp only [cons_empty_tail_eq_nil]
-    simp only [Nat.reduceAdd, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
-      Finset.sum_singleton, Finset.univ_eq_empty, Finset.sum_empty, add_zero]
+    simp_all only [Nat.reduceAdd, Finset.univ_unique, Fin.default_eq_zero,
+                  Fin.isValue, Finset.sum_singleton,
+                  Finset.univ_eq_empty, Finset.sum_empty, _root_.add_zero]
     rfl
   else
     -- ⊢ ∑ i, (cons a b).get i * (cons c d).get i = a * c + ∑ i, b.get i * d.get i
