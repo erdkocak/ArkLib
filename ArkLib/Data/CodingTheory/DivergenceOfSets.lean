@@ -21,9 +21,9 @@ open NNReal ProximityGap
 
 namespace DivergenceOfSets
 
-noncomputable section
-
 open Code ReedSolomonCode ProbabilityTheory
+
+section Defs
 
 variable {ι : Type*} [Fintype ι] [Nonempty ι]
          {F : Type*} [DecidableEq F]
@@ -46,20 +46,32 @@ lemma finite_possibleDeltas : (possibleDeltas U V).Finite :=
 
 open Classical in
 /-- Definition of divergence of two sets from `Section 1.2` in [BCIKS20]. -/
-def divergence (U V : Set (ι → F)) : ℚ≥0 :=
+noncomputable def divergence (U V : Set (ι → F)) : ℚ≥0 :=
   haveI : Fintype (possibleDeltas U V) := @Fintype.ofFinite _ finite_possibleDeltas
   if h : (possibleDeltas U V).Nonempty
   then (possibleDeltas U V).toFinset.max' (Set.toFinset_nonempty.2 h)
   else 0
 
+end Defs
+
+section Theorems
+
+-- For theorems, since we are using the probability notation `Pr_{let x ← $ᵖ S}[...]` which is
+-- not universe-polymorphic, we need to put everything in `Type` and not `Type*`.
+
+variable {ι : Type} [Fintype ι] [Nonempty ι]
+         {F : Type} [Fintype F] [Field F]
+         {U V C : Set (ι → F)}
+
 open Classical in
 /-- `Corollary 1.3` (Concentration bounds) from [BCIKS20]. -/
-lemma concentration_bounds [Fintype F] [Field F] [Fintype ι] {deg : ℕ} {domain : ι ↪ F}
+lemma concentration_bounds {deg : ℕ} {domain : ι ↪ F}
   {U : AffineSubspace F (ι → F)} [Nonempty U]
   (hdiv : (divergence U (RScodeSet domain deg) : ℝ≥0) ≤ 1 - ReedSolomonCode.sqrtRate deg domain)
   : let δ' := divergence U (RScodeSet domain deg)
     Pr_{let y ← $ᵖ U}[Code.relHammingDistToCode y (RScodeSet domain deg) ≠ δ']
     ≤ errorBound δ' deg domain := by sorry
 
-end
+end Theorems
+
 end DivergenceOfSets
