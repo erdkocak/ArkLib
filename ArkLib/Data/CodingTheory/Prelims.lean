@@ -159,7 +159,8 @@ variable {ι : Type*} [Fintype ι] [Nonempty ι]
 def parametrisedCurve {l : ℕ} [Semiring F] (u : Fin l → ι → F) : Set (ι → F)
   := {v | ∃ r : F, v = ∑ i : Fin l, (r ^ (i : ℕ)) • u i}
 
-/-- A parametrised curve over a finite field is finite. -/
+/-- A parametrised curve over a finite field, as a `Finset`. Requires `DecidableEq ι` and
+  `DecidableEq F` to be able to construct the `Finset`. -/
 def parametrisedCurveFinite [DecidableEq ι] [Fintype F] [DecidableEq F] [Semiring F]
   {l : ℕ} (u : Fin l → ι → F) : Finset (ι → F) :=
   {v | ∃ r : F, v = ∑ i : Fin l, (r ^ (i : ℕ)) • u i}
