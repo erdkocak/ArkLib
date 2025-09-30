@@ -769,12 +769,13 @@ noncomputable def rate [Semiring F] (LC : LinearCode ι F) : ℚ≥0 :=
 
 /--
   `ρ LC` is the rate of the linear code `LC`.
+
+  Uses `&` to make the notation non-reserved, allowing `ρ` to also be used as a variable name.
 -/
+scoped syntax &"ρ" term : term
 
-syntax &"ρ" term : term
-
-macro_rules
-   | `(ρ $t:term) => `(LinearCode.rate $t)
+scoped macro_rules
+  | `(ρ $t:term) => `(LinearCode.rate $t)
 
 end
 

@@ -4,10 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Katerina Hristova, František Silváši, Julian Sutherland
 -/
 
-import ArkLib.Data.Fin.Basic
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Data.Matrix.Rank
-import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
 import Mathlib.LinearAlgebra.AffineSpace.Pointwise
 
 noncomputable section
@@ -19,6 +17,7 @@ variable {F : Type*}
 
 namespace Matrix
 
+/-- The set of column indices where two matrices differ. -/
 def neqCols [DecidableEq F] (U V : Matrix ι ι' F) : Finset ι' :=
   {j | ∃ i : ι, V i j ≠ U i j}
 
@@ -26,15 +25,19 @@ section
 
 variable [Semiring F] (U : Matrix ι ι' F)
 
+/-- The submodule spanned by the rows of a matrix. -/
 def rowSpan : Submodule F (ι' → F) :=
   Submodule.span F {U i | i : ι}
 
+/-- The row rank of a matrix (dimension of the row span). -/
 def rowRank : ℕ :=
   Module.finrank F (rowSpan U)
 
+/-- The submodule spanned by the columns of a matrix. -/
 def colSpan : Submodule F (ι → F) :=
   Submodule.span F {Matrix.transpose U i | i : ι'}
 
+/-- The column rank of a matrix (dimension of the column span). -/
 def colRank : ℕ :=
   Module.finrank F (colSpan U)
 
@@ -42,23 +45,29 @@ end
 
 section
 
+/-- Extract an n×n submatrix from an m×n matrix by selecting n rows. -/
 def subUpFull (U : Matrix (Fin m) (Fin n) F) (r_reindex : Fin n → Fin m) :
   Matrix (Fin n) (Fin n) F := Matrix.submatrix U r_reindex id
 
+/-- Extract an m×m submatrix from an m×n matrix by selecting m columns. -/
 def subLeftFull (U : Matrix (Fin m) (Fin n) F) (c_reindex : Fin m → Fin n) :
   Matrix (Fin m) (Fin m) F := Matrix.submatrix U id c_reindex
 
 variable [CommRing F]
          {U : Matrix (Fin m) (Fin n) F}
 
+/-- The rank of a matrix equals the minimum of its row rank and column rank. -/
 lemma rank_eq_min_row_col_rank : U.rank = min (rowRank U) (colRank U) := by sorry
 
+/-- A square matrix has full rank if and only if its determinant is nonzero. -/
 lemma rank_eq_iff_det_ne_zero {U : Matrix (Fin n) (Fin n) F} :
   U.rank = n ↔ Matrix.det U ≠ 0 := by sorry
 
+/-- An m×n matrix has rank n if and only if some n×n row submatrix has rank n. -/
 lemma rank_eq_iff_subUpFull_eq (h : n ≤ m) :
   U.rank = n ↔ (subUpFull U (Fin.castLE h)).rank = n := sorry
 
+/-- An m×n matrix has full row rank if and only if some m×m column submatrix has rank m. -/
 lemma full_row_rank_via_rank_subLeftFull (h : m ≤ n) :
   U.rank = m ↔ (subLeftFull U (Fin.castLE h)).rank = m := by sorry
 
@@ -80,26 +89,25 @@ def line [Ring F] (u v : ι → F) : Submodule F (ι → F) :=
 
 variable [DecidableEq F]
 
-def finsetOfVectors (U : Fin k → ι → F) : Finset (ι → F) :=
-  Finset.univ.image U
-
-@[simp]
-lemma Nonempty_finsetOfVector [NeZero k]
-  {U : Fin k → ι → F} : (finsetOfVectors U).Nonempty := by simp [finsetOfVectors]
-
-instance [NeZero k] {U : Fin k → ι → F} : Nonempty (finsetOfVectors U) :=
-  Nonempty_finsetOfVector.to_subtype
-
 variable [Field F] [Fintype F]
 
+/-- Vector addition action on affine subspaces. -/
 instance : VAdd (ι → F) (AffineSubspace F (ι → F)) := AffineSubspace.pointwiseVAdd
 
+/-- A translate of a finite affine subspace is finite. -/
 noncomputable instance {v : ι → F} {s : AffineSubspace F (ι → F)} [Fintype s] :
     Fintype (v +ᵥ s) := Fintype.ofFinite ↥(v +ᵥ s)
 
+/-- The affine span of a set is finite over a finite field. -/
 noncomputable instance {s : Set (ι → F)} : Fintype (affineSpan F s) :=
   Fintype.ofFinite ↥(affineSpan F s)
 
+/-- The image of a function `Fin k → α` over `Finset.univ` is nonempty when `k ≠ 0`. -/
+instance [NeZero k] {f : Fin k → ι → F} : Nonempty (Finset.univ.image f) := by
+  simp only [Finset.mem_image, Finset.mem_univ, true_and, nonempty_subtype]
+  exact ⟨f 0, 0, by simp⟩
+
+/-- A translate of a nonempty affine subspace is nonempty. -/
 noncomputable instance {v : ι → F} {s : AffineSubspace F (ι → F)} [inst : Nonempty s] :
     Nonempty (v +ᵥ s) := by
   apply nonempty_subtype.mpr
@@ -108,21 +116,26 @@ noncomputable instance {v : ι → F} {s : AffineSubspace F (ι → F)} [inst : 
   rw [AffineSubspace.vadd_mem_pointwise_vadd_iff]
   exact h
 
+/-- The carrier set of the affine span of the image of a function `U : Fin k → ι → F`.
+  This is the set of all affine combinations of `U 0, U 1, ..., U (k-1)`. -/
 abbrev AffSpanSet [NeZero k] (U : Fin k → ι → F) : Set (ι → F) :=
-  (affineSpan F (finsetOfVectors U)).carrier
+  (affineSpan F (Finset.univ.image U : Set (ι → F))).carrier
 
-lemma AffSpanFinite [NeZero k] (u : Fin k → ι → F) : (AffSpanSet u).Finite := by
+/-- The affine span of a finite set of vectors is finite over a finite field. -/
+instance AffSpanSet.instFinite [NeZero k] (u : Fin k → ι → F) : (AffSpanSet u).Finite := by
   unfold AffSpanSet
   exact Set.toFinite _
 
-noncomputable def AffSpanSetFinset [NeZero k] (U : Fin k → ι → F) : Finset (ι → F) :=
-  (AffSpanFinite U).toFinset
+/-- The affine span as a `Finset`, using `AffSpanFinite` to convert from the set. -/
+noncomputable def AffSpanFinset [NeZero k] (U : Fin k → ι → F) : Finset (ι → F) :=
+  (AffSpanSet.instFinite U).toFinset
 
 /-- A collection of affine subspaces in `F^ι`. -/
-noncomputable def AffSpanSetFinsetCol {t : ℕ} [NeZero k] [NeZero t]
+noncomputable def AffSpanFinsetCol {t : ℕ} [NeZero k] [NeZero t]
   (C : Fin t → (Fin k → (ι → F))) : Set (Finset (ι → F)) :=
-  Set.range (fun i => AffSpanSetFinset (C i))
+  Set.range (fun i => AffSpanFinset (C i))
 
+/-- The carrier set of a nonempty finset is nonempty. -/
 instance {α : Type*} {s : Finset α} [inst : Nonempty s] : Nonempty (s.toSet) := by
     rcases inst with ⟨w, h⟩
     refine nonempty_subtype.mpr ?_
@@ -151,6 +164,7 @@ def parametrisedCurveFinite [DecidableEq ι] [Fintype F] [DecidableEq F] [Semiri
   {l : ℕ} (u : Fin l → ι → F) : Finset (ι → F) :=
   {v | ∃ r : F, v = ∑ i : Fin l, (r ^ (i : ℕ)) • u i}
 
+/-- A parametrised curve over a nonempty finite field contains at least one point. -/
 instance [Fintype F] [Nonempty F] [Semiring F] [DecidableEq ι] [DecidableEq F] {l : ℕ} :
   ∀ u : Fin l → ι → F, Nonempty {x // x ∈ parametrisedCurveFinite u } := by
   intro u
@@ -164,6 +178,7 @@ end Curve
 
 namespace sInf
 
+/-- If every element of a set is bounded above by `i`, then the infimum is also bounded by `i`. -/
 lemma sInf_UB_of_le_UB {S : Set ℕ} {i : ℕ} : (∀ s ∈ S, s ≤ i) → sInf S ≤ i := fun h ↦ by
   by_cases S_empty : S.Nonempty
   · classical
@@ -172,6 +187,7 @@ lemma sInf_UB_of_le_UB {S : Set ℕ} {i : ℕ} : (∀ s ∈ S, s ≤ i) → sInf
     aesop
   · aesop (add simp (show S = ∅ by aesop (add simp Set.Nonempty)))
 
+/-- If `i` is a lower bound for all elements in a nonempty set, then `i` is at most the infimum. -/
 lemma le_sInf_of_LB {S : Set ℕ} (hne : S.Nonempty) {i : ℕ}
     (hLB : ∀ s ∈ S, i ≤ s) : i ≤ sInf S := by
   rw [Nat.sInf_def hne]
@@ -182,6 +198,7 @@ lemma le_sInf_of_LB {S : Set ℕ} (hne : S.Nonempty) {i : ℕ}
 
 end sInf
 
+/-- A nonempty fintype has positive cardinality. -/
 @[simp]
 lemma Fintype.zero_lt_card {ι : Type*} [Fintype ι] [Nonempty ι] : 0 < Fintype.card ι := by
   have := Fintype.card_ne_zero (α := ι); omega
@@ -192,6 +209,7 @@ section
 
 variable {α : Type*} [DecidableEq α] {s : Finset α}
 
+/-- The diagonal of `s × s` has the same cardinality as `s`. -/
 @[simp]
 theorem card_filter_prod_self_eq :
   #({x ∈ s ×ˢ s | x.1 = x.2}) = #s := by
@@ -206,6 +224,7 @@ theorem card_filter_prod_self_eq :
 
 variable [Fintype α]
 
+/-- The number of elements different from a fixed element `e` is one less than the total. -/
 @[simp]
 theorem card_univ_filter_eq {e : α} :
   #{x : α | x ≠ e} = #(Finset.univ (α := α)) - 1 := by
@@ -215,6 +234,7 @@ theorem card_univ_filter_eq {e : α} :
   ]
   simp
 
+/-- The diagonal of `s × s` (intersection form) has the same cardinality as `s`. -/
 @[simp]
 theorem card_prod_self_eq :
   #(((s ×ˢ s : Finset _) ∩ ({x : α × α | x.1 = x.2} : Finset _)) : Finset _) = #s := by

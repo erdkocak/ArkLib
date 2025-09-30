@@ -5,20 +5,10 @@ Authors: Quang Dao, Katerina Hristova, František Silváši, Julian Sutherland, 
 Mirco Richter
 -/
 
-import ArkLib.Data.CodingTheory.Basic
-import ArkLib.Data.Fin.Lift
 import ArkLib.Data.MvPolynomial.LinearMvExtension
 import ArkLib.Data.Polynomial.Interface
-import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.LinearAlgebra.Lagrange
-import Mathlib.Data.Finset.BooleanAlgebra
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Real.Sqrt
-import Mathlib.Data.Set.Defs
-import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
-import Mathlib.Probability.Distributions.Uniform
 import Mathlib.RingTheory.Henselian
-
 
 /-!
   # Reed-Solomon Codes

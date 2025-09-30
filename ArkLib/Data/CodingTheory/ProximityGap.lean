@@ -29,17 +29,19 @@ import Mathlib.RingTheory.Henselian
 
 -/
 
+universe u
+
 namespace ProximityGap
 
 open NNReal Finset Function ProbabilityTheory
 
-open scoped BigOperators
+open scoped BigOperators LinearCode
 
 section
 
-variable {n : Type*} [Fintype n] [DecidableEq n]
+variable {n : Type} [Fintype n] [DecidableEq n]
 
-variable {F : Type*} [Field F] [Fintype F] [DecidableEq F]
+variable {F : Type} [Field F] [Fintype F] [DecidableEq F]
 
 variable (C : Submodule F (n → F)) [DecidablePred (· ∈ C)]
 
@@ -68,11 +70,11 @@ end
 
 section
 
-variable {ι : Type*} [Fintype ι] [Nonempty ι]
-         {F : Type*}
+variable {ι : Type} [Fintype ι] [Nonempty ι]
+         {F : Type}
 
 /-- `Definition 1.1` in [BCIKS20]. -/
-noncomputable def generalProximityGap {α : Type*} [DecidableEq α] [Nonempty α]
+noncomputable def generalProximityGap {α : Type} [DecidableEq α] [Nonempty α]
   (P : Finset (ι → α)) (C : Set (Finset (ι → α))) (δ ε : ℝ≥0) : Prop :=
   ∀ S ∈ C, ∀ [Nonempty S],
     Pr_{let x ← $ᵖ S}[Code.relHammingDistToCode x.1 P ≤ δ] = 1 ∨
@@ -80,22 +82,20 @@ noncomputable def generalProximityGap {α : Type*} [DecidableEq α] [Nonempty α
 end
 
 section
-variable {ι : Type*} [Fintype ι] [Nonempty ι]
-         {F : Type*} [Field F] [Fintype F] [DecidableEq F]
-
-scoped notation "(" a:51 "," b:51 ")ₛ" => Set.Ioo a b
-scoped notation "(" a:51 "," b:51 "]ₛ" => Set.Ioc a b
+variable {ι : Type} [Fintype ι] [Nonempty ι]
+         {F : Type} [Field F] [Fintype F] [DecidableEq F]
 
 /-- The error bound `ε` in the pair of proximity and error parameters `(δ,ε)` for Reed-Solomon codes
   defined up to the Johnson bound. More precisely, let `ρ` be the rate of the Reed-Solomon code.
   Then for `δ ∈ (0, 1 - √ρ)`, we define the relevant error parameter `ε` for the unique decoding
-  bound, i.e. `δ ∈ [0, (1-ρ)/2]` and Johnson bound, i.e. `δ ∈ [(1-ρ)/2 , 1 - √ρ]`.
+  bound, i.e. `δ ∈ [0, (1-ρ)/2]` and Johnson bound, i.e. `δ ∈ [(1-ρ)/2 , 1 - √ρ]`. Otherwise,
+  we set `ε = 0`.
 -/
 noncomputable def errorBound (δ : ℝ≥0) (deg : ℕ) (domain : ι ↪ F) : ℝ≥0 :=
   letI ρ : ℝ≥0 := ρ (ReedSolomon.code domain deg)
-  if δ ∈ (0, (1 - ρ)/2]ₛ
+  if δ ∈ Set.Ioc 0 ((1 - ρ)/2)
   then Fintype.card ι / Fintype.card F
-  else if δ ∈ ((1 - ρ)/2, 1 - ρ.sqrt)ₛ
+  else if δ ∈ Set.Ioo ((1 - ρ)/2) (1 - ρ.sqrt)
        then letI m := min (1 - ρ.sqrt - δ) (ρ.sqrt / 20)
             ⟨(deg ^ 2 : ℝ≥0) / ((2 * m) ^ 7 * (Fintype.card F : ℝ)), by positivity⟩
        else 0
@@ -105,7 +105,7 @@ theorem proximity_gap_RSCodes {k t : ℕ} [NeZero k] [NeZero t] {deg : ℕ} {dom
   (C : Fin t → (Fin k → (ι → F))) {δ : ℝ≥0} (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain)) :
   generalProximityGap
     (ReedSolomonCode.toFinset domain deg)
-    (Affine.AffSpanSetFinsetCol C)
+    (Affine.AffSpanFinsetCol C)
     δ
     (errorBound δ deg domain) := by sorry
 
@@ -136,7 +136,7 @@ open Affine in
 theorem correlatedAgreement_affine_spaces {k : ℕ} [NeZero k] {u : Fin (k + 1) → ι → F}
   {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0} (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain))
   (hproximity :
-    Pr_{let y ← $ᵖ (u 0 +ᵥ affineSpan F (Affine.finsetOfVectors (Fin.tail u)).toSet)}[
+    Pr_{let y ← $ᵖ (u 0 +ᵥ affineSpan F (Finset.univ.image (Fin.tail u)).toSet)}[
         Code.relHammingDistToCode (ι := ι) (F := F) y (ReedSolomon.code domain deg) ≤ δ
     ] > errorBound δ deg domain) :
   correlatedAgreement (ReedSolomon.code domain deg) δ u := by sorry
