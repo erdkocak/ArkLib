@@ -20,6 +20,7 @@ import ArkLib.Data.Classes.Initialize
 import ArkLib.Data.Classes.Serde
 import ArkLib.Data.Classes.Slice
 import ArkLib.Data.Classes.ToNat
+import ArkLib.Data.CodingTheory
 import ArkLib.Data.CodingTheory.Basic
 import ArkLib.Data.CodingTheory.BerlekampWelch.BerlekampWelch
 import ArkLib.Data.CodingTheory.BerlekampWelch.Condition
@@ -67,6 +68,7 @@ import ArkLib.Data.Fin.Tuple.Lemmas
 import ArkLib.Data.Fin.Tuple.Notation
 import ArkLib.Data.Fin.Tuple.TakeDrop
 import ArkLib.Data.GroupTheory.PrimeOrder
+import ArkLib.Data.GroupTheory.Smooth
 import ArkLib.Data.Hash.DomainSep
 import ArkLib.Data.Hash.DuplexSponge
 import ArkLib.Data.Hash.Poseidon2
@@ -94,6 +96,7 @@ import ArkLib.Data.Polynomial.Frobenius
 import ArkLib.Data.Polynomial.Interface
 import ArkLib.Data.Polynomial.MonomialBasis
 import ArkLib.Data.Polynomial.PolynomialLike
+import ArkLib.Data.Polynomial.SplitFold
 import ArkLib.Data.Probability.Instances
 import ArkLib.Data.Probability.Notation
 import ArkLib.Data.RingTheory.TowerOfAlgebra
@@ -148,7 +151,10 @@ import ArkLib.ProofSystem.ConstraintSystem.MemoryChecking
 import ArkLib.ProofSystem.ConstraintSystem.Plonk
 import ArkLib.ProofSystem.ConstraintSystem.R1CS
 import ArkLib.ProofSystem.DSL
+import ArkLib.ProofSystem.Fri.Domain
 import ArkLib.ProofSystem.Fri.RoundConsistency
+import ArkLib.ProofSystem.Fri.Spec.General
+import ArkLib.ProofSystem.Fri.Spec.SingleRound
 import ArkLib.ProofSystem.Plonk.Basic
 import ArkLib.ProofSystem.Spartan.Basic
 import ArkLib.ProofSystem.Stir

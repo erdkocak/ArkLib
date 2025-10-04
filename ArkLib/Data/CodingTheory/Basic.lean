@@ -354,7 +354,7 @@ lemma distToCode_of_nonempty {α : Type*} [LinearOrder α] [Zero α]
 /-- Computable version of the distance from a vector `u` to a code `C`, assuming `C` is a `Fintype`.
 -/
 def distFromCode' (C : Set (n → R)) [Fintype C] (u : n → R) : ℕ∞ :=
-Finset.min <| (@Finset.univ C _).image (fun v => hammingDist u v.1)
+  Finset.min <| (@Finset.univ C _).image (fun v => hammingDist u v.1)
 
 notation "Δ₀'(" u ", " C ")" => distFromCode' C u
 
@@ -560,7 +560,8 @@ open Fintype
 def projection (S : Finset n) (w : n → R) : S → R :=
   fun i => w i.val
 
-omit [Finite R] in theorem projection_injective
+omit [Finite R] in
+theorem projection_injective
     (C : Set (n → R))
     (nontriv : ‖C‖₀ ≥ 1)
     (S : Finset n)
