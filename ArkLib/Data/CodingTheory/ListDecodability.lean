@@ -18,34 +18,29 @@ variable {ι : Type*} [Fintype ι]
 abbrev Code.{u, v} (ι : Type u) (S : Type v) : Type (max u v) := Set (ι → S)
 
 open Classical in
-/--
-Hamming ball of radius `r` centred at a word `y`.
+/-- Hamming ball of radius `r` centred at a word `y`.
 -/
 def hammingBall (C : Code ι F) (y : ι → F) (r : ℕ) : Set (ι → F) :=
   { c | c ∈ C ∧ hammingDist y c ≤ r }
 
 open Classical in
-/--
-Ball of radius `r` centred at a word `y` with respect to the relative Hamming distance.
+/-- Ball of radius `r` centred at a word `y` with respect to the relative Hamming distance.
 -/
-def relHammingBall (C : Code ι F) (y : ι → F) (r : ℝ) : Set (ι → F) :=
+def relHammingBall (C : Code ι F) (y : ι → F) (r : ℝ) : Code ι F :=
   { c | c ∈ C ∧ Code.relHammingDist y c ≤ r }
 
-/--
-The number of close codewords to a given word `y` with respect to the Hamming distance metric.
+/-- The number of close codewords to a given word `y` with respect to the Hamming distance metric.
 -/
 def listOfCloseCodewords (C : Code ι F) (y : ι → F) (r : ℕ) : ℕ :=
   Nat.card (hammingBall C y r)
 
-/--
-The number of close codewords to a given word `y` with respect to the relative Hamming
+/-- The number of close codewords to a given word `y` with respect to the relative Hamming
 distance metric.
 -/
 def listOfCloseCodewordsRel (C : Code ι F) (y : ι → F) (r : ℝ) : ℕ :=
   Nat.card (relHammingBall C y r)
 
-/--
-The code `C` is `(r,ℓ)`-list decodable.
+/-- The code `C` is `(r,ℓ)`-list decodable.
 
 - Remark:
    Note that the number of codewords `ℓ` in the Hamming ball of radius `r`

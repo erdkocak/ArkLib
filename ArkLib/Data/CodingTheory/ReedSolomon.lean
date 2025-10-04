@@ -5,12 +5,10 @@ Authors: Quang Dao, Katerina Hristova, František Silváši, Julian Sutherland, 
 Mirco Richter
 -/
 
-import ArkLib.Data.CodingTheory.Basic
-import Mathlib.LinearAlgebra.Lagrange
-import Mathlib.RingTheory.Henselian
-import ArkLib.Data.Fin.Lift
 import ArkLib.Data.MvPolynomial.LinearMvExtension
 import ArkLib.Data.Polynomial.Interface
+import Mathlib.LinearAlgebra.Lagrange
+import Mathlib.RingTheory.Henselian
 
 /-!
   # Reed-Solomon Codes
@@ -23,7 +21,7 @@ import ArkLib.Data.Polynomial.Interface
 
 namespace ReedSolomon
 
-open Polynomial
+open Polynomial NNReal
 
 variable {F : Type*} {ι : Type*} (domain : ι ↪ F)
 
@@ -170,6 +168,23 @@ namespace ReedSolomonCode
 
 section
 
+open Finset Function
+
+open scoped BigOperators
+
+variable {ι : Type*} [Fintype ι] [Nonempty ι]
+         {F : Type*} [Field F] [Fintype F]
+
+abbrev RScodeSet (domain : ι ↪ F) (deg : ℕ) : Set (ι → F) := (ReedSolomon.code domain deg).carrier
+
+open Classical in
+def toFinset (domain : ι ↪ F) (deg : ℕ) : Finset (ι → F) :=
+  (RScodeSet domain deg).toFinset
+
+end
+
+section
+
 variable {deg m n : ℕ} {α : Fin m → F}
 
 section
@@ -219,6 +234,8 @@ lemma genMatIsVandermonde [Fintype ι] [Field F] [DecidableEq F] [inst : NeZero 
 
 section
 
+open NNReal
+
 variable [Field F]
 
 lemma dim_eq_deg_of_le [NeZero n] (inj : Function.Injective α) (h : n ≤ m) :
@@ -242,6 +259,9 @@ lemma dist_le_length [DecidableEq F] (inj : Function.Injective α) :
     minDist ((ReedSolomon.code ⟨α, inj⟩ n) : Set (Fin m → F)) ≤ m := by
   convert dist_UB
   simp
+
+abbrev sqrtRate [Fintype ι] (deg : ℕ) (domain : ι ↪ F) : ℝ≥0 :=
+  (LinearCode.rate (ReedSolomon.code domain deg) : ℝ≥0).sqrt
 
 end
 
@@ -348,7 +368,8 @@ noncomputable def decode : (ReedSolomon.code domain deg) →ₗ[F] F[X] :=
     (interpolate (domain := domain))
     (ReedSolomon.code domain deg)
 
-/- ReedSolomon codewords are decoded into degree < deg polynomials-/
+/-- ReedSolomon codewords are decoded into degree < deg polynomials
+-/
 lemma decoded_polynomial_lt_deg (c : ReedSolomon.code domain deg) :
   decode c ∈ (degreeLT F deg : Submodule F F[X]) := by
   -- Unpack the witness polynomial for this codeword
