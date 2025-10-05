@@ -1,0 +1,226 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../../.././style.css"></link><link rel="icon" href="../../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.Data.FieldTheory.BinaryField.Tower.TensorAlgebra</title><script defer="true" src="../../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../../.././";</script><script>const MODULE_NAME="ArkLib.Data.FieldTheory.BinaryField.Tower.TensorAlgebra";</script><script type="module" src="../../../../.././jump-src.js"></script><script type="module" src="../../../../.././search.js"></script><script type="module" src="../../../../.././expand-nav.js"></script><script type="module" src="../../../../.././how-about.js"></script><script type="module" src="../../../../.././instances.js"></script><script type="module" src="../../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">Data</span>.<span class="name">FieldTheory</span>.<span class="name">BinaryField</span>.<span class="name">Tower</span>.<span class="name">TensorAlgebra</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../../.././Init.html">Init</a></li><li><a href="../../../../.././Mathlib/LinearAlgebra/StdBasis.html">Mathlib.LinearAlgebra.StdBasis</a></li><li><a href="../../../../.././Mathlib/Algebra/MvPolynomial/Basic.html">Mathlib.Algebra.MvPolynomial.Basic</a></li><li><a href="../../../../.././Mathlib/GroupTheory/MonoidLocalization/Basic.html">Mathlib.GroupTheory.MonoidLocalization.Basic</a></li><li><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basis.html">Mathlib.LinearAlgebra.TensorProduct.Basis</a></li><li><a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html">Mathlib.RingTheory.TensorProduct.Basic</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.Data.FieldTheory.BinaryField.Tower.TensorAlgebra" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#instCommSemiringTensorProduct_arkLib"><span class="name">instCommSemiringTensorProduct_arkLib</span></a></div><div class="nav_link"><a class="break_within" href="#instAlgebraTensorProduct_arkLib"><span class="name">instAlgebraTensorProduct_arkLib</span></a></div><div class="nav_link"><a class="break_within" href="#instAlgebraTensorProduct_arkLib_1"><span class="name">instAlgebraTensorProduct_arkLib_1</span></a></div><div class="nav_link"><a class="break_within" href="#instAlgebraTensorProduct_arkLib_2"><span class="name">instAlgebraTensorProduct_arkLib_2</span></a></div><div class="nav_link"><a class="break_within" href="#comm_map_smul_tmul"><span class="name">comm_map_smul_tmul</span></a></div><div class="nav_link"><a class="break_within" href="#comm_map_smul_add"><span class="name">comm_map_smul_add</span></a></div><div class="nav_link"><a class="break_within" href="#commSEquiv"><span class="name">commSEquiv</span></a></div><div class="nav_link"><a class="break_within" href="#Basis.baseChangeRight"><span class="name">Basis</span>.<span class="name">baseChangeRight</span></a></div><div class="nav_link"><a class="break_within" href="#Basis.baseChangeRight_repr_tmul"><span class="name">Basis</span>.<span class="name">baseChangeRight_repr_tmul</span></a></div><div class="nav_link"><a class="break_within" href="#Basis.baseChangeRight_apply"><span class="name">Basis</span>.<span class="name">baseChangeRight_apply</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Generalized-Tensor-Algebra-and-Dual-View">Generalized Tensor Algebra and Dual View <a class="hover-link" href="#Generalized-Tensor-Algebra-and-Dual-View">#</a></h1><p>This file develops the algebraic theory of the tensor product algebra <code>A := R ⊗[K] C</code>
+for arbitrary field extensions <code>R/K</code> and <code>C/K</code>, upon the existing <code><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a></code> module.</p><h2 class="markdown-heading" id="Main-Definitions">Main Definitions <a class="hover-link" href="#Main-Definitions">#</a></h2><ul>
+<li><code><a href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#Basis.baseChangeRight">Basis.baseChangeRight</a></code> : the lift of a basis of <code>Left</code> to an <code>Right</code>-basis
+of the base change <code>Left ⊗[K] Right</code>.</li>
+</ul><h2 class="markdown-heading" id="TODOs">TODOs <a class="hover-link" href="#TODOs">#</a></h2><ul>
+<li>multilinear bases of tensor algebra over binary tower subfields</li>
+<li>Proximity Gap for Tensor Algebras</li>
+</ul><h2 class="markdown-heading" id="References">References <a class="hover-link" href="#References">#</a></h2><ul>
+<li><p>[Lan02] Serge Lang. &quot;Algebra&quot;. Revised Third Edition. Vol. 211.
+Graduate Texts in Mathematics. Springer, 2002.</p>
+</li>
+<li><p>[DP24] Diamond, Benjamin E., and Jim Posen. &quot;Polylogarithmic Proofs for Multilinears over Binary
+Towers.&quot; Cryptology ePrint Archive (2024).</p>
+</li>
+<li><p>[DP23] Diamond, Benjamin E., and Jim Posen. &quot;Succinct arguments over towers of binary fields.&quot;
+Cryptology ePrint Archive (2023).</p>
+</li>
+</ul></div><div class="decl" id="instCommSemiringTensorProduct_arkLib"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L48-L48">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable instance</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#instCommSemiringTensorProduct_arkLib"><span class="name">instCommSemiringTensorProduct_arkLib</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Left</span> <span class="fn">Right</span>)</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="instAlgebraTensorProduct_arkLib"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L49-L49">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable instance</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#instAlgebraTensorProduct_arkLib"><span class="name">instAlgebraTensorProduct_arkLib</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Left</span> <span class="fn">Right</span>)</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="instAlgebraTensorProduct_arkLib_1"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L50-L50">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable instance</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#instAlgebraTensorProduct_arkLib_1"><span class="name">instAlgebraTensorProduct_arkLib_1</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">Left</span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Left</span> <span class="fn">Right</span>)</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="instAlgebraTensorProduct_arkLib_2"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L51-L51">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable instance</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#instAlgebraTensorProduct_arkLib_2"><span class="name">instAlgebraTensorProduct_arkLib_2</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">Right</span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Left</span> <span class="fn">Right</span>)</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="comm_map_smul_tmul"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L57-L77">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#comm_map_smul_tmul"><span class="name">comm_map_smul_tmul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s </span><span class="fn">s'</span> : <span class="fn">Right</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">Left</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> (<span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">s'</span> <a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">⊗ₜ[</a><span class="fn">K</span><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">]</a> <span class="fn">m</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> (<span class="fn">s'</span> <a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">⊗ₜ[</a><span class="fn">K</span><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">]</a> <span class="fn">m</span>)</span></div></div></div></div><div class="decl" id="comm_map_smul_add"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L79-L83">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#comm_map_smul_add"><span class="name">comm_map_smul_add</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn">Right</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x </span><span class="fn">y</span> : <span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> (<span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> <span class="fn">x</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> (<span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">y</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> <span class="fn">y</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> (<span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span>)</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> (<span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">y</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a>   <span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> <span class="fn">x</span></span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">s</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span>)</span> <span class="fn">y</span></span></div></div></div></div><div class="decl" id="commSEquiv"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L85-L108">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#commSEquiv"><span class="name">commSEquiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Right</span> <span class="fn">Left</span></span> <a href="../../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv">≃ₗ[</a><span class="fn">Right</span><a href="../../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv">]</a> <span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Left</span> <span class="fn">Right</span></span></div></div><p>A helper definition to package <code><a href="../../../../.././Mathlib/RingTheory/TensorProduct/Basic.html#Algebra.TensorProduct.comm">Algebra.TensorProduct.comm</a></code> as an <code>Right</code>-linear equivalence.
+It takes the existing K-algebra equivalence and adds a proof that it is also Right-linear.
+We make the types explicit arguments to avoid type inference issues.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-commSEquiv" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Basis.baseChangeRight"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L111-L117">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#Basis.baseChangeRight"><span class="name">Basis</span>.<span class="name">baseChangeRight</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/Basis/Defs.html#Module.Basis">Module.Basis</a> <span class="fn">ι</span> <span class="fn">K</span> <span class="fn">Left</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/Basis/Defs.html#Module.Basis">Module.Basis</a> <span class="fn">ι</span> <span class="fn">Right</span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct">TensorProduct</a> <span class="fn">K</span> <span class="fn">Left</span> <span class="fn">Right</span>)</span></span></div></div><p>The lift of an <code>K</code>-basis of <code>Left</code> to an <code>Right</code>-basis of the base change <code>Left ⊗[K] Right</code>.
+This is the right-sided counterpart to <code>Basis.baseChange</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Basis.baseChangeRight" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Basis.baseChangeRight_repr_tmul"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L119-L126">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#Basis.baseChangeRight_repr_tmul"><span class="name">Basis</span>.<span class="name">baseChangeRight_repr_tmul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/Basis/Defs.html#Module.Basis">Module.Basis</a> <span class="fn">ι</span> <span class="fn">K</span> <span class="fn">Left</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">Left</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn">Right</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><span class="fn">(<a href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#Basis.baseChangeRight">baseChangeRight</a> <span class="fn">b</span>)</span>.<a href="../../../../.././Mathlib/LinearAlgebra/Basis/Defs.html#Module.Basis.repr">repr</a></span> (<span class="fn">x</span> <a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">⊗ₜ[</a><span class="fn">K</span><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">]</a> <span class="fn">y</span>))</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn"><span class="fn">b</span>.<a href="../../../../.././Mathlib/LinearAlgebra/Basis/Defs.html#Module.Basis.repr">repr</a></span> <span class="fn">x</span>)</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">y</span></div></div></div></div><div class="decl" id="Basis.baseChangeRight_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.lean#L128-L135">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#Basis.baseChangeRight_apply"><span class="name">Basis</span>.<span class="name">baseChangeRight_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Left</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Right</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">Right</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Left</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">Right</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn"><a href="../../../../.././Mathlib/LinearAlgebra/Basis/Defs.html#Module.Basis">Module.Basis</a> <span class="fn">ι</span> <span class="fn">K</span> <span class="fn">Left</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../../.././ArkLib/Data/FieldTheory/BinaryField/Tower/TensorAlgebra.html#Basis.baseChangeRight">baseChangeRight</a> <span class="fn">b</span>)</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">b</span> <span class="fn">i</span></span> <a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">⊗ₜ[</a><span class="fn">K</span><a href="../../../../.././Mathlib/LinearAlgebra/TensorProduct/Basic.html#TensorProduct.tmul">]</a> <span class="fn">1</span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

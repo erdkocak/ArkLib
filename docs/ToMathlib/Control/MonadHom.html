@@ -1,0 +1,239 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../.././style.css"></link><link rel="icon" href="../.././favicon.svg"></link><link rel="mask-icon" href="../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../.././/declarations/declaration-data.bmp" as="image"></link><title>ToMathlib.Control.MonadHom</title><script defer="true" src="../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../.././";</script><script>const MODULE_NAME="ToMathlib.Control.MonadHom";</script><script type="module" src="../.././jump-src.js"></script><script type="module" src="../.././search.js"></script><script type="module" src="../.././expand-nav.js"></script><script type="module" src="../.././how-about.js"></script><script type="module" src="../.././instances.js"></script><script type="module" src="../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ToMathlib</span>.<span class="name">Control</span>.<span class="name">MonadHom</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../.././Init.html">Init</a></li><li><a href="../.././ToMathlib/Control/MonadAlgebra.html">ToMathlib.Control.MonadAlgebra</a></li><li><a href="../.././Mathlib/Probability/ProbabilityMassFunction/Monad.html">Mathlib.Probability.ProbabilityMassFunction.Monad</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ToMathlib.Control.MonadHom" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#IsMonadHom"><span class="name">IsMonadHom</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom"><span class="name">MonadHom</span></a></div><div class="nav_link"><a class="break_within" href="#«term_→ᵐ_»"><span class="name">«term_→ᵐ_»</span></a></div><div class="nav_link"><a class="break_within" href="#instIsMonadHomToFun"><span class="name">instIsMonadHomToFun</span></a></div><div class="nav_link"><a class="break_within" href="#instCoeFunMonadHomForallForall"><span class="name">instCoeFunMonadHomForallForall</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_pure"><span class="name">MonadHom</span>.<span class="name">mmap_pure</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_bind"><span class="name">MonadHom</span>.<span class="name">mmap_bind</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_map"><span class="name">MonadHom</span>.<span class="name">mmap_map</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_seq"><span class="name">MonadHom</span>.<span class="name">mmap_seq</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_seqLeft"><span class="name">MonadHom</span>.<span class="name">mmap_seqLeft</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_seqRight"><span class="name">MonadHom</span>.<span class="name">mmap_seqRight</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.ofLift"><span class="name">MonadHom</span>.<span class="name">ofLift</span></a></div><div class="nav_link"><a class="break_within" href="#MonadHom.mmap_ofLift"><span class="name">MonadHom</span>.<span class="name">mmap_ofLift</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Morphisms-Between-Monads">Morphisms Between Monads <a class="hover-link" href="#Morphisms-Between-Monads">#</a></h1></div><div class="decl" id="IsMonadHom"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L15-L19">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#IsMonadHom"><span class="name">IsMonadHom</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u} → <span class="fn"><span class="fn"><span class="fn">m</span> <span class="fn">α</span></span> → <span class="fn"><span class="fn">n</span> <span class="fn">α</span></span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../.././foundational_types.html">Prop</a></div></div><ul class="structure_fields" id="IsMonadHom.mk"><li id="IsMonadHom.map_pure" class="structure_field"><div class="structure_field_info">map_pure<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">α</span>)</span></span>
+ : <span class="fn"><span class="fn">f</span> <span class="fn">(<a href="../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span></span></div></li><li id="IsMonadHom.map_bind" class="structure_field"><div class="structure_field_info">map_bind<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span></span>)</span></span>
+ : <span class="fn"><span class="fn">f</span> (<span class="fn">x</span> <a href="../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">y</span>)</span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span> <span class="fn">x</span></span> <a href="../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">f</span> <a href="../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">y</span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-IsMonadHom" class="instances-list"></ul></details></div></div><div class="decl" id="MonadHom"><div class="structure"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L21-L30">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom"><span class="name">MonadHom</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../.././foundational_types.html">Type</a> (max (max (u + 1) v) w)</div></div><p>Structure to represent a well-behaved mapping between computations in two monads <code>m</code> and <code>n</code>.
+This is similar to <code><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a></code> but isn't a type-class but rather an actual object.
+This is useful for non-canonical mappings that shouldn't be applied automatically in general.
+We also enforce similar laws to <code><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a></code>.</p><ul class="structure_fields" id="MonadHom.mk"><li id="MonadHom.toFun" class="structure_field"><div class="structure_field_info">toFun<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span> : <span class="fn"><span class="fn"><span class="fn">m</span> <span class="fn">α</span></span> → <span class="fn"><span class="fn">n</span> <span class="fn">α</span></span></span></div></li><li id="MonadHom.toFun_pure'" class="structure_field"><div class="structure_field_info">toFun_pure'<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">α</span>)</span></span>
+ : <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">(<a href="../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span></span></div></li><li id="MonadHom.toFun_bind'" class="structure_field"><div class="structure_field_info">toFun_bind'<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span></span>)</span></span>
+ : <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> (<span class="fn">x</span> <a href="../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">y</span>)</span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn">do
+  let <span class="fn">a</span> ← <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x</span></span>
+  <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">(<span class="fn">y</span> <span class="fn">a</span>)</span></span></span></div></li></ul><details id="instances-for-list-MonadHom" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="«term_→ᵐ_»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L32-L32">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#«term_→ᵐ_»"><span class="name">«term_→ᵐ_»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../.././Init/Prelude.html#Lean.TrailingParserDescr">Lean.TrailingParserDescr</a></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-«term_→ᵐ_»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="instIsMonadHomToFun"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L34-L38">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#instIsMonadHomToFun"><span class="name">instIsMonadHomToFun</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././ToMathlib/Control/MonadHom.html#IsMonadHom">IsMonadHom</a> <span class="fn">m</span> <span class="fn">n</span> <span class="fn">fun {<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u} =&gt; <span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span></span></span></div></div></div></div><div class="decl" id="instCoeFunMonadHomForallForall"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L40-L44">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#instCoeFunMonadHomForallForall"><span class="name">instCoeFunMonadHomForallForall</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Bind">Bind</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Coe.html#CoeFun">CoeFun</a> (<span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>) <span class="fn">fun (<span class="fn">x</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>) =&gt; <span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u} → <span class="fn"><span class="fn"><span class="fn">m</span> <span class="fn">α</span></span> → <span class="fn"><span class="fn">n</span> <span class="fn">α</span></span></span></span></span></span></div></div><p>View a monad map as a function between computations. Note we can't have a full
+<code><a href="../.././Mathlib/Data/FunLike/Basic.html#FunLike">FunLike</a></code> instance because the type parameter <code>α</code> isn't constrained by the types.</p><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="MonadHom.mmap_pure"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L53-L55">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_pure"><span class="name">MonadHom</span>.<span class="name">mmap_pure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">(<a href="../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="MonadHom.mmap_bind"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L57-L59">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_bind"><span class="name">MonadHom</span>.<span class="name">mmap_bind</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> (<span class="fn">x</span> <a href="../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">y</span>)</span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn">do
+  let <span class="fn">x</span> ← <span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">x</span></span>
+  <span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">(<span class="fn">y</span> <span class="fn">x</span>)</span></span></span></div></div></div></div><div class="decl" id="MonadHom.mmap_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L61-L64">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_map"><span class="name">MonadHom</span>.<span class="name">mmap_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> (<span class="fn">g</span> <a href="../.././Init/Prelude.html#Functor.map">&lt;$&gt;</a> <span class="fn">x</span>)</span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn">g</span> <a href="../.././Init/Prelude.html#Functor.map">&lt;$&gt;</a> <span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="MonadHom.mmap_seq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L66-L69">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_seq"><span class="name">MonadHom</span>.<span class="name">mmap_seq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">(<span class="fn">α</span> → <span class="fn">β</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">(<span class="fn">x</span> &lt;*&gt; <span class="fn">y</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">x</span></span> &lt;*&gt; <span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">y</span></span></span></div></div></div></div><div class="decl" id="MonadHom.mmap_seqLeft"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L71-L74">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_seqLeft"><span class="name">MonadHom</span>.<span class="name">mmap_seqLeft</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">(<span class="fn">x</span> &lt;* <span class="fn">y</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">x</span></span> &lt;* <span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">y</span></span></span></div></div></div></div><div class="decl" id="MonadHom.mmap_seqRight"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L76-L79">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_seqRight"><span class="name">MonadHom</span>.<span class="name">mmap_seqRight</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> w</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">(<span class="fn">x</span> *&gt; <span class="fn">y</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">x</span></span> *&gt; <span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">y</span></span></span></div></div></div></div><div class="decl" id="MonadHom.ofLift"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L83-L88">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.ofLift"><span class="name">MonadHom</span>.<span class="name">ofLift</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">m </span><span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">m</span> <a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">→ᵐ</a> <span class="fn">n</span></div></div><p>Construct a <code><a href="../.././ToMathlib/Control/MonadHom.html#MonadHom">MonadHom</a></code> from a lawful monad lift.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-MonadHom.ofLift" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="MonadHom.mmap_ofLift"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/MonadHom.lean#L90-L93">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/MonadHom.html#MonadHom.mmap_ofLift"><span class="name">MonadHom</span>.<span class="name">mmap_ofLift</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">m </span><span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u → <a href="../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(fun {<span class="fn">x</span> : <a href="../.././foundational_types.html">Type</a> u} (<span class="fn">x_1</span> : <span class="fn"><span class="fn">m</span> <span class="fn">x</span></span>) =&gt; <span class="fn"><span class="fn"><span class="fn">(<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.ofLift">ofLift</a> <span class="fn">m</span> <span class="fn">n</span>)</span>.<a href="../.././ToMathlib/Control/MonadHom.html#MonadHom.toFun">toFun</a></span> <span class="fn">x_1</span></span>)</span> <span class="fn">x</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">x</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

@@ -1,0 +1,297 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.ProofSystem.Whir.MutualCorrAgreement</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="ArkLib.ProofSystem.Whir.MutualCorrAgreement";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">ProofSystem</span>.<span class="name">Whir</span>.<span class="name">MutualCorrAgreement</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html">ArkLib.Data.CodingTheory.InterleavedCode</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/ListDecodability.html">ArkLib.Data.CodingTheory.ListDecodability</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html">ArkLib.Data.CodingTheory.ReedSolomon</a></li><li><a href="../../.././ArkLib/Data/Probability/Notation.html">ArkLib.Data.Probability.Notation</a></li><li><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html">ArkLib.ProofSystem.Whir.ProximityGen</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.ProofSystem.Whir.MutualCorrAgreement" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.proximityCondition"><span class="name">MutualCorrAgreement</span>.<span class="name">proximityCondition</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.hasMutualCorrAgreement"><span class="name">MutualCorrAgreement</span>.<span class="name">hasMutualCorrAgreement</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.mca_linearCode"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_linearCode</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.mca_rsc"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_rsc</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.mca_johnson_bound_CONJECTURE"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_johnson_bound_CONJECTURE</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.mca_capacity_bound_CONJECTURE"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_capacity_bound_CONJECTURE</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.proximityListDecodingCondition"><span class="name">MutualCorrAgreement</span>.<span class="name">proximityListDecodingCondition</span></a></div><div class="nav_link"><a class="break_within" href="#MutualCorrAgreement.mca_list_decoding"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_list_decoding</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Mutual-Correlated-Agreement-for-Proximity-Generators">Mutual Correlated Agreement for Proximity Generators <a class="hover-link" href="#Mutual-Correlated-Agreement-for-Proximity-Generators">#</a></h1><p>This file formalizes the notion of mutual correlated agreement for proximity generators,
+introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].</p><h2 class="markdown-heading" id="Implementation-notes">Implementation notes <a class="hover-link" href="#Implementation-notes">#</a></h2><p>The reference paper is phrased in terms of a minimum distance,
+which should be understood as being the minimum relative hamming distance, which is used here.</p><h2 class="markdown-heading" id="References">References <a class="hover-link" href="#References">#</a></h2><ul>
+<li>G Arnon, A Chiesa, G Fenzi, and E Yogev,
+[<em>WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification</em>][todo: ArkLib bibliography]
+Freely available at <a href="https://eprint.iacr.org/2024/1586">https://eprint.iacr.org/2024/1586</a></li>
+</ul><h2 class="markdown-heading" id="Tags">Tags <a class="hover-link" href="#Tags">#</a></h2><p>Todo: should we aim to add tags?</p></div><div class="decl" id="MutualCorrAgreement.proximityCondition"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L42-L53">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.proximityCondition"><span class="name">MutualCorrAgreement</span>.<span class="name">proximityCondition</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι </span><span class="fn">parℓ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">parℓ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">parℓ</span> → <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><span class="fn">parℓ</span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>For <code>parℓ</code> functions <code>fᵢ : ι → 𝔽</code>, distance <code>δ</code>, generator function <code>GenFun: 𝔽 → parℓ → 𝔽</code>
+and linear code <code>C</code> the predicate <code>proximityCondition(r)</code> is true, if <code>∃ S ⊆ ι</code>, s.t.
+the following three conditions hold
+(i) <code>|S| ≥ (1-δ)*|ι|</code>
+(ii) <code>∃ u ∈ C, u(S) = ∑ j : parℓ, rⱼ * fⱼ(S)</code>
+(iii) <code>∃ i : parℓ, ∀ u' ∈ C, u'(S) ≠ fᵢ(S)</code></p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-MutualCorrAgreement.proximityCondition" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="MutualCorrAgreement.hasMutualCorrAgreement"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L55-L69">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.hasMutualCorrAgreement"><span class="name">MutualCorrAgreement</span>.<span class="name">hasMutualCorrAgreement</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">Gen</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator">Generator.ProximityGenerator</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">BStar</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">errStar</span> : <span class="fn"><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> → <a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal">ENNReal</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Definition 4.9
+Let <code>C</code> be a linear code, then Gen is a proximity generator with mutual correlated agreement,
+if for <code>parℓ</code> functions <code>fᵢ : ι → F</code> and distance <code>δ &lt; 1 - BStar(C,parℓ)</code>,
+<code>Pr_{ r ← F } [ proximityCondition(r) ] ≤ errStar(δ)</code>.</p><p>Note that there is a typo in the paper:
+it should <code>δ &lt; 1 - BStar(C,parℓ)</code> in place of <code>δ &lt; 1 - B(C,parℓ)</code></p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-MutualCorrAgreement.hasMutualCorrAgreement" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="MutualCorrAgreement.mca_linearCode"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L71-L85">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.mca_linearCode"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_linearCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">Gen</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator">Generator.ProximityGenerator</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hC</span> : <span class="fn">C</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.C">C</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.hasMutualCorrAgreement">hasMutualCorrAgreement</a> <span class="fn">Gen</span> <span class="fn">(<a href="../../.././Init/Prelude.html#Min.min">min</a> (<span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">↑(<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minRelHammingDistCode">δᵣ</a><span class="fn">↑<span class="fn">C</span></span>)</span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">2</span>) <span class="fn">(<span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.B">B</a></span> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.C">C</a></span> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span>)</span>)</span> <span class="fn">fun (<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>) =&gt; <span class="fn"><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.err">err</a></span> <span class="fn">C</span> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> <span class="fn">δ</span></span></span></span></div></div><p>Lemma 4.10
+Let <code>C</code> be a linear code with minimum distance <code>δ_C</code>, <code>Gen</code> be a proximity generator for C
+with parameters <code>B</code> and <code>err</code>, then Gen has mutual correlated agreement with proximity bounds
+<code>BStar = min {1 - δ_C/2, B}</code> and <code>errStar = err</code>.</p></div></div><div class="decl" id="MutualCorrAgreement.mca_rsc"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L87-L111">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.mca_rsc"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_rsc</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">α</span> : <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">parℓ_type</span> : <a href="../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">parℓ_type</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">exp</span> : <span class="fn">parℓ_type</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">have <span class="fn">Gen</span> := <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#RSGenerator.genRSC">RSGenerator.genRSC</a> <span class="fn">parℓ_type</span> <span class="fn">φ</span> <span class="fn">m</span> <span class="fn">exp</span></span>;
+<span class="fn">have <span class="fn">this</span> := <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.hℓ">hℓ</a></span>;
+<span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.hasMutualCorrAgreement">hasMutualCorrAgreement</a> <span class="fn">Gen</span> ((<span class="fn">1</span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span>) <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">2</span>) <span class="fn">fun (<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>) =&gt;
+  <span class="fn"><a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.ofReal">ENNReal.ofReal</a> ((<span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">parℓ_type</span>)</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">1</span>) <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> (<span class="fn">2</span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">m</span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> (<span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">F</span>)</span></span>)))</span></span></span></span></span></div></div><p>Corollary 4.11
+Let <code>C</code> be a (smooth) ReedSolomon Code with rate <code>ρ</code>, then the function
+<code>Gen(parℓ,α)={1,α,..,α^(parℓ-1)}</code> is a proximity generator for Gen with
+mutual correlated agreement with proximity bounds
+<code>BStar = (1+ρ) / 2</code>
+<code>errStar = (parℓ-1)*2^m / ρ*|F|</code>.</p><p>function <code>Gen(parℓ,α)={1,α,..,α ^ parℓ-1}</code></p></div></div><div class="decl" id="MutualCorrAgreement.mca_johnson_bound_CONJECTURE"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L114-L137">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.mca_johnson_bound_CONJECTURE"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_johnson_bound_CONJECTURE</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">α</span> : <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">parℓ_type</span> : <a href="../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">parℓ_type</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">exp</span> : <span class="fn">parℓ_type</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">have <span class="fn">Gen</span> := <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#RSGenerator.genRSC">RSGenerator.genRSC</a> <span class="fn">parℓ_type</span> <span class="fn">φ</span> <span class="fn">m</span> <span class="fn">exp</span></span>;
+<span class="fn">have <span class="fn">this</span> := <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.hℓ">hℓ</a></span>;
+<span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.hasMutualCorrAgreement">hasMutualCorrAgreement</a> <span class="fn">Gen</span> <a href="../../.././Mathlib/Data/Real/Sqrt.html#Real.sqrt">√</a><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span> <span class="fn">fun (<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>) =&gt;
+  <span class="fn">have <span class="fn">min_val</span> := <span class="fn"><a href="../../.././Init/Prelude.html#Min.min">min</a> (<span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <a href="../../.././Mathlib/Data/Real/Sqrt.html#Real.sqrt">√</a><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">δ</span>) (<a href="../../.././Mathlib/Data/Real/Sqrt.html#Real.sqrt">√</a><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">20</span>)</span>;
+  <span class="fn"><a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.ofReal">ENNReal.ofReal</a> ((<span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">parℓ_type</span>)</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">1</span>) <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">2</span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> (<span class="fn">2</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">m</span>) <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> (<span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">F</span>)</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> (<span class="fn">2</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">min_val</span>) <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">7</span>))</span></span></span></span></span></span></div></div><p>Conjecture 4.12 (Johnson Bound)
+The function <code>Gen(parℓ,α)={1,α,..,α ^ parℓ-1}</code> is a proximity generator with
+mutual correlated agreement for every (smooth) ReedSolomon code <code>C</code> with rate <code>ρ = 2^m / |ι|</code>.</p><ol>
+<li>Up to Johnson bound: BStar = √ρ and
+errStar = (parℓ-1) * 2^2m / |F| * (2 * min {1 - √ρ - δ, √ρ/20}) ^ 7.</li>
+</ol></div></div><div class="decl" id="MutualCorrAgreement.mca_capacity_bound_CONJECTURE"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L139-L162">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.mca_capacity_bound_CONJECTURE"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_capacity_bound_CONJECTURE</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">α</span> : <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">parℓ_type</span> : <a href="../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">parℓ_type</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">exp</span> : <span class="fn">parℓ_type</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">have <span class="fn">Gen</span> := <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#RSGenerator.genRSC">RSGenerator.genRSC</a> <span class="fn">parℓ_type</span> <span class="fn">φ</span> <span class="fn">m</span> <span class="fn">exp</span></span>;
+<span class="fn">have <span class="fn">this</span> := <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.hℓ">hℓ</a></span>;
+<span class="fn">∃ (<span class="fn">c₁</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) (<span class="fn">c₂</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>),
+  <span class="fn">∀ (<span class="fn">f</span> : <span class="fn"><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> → <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span></span>) (<span class="fn">η</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>),
+    <span class="fn"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">η</span> →
+      <span class="fn">∀ (<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>),
+        <span class="fn"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">↑<span class="fn">δ</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">η</span> →
+          <span class="fn"><span class="fn">(do
+                let <span class="fn">r</span> ← <span class="fn"><a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <a href="../../.././Init/Prelude.html#Subtype">{</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Subtype">:</a> <span class="fn"><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> → <span class="fn">F</span></span> <a href="../../.././Init/Prelude.html#Subtype">//</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.Gen">Gen</a></span> <a href="../../.././Init/Prelude.html#Subtype">}</a></span>
+                <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.proximityCondition">proximityCondition</a> <span class="fn">f</span> <span class="fn">δ</span> <span class="fn">(↑<span class="fn">r</span>)</span> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.C">C</a></span>)</span></span>)</span>
+              <a href="../../.././Init/Prelude.html#True">True</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a>             <span class="fn"><a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.ofReal">ENNReal.ofReal</a>
+              ((<span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">parℓ_type</span>)</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">1</span>) <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">c₂</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> (<span class="fn">2</span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">m</span>) <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">c₂</span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a>                 (<span class="fn">η</span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">c₁</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.rate">rate</a></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> (<span class="fn">c₁</span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">c₂</span>) <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">F</span>)</span></span>))</span></span></span></span></span></span></span></span></div></div><p>Conjecture 4.12 (Capacity Bound)
+The function <code>Gen(parℓ,α)={1,α,..,α ^ parℓ-1}</code> is a proximity generator with
+mutual correlated agreement for every (smooth) ReedSolomon code <code>C</code> with rate <code>ρ = 2^m / |ι|</code>.
+2. Up to capacity: BStar = ρ and ∃ c₁,c₂ ∈ ℕ s.t. ∀ η &gt; 0 and 0 &lt; δ &lt; 1 - ρ - η
+errStar = (parℓ-1)^c₂ * d^c₂ / η^c₁ * ρ^(c₁+c₂) * |F|, where d = 2^m is the degree.</p><p>N.b: there is a typo in the paper, c₃ is not needed and carried over from STIR paper definition</p></div></div><div class="decl" id="MutualCorrAgreement.proximityListDecodingCondition"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L168-L182">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.proximityListDecodingCondition"><span class="name">MutualCorrAgreement</span>.<span class="name">proximityListDecodingCondition</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι </span><span class="fn">parℓ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><span class="fn">parℓ</span> → <span class="fn">F</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">parℓ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">fs</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">parℓ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode">InterleavedCode</a> <span class="fn">parℓ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>For <code>parℓ</code> functions <code>{f₀,..,f_{parℓ - 1}}</code>,
+<code>IC</code> be the <code>parℓ</code>-interleaved code from a linear code C,
+with <code>Gen</code> as a proximity generator with mutual correlated agreement,
+<code>proximityListDecodingCondition(r)</code> is true if,
+<code>List(C, ∑ⱼ rⱼ * fⱼ, δ) ≠ </code>
+<code>{ ∑ⱼ rⱼ * uⱼ, where {u₀,..u_{parℓ-1}} ∈ Λᵢ({f₀,..,f_{parℓ-1}}, IC, δ) }</code></p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-MutualCorrAgreement.proximityListDecodingCondition" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="MutualCorrAgreement.mca_list_decoding"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/MutualCorrAgreement.lean#L185-L204">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.mca_list_decoding"><span class="name">MutualCorrAgreement</span>.<span class="name">mca_list_decoding</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">Gen</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator">Generator.ProximityGenerator</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">δ </span><span class="fn">BStar</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">errStar</span> : <span class="fn"><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> → <a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal">ENNReal</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">fs </span><span class="fn">us</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode">InterleavedCode</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">haveIC</span> : <span class="fn">IC</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.codeOfLinearCode">InterleavedCode.codeOfLinearCode</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.C">C</a></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hGen</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.hasMutualCorrAgreement">hasMutualCorrAgreement</a> <span class="fn">Gen</span> <span class="fn">BStar</span> <span class="fn">errStar</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn">ι</span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hC</span> : <span class="fn">C</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.C">C</a></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">fs✝</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> <span class="fn">ι</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hδPos</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#GT.gt">&gt;</a> <span class="fn">0</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hδLt</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><a href="../../.././Init/Prelude.html#Min.min">min</a> <span class="fn">(↑(<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minRelHammingDistCode">δᵣ</a> <span class="fn">C</span>))</span> (<span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">BStar</span>)</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(do
+      let <span class="fn">r</span> ← <span class="fn"><a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <a href="../../.././Init/Prelude.html#Subtype">{</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Subtype">:</a> <span class="fn"><span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.parℓ">parℓ</a></span> → <span class="fn">F</span></span> <a href="../../.././Init/Prelude.html#Subtype">//</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.Gen">Gen</a></span> <a href="../../.././Init/Prelude.html#Subtype">}</a></span>
+      <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/MutualCorrAgreement.html#MutualCorrAgreement.proximityListDecodingCondition">proximityListDecodingCondition</a> <span class="fn"><span class="fn">Gen</span>.<a href="../../.././ArkLib/ProofSystem/Whir/ProximityGen.html#Generator.ProximityGenerator.C">C</a></span> <span class="fn">(↑<span class="fn">r</span>)</span> <span class="fn">δ</span> <span class="fn">fs✝</span> <span class="fn">IC</span>)</span></span>)</span>
+    <a href="../../.././Init/Prelude.html#True">True</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a>   <span class="fn"><span class="fn">errStar</span> <span class="fn">δ</span></span></div></div><p>Lemma 4.13: Mutual correlated agreement preserves list decoding
+Let C be a linear code with minimum distance δ_c and <code>Gen</code> be a proximity generator
+with mutual correlated agreement for <code>C</code>.
+Then for every <code>{f₀,..,f_{parℓ - 1}}</code> and <code>δ ∈ (0, min δ_c (1 - BStar))</code>,
+<code>Pr_{ r ← F} [ proximityListDecodingCondition(r) ] ≤ errStar(δ)</code>.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

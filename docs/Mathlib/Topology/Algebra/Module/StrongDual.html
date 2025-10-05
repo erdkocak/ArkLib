@@ -1,0 +1,574 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../.././style.css"></link><link rel="icon" href="../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Topology.Algebra.Module.StrongDual</title><script defer="true" src="../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../.././";</script><script>const MODULE_NAME="Mathlib.Topology.Algebra.Module.StrongDual";</script><script type="module" src="../../../.././jump-src.js"></script><script type="module" src="../../../.././search.js"></script><script type="module" src="../../../.././expand-nav.js"></script><script type="module" src="../../../.././how-about.js"></script><script type="module" src="../../../.././instances.js"></script><script type="module" src="../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Topology</span>.<span class="name">Algebra</span>.<span class="name">Module</span>.<span class="name">StrongDual</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../.././Init.html">Init</a></li><li><a href="../../../.././Mathlib/Analysis/LocallyConvex/Polar.html">Mathlib.Analysis.LocallyConvex.Polar</a></li><li><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html">Mathlib.Topology.Algebra.Module.LinearMap</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Topology.Algebra.Module.StrongDual" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#strongDualPairing"><span class="name">strongDualPairing</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.NormedSpace.dualPairing"><span class="name">StrongDual</span>.<span class="name">NormedSpace</span>.<span class="name">dualPairing</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.dualPairing_apply"><span class="name">StrongDual</span>.<span class="name">dualPairing_apply</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.NormedSpace.dualPairing_apply"><span class="name">StrongDual</span>.<span class="name">NormedSpace</span>.<span class="name">dualPairing_apply</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.dualPairing_separatingLeft"><span class="name">StrongDual</span>.<span class="name">dualPairing_separatingLeft</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.NormedSpace.dualPairing_separatingLeft"><span class="name">StrongDual</span>.<span class="name">NormedSpace</span>.<span class="name">dualPairing_separatingLeft</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polar"><span class="name">StrongDual</span>.<span class="name">polar</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polar"><span class="name">NormedSpace</span>.<span class="name">polar</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polarSubmodule"><span class="name">StrongDual</span>.<span class="name">polarSubmodule</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polarSubmodule"><span class="name">NormedSpace</span>.<span class="name">polarSubmodule</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polarSubmodule_eq_polar"><span class="name">StrongDual</span>.<span class="name">polarSubmodule_eq_polar</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polarSubmodule_eq_polar"><span class="name">NormedSpace</span>.<span class="name">polarSubmodule_eq_polar</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.mem_polar_iff"><span class="name">StrongDual</span>.<span class="name">mem_polar_iff</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.mem_polar_iff"><span class="name">NormedSpace</span>.<span class="name">mem_polar_iff</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polarSubmodule_eq_setOf"><span class="name">StrongDual</span>.<span class="name">polarSubmodule_eq_setOf</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polarSubmodule_eq_setOf"><span class="name">NormedSpace</span>.<span class="name">polarSubmodule_eq_setOf</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.mem_polarSubmodule"><span class="name">StrongDual</span>.<span class="name">mem_polarSubmodule</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.mem_polarSubmodule"><span class="name">NormedSpace</span>.<span class="name">mem_polarSubmodule</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.zero_mem_polar"><span class="name">StrongDual</span>.<span class="name">zero_mem_polar</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.zero_mem_polar"><span class="name">NormedSpace</span>.<span class="name">zero_mem_polar</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polar_nonempty"><span class="name">StrongDual</span>.<span class="name">polar_nonempty</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polar_nonempty"><span class="name">NormedSpace</span>.<span class="name">polar_nonempty</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polar_empty"><span class="name">StrongDual</span>.<span class="name">polar_empty</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polar_empty"><span class="name">NormedSpace</span>.<span class="name">polar_empty</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polar_singleton"><span class="name">StrongDual</span>.<span class="name">polar_singleton</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polar_singleton"><span class="name">NormedSpace</span>.<span class="name">polar_singleton</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.mem_polar_singleton"><span class="name">StrongDual</span>.<span class="name">mem_polar_singleton</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.mem_polar_singleton"><span class="name">NormedSpace</span>.<span class="name">mem_polar_singleton</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polar_zero"><span class="name">StrongDual</span>.<span class="name">polar_zero</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polar_zero"><span class="name">NormedSpace</span>.<span class="name">polar_zero</span></a></div><div class="nav_link"><a class="break_within" href="#StrongDual.polar_univ"><span class="name">StrongDual</span>.<span class="name">polar_univ</span></a></div><div class="nav_link"><a class="break_within" href="#NormedSpace.polar_univ"><span class="name">NormedSpace</span>.<span class="name">polar_univ</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="The-topological-strong-dual-of-a-module">The topological strong dual of a module <a class="hover-link" href="#The-topological-strong-dual-of-a-module">#</a></h1><h2 class="markdown-heading" id="Main-definitions">Main definitions <a class="hover-link" href="#Main-definitions">#</a></h2><ul>
+<li><code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing">strongDualPairing</a></code>: The strong dual pairing as a bilinear form.</li>
+<li><code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a></code>: Given a subset <code>s</code> in a monoid <code>M</code> (over a commutative ring <code>R</code>), the polar
+<code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> R s</code> is the subset of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> R M</code> consisting of those functionals which evaluate to
+something of norm at most one at all points <code>z ∈ s</code>.</li>
+<li><code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">StrongDual.polarSubmodule</a></code>: Given a subset <code>s</code> in a monoid <code>M</code> (over a field <code>𝕜</code>) closed under
+scalar multiplication, the polar <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">polarSubmodule</a> 𝕜 s</code> is the submodule of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> 𝕜 M</code>
+consisting of those functionals which evaluate to zero at all points <code>z ∈ s</code>.</li>
+</ul><h2 class="markdown-heading" id="References">References <a class="hover-link" href="#References">#</a></h2><ul>
+<li>[Conway, John B., A course in functional analysis][conway1990]</li>
+</ul><h2 class="markdown-heading" id="Tags">Tags <a class="hover-link" href="#Tags">#</a></h2><p>StrongDual, polar</p></div><div class="decl" id="strongDualPairing"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L39-L41">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing"><span class="name">strongDualPairing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">R</span> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">R</span> <span class="fn">M</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">M</span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">R</span></div></div><p>The StrongDual pairing as a bilinear form.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-strongDualPairing" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="StrongDual.NormedSpace.dualPairing"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L43-L43">source</a></div><div class="attributes">@[deprecated strongDualPairing (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.NormedSpace.dualPairing"><span class="name">StrongDual</span>.<span class="name">NormedSpace</span>.<span class="name">dualPairing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">R</span> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">R</span> <span class="fn">M</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">M</span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">R</span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing">strongDualPairing</a></code>.</p><hr></hr><p>The StrongDual pairing as a bilinear form.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-StrongDual.NormedSpace.dualPairing" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="StrongDual.dualPairing_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L45-L47">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.dualPairing_apply"><span class="name">StrongDual</span>.<span class="name">dualPairing_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">R</span> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">v</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x</span> : <span class="fn">M</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing">strongDualPairing</a> <span class="fn">R</span> <span class="fn">M</span>)</span> <span class="fn">v</span>)</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">v</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="StrongDual.NormedSpace.dualPairing_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L49-L49">source</a></div><div class="attributes">@[deprecated StrongDual.dualPairing_apply (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.NormedSpace.dualPairing_apply"><span class="name">StrongDual</span>.<span class="name">NormedSpace</span>.<span class="name">dualPairing_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">R</span> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">v</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x</span> : <span class="fn">M</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing">strongDualPairing</a> <span class="fn">R</span> <span class="fn">M</span>)</span> <span class="fn">v</span>)</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">v</span> <span class="fn">x</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.dualPairing_apply">StrongDual.dualPairing_apply</a></code>.</p></div></div><div class="decl" id="StrongDual.dualPairing_separatingLeft"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L57-L59">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.dualPairing_separatingLeft"><span class="name">StrongDual</span>.<span class="name">dualPairing_separatingLeft</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Ring/Basic.html#SeminormedCommRing">SeminormedCommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing">strongDualPairing</a> <span class="fn">R</span> <span class="fn">M</span>)</span>.<a href="../../../.././Mathlib/LinearAlgebra/SesquilinearForm.html#LinearMap.SeparatingLeft">SeparatingLeft</a></span></div></div></div></div><div class="decl" id="StrongDual.NormedSpace.dualPairing_separatingLeft"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L61-L62">source</a></div><div class="attributes">@[deprecated StrongDual.dualPairing_separatingLeft (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.NormedSpace.dualPairing_separatingLeft"><span class="name">StrongDual</span>.<span class="name">NormedSpace</span>.<span class="name">dualPairing_separatingLeft</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Ring/Basic.html#SeminormedCommRing">SeminormedCommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#strongDualPairing">strongDualPairing</a> <span class="fn">R</span> <span class="fn">M</span>)</span>.<a href="../../../.././Mathlib/LinearAlgebra/SesquilinearForm.html#LinearMap.SeparatingLeft">SeparatingLeft</a></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.dualPairing_separatingLeft">StrongDual.dualPairing_separatingLeft</a></code>.</p></div></div><div class="decl" id="StrongDual.polar"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L68-L73">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar"><span class="name">StrongDual</span>.<span class="name">polar</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Ring/Basic.html#NormedCommRing">NormedCommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">M</span></span> → <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">R</span> <span class="fn">M</span>)</span></span></span></div></div><p>Given a subset <code>s</code> in a monoid <code>M</code> (over a commutative ring <code>R</code>), the polar <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> R s</code> is the
+subset of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> R M</code> consisting of those functionals which evaluate to something of norm at
+most one at all points <code>z ∈ s</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-StrongDual.polar" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="NormedSpace.polar"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L75-L75">source</a></div><div class="attributes">@[deprecated StrongDual.polar (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polar"><span class="name">NormedSpace</span>.<span class="name">polar</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Ring/Basic.html#NormedCommRing">NormedCommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">M</span></span> → <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">R</span> <span class="fn">M</span>)</span></span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a></code>.</p><hr></hr><p>Given a subset <code>s</code> in a monoid <code>M</code> (over a commutative ring <code>R</code>), the polar <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> R s</code> is the
+subset of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> R M</code> consisting of those functionals which evaluate to something of norm at
+most one at all points <code>z ∈ s</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-NormedSpace.polar" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="StrongDual.polarSubmodule"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L77-L82">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule"><span class="name">StrongDual</span>.<span class="name">polarSubmodule</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/SetLike/Basic.html#SetLike">SetLike</a> <span class="fn">S</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SMulMemClass">SMulMemClass</a> <span class="fn">S</span> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Submodule/Defs.html#Submodule">Submodule</a> <span class="fn">𝕜</span> <span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">M</span>)</span></span></div></div><p>Given a subset <code>s</code> in a monoid <code>M</code> (over a field <code>𝕜</code>) closed under scalar multiplication,
+the polar <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">polarSubmodule</a> 𝕜 s</code> is the submodule of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> 𝕜 M</code> consisting of those functionals
+which evaluate to zero at all points <code>z ∈ s</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-StrongDual.polarSubmodule" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="NormedSpace.polarSubmodule"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L84-L84">source</a></div><div class="attributes">@[deprecated StrongDual.polarSubmodule (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polarSubmodule"><span class="name">NormedSpace</span>.<span class="name">polarSubmodule</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/SetLike/Basic.html#SetLike">SetLike</a> <span class="fn">S</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SMulMemClass">SMulMemClass</a> <span class="fn">S</span> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Submodule/Defs.html#Submodule">Submodule</a> <span class="fn">𝕜</span> <span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">M</span>)</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">StrongDual.polarSubmodule</a></code>.</p><hr></hr><p>Given a subset <code>s</code> in a monoid <code>M</code> (over a field <code>𝕜</code>) closed under scalar multiplication,
+the polar <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">polarSubmodule</a> 𝕜 s</code> is the submodule of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> 𝕜 M</code> consisting of those functionals
+which evaluate to zero at all points <code>z ∈ s</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-NormedSpace.polarSubmodule" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="StrongDual.polarSubmodule_eq_polar"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L89-L90">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule_eq_polar"><span class="name">StrongDual</span>.<span class="name">polarSubmodule_eq_polar</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SubMulAction">SubMulAction</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">polarSubmodule</a> <span class="fn">𝕜</span> <span class="fn">m</span>)</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <span class="fn">↑<span class="fn">m</span></span></span></div></div></div></div><div class="decl" id="NormedSpace.polarSubmodule_eq_polar"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L92-L93">source</a></div><div class="attributes">@[deprecated StrongDual.polarSubmodule_eq_polar (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polarSubmodule_eq_polar"><span class="name">NormedSpace</span>.<span class="name">polarSubmodule_eq_polar</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SubMulAction">SubMulAction</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">StrongDual.polarSubmodule</a> <span class="fn">𝕜</span> <span class="fn">m</span>)</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <span class="fn">↑<span class="fn">m</span></span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule_eq_polar">StrongDual.polarSubmodule_eq_polar</a></code>.</p></div></div><div class="decl" id="StrongDual.mem_polar_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L95-L96">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.mem_polar_iff"><span class="name">StrongDual</span>.<span class="name">mem_polar_iff</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x'</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">x'</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <span class="fn">s</span></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ <span class="fn">z</span> ∈ <span class="fn">s</span>, <a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a><span class="fn"><span class="fn">x'</span> <span class="fn">z</span></span><a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></span></div></div></div></div><div class="decl" id="NormedSpace.mem_polar_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L98-L98">source</a></div><div class="attributes">@[deprecated StrongDual.mem_polar_iff (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.mem_polar_iff"><span class="name">NormedSpace</span>.<span class="name">mem_polar_iff</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x'</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">x'</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <span class="fn">s</span></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ <span class="fn">z</span> ∈ <span class="fn">s</span>, <a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a><span class="fn"><span class="fn">x'</span> <span class="fn">z</span></span><a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.mem_polar_iff">StrongDual.mem_polar_iff</a></code>.</p></div></div><div class="decl" id="StrongDual.polarSubmodule_eq_setOf"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L100-L102">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule_eq_setOf"><span class="name">StrongDual</span>.<span class="name">polarSubmodule_eq_setOf</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/SetLike/Basic.html#SetLike">SetLike</a> <span class="fn">S</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SMulMemClass">SMulMemClass</a> <span class="fn">S</span> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">polarSubmodule</a> <span class="fn">𝕜</span> <span class="fn">m</span>)</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">{</a><span class="fn">y</span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">:</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">|</a> <span class="fn">∀ <span class="fn">x</span> ∈ <span class="fn">m</span>, <span class="fn"><span class="fn">y</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span><a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">}</a></div></div></div></div><div class="decl" id="NormedSpace.polarSubmodule_eq_setOf"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L104-L105">source</a></div><div class="attributes">@[deprecated StrongDual.polarSubmodule_eq_setOf (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polarSubmodule_eq_setOf"><span class="name">NormedSpace</span>.<span class="name">polarSubmodule_eq_setOf</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/SetLike/Basic.html#SetLike">SetLike</a> <span class="fn">S</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SMulMemClass">SMulMemClass</a> <span class="fn">S</span> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">StrongDual.polarSubmodule</a> <span class="fn">𝕜</span> <span class="fn">m</span>)</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">{</a><span class="fn">y</span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">:</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">|</a> <span class="fn">∀ <span class="fn">x</span> ∈ <span class="fn">m</span>, <span class="fn"><span class="fn">y</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span><a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">}</a></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule_eq_setOf">StrongDual.polarSubmodule_eq_setOf</a></code>.</p></div></div><div class="decl" id="StrongDual.mem_polarSubmodule"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L107-L109">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.mem_polarSubmodule"><span class="name">StrongDual</span>.<span class="name">mem_polarSubmodule</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/SetLike/Basic.html#SetLike">SetLike</a> <span class="fn">S</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SMulMemClass">SMulMemClass</a> <span class="fn">S</span> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">y</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">polarSubmodule</a> <span class="fn">𝕜</span> <span class="fn">m</span></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ <span class="fn">x</span> ∈ <span class="fn">m</span>, <span class="fn"><span class="fn">y</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span></div></div></div></div><div class="decl" id="NormedSpace.mem_polarSubmodule"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L111-L112">source</a></div><div class="attributes">@[deprecated StrongDual.mem_polarSubmodule (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.mem_polarSubmodule"><span class="name">NormedSpace</span>.<span class="name">mem_polarSubmodule</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/SetLike/Basic.html#SetLike">SetLike</a> <span class="fn">S</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/GroupTheory/GroupAction/SubMulAction.html#SMulMemClass">SMulMemClass</a> <span class="fn">S</span> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">y</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polarSubmodule">StrongDual.polarSubmodule</a> <span class="fn">𝕜</span> <span class="fn">m</span></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ <span class="fn">x</span> ∈ <span class="fn">m</span>, <span class="fn"><span class="fn">y</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.mem_polarSubmodule">StrongDual.mem_polarSubmodule</a></code>.</p></div></div><div class="decl" id="StrongDual.zero_mem_polar"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L114-L116">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.zero_mem_polar"><span class="name">StrongDual</span>.<span class="name">zero_mem_polar</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <span class="fn">s</span></span></div></div></div></div><div class="decl" id="NormedSpace.zero_mem_polar"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L118-L118">source</a></div><div class="attributes">@[deprecated StrongDual.zero_mem_polar (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.zero_mem_polar"><span class="name">NormedSpace</span>.<span class="name">zero_mem_polar</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <span class="fn">s</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.zero_mem_polar">StrongDual.zero_mem_polar</a></code>.</p></div></div><div class="decl" id="StrongDual.polar_nonempty"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L120-L121">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_nonempty"><span class="name">StrongDual</span>.<span class="name">polar_nonempty</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <span class="fn">s</span>)</span>.<a href="../../../.././Mathlib/Data/Set/Defs.html#Set.Nonempty">Nonempty</a></span></div></div></div></div><div class="decl" id="NormedSpace.polar_nonempty"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L123-L123">source</a></div><div class="attributes">@[deprecated StrongDual.polar_nonempty (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polar_nonempty"><span class="name">NormedSpace</span>.<span class="name">polar_nonempty</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <span class="fn">s</span>)</span>.<a href="../../../.././Mathlib/Data/Set/Defs.html#Set.Nonempty">Nonempty</a></span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_nonempty">StrongDual.polar_nonempty</a></code>.</p></div></div><div class="decl" id="StrongDual.polar_empty"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L127-L129">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_empty"><span class="name">StrongDual</span>.<span class="name">polar_empty</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#EmptyCollection.emptyCollection">∅</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></div></div></div></div><div class="decl" id="NormedSpace.polar_empty"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L131-L131">source</a></div><div class="attributes">@[deprecated StrongDual.polar_empty (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polar_empty"><span class="name">NormedSpace</span>.<span class="name">polar_empty</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#EmptyCollection.emptyCollection">∅</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_empty">StrongDual.polar_empty</a></code>.</p></div></div><div class="decl" id="StrongDual.polar_singleton"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L133-L135">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_singleton"><span class="name">StrongDual</span>.<span class="name">polar_singleton</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">E</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">a</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">{</a><span class="fn">x</span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">:</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">|</a> <a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a><span class="fn"><span class="fn">x</span> <span class="fn">a</span></span><a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span><a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">}</a></div></div></div></div><div class="decl" id="NormedSpace.polar_singleton"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L137-L137">source</a></div><div class="attributes">@[deprecated StrongDual.polar_singleton (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polar_singleton"><span class="name">NormedSpace</span>.<span class="name">polar_singleton</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">E</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">a</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">{</a><span class="fn">x</span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">:</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span> <a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">|</a> <a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a><span class="fn"><span class="fn">x</span> <span class="fn">a</span></span><a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span><a href="../../../.././Mathlib/Data/Set/Defs.html#setOf">}</a></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_singleton">StrongDual.polar_singleton</a></code>.</p></div></div><div class="decl" id="StrongDual.mem_polar_singleton"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L139-L140">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.mem_polar_singleton"><span class="name">StrongDual</span>.<span class="name">mem_polar_singleton</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">E</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">y</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">a</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a><span class="fn"><span class="fn">y</span> <span class="fn">a</span></span><a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="NormedSpace.mem_polar_singleton"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L142-L143">source</a></div><div class="attributes">@[deprecated StrongDual.mem_polar_singleton (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.mem_polar_singleton"><span class="name">NormedSpace</span>.<span class="name">mem_polar_singleton</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">E</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/LinearMap.html#StrongDual">StrongDual</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">y</span> <a href="../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">a</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a><span class="fn"><span class="fn">y</span> <span class="fn">a</span></span><a href="../../../.././Mathlib/Analysis/Normed/Group/Basic.html#Norm.norm">‖</a> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.mem_polar_singleton">StrongDual.mem_polar_singleton</a></code>.</p></div></div><div class="decl" id="StrongDual.polar_zero"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L145-L146">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_zero"><span class="name">StrongDual</span>.<span class="name">polar_zero</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">0</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></div></div></div></div><div class="decl" id="NormedSpace.polar_zero"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L148-L148">source</a></div><div class="attributes">@[deprecated StrongDual.polar_zero (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polar_zero"><span class="name">NormedSpace</span>.<span class="name">polar_zero</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">0</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_zero">StrongDual.polar_zero</a></code>.</p></div></div><div class="decl" id="StrongDual.polar_univ"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L159-L162">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_univ"><span class="name">StrongDual</span>.<span class="name">polar_univ</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">polar</a> <span class="fn">𝕜</span> <a href="../../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">0</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></div></div></div></div><div class="decl" id="NormedSpace.polar_univ"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/Topology/Algebra/Module/StrongDual.lean#L164-L164">source</a></div><div class="attributes">@[deprecated StrongDual.polar_univ (since := &quot;2025-08-3&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#NormedSpace.polar_univ"><span class="name">NormedSpace</span>.<span class="name">polar_univ</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Analysis/Normed/Field/Basic.html#NontriviallyNormedField">NontriviallyNormedField</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">𝕜</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar">StrongDual.polar</a> <span class="fn">𝕜</span> <a href="../../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">0</span><a href="../../../.././Init/Core.html#Singleton.singleton">}</a></div></div><p><strong>Alias</strong> of <code><a href="../../../.././Mathlib/Topology/Algebra/Module/StrongDual.html#StrongDual.polar_univ">StrongDual.polar_univ</a></code>.</p></div></div></main>
+<nav class="nav"><iframe src="../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

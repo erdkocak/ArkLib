@@ -1,0 +1,403 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.ProofSystem.Whir.BlockRelDistance</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="ArkLib.ProofSystem.Whir.BlockRelDistance";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">ProofSystem</span>.<span class="name">Whir</span>.<span class="name">BlockRelDistance</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/ListDecodability.html">ArkLib.Data.CodingTheory.ListDecodability</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html">ArkLib.Data.CodingTheory.ReedSolomon</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.ProofSystem.Whir.BlockRelDistance" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.indexPowT"><span class="name">BlockRelDistance</span>.<span class="name">indexPowT</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.powFiberT"><span class="name">BlockRelDistance</span>.<span class="name">powFiberT</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.block"><span class="name">BlockRelDistance</span>.<span class="name">block</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.DecidableBlockDisagreement"><span class="name">BlockRelDistance</span>.<span class="name">DecidableBlockDisagreement</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.disagreementSet"><span class="name">BlockRelDistance</span>.<span class="name">disagreementSet</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.blockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">blockRelDistance</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.«termΔᵣ(_,_,_,_,_,_)»"><span class="name">BlockRelDistance</span>.<span class="name">«termΔᵣ(_,_,_,_,_,_)»</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.blockRelDistance_eq_relHammingDist_of_k_eq_i"><span class="name">BlockRelDistance</span>.<span class="name">blockRelDistance_eq_relHammingDist_of_k_eq_i</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.minBlockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">minBlockRelDistance</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.«termΔₛ(_,_,_,_,_,_)»"><span class="name">BlockRelDistance</span>.<span class="name">«termΔₛ(_,_,_,_,_,_)»</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.listBlockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">listBlockRelDistance</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.«termΛᵣ(_,_,_,_,_,_,_)»"><span class="name">BlockRelDistance</span>.<span class="name">«termΛᵣ(_,_,_,_,_,_,_)»</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.relHammingDist_le_blockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">relHammingDist_le_blockRelDistance</span></a></div><div class="nav_link"><a class="break_within" href="#BlockRelDistance.listBlock_subset_listHamming"><span class="name">BlockRelDistance</span>.<span class="name">listBlock_subset_listHamming</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Block-Relative-Distance-for-smooth-Reed-Solomon-Codes">Block Relative Distance for smooth Reed-Solomon Codes <a class="hover-link" href="#Block-Relative-Distance-for-smooth-Reed-Solomon-Codes">#</a></h1><p>This file formalizes the notion of mutual correlated agreement for proximity generators,
+introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].</p><h2 class="markdown-heading" id="Implementation-notes">Implementation notes <a class="hover-link" href="#Implementation-notes">#</a></h2><p>Block relative distance is defined for smooth rather than constrained Reed Solomon codes,
+as is done in the reference paper, as they are more general.
+The definition of `block' is also stated in a more general form than the reference paper.</p><p>We define distances for smooth ReedSolomon codes with respect to power and fiber domains,
+as per Section 4.3.1, [ACFY24].
+We have generalized the definitions for a generic i to present (i,k)-wise distance measures.
+This modification is necessary to support following lemmas from Section  4.3.2.
+The definitions from Section 4.3.1 correspond to i = 0.</p><h2 class="markdown-heading" id="References">References <a class="hover-link" href="#References">#</a></h2><ul>
+<li>G Arnon, A Chiesa, G Fenzi, and E Yogev,
+[<em>WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification</em>][todo: ArkLib bibliography]
+Freely available at <a href="https://eprint.iacr.org/2024/1586">https://eprint.iacr.org/2024/1586</a></li>
+</ul></div><div class="decl" id="BlockRelDistance.indexPowT"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L42-L49">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT"><span class="name">BlockRelDistance</span>.<span class="name">indexPowT</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> u_1</div></div><p>The <code>2^k</code>-th power images over an embedding <code>φ : ι ↪ F</code> and a finite set
+of elements <code>S : <a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> ι</code>.</p><p>In particular, it returns the set of field elements <code>y ∈ F</code> for which there exists <code>x ∈ S</code>
+such that <code>y = (φ x)^(2ᵏ)</code>. It models the image of the map <code>x ↦ (φ x)^(2ᵏ)</code> restricted to <code>S</code>.
+Semantically: <code><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> S φ k = { (φ x)^(2ᵏ) | x ∈ S } ⊆ F</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.indexPowT" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.powFiberT"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L51-L62">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.powFiberT"><span class="name">BlockRelDistance</span>.<span class="name">powFiberT</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">k</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> u_1</div></div><p>For i ≤ k, the generic <code>2^(k-i)</code>-th power fiber over <code>y ∈ <a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> S φ k</code>.
+For <code>φ' : ι^(2ⁱ) → F</code>, this defines the preimage of <code>y</code> under the map
+<code>x^(2ⁱ) ↦ x^(2ᵏ)</code> restricted to <code>x^(2ⁱ) ∈ S'</code>.</p><p>It returns the subset <code>S'</code> of elements of type <code>ι^(2ⁱ)</code>
+such that <code>(x^(2ⁱ))^(2^(k-i)) = x^(2^k) = y</code>.
+Example i = 0 : powFiberT 0 k S' φ' y = { x ∈ S' | (x)^(2^k) = y }.
+Example i = 1 : powFiberT 1 k S' φ' y = { x^2 ∈ S' | (x^2)^(2^(k-1)) = y }.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.powFiberT" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.block"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L64-L71">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.block"><span class="name">BlockRelDistance</span>.<span class="name">block</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">z</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">k</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> u_1</div></div><p>Definition 4.16
+For <code>ι</code> be a smooth evaluation domain, <code>k</code> be a folding parameter, <code>z ∈ (ι^(2ᵏ))</code>,
+Block is the set of elements <code>{ y ∈ S', y ^ 2^(k-i) = z }</code>, for <code>S' : <a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> ι^(2ⁱ)</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.block" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.DecidableBlockDisagreement"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L73-L88">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement"><span class="name">BlockRelDistance</span>.<span class="name">DecidableBlockDisagreement</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> u_1</div></div><p>The class DecidableBlockDisagreement provides a decidability instance for testing
+pointwise inequality of two functions <code>f, g : ι^(2ⁱ) → F</code> on elements of <code><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.block">block</a> i k S' φ' z</code>,
+for all <code>z ∈ LpowT S' φ' k</code>.</p><p>This class abstracts the decidability condition required to determine whether two
+functions disagree on any point in the preimage of <code>z</code> under the map <code>x^(2ⁱ) ↦ x^(2ᵏ)</code> over the
+evaluation domain <code>φ' : ι^(2ⁱ) ↪ F</code>. This is useful in defining sets of such <code>z</code>.</p><ul class="structure_fields" id="BlockRelDistance.DecidableBlockDisagreement.mk"><li id="BlockRelDistance.DecidableBlockDisagreement.dec_inst" class="structure_field"><div class="structure_field_info">dec_inst<span class="decl_args">
+<span class="fn">(<span class="fn">z</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">k</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+ : <span class="fn"><a href="../../.././Init/Prelude.html#Decidable">Decidable</a> <span class="fn">(∃ (<span class="fn">y</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.block">block</a> <span class="fn">i</span> <span class="fn">S'</span> <span class="fn">φ'</span> <span class="fn">z</span></span>), <span class="fn"><span class="fn">f</span> <span class="fn">↑<span class="fn">y</span></span></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn"><span class="fn">g</span> <span class="fn">↑<span class="fn">y</span></span></span>)</span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-BlockRelDistance.DecidableBlockDisagreement" class="instances-list"></ul></details></div></div><div class="decl" id="BlockRelDistance.disagreementSet"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L90-L105">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.disagreementSet"><span class="name">BlockRelDistance</span>.<span class="name">disagreementSet</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">k</span>)</span></span></div></div><p>Let C be a smooth ReedSolomon code <code>C = RS[F, ι^(2ⁱ), φ', m]</code> and <code>f,g : ι^(2ⁱ) → F</code>, then
+the (i,k)-wise block relative distance is defined as
+Δᵣ(i, k, f, S', φ', g) = |{z ∈ ι ^ 2^k : ∃ y ∈ Block(i,k,S',φ',z) f(y) ≠ g(y)}| / |ι^(2^k)|.</p><p>Below, we define a disagreementSet(i,k,f,S',φ') as a map (g → Finset (indexPow S φ k))
+using the class DecidableBlockDisagreement, to filter a finite subset of the Finset
+(indexPow S φ k), as per {z ∈ ι ^ 2^k : ∃ y ∈ Block(i,k,S',φ',z) f(y) ≠ g(y)} for a given g.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.disagreementSet" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.blockRelDistance"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L107-L119">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.blockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">blockRelDistance</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></div></div><p>Definition 4.17
+Given the disagreementSet from above, we obtain the block relative distance as
+|disagreementSet|/ |ι ^ (2^k)|</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.blockRelDistance" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.«termΔᵣ(_,_,_,_,_,_)»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L121-L122">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.«termΔᵣ(_,_,_,_,_,_)»"><span class="name">BlockRelDistance</span>.<span class="name">«termΔᵣ(_,_,_,_,_,_)»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p>notation <code>Δᵣ(i, k, f, S', φ', g)</code> is the (i,k)-wise block relative distance.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.«termΔᵣ(_,_,_,_,_,_)»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.blockRelDistance_eq_relHammingDist_of_k_eq_i"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L124-L134">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.blockRelDistance_eq_relHammingDist_of_k_eq_i"><span class="name">BlockRelDistance</span>.<span class="name">blockRelDistance_eq_relHammingDist_of_k_eq_i</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Pow">Pow</a> <span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Nat">ℕ</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h_fintype</span> : <span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f </span><span class="fn">g</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hS'</span> : <span class="fn">S'</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Data/Fintype/Defs.html#Finset.univ">Finset.univ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h_dec</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">i</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.blockRelDistance">blockRelDistance</a> <span class="fn">i</span> <span class="fn">i</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span> <span class="fn">g</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDist">δᵣ(</a><span class="fn">f</span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDist">,</a> <span class="fn">g</span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDist">)</a></span></div></div><p>The block relative distance simplifies to the standard relative Hamming distance when <code>k=0</code>.</p></div></div><div class="decl" id="BlockRelDistance.minBlockRelDistance"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L136-L144">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.minBlockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">minBlockRelDistance</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Set</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></div></div><p>For the set S ⊆ F^ι, we define the minimum block relative distance wrt set S.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.minBlockRelDistance" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.«termΔₛ(_,_,_,_,_,_)»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L146-L147">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.«termΔₛ(_,_,_,_,_,_)»"><span class="name">BlockRelDistance</span>.<span class="name">«termΔₛ(_,_,_,_,_,_)»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p>notation <code>Δₛ(i, k, f, S', φ', Set)</code> denotes the minimum block relative distance wrt <code><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a></code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.«termΔₛ(_,_,_,_,_,_)»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.listBlockRelDistance"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L149-L160">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.listBlockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">listBlockRelDistance</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">_hcode</span> : <span class="fn">C</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#smoothCode">smoothCode</a> <span class="fn">φ'</span> <span class="fn">m</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span>)</span></span></div></div><p>Definition 4.18
+For a smooth ReedSolomon code C = RS[F, ι^(2ⁱ), φ', m], proximity parameter δ ∈ [0,1]
+function f : ι^(2ⁱ) → F, we define the following as the list of codewords of C δ-close to f,
+i.e., u ∈ C such that Δᵣ(i, k, f, S', φ', u) ≤ δ.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.listBlockRelDistance" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.«termΛᵣ(_,_,_,_,_,_,_)»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L162-L165">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.«termΛᵣ(_,_,_,_,_,_,_)»"><span class="name">BlockRelDistance</span>.<span class="name">«termΛᵣ(_,_,_,_,_,_,_)»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p><code>Λᵣ(i, k, f, S', C, hcode, δ)</code> denotes the list of codewords of C δ-close to f,
+wrt to the block relative distance.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-BlockRelDistance.«termΛᵣ(_,_,_,_,_,_,_)»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="BlockRelDistance.relHammingDist_le_blockRelDistance"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L167-L178">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.relHammingDist_le_blockRelDistance"><span class="name">BlockRelDistance</span>.<span class="name">relHammingDist_le_blockRelDistance</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Pow">Pow</a> <span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Nat">ℕ</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f </span><span class="fn">g</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h_fintype</span> : <span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h_dec</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDist">δᵣ(</a><span class="fn">f</span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDist">,</a> <span class="fn">g</span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDist">)</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.blockRelDistance">blockRelDistance</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span> <span class="fn">g</span></span></div></div><p>Claim 4.19, Part 1
+For a smooth Reed-Solomon code, the standard relative Hamming distance <code>δᵣ(f,g)</code>
+is a lower bound for the (i, k)-wise block relative distance <code>Δᵣ(i, k, f, S', φ', g)</code>.</p></div></div><div class="decl" id="BlockRelDistance.listBlock_subset_listHamming"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/ProofSystem/Whir/BlockRelDistance.lean#L180-L193">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.listBlock_subset_listHamming"><span class="name">BlockRelDistance</span>.<span class="name">listBlock_subset_listHamming</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Pow">Pow</a> <span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Nat">ℕ</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ'</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h_fintype</span> : <span class="fn">(<span class="fn">i</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>) → <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">(<a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span>)</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#Smooth">Smooth</a> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.indexPowT">indexPowT</a> <span class="fn">S</span> <span class="fn">φ</span> <span class="fn">i</span></span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcode</span> : <span class="fn">C</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#smoothCode">smoothCode</a> <span class="fn">φ'</span> <span class="fn">m</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h_dec</span> : <span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.DecidableBlockDisagreement">DecidableBlockDisagreement</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">φ'</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hδLe</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.listBlockRelDistance">listBlockRelDistance</a> <span class="fn">i</span> <span class="fn">k</span> <span class="fn">f</span> <span class="fn">S'</span> <span class="fn">C</span> <span class="fn">hcode</span> <span class="fn">δ</span></span> <a href="../../.././Init/Core.html#HasSubset.Subset">⊆</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ListDecodability.html#ListDecodable.relHammingBall">ListDecodable.relHammingBall</a> <span class="fn">C</span> <span class="fn">f</span> <span class="fn">↑<span class="fn">δ</span></span></span></div></div><p>Claim 4.19, Part 2
+As a consequence of <code><a href="../../.././ArkLib/ProofSystem/Whir/BlockRelDistance.html#BlockRelDistance.relHammingDist_le_blockRelDistance">relHammingDist_le_blockRelDistance</a></code>, the list of codewords
+within a certain block relative distance <code>δ</code> is a subset of the list of codewords
+within the same relative Hamming distance <code>δ</code>.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

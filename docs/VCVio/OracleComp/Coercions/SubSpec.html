@@ -1,0 +1,476 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>VCVio.OracleComp.Coercions.SubSpec</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="VCVio.OracleComp.Coercions.SubSpec";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">VCVio</span>.<span class="name">OracleComp</span>.<span class="name">Coercions</span>.<span class="name">SubSpec</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html">VCVio.OracleComp.Constructions.UniformSelect</a></li><li><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html">VCVio.OracleComp.SimSemantics.SimulateQ</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-VCVio.OracleComp.Coercions.SubSpec" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.«term_⊂ₒ_»"><span class="name">OracleSpec</span>.<span class="name">«term_⊂ₒ_»</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.liftM_query_eq_liftM_liftM"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">liftM_query_eq_liftM_liftM</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.evalDist_lift_query"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">evalDist_lift_query</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.evalDist_liftM"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">evalDist_liftM</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.supportWhen_monadLift"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">supportWhen_monadLift</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.support_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">support_toFun</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.finSupport_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">finSupport_toFun</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.probOutput_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">probOutput_toFun</span></a></div><div class="nav_link"><a class="break_within" href="#OracleSpec.SubSpec.probEvent_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">probEvent_toFun</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp"><span class="name">OracleComp</span>.<span class="name">liftComp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_def"><span class="name">OracleComp</span>.<span class="name">liftComp_def</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_pure"><span class="name">OracleComp</span>.<span class="name">liftComp_pure</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_query"><span class="name">OracleComp</span>.<span class="name">liftComp_query</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_bind"><span class="name">OracleComp</span>.<span class="name">liftComp_bind</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_failure"><span class="name">OracleComp</span>.<span class="name">liftComp_failure</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_map"><span class="name">OracleComp</span>.<span class="name">liftComp_map</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftComp_seq"><span class="name">OracleComp</span>.<span class="name">liftComp_seq</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.evalDist_liftComp"><span class="name">OracleComp</span>.<span class="name">evalDist_liftComp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.support_liftComp"><span class="name">OracleComp</span>.<span class="name">support_liftComp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.finSupport_liftComp"><span class="name">OracleComp</span>.<span class="name">finSupport_liftComp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.probOutput_liftComp"><span class="name">OracleComp</span>.<span class="name">probOutput_liftComp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.probEvent_liftComp"><span class="name">OracleComp</span>.<span class="name">probEvent_liftComp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.neverFails_lift_comp_iff"><span class="name">OracleComp</span>.<span class="name">neverFails_lift_comp_iff</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.instMonadLiftOfOracleQuery"><span class="name">OracleComp</span>.<span class="name">instMonadLiftOfOracleQuery</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.liftM_eq_liftComp"><span class="name">OracleComp</span>.<span class="name">liftM_eq_liftComp</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Coercions-Between-Computations-With-Additional-Oracles">Coercions Between Computations With Additional Oracles <a class="hover-link" href="#Coercions-Between-Computations-With-Additional-Oracles">#</a></h1><p>This file defines a <code>isSubSpec</code> relation for pairs of <code>oracleSpec</code> where one can be
+thought of as an extension of the other with additional oracles.
+The definition consists is a thin wrapper around a <code><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a></code> instance on <code>OracleQuery</code>,
+which extends to a lifting operation on <code><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a></code>.</p><p>We use the notation <code>spec ⊂ₒ spec'</code> to represent that one set of oracles is a subset of another,
+where the non-inclusive subset symbol reflects that we avoid defining this instance reflexively.</p></div><div class="decl" id="OracleSpec.SubSpec"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L30-L38">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="decl_extends">extends</span> <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (max (max u v) (w + 1))</div></div><p>Relation defining an inclusion of one set of oracles into another, where the mapping
+doesn't affect the underlying probability distribution of the computation.
+Informally, <code>spec ⊂ₒ superSpec</code> means that for any query to an oracle of <code>sub_spec</code>,
+it can be perfectly simulated by a computation using the oracles of <code>superSpec</code>.</p><p>We avoid implementing this via the built-in subset notation as we care about the actual data
+of the mapping rather than just its existence, which is needed when defining type coercions.</p><ul class="structure_fields" id="OracleSpec.SubSpec.mk"><li class="structure_field inherited_field"><div class="structure_field_info"><a href="../../.././Init/Prelude.html#MonadLift.monadLift">monadLift</a><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span> → <span class="fn"><span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-OracleSpec.SubSpec" class="instances-list"></ul></details></div></div><div class="decl" id="OracleSpec.«term_⊂ₒ_»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L40-L40">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.«term_⊂ₒ_»"><span class="name">OracleSpec</span>.<span class="name">«term_⊂ₒ_»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.TrailingParserDescr">Lean.TrailingParserDescr</a></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleSpec.«term_⊂ₒ_»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleSpec.SubSpec.liftM_query_eq_liftM_liftM"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L48-L49">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.liftM_query_eq_liftM_liftM"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">liftM_query_eq_liftM_liftM</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span></span></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.evalDist_lift_query"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L52-L56">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.evalDist_lift_query"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">evalDist_lift_query</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span>)</span>.<a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.evalDist">evalDist</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Control/Option.html#OptionT.lift">OptionT.lift</a> <span class="fn">(<a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <span class="fn">α</span>)</span></span></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.evalDist_liftM"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L58-L62">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.evalDist_liftM"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">evalDist_liftM</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span>.<a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.evalDist">evalDist</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Control/Option.html#OptionT.lift">OptionT.lift</a> <span class="fn">(<a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <span class="fn">α</span>)</span></span></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.supportWhen_monadLift"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L64-L68">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.supportWhen_monadLift"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">supportWhen_monadLift</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">poss</span> : <span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w} → <span class="fn"><span class="fn"><span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span> → <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.supportWhen">supportWhen</a></span> <span class="fn">fun {<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w} =&gt; <span class="fn">poss</span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">poss</span> <span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span></span></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.support_toFun"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L70-L73">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.support_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">support_toFun</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../../.././Init/Prelude.html#MonadLift.monadLift">MonadLift.monadLift</a> <span class="fn">q</span>)</span>)</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.support">support</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.finSupport_toFun"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L75-L79">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.finSupport_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">finSupport_toFun</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.DecidableEq">DecidableEq</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.DecidableEq">DecidableEq</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../../.././Init/Prelude.html#MonadLift.monadLift">MonadLift.monadLift</a> <span class="fn">q</span>)</span>)</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.finSupport">finSupport</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Data/Fintype/Defs.html#Finset.univ">Finset.univ</a></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.probOutput_toFun"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L81-L86">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.probOutput_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">probOutput_toFun</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">u</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">[=</a><span class="fn">u</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">|</a><span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../../.././Init/Prelude.html#MonadLift.monadLift">MonadLift.monadLift</a> <span class="fn">q</span>)</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">]</a> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">(↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">α</span>)</span>)</span><a href="../../.././Init/Prelude.html#Inv.inv">⁻¹</a></div></div></div></div><div class="decl" id="OracleSpec.SubSpec.probEvent_toFun"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L88-L93">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec.probEvent_toFun"><span class="name">OracleSpec</span>.<span class="name">SubSpec</span>.<span class="name">probEvent_toFun</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././foundational_types.html">Prop</a></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidablePred">DecidablePred</a> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">[</a><span class="fn">p</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">|</a><span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../../.././Init/Prelude.html#MonadLift.monadLift">MonadLift.monadLift</a> <span class="fn">q</span>)</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">]</a> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn"><span class="fn">(<a href="../../.././Mathlib/Data/Finset/Filter.html#Finset.filter">Finset.filter</a> <span class="fn">p</span> <a href="../../.././Mathlib/Data/Fintype/Defs.html#Finset.univ">Finset.univ</a>)</span>.<a href="../../.././Mathlib/Data/Finset/Card.html#Finset.card">card</a></span></span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">α</span>)</span></span></div></div></div></div><div class="decl" id="OracleComp.liftComp"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L109-L112">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp"><span class="name">OracleComp</span>.<span class="name">liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">superSpec</span> <span class="fn">α</span></span></div></div><p>Lift a computation from <code>spec</code> to <code>superSpec</code> using a <code><a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleSpec.SubSpec">SubSpec</a></code> instance on queries.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleComp.liftComp" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleComp.liftComp_def"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L116-L117">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_def"><span class="name">OracleComp</span>.<span class="name">liftComp_def</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.mk">{</a> <span class="fn">impl</span> := <span class="fn">fun {<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w} =&gt; <a href="../../.././Init/Prelude.html#liftM">liftM</a></span> <a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.mk">}</a> <span class="fn">oa</span></span></div></div></div></div><div class="decl" id="OracleComp.liftComp_pure"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L119-L120">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_pure"><span class="name">OracleComp</span>.<span class="name">liftComp_pure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span>)</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="OracleComp.liftComp_query"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L122-L125">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_query"><span class="name">OracleComp</span>.<span class="name">liftComp_query</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span></span></div></div></div></div><div class="decl" id="OracleComp.liftComp_bind"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L127-L131">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_bind"><span class="name">OracleComp</span>.<span class="name">liftComp_bind</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ob</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">β</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">oa</span> <a href="../../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">ob</span>).<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">do
+  let <span class="fn">x</span> ← <span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span>
+  <span class="fn"><span class="fn"><span class="fn">(<span class="fn">ob</span> <span class="fn">x</span>)</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span></span></div></div></div></div><div class="decl" id="OracleComp.liftComp_failure"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L133-L134">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_failure"><span class="name">OracleComp</span>.<span class="name">liftComp_failure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../.././Init/Control/Basic.html#Alternative.failure">failure</a>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Control/Basic.html#Alternative.failure">failure</a></div></div></div></div><div class="decl" id="OracleComp.liftComp_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L136-L139">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_map"><span class="name">OracleComp</span>.<span class="name">liftComp_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">f</span> <a href="../../.././Init/Prelude.html#Functor.map">&lt;$&gt;</a> <span class="fn">oa</span>).<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">f</span> <a href="../../.././Init/Prelude.html#Functor.map">&lt;$&gt;</a> <span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span></div></div></div></div><div class="decl" id="OracleComp.liftComp_seq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L141-L144">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp_seq"><span class="name">OracleComp</span>.<span class="name">liftComp_seq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">og</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">(<span class="fn">α</span> → <span class="fn">β</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<span class="fn">og</span> &lt;*&gt; <span class="fn">oa</span>)</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">og</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span> &lt;*&gt; <span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span></span></div></div></div></div><div class="decl" id="OracleComp.evalDist_liftComp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L146-L159">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.evalDist_liftComp"><span class="name">OracleComp</span>.<span class="name">evalDist_liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span>)</span>.<a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.evalDist">evalDist</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.evalDist">evalDist</a></span></div></div><p>Lifting a computation to a different set of oracles doesn't change the output distribution,
+since <code>evalDist</code> assumes uniformly random queries.</p></div></div><div class="decl" id="OracleComp.support_liftComp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L161-L164">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.support_liftComp"><span class="name">OracleComp</span>.<span class="name">support_liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span>)</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.support">support</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.support">support</a></span></div></div></div></div><div class="decl" id="OracleComp.finSupport_liftComp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L166-L170">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.finSupport_liftComp"><span class="name">OracleComp</span>.<span class="name">finSupport_liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.DecidableEq">DecidableEq</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.DecidableEq">DecidableEq</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span>)</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.finSupport">finSupport</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Support.html#OracleComp.finSupport">finSupport</a></span></div></div></div></div><div class="decl" id="OracleComp.probOutput_liftComp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L172-L175">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.probOutput_liftComp"><span class="name">OracleComp</span>.<span class="name">probOutput_liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">[=</a><span class="fn">x</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">|</a><span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">]</a> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">[=</a><span class="fn">x</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">|</a><span class="fn">oa</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probOutput">]</a></div></div></div></div><div class="decl" id="OracleComp.probEvent_liftComp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L177-L181">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.probEvent_liftComp"><span class="name">OracleComp</span>.<span class="name">probEvent_liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././foundational_types.html">Prop</a></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidablePred">DecidablePred</a> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">[</a><span class="fn">p</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">|</a><span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">]</a> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">[</a><span class="fn">p</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">|</a><span class="fn">oa</span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">]</a></div></div></div></div><div class="decl" id="OracleComp.neverFails_lift_comp_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L183-L186">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.neverFails_lift_comp_iff"><span class="name">OracleComp</span>.<span class="name">neverFails_lift_comp_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">h</span> : <span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span>)</span>.<a href="../../.././VCVio/OracleComp/Traversal.html#OracleComp.neverFails">neverFails</a></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Traversal.html#OracleComp.neverFails">neverFails</a></span></div></div></div></div><div class="decl" id="OracleComp.instMonadLiftOfOracleQuery"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L190-L193">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.instMonadLiftOfOracleQuery"><span class="name">OracleComp</span>.<span class="name">instMonadLiftOfOracleQuery</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">(<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span>)</span> <span class="fn">(<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">superSpec</span>)</span></span></div></div><p>Extend a lifting on <code>OracleQuery</code> to a lifting on <code><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a></code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="OracleComp.liftM_eq_liftComp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/Coercions/SubSpec.lean#L197-L199">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftM_eq_liftComp"><span class="name">OracleComp</span>.<span class="name">liftM_eq_liftComp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">τ</span> : <a href="../../.././foundational_types.html">Type</a> v}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">superSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">τ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn"><span class="fn">superSpec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">oa</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/Coercions/SubSpec.html#OracleComp.liftComp">liftComp</a></span> <span class="fn">superSpec</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

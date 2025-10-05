@@ -1,0 +1,366 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.Data.CodingTheory.InterleavedCode</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="ArkLib.Data.CodingTheory.InterleavedCode";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">Data</span>.<span class="name">CodingTheory</span>.<span class="name">InterleavedCode</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/Order/CompletePartialOrder.html">Mathlib.Order.CompletePartialOrder</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/Basic.html">ArkLib.Data.CodingTheory.Basic</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html">ArkLib.Data.CodingTheory.ReedSolomon</a></li><li><a href="../../.././Mathlib/Probability/Distributions/Uniform.html">Mathlib.Probability.Distributions.Uniform</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.Data.CodingTheory.InterleavedCode" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#MatrixSubmodule"><span class="name">MatrixSubmodule</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode"><span class="name">InterleavedCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.isInterleaved"><span class="name">InterleavedCode</span>.<span class="name">isInterleaved</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.LawfulInterleavedCode"><span class="name">InterleavedCode</span>.<span class="name">LawfulInterleavedCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.matrixSubmoduleOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">matrixSubmoduleOfLinearCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.codeOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">codeOfLinearCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.isInterleaved_codeOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">isInterleaved_codeOfLinearCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.lawfulInterleavedCodeOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">lawfulInterleavedCodeOfLinearCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.distCodewords"><span class="name">InterleavedCode</span>.<span class="name">distCodewords</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.«termΔ(_,_)»"><span class="name">InterleavedCode</span>.<span class="name">«termΔ(_,_)»</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.minDist"><span class="name">InterleavedCode</span>.<span class="name">minDist</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.termΔ_"><span class="name">InterleavedCode</span>.<span class="name">termΔ_</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.distToCode"><span class="name">InterleavedCode</span>.<span class="name">distToCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.«termΔ(_,_)_1»"><span class="name">InterleavedCode</span>.<span class="name">«termΔ(_,_)_1»</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.relDistCodewords"><span class="name">InterleavedCode</span>.<span class="name">relDistCodewords</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.relHammingBallInterleavedCode"><span class="name">InterleavedCode</span>.<span class="name">relHammingBallInterleavedCode</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.«termΛᵢ(_,_,_)»"><span class="name">InterleavedCode</span>.<span class="name">«termΛᵢ(_,_,_)»</span></a></div><div class="nav_link"><a class="break_within" href="#InterleavedCode.minDist_eq_minDist"><span class="name">InterleavedCode</span>.<span class="name">minDist_eq_minDist</span></a></div><div class="nav_link"><a class="break_within" href="#instFintype_arkLib"><span class="name">instFintype_arkLib</span></a></div><div class="nav_link"><a class="break_within" href="#distInterleavedCodeToCodeLB"><span class="name">distInterleavedCodeToCodeLB</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityToRS.closePtsOnAffineLine"><span class="name">ProximityToRS</span>.<span class="name">closePtsOnAffineLine</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityToRS.numberOfClosePts"><span class="name">ProximityToRS</span>.<span class="name">numberOfClosePts</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityToRS.e_leq_dist_over_3"><span class="name">ProximityToRS</span>.<span class="name">e_leq_dist_over_3</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityToRS.probOfBadPts"><span class="name">ProximityToRS</span>.<span class="name">probOfBadPts</span></a></div></nav><main>
+<div class="mod_doc"><p>Definition of an interleaved code of a linear code over a semiring.
+Definition of distances for interleaved codes and statement for the relation between the minimal
+distance of an interleaved code and its underlying linear code.
+Statements of proximity results for Reed Solomon codes (<code>Lemma 4.3</code>, <code>Lemma 4.4</code> and <code>Lemma 4.5</code>
+from <code>[AHIV22]</code> : <code>Ligero: Lightweight Sublinear Arguments Without a Trusted Setup</code>
+by <code>S. Ames, C. Hazay, Y. Ishai, M. Venkitasubramaniam</code>.</p></div><div class="decl" id="MatrixSubmodule"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L27-L29">source</a></div><div class="attributes">@[reducible, inline]</div>
+<div class="decl_header"><span class="decl_kind">abbrev</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#MatrixSubmodule"><span class="name">MatrixSubmodule</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> v)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> w)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (max u v w)</div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-MatrixSubmodule" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode"><div class="structure"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L31-L35">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode"><span class="name">InterleavedCode</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_6)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (max (max u_4 u_5) u_6)</div></div><p>The data needed to construct an interleaved code.</p><ul class="structure_fields" id="InterleavedCode.mk"><li id="InterleavedCode.MF" class="structure_field"><div class="structure_field_info">MF : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#MatrixSubmodule">MatrixSubmodule</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span></div></li><li id="InterleavedCode.LC" class="structure_field"><div class="structure_field_info">LC : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span></div></li></ul><details id="instances-for-list-InterleavedCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.isInterleaved"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L39-L42">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.isInterleaved"><span class="name">InterleavedCode</span>.<span class="name">isInterleaved</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode">InterleavedCode</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>The condition making the <code><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode">InterleavedCode</a></code> structure an interleaved code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.isInterleaved" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.LawfulInterleavedCode"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L44-L46">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LawfulInterleavedCode"><span class="name">InterleavedCode</span>.<span class="name">LawfulInterleavedCode</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_6)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (max 0 (max u_4 u_5) u_6)</div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.LawfulInterleavedCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.matrixSubmoduleOfLinearCode"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L48-L52">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.matrixSubmoduleOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">matrixSubmoduleOfLinearCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">LC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#MatrixSubmodule">MatrixSubmodule</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span></div></div><p>The submodule of the module of matrices whose rows belong to a linear code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.matrixSubmoduleOfLinearCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.codeOfLinearCode"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L54-L55">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.codeOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">codeOfLinearCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">LC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode">InterleavedCode</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.codeOfLinearCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.isInterleaved_codeOfLinearCode"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L57-L60">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.isInterleaved_codeOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">isInterleaved_codeOfLinearCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">LC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.codeOfLinearCode">codeOfLinearCode</a> <span class="fn">κ</span> <span class="fn">LC</span>)</span>.<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.isInterleaved">isInterleaved</a></span></div></div><p>The module of matrices whose rows belong to a linear code is in fact an interleaved code.</p></div></div><div class="decl" id="InterleavedCode.lawfulInterleavedCodeOfLinearCode"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L62-L63">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.lawfulInterleavedCodeOfLinearCode"><span class="name">InterleavedCode</span>.<span class="name">lawfulInterleavedCodeOfLinearCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">LC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#LinearCode">LinearCode</a> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LawfulInterleavedCode">LawfulInterleavedCode</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.lawfulInterleavedCodeOfLinearCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.distCodewords"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L65-L68">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distCodewords"><span class="name">InterleavedCode</span>.<span class="name">distCodewords</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">U </span><span class="fn">V</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Nat">ℕ</a></div></div><p>Distance between codewords of an interleaved code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.distCodewords" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.«termΔ(_,_)»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L70-L72">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.«termΔ(_,_)»"><span class="name">InterleavedCode</span>.<span class="name">«termΔ(_,_)»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p><code>Δ(U,V)</code> is the distance between codewords <code>U</code> and <code>V</code> of a <code>κ</code>-interleaved code <code>IC</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.«termΔ(_,_)»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.minDist"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L74-L77">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.minDist"><span class="name">InterleavedCode</span>.<span class="name">minDist</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#MatrixSubmodule">MatrixSubmodule</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Nat">ℕ</a></div></div><p>Minimal distance of an interleaved code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.minDist" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.termΔ_"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L79-L81">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.termΔ_"><span class="name">InterleavedCode</span>.<span class="name">termΔ_</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p><code>Δ IC</code> is the min distance of an interleaved code <code>IC</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.termΔ_" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.distToCode"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L83-L86">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode"><span class="name">InterleavedCode</span>.<span class="name">distToCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">U</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#MatrixSubmodule">MatrixSubmodule</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Nat">ℕ</a></div></div><p>Distance from a matrix to the closest word in an interleaved code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.distToCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.«termΔ(_,_)_1»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L88-L90">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.«termΔ(_,_)_1»"><span class="name">InterleavedCode</span>.<span class="name">«termΔ(_,_)_1»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p><code>Δ(U,C')</code> denotes distance between a <code>κ x ι</code> matrix <code>U</code> and <code>κ</code>-interleaved code <code>IC</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.«termΔ(_,_)_1»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.relDistCodewords"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L92-L95">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.relDistCodewords"><span class="name">InterleavedCode</span>.<span class="name">relDistCodewords</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">U </span><span class="fn">V</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></div></div><p>Relative distance between codewords of an interleaved code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.relDistCodewords" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.relHammingBallInterleavedCode"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L97-L102">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.relHammingBallInterleavedCode"><span class="name">InterleavedCode</span>.<span class="name">relHammingBallInterleavedCode</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">U</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#MatrixSubmodule">MatrixSubmodule</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span>)</span></span></div></div><p>The list of codewords of <code>IC</code> <code>r</code>-close to <code>U</code>, with respect to relative distance of
+interleaved codes.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.relHammingBallInterleavedCode" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.«termΛᵢ(_,_,_)»"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L104-L106">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.«termΛᵢ(_,_,_)»"><span class="name">InterleavedCode</span>.<span class="name">«termΛᵢ(_,_,_)»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p><code>Λᵢ(U, IC, r)</code> denotes the list of codewords of IC <code>r</code>-close to <code>U</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-InterleavedCode.«termΛᵢ(_,_,_)»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="InterleavedCode.minDist_eq_minDist"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L108-L112">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.minDist_eq_minDist"><span class="name">InterleavedCode</span>.<span class="name">minDist_eq_minDist</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LawfulInterleavedCode">LawfulInterleavedCode</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minDist">Code.minDist</a> <span class="fn">↑<span class="fn"><span class="fn">(↑<span class="fn">IC</span>)</span>.<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LC">LC</a></span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.minDist">Δ</a> <span class="fn"><span class="fn">(↑<span class="fn">IC</span>)</span>.<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.MF">MF</a></span></div></div><p>The minimal distance of an interleaved code is the same as the minimal distance of its
+underlying linear code.</p></div></div><div class="decl" id="instFintype_arkLib"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L125-L125">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#instFintype_arkLib"><span class="name">instFintype_arkLib</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-instFintype_arkLib" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="distInterleavedCodeToCodeLB"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L127-L133">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#distInterleavedCodeToCodeLB"><span class="name">distInterleavedCodeToCodeLB</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">IC</span> : <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LawfulInterleavedCode">InterleavedCode.LawfulInterleavedCode</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">F</span></span> <a href="../../.././Init/Prelude.html#GE.ge">≥</a> <span class="fn">e</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">he</span> : <span class="fn">↑<span class="fn">e</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minDist">Code.minDist</a> <span class="fn">↑<span class="fn"><span class="fn">(↑<span class="fn">IC</span>)</span>.<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LC">LC</a></span></span>)</span></span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">3</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hU</span> : <span class="fn">e</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode">Δ(</a><span class="fn">U</span><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode">,</a><span class="fn"><span class="fn">(↑<span class="fn">IC</span>)</span>.<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.MF">MF</a></span><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ <span class="fn">v</span> ∈ <span class="fn"><span class="fn">U</span>.<a href="../../.././ArkLib/Data/CodingTheory/Prelims.html#Matrix.rowSpan">rowSpan</a></span>, <span class="fn">↑<span class="fn">e</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">Δ₀(</a><span class="fn">v</span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">,</a> <span class="fn">↑<span class="fn"><span class="fn">(↑<span class="fn">IC</span>)</span>.<a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.LC">LC</a></span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">)</a></span></div></div><p><code>Lemma 4.3</code> from <code>[AHIV22]</code>.</p></div></div><div class="decl" id="ProximityToRS.closePtsOnAffineLine"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L139-L143">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#ProximityToRS.closePtsOnAffineLine"><span class="name">ProximityToRS</span>.<span class="name">closePtsOnAffineLine</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_7}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">u </span><span class="fn">v</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">α</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn">ι</span> → <span class="fn">F</span>)</span></span></div></div><p>The set of points on an affine line, which are within distance <code>e</code> from a Reed-Solomon code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityToRS.closePtsOnAffineLine" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityToRS.numberOfClosePts"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L145-L149">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#ProximityToRS.numberOfClosePts"><span class="name">ProximityToRS</span>.<span class="name">numberOfClosePts</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">u </span><span class="fn">v</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">α</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Nat">ℕ</a></div></div><p>The number of points on an affine line between, which are within distance <code>e</code> from a
+Reed-Solomon code.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityToRS.numberOfClosePts" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityToRS.e_leq_dist_over_3"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L151-L157">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#ProximityToRS.e_leq_dist_over_3"><span class="name">ProximityToRS</span>.<span class="name">e_leq_dist_over_3</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">u </span><span class="fn">v</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">he</span> : <span class="fn">↑<span class="fn">e</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minDist">Code.minDist</a> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.RScodeSet">ReedSolomonCode.RScodeSet</a> <span class="fn">α</span> <span class="fn">deg</span>)</span>)</span></span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">3</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Prelims.html#Affine.line">Affine.line</a> <span class="fn">u</span> <span class="fn">v</span></span> →
+  <a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">Δ₀(</a><span class="fn">x</span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">,</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">α</span> <span class="fn">deg</span>)</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">)</a> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">↑<span class="fn">e</span></span> <a href="../../.././Init/Prelude.html#Or">∨</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#ProximityToRS.numberOfClosePts">numberOfClosePts</a> <span class="fn">u</span> <span class="fn">v</span> <span class="fn">deg</span> <span class="fn">α</span> <span class="fn">e</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minDist">Code.minDist</a> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.RScodeSet">ReedSolomonCode.RScodeSet</a> <span class="fn">α</span> <span class="fn">deg</span>)</span></span></span></div></div><p><code>Lemma 4.4</code> from <code>[AHIV22]</code>
+Remark: Below, can use (ReedSolomonCode.minDist deg α) instead of ι - deg + 1 once proved.</p></div></div><div class="decl" id="ProximityToRS.probOfBadPts"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/InterleavedCode.lean#L159-L167">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#ProximityToRS.probOfBadPts"><span class="name">ProximityToRS</span>.<span class="name">probOfBadPts</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">κ</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">κ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <span class="fn"><a href="../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">κ</span> <span class="fn">ι</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">he</span> : <span class="fn">↑<span class="fn">e</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minDist">Code.minDist</a> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.RScodeSet">ReedSolomonCode.RScodeSet</a> <span class="fn">α</span> <span class="fn">deg</span>)</span>)</span></span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">3</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hU</span> : <span class="fn">e</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode">Δ(</a><span class="fn">U</span><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode">,</a><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.matrixSubmoduleOfLinearCode">InterleavedCode.matrixSubmoduleOfLinearCode</a> <span class="fn">κ</span> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">α</span> <span class="fn">deg</span>)</span></span><a href="../../.././ArkLib/Data/CodingTheory/InterleavedCode.html#InterleavedCode.distToCode">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <span class="fn">↥<span class="fn"><span class="fn">U</span>.<a href="../../.././ArkLib/Data/CodingTheory/Prelims.html#Matrix.rowSpan">rowSpan</a></span></span>)</span>.<a href="../../.././Mathlib/Probability/ProbabilityMassFunction/Basic.html#PMF.toOuterMeasure">toOuterMeasure</a></span> <a href="../../.././Mathlib/Data/Set/Defs.html#setOf">{</a><span class="fn">w</span> <a href="../../.././Mathlib/Data/Set/Defs.html#setOf">:</a> <span class="fn">↥<span class="fn"><span class="fn">U</span>.<a href="../../.././ArkLib/Data/CodingTheory/Prelims.html#Matrix.rowSpan">rowSpan</a></span></span> <a href="../../.././Mathlib/Data/Set/Defs.html#setOf">|</a> <a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">Δ₀(</a><span class="fn">↑<span class="fn">w</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">,</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">α</span> <span class="fn">deg</span>)</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.distFromCode">)</a> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">↑<span class="fn">e</span></span><a href="../../.././Mathlib/Data/Set/Defs.html#setOf">}</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a>   <span class="fn">↑<span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.minDist">Code.minDist</a> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.RScodeSet">ReedSolomonCode.RScodeSet</a> <span class="fn">α</span> <span class="fn">deg</span>)</span>)</span></span></span> <a href="../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">↑<span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">F</span>)</span></span></span></div></div><p><code>Lemma 4.5</code> from <code>[AHIV22]</code>.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

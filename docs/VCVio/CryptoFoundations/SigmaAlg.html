@@ -1,0 +1,44 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../.././style.css"></link><link rel="icon" href="../.././favicon.svg"></link><link rel="mask-icon" href="../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../.././/declarations/declaration-data.bmp" as="image"></link><title>VCVio.CryptoFoundations.SigmaAlg</title><script defer="true" src="../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../.././";</script><script>const MODULE_NAME="VCVio.CryptoFoundations.SigmaAlg";</script><script type="module" src="../.././jump-src.js"></script><script type="module" src="../.././search.js"></script><script type="module" src="../.././expand-nav.js"></script><script type="module" src="../.././how-about.js"></script><script type="module" src="../.././instances.js"></script><script type="module" src="../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">VCVio</span>.<span class="name">CryptoFoundations</span>.<span class="name">SigmaAlg</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/CryptoFoundations/SigmaAlg.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../.././Init.html">Init</a></li><li><a href="../.././VCVio/OracleComp/ExecutionMethod.html">VCVio.OracleComp.ExecutionMethod</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-VCVio.CryptoFoundations.SigmaAlg" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#SigmaAlg"><span class="name">SigmaAlg</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Sigma-Protocol">Sigma Protocol <a class="hover-link" href="#Sigma-Protocol">#</a></h1><p>This file defines a structure type for Σ-protocols.</p></div><div class="decl" id="SigmaAlg"><div class="structure"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/CryptoFoundations/SigmaAlg.lean#L18-L40">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../.././VCVio/CryptoFoundations/SigmaAlg.html#SigmaAlg"><span class="name">SigmaAlg</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">S </span><span class="fn">W </span><span class="fn">PC </span><span class="fn">SC </span><span class="fn">Ω </span><span class="fn">P</span> : <a href="../.././foundational_types.html">Type</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><span class="fn">S</span> → <span class="fn"><span class="fn">W</span> → <a href="../.././Init/Prelude.html#Bool">Bool</a></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../.././foundational_types.html">Type</a> 1</div></div><p>A sigma protocol for statements in <code>S</code> and witnesses in <code>W</code>,
+where <code>p : X → W → <a href="../.././Init/Prelude.html#Bool">Bool</a></code> is the proposition that is proven by the Σ-protocol.
+Commitments are split into private and public parts in <code>PC</code> and <code>SC</code> resp.
+Verifier challenges are assumed to be drawn uniformly from <code>Ω</code>.
+Provers final proof responses are in <code>P</code>.</p><p>We have two types for the commitments in order to allow for a public part in <code>PC</code>
+and secret part in <code>SC</code>. Only the commitment in <code>PC</code> is revealed to the verifier,
+but the <code>prove</code> function may still use <code>SC</code> in generating a proof.</p><p>We leave properties like special soundness as seperate definitions for better modularity.</p><ul class="structure_fields" id="SigmaAlg.mk"><li id="SigmaAlg.commit" class="structure_field"><div class="structure_field_info">commit<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">w</span> : <span class="fn">W</span>)</span></span>
+ : <span class="fn"><a href="../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> (<span class="fn">PC</span> <a href="../.././Init/Prelude.html#Prod">×</a> <span class="fn">SC</span>)</span></div><div class="structure_field_doc"><p>Given a statement <code>s</code>, make a commitment to prove that you have a valid witness <code>w</code>.</p></div></li><li id="SigmaAlg.respond" class="structure_field"><div class="structure_field_info">respond<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">w</span> : <span class="fn">W</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">sc</span> : <span class="fn">SC</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ω</span> : <span class="fn">Ω</span>)</span></span>
+ : <span class="fn"><a href="../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">P</span></span></div><div class="structure_field_doc"><p>Given a previous secret commitment <code>sc</code>, repond to the challenge <code>ω</code></p></div></li><li id="SigmaAlg.verify" class="structure_field"><div class="structure_field_info">verify<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">pc</span> : <span class="fn">PC</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ω</span> : <span class="fn">Ω</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn">P</span>)</span></span>
+ : <a href="../.././Init/Prelude.html#Bool">Bool</a></div><div class="structure_field_doc"><p>Deterministic function to check that the proof <code>p</code> satisfies the challenge <code>ω</code>.</p></div></li><li id="SigmaAlg.sim" class="structure_field"><div class="structure_field_info">sim<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn">S</span>)</span></span>
+ : <span class="fn"><a href="../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">PC</span></span></div><div class="structure_field_doc"><p>Simulate public commitment generation while only knowing the statement.</p></div></li><li id="SigmaAlg.extract" class="structure_field"><div class="structure_field_info">extract<span class="decl_args">
+<span class="fn">(<span class="fn">ω₁</span> : <span class="fn">Ω</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p₁</span> : <span class="fn">P</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ω₂</span> : <span class="fn">Ω</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p₂</span> : <span class="fn">P</span>)</span></span>
+ : <span class="fn"><a href="../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">W</span></span></div><div class="structure_field_doc"><p>Extract a witness to the statement from two proofs.</p></div></li></ul><details id="instances-for-list-SigmaAlg" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div></main>
+<nav class="nav"><iframe src="../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

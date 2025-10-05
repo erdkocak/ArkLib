@@ -1,0 +1,652 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.OracleReduction.LiftContext.OracleReduction</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="ArkLib.OracleReduction.LiftContext.OracleReduction";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">OracleReduction</span>.<span class="name">LiftContext</span>.<span class="name">OracleReduction</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html">ArkLib.OracleReduction.LiftContext.Reduction</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.OracleReduction.LiftContext.OracleReduction" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#OracleProver.liftContext"><span class="name">OracleProver</span>.<span class="name">liftContext</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.liftContext"><span class="name">OracleVerifier</span>.<span class="name">liftContext</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.liftContext"><span class="name">OracleReduction</span>.<span class="name">liftContext</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.liftContext_toVerifier_comm"><span class="name">OracleVerifier</span>.<span class="name">liftContext_toVerifier_comm</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.liftContext_toReduction_comm"><span class="name">OracleReduction</span>.<span class="name">liftContext_toReduction_comm</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.liftContext_completeness"><span class="name">OracleReduction</span>.<span class="name">liftContext_completeness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.liftContext_perfectCompleteness"><span class="name">OracleReduction</span>.<span class="name">liftContext_perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.liftContext_soundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_soundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.liftContext_knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_knowledgeSoundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.liftContext_rbr_soundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_rbr_soundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.liftContext_rbr_knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_rbr_knowledgeSoundness</span></a></div></nav><main>
+<div class="mod_doc"><h2 class="markdown-heading" id="Lifting-Oracle-Reductions-to-Larger-Contexts">Lifting Oracle Reductions to Larger Contexts <a class="hover-link" href="#Lifting-Oracle-Reductions-to-Larger-Contexts">#</a></h2><p>This file is a continuation of <code><a href="../../.././LiftContext/Reduction.html">LiftContext/Reduction.lean</a></code>, where we lift oracle reductions to
+larger contexts.</p><p>The only new thing here is the definition of the oracle verifier. The rest (oracle prover +
+security properties) are just ported from <code><a href="../../.././LiftContext/Reduction.html">LiftContext/Reduction.lean</a></code>, with suitable conversions.</p></div><div class="decl" id="OracleProver.liftContext"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L32-L42">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleProver.liftContext"><span class="name">OracleProver</span>.<span class="name">liftContext</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens">OracleContext.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">P</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleProver">OracleProver</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">InnerWitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleProver">OracleProver</a> <span class="fn">oSpec</span> <span class="fn">OuterStmtIn</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">OuterOStmtOut</span> <span class="fn">OuterWitOut</span> <span class="fn">pSpec</span></span></div></div><p>The lifting of the prover from an inner oracle reduction to an outer oracle reduction, requiring
+an associated oracle context lens</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleProver.liftContext" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleVerifier.liftContext"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L46-L58">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext"><span class="name">OracleVerifier</span>.<span class="name">liftContext</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterStmtOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerStmtOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens">OracleStatement.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">V</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">OuterStmtIn</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">OuterOStmtOut</span> <span class="fn">pSpec</span></span></div></div><p>The lifting of the verifier from an inner oracle reduction to an outer oracle reduction,
+requiring an associated oracle statement lens</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleVerifier.liftContext" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleReduction.liftContext"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L60-L71">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext"><span class="name">OracleReduction</span>.<span class="name">liftContext</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens">OracleContext.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">InnerWitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">OuterStmtIn</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">OuterOStmtOut</span> <span class="fn">OuterWitOut</span> <span class="fn">pSpec</span></span></div></div><p>The lifting of an inner oracle reduction to an outer oracle reduction,
+requiring an associated oracle context lens</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleReduction.liftContext" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleVerifier.liftContext_toVerifier_comm"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L75-L82">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext_toVerifier_comm"><span class="name">OracleVerifier</span>.<span class="name">liftContext_toVerifier_comm</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterStmtOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerStmtOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens">OracleStatement.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext">liftContext</a> <span class="fn">lens</span> <span class="fn">V</span>)</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.toVerifier">toVerifier</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Verifier.liftContext">Verifier.liftContext</a> <span class="fn">lens</span> <span class="fn"><span class="fn">V</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.toVerifier">toVerifier</a></span></span></div></div><p>The lifting of the verifier commutes with the conversion from the oracle verifier to the
+verifier</p></div></div><div class="decl" id="OracleReduction.liftContext_toReduction_comm"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L84-L93">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext_toReduction_comm"><span class="name">OracleReduction</span>.<span class="name">liftContext_toReduction_comm</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens">OracleContext.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">InnerWitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext">liftContext</a> <span class="fn">lens</span> <span class="fn">R</span>)</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction.toReduction">toReduction</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Reduction.liftContext">Reduction.liftContext</a> <span class="fn"><span class="fn">lens</span>.<a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens.toContext">toContext</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction.toReduction">toReduction</a></span></span></div></div><p>The lifting of the reduction commutes with the conversion from the oracle reduction to the
+reduction</p></div></div><div class="decl" id="OracleReduction.liftContext_completeness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L118-L123">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext_completeness"><span class="name">OracleReduction</span>.<span class="name">liftContext_completeness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><span class="fn">OuterOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><span class="fn">InnerOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><span class="fn">InnerOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens">OracleContext.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">InnerWitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">lensComplete</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Context.Lens.IsComplete">Context.Lens.IsComplete</a> <span class="fn">outerRelIn</span> <span class="fn">innerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">innerRelOut</span>
+    <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Reduction.compatContext">Reduction.compatContext</a> <span class="fn"><span class="fn">lens</span>.<a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens.toContext">toContext</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction.toReduction">toReduction</a></span>)</span> <span class="fn"><span class="fn">lens</span>.<a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens.toContext">toContext</a></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">completenessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">innerRelIn</span> <span class="fn">innerRelOut</span> <span class="fn">R</span> <span class="fn">completenessError</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">outerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext">liftContext</a> <span class="fn">lens</span> <span class="fn">R</span>)</span> <span class="fn">completenessError</span></span></div></div></div></div><div class="decl" id="OracleReduction.liftContext_perfectCompleteness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L125-L128">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext_perfectCompleteness"><span class="name">OracleReduction</span>.<span class="name">liftContext_perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><span class="fn">OuterOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><span class="fn">InnerOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><span class="fn">InnerOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens">OracleContext.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span> <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">InnerWitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">lensComplete</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Context.Lens.IsComplete">Context.Lens.IsComplete</a> <span class="fn">outerRelIn</span> <span class="fn">innerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">innerRelOut</span>
+    <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Reduction.compatContext">Reduction.compatContext</a> <span class="fn"><span class="fn">lens</span>.<a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens.toContext">toContext</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction.toReduction">toReduction</a></span>)</span> <span class="fn"><span class="fn">lens</span>.<a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleContext.Lens.toContext">toContext</a></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.perfectCompleteness">perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">innerRelIn</span> <span class="fn">innerRelOut</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.perfectCompleteness">perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">outerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleReduction.liftContext">liftContext</a> <span class="fn">lens</span> <span class="fn">R</span>)</span></span></div></div></div></div><div class="decl" id="OracleVerifier.liftContext_soundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L140-L153">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext_soundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterStmtOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerStmtOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerLangIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerLangOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">OuterStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><span class="fn">OuterOStmtOut</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerLangIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">InnerStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><span class="fn">InnerOStmtIn</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerLangOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">InnerStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><span class="fn">InnerOStmtOut</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">InnerStmtOut</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">soundnessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens">OracleStatement.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">V</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">lensSound</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens.IsSound">OracleStatement.Lens.IsSound</a> <span class="fn">outerLangIn</span> <span class="fn">outerLangOut</span> <span class="fn">innerLangIn</span> <span class="fn">innerLangOut</span>
+    <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Verifier.compatStatement">Verifier.compatStatement</a> <span class="fn">lens</span> <span class="fn"><span class="fn">V</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.toVerifier">toVerifier</a></span>)</span> <span class="fn">lens</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.soundness">soundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">innerLangIn</span> <span class="fn">innerLangOut</span> <span class="fn">V</span> <span class="fn">soundnessError</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.soundness">soundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">outerLangIn</span> <span class="fn">outerLangOut</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext">liftContext</a> <span class="fn">lens</span> <span class="fn">V</span>)</span> <span class="fn">soundnessError</span></span></div></div><p>Lifting the reduction preserves soundness, assuming the lens satisfies its soundness
+conditions</p></div></div><div class="decl" id="OracleVerifier.liftContext_knowledgeSoundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L155-L170">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext_knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><span class="fn">OuterOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><span class="fn">InnerOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><span class="fn">InnerOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">InnerStmtOut</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">InnerWitIn</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">knowledgeError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">stmtLens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens">OracleStatement.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">witLens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Witness.InvLens">Witness.InvLens</a> (<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>) <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">V</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">lensKS</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Extractor.Lens.IsKnowledgeSound">Extractor.Lens.IsKnowledgeSound</a> <span class="fn">outerRelIn</span> <span class="fn">innerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">innerRelOut</span>
+    <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Verifier.compatStatement">Verifier.compatStatement</a> <span class="fn">stmtLens</span> <span class="fn"><span class="fn">V</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.toVerifier">toVerifier</a></span>)</span> <span class="fn">(fun (<span class="fn">x</span> : <span class="fn">OuterWitOut</span>) (<span class="fn">x</span> : <span class="fn">InnerWitIn</span>) =&gt; <a href="../../.././Init/Prelude.html#True">True</a>)</span>
+    <a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Extractor.Lens.mk">{</a> <span class="fn">stmt</span> := <span class="fn">stmtLens</span>, <span class="fn">wit</span> := <span class="fn">witLens</span> <a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Extractor.Lens.mk">}</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.knowledgeSoundness">knowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">innerRelIn</span> <span class="fn">innerRelOut</span> <span class="fn">V</span> <span class="fn">knowledgeError</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.knowledgeSoundness">knowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">outerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext">liftContext</a> <span class="fn">stmtLens</span> <span class="fn">V</span>)</span> <span class="fn">knowledgeError</span></span></div></div></div></div><div class="decl" id="OracleVerifier.liftContext_rbr_soundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L172-L184">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext_rbr_soundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_rbr_soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterStmtOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerStmtOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerLangIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerLangOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">OuterStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><span class="fn">OuterOStmtOut</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerLangIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">InnerStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><span class="fn">InnerOStmtIn</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerLangOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">InnerStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><span class="fn">InnerOStmtOut</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">InnerStmtOut</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">rbrSoundnessError</span> : <span class="fn"><span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span> → <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens">OracleStatement.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">V</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">lensSound</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens.IsSound">OracleStatement.Lens.IsSound</a> <span class="fn">outerLangIn</span> <span class="fn">outerLangOut</span> <span class="fn">innerLangIn</span> <span class="fn">innerLangOut</span>
+    <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Verifier.compatStatement">Verifier.compatStatement</a> <span class="fn">lens</span> <span class="fn"><span class="fn">V</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.toVerifier">toVerifier</a></span>)</span> <span class="fn">lens</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/RoundByRound.html#OracleVerifier.rbrSoundness">rbrSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">innerLangIn</span> <span class="fn">innerLangOut</span> <span class="fn">V</span> <span class="fn">rbrSoundnessError</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/RoundByRound.html#OracleVerifier.rbrSoundness">rbrSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">outerLangIn</span> <span class="fn">outerLangOut</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext">liftContext</a> <span class="fn">lens</span> <span class="fn">V</span>)</span> <span class="fn">rbrSoundnessError</span></span></div></div></div></div><div class="decl" id="OracleVerifier.liftContext_rbr_knowledgeSoundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/LiftContext/OracleReduction.lean#L186-L202">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext_rbr_knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">liftContext_rbr_knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterStmtIn </span><span class="fn">OuterWitIn </span><span class="fn">OuterStmtOut </span><span class="fn">OuterWitOut </span><span class="fn">Outer_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtIn</span> : <span class="fn"><span class="fn">Outer_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outer_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OuterOStmtOut</span> : <span class="fn"><span class="fn">Outer_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OuterOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtIn</span> : <span class="fn"><span class="fn">Inner_ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Inner_ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerOStmtOut</span> : <span class="fn"><span class="fn">Inner_ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">InnerStmtIn </span><span class="fn">InnerWitIn </span><span class="fn">InnerStmtOut </span><span class="fn">InnerWitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">outerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">OuterStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛₒ</span>) → <span class="fn"><span class="fn">OuterOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">OuterWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛᵢ</span>) → <span class="fn"><span class="fn">InnerOStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">innerRelOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">InnerStmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><span class="fn">InnerOStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">InnerWitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">InnerStmtOut</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">Inner_ιₛₒ</span>) → <span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">(<span class="fn">InnerOStmtOut</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">Inhabited</a> <span class="fn">InnerWitIn</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">rbrKnowledgeError</span> : <span class="fn"><span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span> → <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">stmtLens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#OracleStatement.Lens">OracleStatement.Lens</a> <span class="fn">OuterStmtIn</span> <span class="fn">OuterStmtOut</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">OuterOStmtIn</span> <span class="fn">OuterOStmtOut</span> <span class="fn">InnerOStmtIn</span>
+    <span class="fn">InnerOStmtOut</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">witLens</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Witness.InvLens">Witness.InvLens</a> (<span class="fn">OuterStmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">Outer_ιₛᵢ</span>) → <span class="fn"><span class="fn">OuterOStmtIn</span> <span class="fn">i</span></span>)</span>) <span class="fn">OuterWitIn</span> <span class="fn">OuterWitOut</span> <span class="fn">InnerWitIn</span> <span class="fn">InnerWitOut</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">V</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">InnerStmtIn</span> <span class="fn">InnerOStmtIn</span> <span class="fn">InnerStmtOut</span> <span class="fn">InnerOStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">lensKS</span> :
+  <span class="fn"><a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Extractor.Lens.IsKnowledgeSound">Extractor.Lens.IsKnowledgeSound</a> <span class="fn">outerRelIn</span> <span class="fn">innerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">innerRelOut</span>
+    <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/Reduction.html#Verifier.compatStatement">Verifier.compatStatement</a> <span class="fn">stmtLens</span> <span class="fn"><span class="fn">V</span>.<a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.toVerifier">toVerifier</a></span>)</span> <span class="fn">(fun (<span class="fn">x</span> : <span class="fn">OuterWitOut</span>) (<span class="fn">x</span> : <span class="fn">InnerWitIn</span>) =&gt; <a href="../../.././Init/Prelude.html#True">True</a>)</span>
+    <a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Extractor.Lens.mk">{</a> <span class="fn">stmt</span> := <span class="fn">stmtLens</span>, <span class="fn">wit</span> := <span class="fn">witLens</span> <a href="../../.././ArkLib/OracleReduction/LiftContext/Lens.html#Extractor.Lens.mk">}</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/RoundByRound.html#OracleVerifier.rbrKnowledgeSoundness">rbrKnowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">innerRelIn</span> <span class="fn">innerRelOut</span> <span class="fn">V</span> <span class="fn">rbrKnowledgeError</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/RoundByRound.html#OracleVerifier.rbrKnowledgeSoundness">rbrKnowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">outerRelIn</span> <span class="fn">outerRelOut</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/LiftContext/OracleReduction.html#OracleVerifier.liftContext">liftContext</a> <span class="fn">stmtLens</span> <span class="fn">V</span>)</span> <span class="fn">rbrKnowledgeError</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

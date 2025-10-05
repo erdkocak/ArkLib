@@ -1,0 +1,76 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../.././style.css"></link><link rel="icon" href="../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.Data.CodingTheory.BerlekampWelch.Sorries</title><script defer="true" src="../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../.././";</script><script>const MODULE_NAME="ArkLib.Data.CodingTheory.BerlekampWelch.Sorries";</script><script type="module" src="../../../.././jump-src.js"></script><script type="module" src="../../../.././search.js"></script><script type="module" src="../../../.././expand-nav.js"></script><script type="module" src="../../../.././how-about.js"></script><script type="module" src="../../../.././instances.js"></script><script type="module" src="../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">Data</span>.<span class="name">CodingTheory</span>.<span class="name">BerlekampWelch</span>.<span class="name">Sorries</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../.././Init.html">Init</a></li><li><a href="../../../.././Mathlib/Algebra/Field/Basic.html">Mathlib.Algebra.Field.Basic</a></li><li><a href="../../../.././Mathlib/Data/Matrix/Mul.html">Mathlib.Data.Matrix.Mul</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.Data.CodingTheory.BerlekampWelch.Sorries" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#linsolve"><span class="name">linsolve</span></a></div><div class="nav_link"><a class="break_within" href="#linsolve_some"><span class="name">linsolve_some</span></a></div><div class="nav_link"><a class="break_within" href="#linsolve_none"><span class="name">linsolve_none</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="All-the-sorries-Berlekamp-Welch-decoder-relies-upon">All the sorries Berlekamp-Welch decoder relies upon. <a class="hover-link" href="#All-the-sorries-Berlekamp-Welch-decoder-relies-upon">#</a></h1><p>The sorries are related to solving linear systems of equations.</p></div><div class="decl" id="linsolve"><div class="opaque"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.lean#L18-L48">source</a></div><div class="decl_header"><span class="decl_kind">opaque</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve"><span class="name">linsolve</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n </span><span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">(<a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span>)</span> <span class="fn">(<a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span>)</span> <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn"><span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span></span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Init/Prelude.html#Option">Option</a> <span class="fn">(<span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> → <span class="fn">F</span>)</span></span></div></div><p>Opaque linear system solver for Berlekamp-Welch decoding.</p><p>Solves the matrix equation A·x = b for x, where:</p><ul>
+<li>A is an n × m coefficient matrix</li>
+<li>b is a length-n RHS vector
+Returning either:</li>
+<li><code>some x</code> if a solution exists</li>
+<li><code>none</code> if the system is inconsistent</li>
+</ul><h3 class="markdown-heading" id="Parameters">Parameters: <a class="hover-link" href="#Parameters">#</a></h3><ul>
+<li><code>A : <a href="../../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> (Fin n) (Fin m) F</code> - Coefficient matrix with dimensions n × m</li>
+<li><code>b : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> n → F</code> - Right-hand side vector of length n</li>
+</ul><h3 class="markdown-heading" id="Returns">Returns: <a class="hover-link" href="#Returns">#</a></h3><ul>
+<li><code>some x</code> where <code>x : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> m → F</code> is a solution vector if one exists</li>
+<li><code>none</code> if the system has no solution</li>
+</ul><h3 class="markdown-heading" id="Behavior">Behavior: <a class="hover-link" href="#Behavior">#</a></h3><ol>
+<li>For consistent systems (solutions exist):<ul>
+<li>Returns any valid solution</li>
+</ul>
+</li>
+<li>For inconsistent systems (no solution):<ul>
+<li>Returns <code>none</code></li>
+</ul>
+</li>
+</ol><h3 class="markdown-heading" id="Implementation-Notes">Implementation Notes: <a class="hover-link" href="#Implementation-Notes">#</a></h3><ul>
+<li>Marked <code>opaque</code> because:<ul>
+<li>There is no means currently to provide the definition using Mathlib (<code>sorry</code> under the hood).</li>
+</ul>
+</li>
+<li>Used internally by the Berlekamp-Welch decoder</li>
+</ul></div></div><div class="decl" id="linsolve_some"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.lean#L50-L64">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve_some"><span class="name">linsolve_some</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n </span><span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">(<a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span>)</span> <span class="fn">(<a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span>)</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">b</span> : <span class="fn"><span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span></span> → <span class="fn">F</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x</span> : <span class="fn"><span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> → <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve">linsolve</a> <span class="fn">A</span> <span class="fn">b</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././Init/Prelude.html#Option.some">some</a> <span class="fn">x</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">A</span>.<a href="../../../.././Mathlib/Data/Matrix/Mul.html#Matrix.mulVec">mulVec</a></span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">b</span></div></div><p><strong>Solution correctness theorem</strong> for the linear system solver.</p><h3 class="markdown-heading" id="Theorem-Statement">Theorem Statement: <a class="hover-link" href="#Theorem-Statement">#</a></h3><p>If <code><a href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve">linsolve</a></code> returns <code>some x</code>, then <code>x</code> is indeed a solution to the linear system.</p><h3 class="markdown-heading" id="Parameters">Parameters: <a class="hover-link" href="#Parameters">#</a></h3><ul>
+<li><code>A : <a href="../../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> (Fin n) (Fin m) F</code> - Coefficient matrix</li>
+<li><code>b : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> n → F</code> - Right-hand side vector</li>
+<li><code>x : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> m → F</code> - Candidate solution vector</li>
+<li><code>h : <a href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve">linsolve</a> A b = some x</code> - Proof that the solver returned this solution</li>
+</ul></div></div><div class="decl" id="linsolve_none"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.lean#L66-L79">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve_none"><span class="name">linsolve_none</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n </span><span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">(<a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span>)</span> <span class="fn">(<a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span>)</span> <span class="fn">F</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">b</span> : <span class="fn"><span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span></span> → <span class="fn">F</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve">linsolve</a> <span class="fn">A</span> <span class="fn">b</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../.././Init/Prelude.html#Option.none">none</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../../.././Init/Prelude.html#Not">¬</a><span class="fn">∃ (<span class="fn">x</span> : <span class="fn"><span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> → <span class="fn">F</span></span>), <span class="fn"><span class="fn"><span class="fn">A</span>.<a href="../../../.././Mathlib/Data/Matrix/Mul.html#Matrix.mulVec">mulVec</a></span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">b</span></span></div></div><p><strong>Inconsistency theorem</strong> for the linear system solver.</p><h3 class="markdown-heading" id="Theorem-Statement">Theorem Statement: <a class="hover-link" href="#Theorem-Statement">#</a></h3><p>If <code><a href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve">linsolve</a></code> returns <code>none</code>, the linear system has no solution.</p><h3 class="markdown-heading" id="Parameters">Parameters: <a class="hover-link" href="#Parameters">#</a></h3><ul>
+<li><code>A : <a href="../../../.././Mathlib/Data/Matrix/Defs.html#Matrix">Matrix</a> (Fin n) (Fin m) F</code> - Coefficient matrix</li>
+<li><code>b : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> n → F</code> - Right-hand side vector</li>
+<li><code>h : <a href="../../../.././ArkLib/Data/CodingTheory/BerlekampWelch/Sorries.html#linsolve">linsolve</a> A b = none</code> - Proof that the solver failed to find a solution</li>
+</ul></div></div></main>
+<nav class="nav"><iframe src="../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

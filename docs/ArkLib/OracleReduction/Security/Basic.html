@@ -1,0 +1,963 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.OracleReduction.Security.Basic</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="ArkLib.OracleReduction.Security.Basic";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">OracleReduction</span>.<span class="name">Security</span>.<span class="name">Basic</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././ArkLib/OracleReduction/Execution.html">ArkLib.OracleReduction.Execution</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.OracleReduction.Security.Basic" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Reduction.completeness"><span class="name">Reduction</span>.<span class="name">completeness</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.perfectCompleteness"><span class="name">Reduction</span>.<span class="name">perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.IsComplete"><span class="name">Reduction</span>.<span class="name">IsComplete</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.IsPerfectComplete"><span class="name">Reduction</span>.<span class="name">IsPerfectComplete</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.instIsCompleteOfIsPerfectComplete"><span class="name">Reduction</span>.<span class="name">instIsCompleteOfIsPerfectComplete</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.completeness_error_mono"><span class="name">Reduction</span>.<span class="name">completeness_error_mono</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.completeness_relIn_mono"><span class="name">Reduction</span>.<span class="name">completeness_relIn_mono</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.completeness_relOut_mono"><span class="name">Reduction</span>.<span class="name">completeness_relOut_mono</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.perfectCompleteness_eq_prob_one"><span class="name">Reduction</span>.<span class="name">perfectCompleteness_eq_prob_one</span></a></div><div class="nav_link"><a class="break_within" href="#Extractor.Straightline"><span class="name">Extractor</span>.<span class="name">Straightline</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.soundness"><span class="name">Verifier</span>.<span class="name">soundness</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.IsSound"><span class="name">Verifier</span>.<span class="name">IsSound</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.knowledgeSoundness"><span class="name">Verifier</span>.<span class="name">knowledgeSoundness</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.IsKnowledgeSound"><span class="name">Verifier</span>.<span class="name">IsKnowledgeSound</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.Extractor.Straightline.IsMonotone"><span class="name">Verifier</span>.<span class="name">Extractor</span>.<span class="name">Straightline</span>.<span class="name">IsMonotone</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.Simulator"><span class="name">Reduction</span>.<span class="name">Simulator</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.completeness"><span class="name">OracleReduction</span>.<span class="name">completeness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.perfectCompleteness"><span class="name">OracleReduction</span>.<span class="name">perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.soundness"><span class="name">OracleVerifier</span>.<span class="name">soundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">knowledgeSoundness</span></a></div><div class="nav_link"><a class="break_within" href="#Proof.completeness"><span class="name">Proof</span>.<span class="name">completeness</span></a></div><div class="nav_link"><a class="break_within" href="#Proof.perfectCompleteness"><span class="name">Proof</span>.<span class="name">perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#Proof.soundness"><span class="name">Proof</span>.<span class="name">soundness</span></a></div><div class="nav_link"><a class="break_within" href="#Proof.knowledgeSoundness"><span class="name">Proof</span>.<span class="name">knowledgeSoundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleProof.completeness"><span class="name">OracleProof</span>.<span class="name">completeness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleProof.perfectCompleteness"><span class="name">OracleProof</span>.<span class="name">perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleProof.soundness"><span class="name">OracleProof</span>.<span class="name">soundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleProof.knowledgeSoundness"><span class="name">OracleProof</span>.<span class="name">knowledgeSoundness</span></a></div><div class="nav_link"><a class="break_within" href="#Reduction.id_perfectCompleteness"><span class="name">Reduction</span>.<span class="name">id_perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.id_soundness"><span class="name">Verifier</span>.<span class="name">id_soundness</span></a></div><div class="nav_link"><a class="break_within" href="#Extractor.Straightline.id"><span class="name">Extractor</span>.<span class="name">Straightline</span>.<span class="name">id</span></a></div><div class="nav_link"><a class="break_within" href="#Verifier.id_knowledgeSoundness"><span class="name">Verifier</span>.<span class="name">id_knowledgeSoundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleReduction.id_perfectCompleteness"><span class="name">OracleReduction</span>.<span class="name">id_perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.id_soundness"><span class="name">OracleVerifier</span>.<span class="name">id_soundness</span></a></div><div class="nav_link"><a class="break_within" href="#OracleVerifier.id_knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">id_knowledgeSoundness</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Security-Definitions-for-Oracle-Reductions">Security Definitions for (Oracle) Reductions <a class="hover-link" href="#Security-Definitions-for-Oracle-Reductions">#</a></h1><p>This file defines basic security notions for (oracle) reductions:</p><ul>
+<li><p>(Perfect) Completeness</p>
+</li>
+<li><p>(Straightline) (Knowledge) Soundness</p>
+</li>
+<li><p>(Honest-verifier) Zero-knowledge</p>
+</li>
+</ul><p>For each security notion, we provide a typeclass for it, so that security can be synthesized
+automatically with verified transformations.</p><p>See other files in the same directory for more refined soundness notions (i.e. state-restoration,
+round-by-round, rewinding, etc.)</p></div><div class="decl" id="Reduction.completeness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L66-L91">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness"><span class="name">Reduction</span>.<span class="name">completeness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">completenessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A reduction satisfies <strong>completeness</strong> with regards to:</p><ul>
+<li>an initialization function <code>init : <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> σ</code> for some ambient state <code>σ</code>,</li>
+<li>a stateful query implementation <code><a href="../../.././Mathlib/Data/MLList/BestFirst.html#impl">impl</a></code> (in terms of <code><a href="../../.././Init/Control/State.html#StateT">StateT</a> σ <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a></code>)
+for the shared oracles <code>oSpec</code>,</li>
+<li>an input relation <code>relIn</code> and output relation <code>relOut</code> (represented as sets), and</li>
+<li>an error <code><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsComplete.completenessError">completenessError</a> ≥ 0</code>,</li>
+</ul><p>if for all valid statement-witness pair <code>(stmtIn, witIn) ∈ relIn</code>, the execution between the
+honest prover and the honest verifier will result in a tuple <code>((prvStmtOut, witOut), stmtOut)</code>
+such that</p><ul>
+<li><code>(stmtOut, witOut) ∈ relOut</code>, (the output statement-witness pair is valid) and</li>
+<li><code>prvStmtOut = stmtOut</code>, (the output statements are the same from both prover and verifier)</li>
+</ul><p>except with probability <code><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsComplete.completenessError">completenessError</a></code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Reduction.completeness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Reduction.perfectCompleteness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L93-L96">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.perfectCompleteness"><span class="name">Reduction</span>.<span class="name">perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A reduction satisfies <strong>perfect completeness</strong> if it satisfies completeness with error <code>0</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Reduction.perfectCompleteness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Reduction.IsComplete"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L98-L103">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsComplete"><span class="name">Reduction</span>.<span class="name">IsComplete</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a></div></div><p>Type class for completeness for a reduction</p><ul class="structure_fields" id="Reduction.IsComplete.mk"><li id="Reduction.IsComplete.completenessError" class="structure_field"><div class="structure_field_info">completenessError : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></div></li><li id="Reduction.IsComplete.is_complete" class="structure_field"><div class="structure_field_info">is_complete : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsComplete.completenessError">completenessError</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span>)</span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-Reduction.IsComplete" class="instances-list"></ul></details></div></div><div class="decl" id="Reduction.IsPerfectComplete"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L105-L108">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsPerfectComplete"><span class="name">Reduction</span>.<span class="name">IsPerfectComplete</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Type class for perfect completeness for a reduction</p><ul class="structure_fields" id="Reduction.IsPerfectComplete.mk"><li id="Reduction.IsPerfectComplete.is_perfect_complete" class="structure_field"><div class="structure_field_info">is_perfect_complete : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.perfectCompleteness">perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-Reduction.IsPerfectComplete" class="instances-list"></ul></details></div></div><div class="decl" id="Reduction.instIsCompleteOfIsPerfectComplete"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L113-L116">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.instIsCompleteOfIsPerfectComplete"><span class="name">Reduction</span>.<span class="name">instIsCompleteOfIsPerfectComplete</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsPerfectComplete">IsPerfectComplete</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.IsComplete">IsComplete</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="Reduction.completeness_error_mono"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L118-L128">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness_error_mono"><span class="name">Reduction</span>.<span class="name">completeness_error_mono</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ε₁ </span><span class="fn">ε₂</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hε</span> : <span class="fn">ε₁</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">ε₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span> <span class="fn">ε₁</span></span> → <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span> <span class="fn">ε₂</span></span></span></div></div><p>If a reduction satisfies completeness with error <code>ε₁</code>, then it satisfies completeness with error
+<code>ε₂</code> for all <code>ε₂ ≥ ε₁</code>.</p></div></div><div class="decl" id="Reduction.completeness_relIn_mono"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L130-L139">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness_relIn_mono"><span class="name">Reduction</span>.<span class="name">completeness_relIn_mono</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ε</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relIn'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hrelIn</span> : <span class="fn">relIn'</span> <a href="../../.././Init/Core.html#HasSubset.Subset">⊆</a> <span class="fn">relIn</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span> <span class="fn">ε</span></span> → <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn'</span> <span class="fn">relOut</span> <span class="fn">reduction</span> <span class="fn">ε</span></span></span></div></div><p>If a reduction satisfies completeness with error <code>ε</code> for some relation <code>relIn</code>, then it
+satisfies completeness with error <code>ε</code> for any relation <code>relIn'</code> that is a subset of <code>relIn</code>.</p></div></div><div class="decl" id="Reduction.completeness_relOut_mono"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L141-L154">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness_relOut_mono"><span class="name">Reduction</span>.<span class="name">completeness_relOut_mono</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ε</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relOut'</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hrelOut</span> : <span class="fn">relOut</span> <a href="../../.././Init/Core.html#HasSubset.Subset">⊆</a> <span class="fn">relOut'</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span> <span class="fn">ε</span></span> → <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.completeness">completeness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut'</span> <span class="fn">reduction</span> <span class="fn">ε</span></span></span></div></div><p>If a reduction satisfies completeness with error <code>ε</code> for some relation <code>relIn</code>, then it
+satisfies completeness with error <code>ε</code> for any relation <code>relOut'</code> that is a superset of <code>relOut</code>.</p></div></div><div class="decl" id="Reduction.perfectCompleteness_eq_prob_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L156-L168">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.perfectCompleteness_eq_prob_one"><span class="name">Reduction</span>.<span class="name">perfectCompleteness_eq_prob_one</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">reduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.perfectCompleteness">perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">reduction</span></span> <a href="../../.././Init/Core.html#Iff">↔</a>   <span class="fn">∀ (<span class="fn">stmtIn</span> : <span class="fn">StmtIn</span>) (<span class="fn">witIn</span> : <span class="fn">WitIn</span>),
+    <span class="fn"><a href="../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">stmtIn</span><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">witIn</span><a href="../../.././Init/Prelude.html#Prod.mk">)</a> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">relIn</span> →
+      <a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">[</a><span class="fn">fun (<span class="fn">x</span> : (<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.FullTranscript">FullTranscript</a></span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">StmtOut</span>) =&gt;
+          <span class="fn">match <span class="fn">x</span> with
+          | <a href="../../.././Init/Prelude.html#Prod.mk">(</a><a href="../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">fst</span><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">prvStmtOut</span><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">witOut</span><a href="../../.././Init/Prelude.html#Prod.mk">)</a><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">stmtOut</span><a href="../../.././Init/Prelude.html#Prod.mk">)</a> =&gt; <a href="../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">stmtOut</span><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">witOut</span><a href="../../.././Init/Prelude.html#Prod.mk">)</a> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">relOut</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">prvStmtOut</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">stmtOut</span></span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">|</a><span class="fn">do
+          let <span class="fn">__do_lift</span> ← <span class="fn">init</span>
+          <span class="fn"><span class="fn"><span class="fn">(<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">OracleComp.simulateQ</a> (<span class="fn">impl</span> <a href="../../.././VCVio/OracleComp/SimSemantics/Append.html#SimOracle.append">++ₛₒ</a> <a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.challengeQueryImpl">ProtocolSpec.challengeQueryImpl</a>) <span class="fn">(<a href="../../.././ArkLib/OracleReduction/Execution.html#Reduction.run">run</a> <span class="fn">stmtIn</span> <span class="fn">witIn</span> <span class="fn">reduction</span>)</span>)</span>.<a href="../../.././Init/Control/State.html#StateT.run'">run'</a></span>
+              <span class="fn">__do_lift</span></span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">]</a> <a href="../../.././Init/Prelude.html#Eq">=</a>         <span class="fn">1</span></span></span></div></div><p>Perfect completeness means that the probability of the reduction outputting a valid
+statement-witness pair is <em>exactly</em> 1 (instead of at least <code>1 - 0</code>).</p></div></div><div class="mod_doc"><p>We define 3 variants each of soundness and knowledge soundness:</p><ol>
+<li>(Plain) soundness</li>
+<li>Knowledge soundness</li>
+</ol><p>For adaptivity, we may want to seed the definition with a term
+<code>chooseStmtIn : <a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> oSpec StmtIn</code>
+(though this is essentially the same as quantifying over all <code>stmtIn : StmtIn</code>).</p><p>Note: all soundness definitions are really defined for the <strong>verifier</strong> only. The (honest)
+prover does not feature into the definitions.</p></div><div class="decl" id="Extractor.Straightline"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L202-L218">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Extractor.Straightline"><span class="name">Extractor</span>.<span class="name">Straightline</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (u_1 + 1)</div></div><p>A straightline, deterministic, non-oracle-querying extractor takes in the output witness, the
+initial statement, the IOR transcript, and the query logs from the prover and verifier, and
+returns a corresponding initial witness.</p><p>Note that the extractor does not need to take in the output statement, since it can be derived
+via re-running the verifier on the initial statement, the transcript, and the verifier's query
+log.</p><p>This form of extractor suffices for proving knowledge soundness of most hash-based IOPs.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Extractor.Straightline" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Verifier.soundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L224-L246">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.soundness"><span class="name">Verifier</span>.<span class="name">soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">StmtOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">langIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">StmtIn</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">langOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">StmtOut</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">StmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">soundnessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A reduction satisfies <strong>soundness</strong> with error <code><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsSound.soundnessError">soundnessError</a> ≥ 0</code> and with respect to input
+language <code>langIn : <a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> StmtIn</code> and output language <code>langOut : <a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> StmtOut</code> if:</p><ul>
+<li>for all (malicious) provers with arbitrary types for <code>WitIn</code>, <code>WitOut</code>,</li>
+<li>for all arbitrary <code>witIn</code>,</li>
+<li>for all input statement <code>stmtIn ∉ langIn</code>,</li>
+</ul><p>the execution between the prover and the honest verifier will result in an output statement
+<code>stmtOut</code> that is in <code>langOut</code> is at most <code><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsSound.soundnessError">soundnessError</a></code>.</p><p>(technical note: since execution may fail, this is <em>not</em> equivalent to saying that
+<code>stmtOut ∉ langOut</code> with probability at least <code>1 - <a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsSound.soundnessError">soundnessError</a></code>)</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Verifier.soundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Verifier.IsSound"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L248-L252">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsSound"><span class="name">Verifier</span>.<span class="name">IsSound</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">StmtOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">langIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">StmtIn</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">langOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">StmtOut</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">StmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a></div></div><p>Type class for soundness for a verifier</p><ul class="structure_fields" id="Verifier.IsSound.mk"><li id="Verifier.IsSound.soundnessError" class="structure_field"><div class="structure_field_info">soundnessError : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></div></li><li id="Verifier.IsSound.is_sound" class="structure_field"><div class="structure_field_info">is_sound : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.soundness">soundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">langIn</span> <span class="fn">langOut</span> <span class="fn">verifier</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsSound.soundnessError">soundnessError</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">langIn</span> <span class="fn">langOut</span> <span class="fn">verifier</span>)</span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-Verifier.IsSound" class="instances-list"></ul></details></div></div><div class="decl" id="Verifier.knowledgeSoundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L258-L285">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.knowledgeSoundness"><span class="name">Verifier</span>.<span class="name">knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">StmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">knowledgeError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A reduction satisfies <strong>(straightline) knowledge soundness</strong> with error <code><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsKnowledgeSound.knowledgeError">knowledgeError</a> ≥ 0</code> and
+with respect to input relation <code>relIn</code> and output relation <code>relOut</code> if:</p><ul>
+<li>there exists a straightline extractor <code>E</code>, such that</li>
+<li>for all input statement <code>stmtIn</code>, witness <code>witIn</code>, and (malicious) prover <code>prover</code>,</li>
+<li>if the execution with the honest verifier results in a pair <code>(stmtOut, witOut)</code>,</li>
+<li>and the extractor produces some <code>witIn'</code>,</li>
+</ul><p>then the probability that <code>(stmtIn, witIn')</code> is not valid and yet <code>(stmtOut, witOut)</code> is valid
+is at most <code><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsKnowledgeSound.knowledgeError">knowledgeError</a></code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Verifier.knowledgeSoundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Verifier.IsKnowledgeSound"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L287-L291">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsKnowledgeSound"><span class="name">Verifier</span>.<span class="name">IsKnowledgeSound</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">StmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a></div></div><p>Type class for knowledge soundness for a verifier</p><ul class="structure_fields" id="Verifier.IsKnowledgeSound.mk"><li id="Verifier.IsKnowledgeSound.knowledgeError" class="structure_field"><div class="structure_field_info">knowledgeError : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></div></li><li id="Verifier.IsKnowledgeSound.is_knowledge_sound" class="structure_field"><div class="structure_field_info">is_knowledge_sound : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.knowledgeSoundness">knowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">verifier</span> <span class="fn">(<a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.IsKnowledgeSound.knowledgeError">knowledgeError</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">relIn</span> <span class="fn">relOut</span> <span class="fn">verifier</span>)</span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-Verifier.IsKnowledgeSound" class="instances-list"></ul></details></div></div><div class="decl" id="Verifier.Extractor.Straightline.IsMonotone"><div class="class"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L293-L308">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.Extractor.Straightline.IsMonotone"><span class="name">Verifier</span>.<span class="name">Extractor</span>.<span class="name">Straightline</span>.<span class="name">IsMonotone</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">E</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Extractor.Straightline">Extractor.Straightline</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">oSpec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>An extractor is <strong>monotone</strong> if its success probability on a given query log is the same as
+the success probability on any extension of that query log.</p><ul class="structure_fields" id="Verifier.Extractor.Straightline.IsMonotone.mk"><li id="Verifier.Extractor.Straightline.IsMonotone.is_monotone" class="structure_field"><div class="structure_field_info">is_monotone<span class="decl_args">
+<span class="fn">(<span class="fn">witOut</span> : <span class="fn">WitOut</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">stmtIn</span> : <span class="fn">StmtIn</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">transcript</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.FullTranscript">FullTranscript</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">proveQueryLog₁ </span><span class="fn">proveQueryLog₂ </span><span class="fn">verifyQueryLog₁ </span><span class="fn">verifyQueryLog₂</span> : <span class="fn"><span class="fn">oSpec</span>.<a href="../../.././VCVio/OracleComp/QueryTracking/Structures.html#OracleSpec.QueryLog">QueryLog</a></span>)</span></span>
+ : <span class="fn"><span class="fn"><a href="../../.././Init/Data/List/Basic.html#List.Sublist">List.Sublist</a> <span class="fn">proveQueryLog₁</span> <span class="fn">proveQueryLog₂</span></span> →
+  <span class="fn"><span class="fn"><a href="../../.././Init/Data/List/Basic.html#List.Sublist">List.Sublist</a> <span class="fn">verifyQueryLog₁</span> <span class="fn">verifyQueryLog₂</span></span> →
+    <a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">[</a><span class="fn">fun (<span class="fn">witIn</span> : <span class="fn">WitIn</span>) =&gt; <a href="../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">stmtIn</span><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">witIn</span><a href="../../.././Init/Prelude.html#Prod.mk">)</a> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">relIn</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">|</a><span class="fn"><span class="fn">E</span> <span class="fn">stmtIn</span> <span class="fn">witOut</span> <span class="fn">transcript</span> <span class="fn">proveQueryLog₁</span> <span class="fn">verifyQueryLog₁</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">]</a> <a href="../../.././Init/Prelude.html#LE.le">≤</a>       <a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">[</a><span class="fn">fun (<span class="fn">witIn</span> : <span class="fn">WitIn</span>) =&gt; <a href="../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">stmtIn</span><a href="../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">witIn</span><a href="../../.././Init/Prelude.html#Prod.mk">)</a> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">relIn</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">|</a><span class="fn"><span class="fn">E</span> <span class="fn">stmtIn</span> <span class="fn">witOut</span> <span class="fn">transcript</span> <span class="fn">proveQueryLog₂</span> <span class="fn">verifyQueryLog₂</span></span><a href="../../.././VCVio/OracleComp/DistSemantics/EvalDist.html#OracleComp.probEvent">]</a></span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-Verifier.Extractor.Straightline.IsMonotone" class="instances-list"></ul></details></div></div><div class="decl" id="Reduction.Simulator"><div class="structure"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L320-L326">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.Simulator"><span class="name">Reduction</span>.<span class="name">Simulator</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">StmtIn</span> : <a href="../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> 1</div></div><p>A simulator for a reduction needs to produce the same transcript as the prover (but potentially
+all at once, instead of sequentially). We also grant the simulator the power to program the shared
+oracles <code>oSpec</code></p><ul class="structure_fields" id="Reduction.Simulator.mk"><li id="Reduction.Simulator.SimState" class="structure_field"><div class="structure_field_info">SimState : <a href="../../.././foundational_types.html">Type</a></div></li><li id="Reduction.Simulator.oracleSim" class="structure_field"><div class="structure_field_info">oracleSim : <span class="fn"><a href="../../.././ArkLib/ToVCVio/SimOracle.html#SimOracle.Stateful">SimOracle.Stateful</a> <span class="fn">oSpec</span> <span class="fn">oSpec</span> <span class="fn"><span class="fn">self</span>.<a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.Simulator.SimState">SimState</a></span></span></div></li><li id="Reduction.Simulator.proverSim" class="structure_field"><div class="structure_field_info">proverSim : <span class="fn"><span class="fn">StmtIn</span> → <span class="fn"><a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn"><span class="fn">self</span>.<a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.Simulator.SimState">SimState</a></span> <span class="fn">(<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">oSpec</span>)</span> <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.FullTranscript">FullTranscript</a></span></span></span></div></li></ul><details id="instances-for-list-Reduction.Simulator" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="mod_doc"><p>Completeness and soundness are the same as for non-oracle reductions. Only zero-knowledge is
+different (but we haven't defined it yet)</p></div><div class="decl" id="OracleReduction.completeness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L361-L367">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.completeness"><span class="name">OracleReduction</span>.<span class="name">completeness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtOut</span> : <span class="fn"><span class="fn">ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛₒ</span>) → <span class="fn"><span class="fn">OStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oracleReduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">OStmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">OStmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">completenessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Completeness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleReduction.completeness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleReduction.perfectCompleteness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L369-L375">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.perfectCompleteness"><span class="name">OracleReduction</span>.<span class="name">perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtOut</span> : <span class="fn"><span class="fn">ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛₒ</span>) → <span class="fn"><span class="fn">OStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oracleReduction</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">OStmtIn</span> <span class="fn">WitIn</span> <span class="fn">StmtOut</span> <span class="fn">OStmtOut</span> <span class="fn">WitOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Perfect completeness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleReduction.perfectCompleteness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleVerifier.soundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L381-L387">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.soundness"><span class="name">OracleVerifier</span>.<span class="name">soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtOut </span><span class="fn">ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtOut</span> : <span class="fn"><span class="fn">ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">langIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">langOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛₒ</span>) → <span class="fn"><span class="fn">OStmtOut</span> <span class="fn">i</span></span>)</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">OStmtIn</span> <span class="fn">StmtOut</span> <span class="fn">OStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">soundnessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Soundness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleVerifier.soundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleVerifier.knowledgeSoundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L389-L395">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitIn </span><span class="fn">StmtOut </span><span class="fn">ιₛₒ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtOut</span> : <span class="fn"><span class="fn">ιₛₒ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitOut</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">relOut</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtOut</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛₒ</span>) → <span class="fn"><span class="fn">OStmtOut</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitOut</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">OStmtIn</span> <span class="fn">StmtOut</span> <span class="fn">OStmtOut</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">knowledgeError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Knowledge soundness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleVerifier.knowledgeSoundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="mod_doc"><p>All security notions are inherited from <code><a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a></code>, with the output relation specialized to the
+trivial accept/reject one: <code>fun accRej _ =&gt; accRej</code>.</p></div><div class="decl" id="Proof.completeness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L414-L417">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Proof.completeness"><span class="name">Proof</span>.<span class="name">completeness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement </span><span class="fn">Witness</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relation</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Witness</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">completenessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">proof</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Proof">Proof</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <span class="fn">Witness</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Proof.completeness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Proof.perfectCompleteness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L419-L422">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Proof.perfectCompleteness"><span class="name">Proof</span>.<span class="name">perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement </span><span class="fn">Witness</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relation</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Witness</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">proof</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Proof">Proof</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <span class="fn">Witness</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Proof.perfectCompleteness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Proof.soundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L424-L428">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Proof.soundness"><span class="name">Proof</span>.<span class="name">soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">langIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">Statement</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Bool">Bool</a> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">soundnessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Proof.soundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Proof.knowledgeSoundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L430-L434">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Proof.knowledgeSoundness"><span class="name">Proof</span>.<span class="name">knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relation</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <a href="../../.././Init/Prelude.html#Bool">Bool</a>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Bool">Bool</a> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">knowledgeError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Proof.knowledgeSoundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleProof.completeness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L442-L449">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleProof.completeness"><span class="name">OracleProof</span>.<span class="name">completeness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement </span><span class="fn">ιₛ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStatement</span> : <span class="fn"><span class="fn">ιₛ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStatement</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Witness</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relation</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><span class="fn">OStatement</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Witness</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oracleProof</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleProof">OracleProof</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <span class="fn">OStatement</span> <span class="fn">Witness</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">completenessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Completeness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleProof.completeness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleProof.perfectCompleteness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L451-L457">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleProof.perfectCompleteness"><span class="name">OracleProof</span>.<span class="name">perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement </span><span class="fn">ιₛ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStatement</span> : <span class="fn"><span class="fn">ιₛ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStatement</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Witness</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relation</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><span class="fn">OStatement</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Witness</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oracleProof</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleProof">OracleProof</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <span class="fn">OStatement</span> <span class="fn">Witness</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Perfect completeness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleProof.perfectCompleteness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleProof.soundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L459-L465">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleProof.soundness"><span class="name">OracleProof</span>.<span class="name">soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement </span><span class="fn">ιₛ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStatement</span> : <span class="fn"><span class="fn">ιₛ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStatement</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">langIn</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><span class="fn">OStatement</span> <span class="fn">i</span></span>)</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <span class="fn">OStatement</span> <a href="../../.././Init/Prelude.html#Bool">Bool</a> <span class="fn">(fun (<span class="fn">x</span> : <a href="../../.././Init/Prelude.html#Empty">Empty</a>) =&gt; <a href="../../.././Init/Prelude.html#Unit">Unit</a>)</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">soundnessError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Soundness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleProof.soundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleProof.knowledgeSoundness"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L467-L473">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleProof.knowledgeSoundness"><span class="name">OracleProof</span>.<span class="name">knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Statement </span><span class="fn">ιₛ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStatement</span> : <span class="fn"><span class="fn">ιₛ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStatement</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Witness</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">pSpec</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">n</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) → <span class="fn"><a href="../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Challenge">Challenge</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.MessageIdx">MessageIdx</a></span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn"><span class="fn">pSpec</span>.<a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.Message">Message</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">relation</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">Statement</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛ</span>) → <span class="fn"><span class="fn">OStatement</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Witness</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">verifier</span> : <span class="fn"><a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">Statement</span> <span class="fn">OStatement</span> <a href="../../.././Init/Prelude.html#Bool">Bool</a> <span class="fn">(fun (<span class="fn">x</span> : <a href="../../.././Init/Prelude.html#Empty">Empty</a>) =&gt; <a href="../../.././Init/Prelude.html#Unit">Unit</a>)</span> <span class="fn">pSpec</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">knowledgeError</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>Knowledge soundness of an oracle reduction is the same as for non-oracle reductions.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleProof.knowledgeSoundness" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Reduction.id_perfectCompleteness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L481-L486">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.id_perfectCompleteness"><span class="name">Reduction</span>.<span class="name">id_perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">rel</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hInit</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/Traversal.html#OracleComp.neverFails">OracleComp.neverFails</a> <span class="fn">init</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.perfectCompleteness">perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">rel</span> <span class="fn">rel</span> <a href="../../.././ArkLib/OracleReduction/Basic.html#Reduction.id">Reduction.id</a></span></div></div><p>The identity / trivial reduction is perfectly complete.</p></div></div><div class="decl" id="Verifier.id_soundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L488-L493">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.id_soundness"><span class="name">Verifier</span>.<span class="name">id_soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lang</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">StmtIn</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.soundness">soundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">lang</span> <span class="fn">lang</span> <a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier.id">Verifier.id</a> <span class="fn">0</span></span></div></div><p>The identity / trivial verifier is perfectly sound.</p></div></div><div class="decl" id="Extractor.Straightline.id"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L495-L499">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Extractor.Straightline.id"><span class="name">Extractor</span>.<span class="name">Straightline</span>.<span class="name">id</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Extractor.Straightline">Straightline</a> <span class="fn">oSpec</span> <span class="fn">StmtIn</span> <span class="fn">WitIn</span> <span class="fn">WitIn</span> <a href="../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.empty">!p[]</a></span></div></div><p>The straightline extractor for the identity / trivial reduction, which just returns the input
+witness.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Extractor.Straightline.id" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Verifier.id_knowledgeSoundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L501-L513">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.id_knowledgeSoundness"><span class="name">Verifier</span>.<span class="name">id_knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">WitIn </span><span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">rel</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#Verifier.knowledgeSoundness">knowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">rel</span> <span class="fn">rel</span> <a href="../../.././ArkLib/OracleReduction/Basic.html#Verifier.id">Verifier.id</a> <span class="fn">0</span></span></div></div><p>The identity / trivial verifier is perfectly knowledge sound.</p></div></div><div class="decl" id="OracleReduction.id_perfectCompleteness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L515-L523">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.id_perfectCompleteness"><span class="name">OracleReduction</span>.<span class="name">id_perfectCompleteness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitIn </span><span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">rel</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hInit</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/Traversal.html#OracleComp.neverFails">OracleComp.neverFails</a> <span class="fn">init</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleReduction.perfectCompleteness">perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">rel</span> <span class="fn">rel</span> <a href="../../.././ArkLib/OracleReduction/Basic.html#OracleReduction.id">OracleReduction.id</a></span></div></div><p>The identity / trivial reduction is perfectly complete.</p></div></div><div class="decl" id="OracleVerifier.id_soundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L525-L530">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.id_soundness"><span class="name">OracleVerifier</span>.<span class="name">id_soundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">lang</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> (<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>)</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.soundness">soundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">lang</span> <span class="fn">lang</span> <a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.id">OracleVerifier.id</a> <span class="fn">0</span></span></div></div><p>The identity / trivial verifier is perfectly sound.</p></div></div><div class="decl" id="OracleVerifier.id_knowledgeSoundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/OracleReduction/Security/Basic.lean#L532-L537">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.id_knowledgeSoundness"><span class="name">OracleVerifier</span>.<span class="name">id_knowledgeSoundness</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">oSpec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">StmtIn </span><span class="fn">ιₛᵢ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">OStmtIn</span> : <span class="fn"><span class="fn">ιₛᵢ</span> → <a href="../../.././foundational_types.html">Type</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">Oₛᵢ</span> : <span class="fn">(<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><a href="../../.././ArkLib/OracleReduction/OracleInterface.html#OracleInterface">OracleInterface</a> <span class="fn">(<span class="fn">OStmtIn</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">WitIn </span><span class="fn">σ</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">init</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">rel</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> ((<span class="fn">StmtIn</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <span class="fn">ιₛᵢ</span>) → <span class="fn"><span class="fn">OStmtIn</span> <span class="fn">i</span></span>)</span>) <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">WitIn</span>)</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/OracleReduction/Security/Basic.html#OracleVerifier.knowledgeSoundness">knowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">rel</span> <span class="fn">rel</span> <a href="../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier.id">OracleVerifier.id</a> <span class="fn">0</span></span></div></div><p>The identity / trivial verifier is perfectly knowledge sound.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

@@ -1,0 +1,174 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../.././style.css"></link><link rel="icon" href="../.././favicon.svg"></link><link rel="mask-icon" href="../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../.././/declarations/declaration-data.bmp" as="image"></link><title>ToMathlib.Control.AlternativeMonad</title><script defer="true" src="../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../.././";</script><script>const MODULE_NAME="ToMathlib.Control.AlternativeMonad";</script><script type="module" src="../.././jump-src.js"></script><script type="module" src="../.././search.js"></script><script type="module" src="../.././expand-nav.js"></script><script type="module" src="../.././how-about.js"></script><script type="module" src="../.././instances.js"></script><script type="module" src="../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ToMathlib</span>.<span class="name">Control</span>.<span class="name">AlternativeMonad</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../.././Init.html">Init</a></li><li><a href="../.././Batteries/Control/AlternativeMonad.html">Batteries.Control.AlternativeMonad</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ToMathlib.Control.AlternativeMonad" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#liftM_failure"><span class="name">liftM_failure</span></a></div><div class="nav_link"><a class="break_within" href="#liftM_orElse"><span class="name">liftM_orElse</span></a></div><div class="nav_link"><a class="break_within" href="#monadLift_guard"><span class="name">monadLift_guard</span></a></div><div class="nav_link"><a class="break_within" href="#liftM_guard"><span class="name">liftM_guard</span></a></div><div class="nav_link"><a class="break_within" href="#monadLift_optional"><span class="name">monadLift_optional</span></a></div><div class="nav_link"><a class="break_within" href="#liftM_optional"><span class="name">liftM_optional</span></a></div><div class="nav_link"><a class="break_within" href="#Option.monadLift_elimM"><span class="name">Option</span>.<span class="name">monadLift_elimM</span></a></div><div class="nav_link"><a class="break_within" href="#Option.liftM_elimM"><span class="name">Option</span>.<span class="name">liftM_elimM</span></a></div></nav><main>
+<div class="decl" id="liftM_failure"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L22-L23">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#liftM_failure"><span class="name">liftM_failure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_3</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Basic.html#Alternative">Alternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Basic.html#Alternative">Alternative</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#LawfulAlternativeLift">LawfulAlternativeLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <a href="../.././Init/Control/Basic.html#Alternative.failure">failure</a></span> <a href="../.././Init/Prelude.html#Eq">=</a> <a href="../.././Init/Control/Basic.html#Alternative.failure">failure</a></div></div></div></div><div class="decl" id="liftM_orElse"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L25-L27">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#liftM_orElse"><span class="name">liftM_orElse</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_3</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Basic.html#Alternative">Alternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Basic.html#Alternative">Alternative</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#LawfulAlternativeLift">LawfulAlternativeLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x </span><span class="fn">y</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<span class="fn">x</span> &lt;|&gt; <span class="fn">y</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn">(<span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">x</span></span> &lt;|&gt; <span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">y</span></span>)</span></div></div></div></div><div class="decl" id="monadLift_guard"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L29-L32">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#monadLift_guard"><span class="name">monadLift_guard</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> → <a href="../.././foundational_types.html">Type</a> u_1</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#LawfulAlternativeLift">LawfulAlternativeLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <a href="../.././foundational_types.html">Prop</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Decidable">Decidable</a> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">(<a href="../.././Init/Control/Basic.html#guard">guard</a> <span class="fn">p</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Control/Basic.html#guard">guard</a> <span class="fn">p</span></span></div></div></div></div><div class="decl" id="liftM_guard"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L34-L37">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#liftM_guard"><span class="name">liftM_guard</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> → <a href="../.././foundational_types.html">Type</a> u_1</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#LawfulAlternativeLift">LawfulAlternativeLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <a href="../.././foundational_types.html">Prop</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Decidable">Decidable</a> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../.././Init/Control/Basic.html#guard">guard</a> <span class="fn">p</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Control/Basic.html#guard">guard</a> <span class="fn">p</span></span></div></div></div></div><div class="decl" id="monadLift_optional"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L39-L43">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#monadLift_optional"><span class="name">monadLift_optional</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_3</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#LawfulAlternativeLift">LawfulAlternativeLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">(<a href="../.././Init/Control/Basic.html#optional">optional</a> <span class="fn">x</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Control/Basic.html#optional">optional</a> <span class="fn">(<a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">x</span>)</span></span></div></div></div></div><div class="decl" id="liftM_optional"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L45-L49">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#liftM_optional"><span class="name">liftM_optional</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_3</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Batteries/Control/AlternativeMonad.html#LawfulAlternativeLift">LawfulAlternativeLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../.././Init/Control/Basic.html#optional">optional</a> <span class="fn">x</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Control/Basic.html#optional">optional</a> <span class="fn">(<a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">x</span>)</span></span></div></div></div></div><div class="decl" id="Option.monadLift_elimM"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L57-L61">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#Option.monadLift_elimM"><span class="name">Option</span>.<span class="name">monadLift_elimM</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_3</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">(<a href="../.././Init/Prelude.html#Option">Option</a> <span class="fn">α</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">z</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">(<a href="../.././Init/Data/Option/Basic.html#Option.elimM">elimM</a> <span class="fn">x</span> <span class="fn">y</span> <span class="fn">z</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Data/Option/Basic.html#Option.elimM">elimM</a> <span class="fn">(<a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">x</span>)</span> <span class="fn">(<a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">y</span>)</span> <span class="fn">fun (<span class="fn">x</span> : <span class="fn">α</span>) =&gt; <span class="fn"><a href="../.././Init/Prelude.html#MonadLiftT.monadLift">monadLift</a> <span class="fn">(<span class="fn">z</span> <span class="fn">x</span>)</span></span></span></span></div></div></div></div><div class="decl" id="Option.liftM_elimM"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/ToMathlib/Control/AlternativeMonad.lean#L63-L67">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../.././ToMathlib/Control/AlternativeMonad.html#Option.liftM_elimM"><span class="name">Option</span>.<span class="name">liftM_elimM</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_2</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <span class="fn"><a href="../.././foundational_types.html">Type</a> u_1 → <a href="../.././foundational_types.html">Type</a> u_3</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#Monad">Monad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Prelude.html#MonadLift">MonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../.././Init/Control/Lawful/MonadLift/Basic.html#LawfulMonadLift">LawfulMonadLift</a> <span class="fn">m</span> <span class="fn">n</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn"><span class="fn">m</span> <span class="fn">(<a href="../.././Init/Prelude.html#Option">Option</a> <span class="fn">α</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">z</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><span class="fn">m</span> <span class="fn">β</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<a href="../.././Init/Data/Option/Basic.html#Option.elimM">elimM</a> <span class="fn">x</span> <span class="fn">y</span> <span class="fn">z</span>)</span></span> <a href="../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../.././Init/Data/Option/Basic.html#Option.elimM">elimM</a> <span class="fn">(<a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">x</span>)</span> <span class="fn">(<a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">y</span>)</span> <span class="fn">fun (<span class="fn">x</span> : <span class="fn">α</span>) =&gt; <span class="fn"><a href="../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">(<span class="fn">z</span> <span class="fn">x</span>)</span></span></span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

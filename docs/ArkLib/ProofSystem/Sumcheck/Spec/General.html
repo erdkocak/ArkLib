@@ -1,0 +1,258 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../.././style.css"></link><link rel="icon" href="../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.ProofSystem.Sumcheck.Spec.General</title><script defer="true" src="../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../.././";</script><script>const MODULE_NAME="ArkLib.ProofSystem.Sumcheck.Spec.General";</script><script type="module" src="../../../.././jump-src.js"></script><script type="module" src="../../../.././search.js"></script><script type="module" src="../../../.././expand-nav.js"></script><script type="module" src="../../../.././how-about.js"></script><script type="module" src="../../../.././instances.js"></script><script type="module" src="../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">ProofSystem</span>.<span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">General</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../.././Init.html">Init</a></li><li><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html">ArkLib.ProofSystem.Sumcheck.Spec.SingleRound</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.ProofSystem.Sumcheck.Spec.General" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.pSpec"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">pSpec</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.StmtIn"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">StmtIn</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.verifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">verifier</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.oracleVerifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleVerifier</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.reduction"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">reduction</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.oracleReduction"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleReduction</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.reduction_verifier_eq_verifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">reduction_verifier_eq_verifier</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.oracleReduction_verifier_eq_oracleVerifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleReduction_verifier_eq_oracleVerifier</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.reduction_perfectCompleteness"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">reduction_perfectCompleteness</span></a></div><div class="nav_link"><a class="break_within" href="#Sumcheck.Spec.oracleVerifier_rbrKnowledgeSoundness"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleVerifier_rbrKnowledgeSoundness</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="The-Sum-check-Protocol">The Sum-check Protocol <a class="hover-link" href="#The-Sum-check-Protocol">#</a></h1><p>We define the sum-check protocol as a series of Interactive Oracle Reductions (IORs), where the
+underlying polynomials are represented using Mathlib's noncomputable types <code><a href="../../../.././Mathlib/Algebra/Polynomial/Basic.html#Polynomial">Polynomial</a></code> and
+<code><a href="../../../.././Mathlib/Algebra/MvPolynomial/Basic.html#MvPolynomial">MvPolynomial</a></code>. See <code>SingleRound.lean</code> for a single round of the protocol, and the definition of the
+sum-check relations.</p><p>In the future, we will have files that deal with implementations of the protocol, and we will prove
+that those implementations derive security from that of the abstract protocol.</p><h2 class="markdown-heading" id="Protocol-Specification">Protocol Specification <a class="hover-link" href="#Protocol-Specification">#</a></h2><p>The sum-check protocol is parameterized by the following:</p><ul>
+<li><code>R</code>: the underlying ring (for soundness, required to be finite and a domain)</li>
+<li><code>n : ℕ+</code>: the number of variables (also number of rounds)</li>
+<li><code>deg : ℕ</code>: the individual degree bound for the polynomial</li>
+<li><code>D : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> m ↪ R</code>: the set of <code>m</code> evaluation points for each variable (for some <code>m</code>), represented as
+an injection <code><a href="../../../.././Init/Prelude.html#Fin">Fin</a> m ↪ R</code>. The image of <code>D</code> as a finite subset of <code>R</code> is written as
+<code>Finset.univ.map D</code>.</li>
+<li><code>oSpec : <a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> ι</code>: the set of underlying oracles (e.g. random oracles) that may be needed for
+other reductions. However, the sum-check protocol does <em>not</em> use any oracles.</li>
+</ul><p>The sum-check relation has no witness. The statement for the <code>i</code>-th round, where <code>i : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> (n + 1)</code>,
+contains:</p><ul>
+<li><code>target : R</code>, which is the target value for sum-check</li>
+<li><code>challenges : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> i → R</code>, which is the list of challenges sent from the verifier to the prover in
+previous rounds</li>
+</ul><p>There is a single oracle statement, which is:</p><ul>
+<li><code>poly : <a href="../../../.././Mathlib/Algebra/MvPolynomial/Basic.html#MvPolynomial">MvPolynomial</a> (Fin n) R</code>, the multivariate polynomial that is summed over</li>
+</ul><p>The sum-check relation for the <code>i</code>-th round, where <code>i = 0, ..., n</code>, checks that:</p><p><code>∑ x ∈ (univ.map D) ^ᶠ (n - i), poly ⸨challenges, x⸩ = target</code>.</p><p>Note that the last statement (when <code>i = n</code>) is the output statement of the sum-check protocol.</p><p>For <code>i = 0, ..., n - 1</code>, the <code>i</code>-th round of the sum-check protocol consists of the following:</p><ol>
+<li><p>The prover sends a univariate polynomial <code>pᵢ ∈ R⦃≤ deg⦄[X]</code> of degree at most <code>deg</code>. If the
+prover is honest, then we have:</p>
+<p><code>pᵢ(X) = ∑ x ∈ (univ.map D) ^ᶠ (n - i - 1), poly ⸨X ⦃i⦄, challenges, x⸩</code>.</p>
+</li>
+</ol><p>Here, <code>poly ⸨X ⦃i⦄, challenges, x⸩</code> is the polynomial <code>poly</code> evaluated at the concatenation of the
+prior challenges <code>challenges</code>, the <code>i</code>-th variable as the new indeterminate <code>X</code>, and the rest of
+the values <code>x ∈ (univ.map D) ^ᶠ (n - i - 1)</code>.</p><p>In the oracle protocol, this polynomial <code>pᵢ</code> is turned into an oracle for which the verifier can
+query for evaluations at arbitrary points.</p><ol start="2">
+<li><p>The verifier then sends the <code>i</code>-th challenge <code>rᵢ</code> sampled uniformly at random from <code>R</code>.</p>
+</li>
+<li><p>The (oracle) verifier then performs queries for the evaluations of <code>pᵢ</code> at all points in
+<code>(univ.map D)</code>, and checks that: <code>∑ x in (univ.map D), pᵢ.eval x = target</code>.</p>
+<p>If the check fails, then the verifier outputs <code>failure</code>.</p>
+<p>Otherwise, it outputs a statement for the next round as follows:</p>
+<ul>
+<li><code>target</code> is updated to <code>pᵢ.eval rᵢ</code></li>
+<li><code>challenges</code> is updated to the concatenation of the previous challenges and <code>rᵢ</code></li>
+</ul>
+</li>
+</ol><h2 class="markdown-heading" id="Notes-TODOs">Notes &amp; TODOs <a class="hover-link" href="#Notes-TODOs">#</a></h2><p>Note that to represent sum-check as a series of IORs, we will need to implicitly constrain the
+degree of the polynomials via using subtypes, such as <code><a href="../../../.././Mathlib/RingTheory/Polynomial/Basic.html#Polynomial.degreeLE">Polynomial.degreeLE</a></code> and
+<code><a href="../../../.././Mathlib/Algebra/MvPolynomial/Degrees.html#MvPolynomial.degreeOf">MvPolynomial.degreeOf</a></code>. This is because the oracle verifier only gets oracle access to evaluating
+the polynomials, but does not see the polynomials in the clear.</p><p>When this is compiled to an interactive proof, the corresponding polynomial commitment schemes will
+enforce that the declared degree bound holds, via letting the (non-oracle) verifier perform explicit
+degree checks.</p><p>There are some generalizations that we could consider later:</p><ul>
+<li><p>Generalize to <code>degs : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> n → ℕ</code> and <code>domain : <a href="../../../.././Init/Prelude.html#Fin">Fin</a> n → (Fin m ↪ R)</code>, e.g. can vary the
+degree bound and the summation domain for each variable. Note: this requires generalizing
+<code><a href="../../../.././Mathlib/RingTheory/MvPolynomial/Basic.html#MvPolynomial.restrictDegree">MvPolynomial.restrictDegree</a></code> to have different degree bounds for each variable.</p>
+</li>
+<li><p>Generalize the challenges to come from a suitable subset of <code>R</code> (e.g. subtractive sets), and not
+necessarily the whole domain. This is used in lattice-based protocols.</p>
+</li>
+<li><p>Sumcheck over modules instead of just rings. This will require extending <code><a href="../../../.././Mathlib/Algebra/MvPolynomial/Basic.html#MvPolynomial">MvPolynomial</a></code> to have
+such a notion of evaluation, something like <code>evalModule (x : σ → M) (p : <a href="../../../.././Mathlib/Algebra/MvPolynomial/Basic.html#MvPolynomial">MvPolynomial</a> σ R) : M</code>,
+where we have <code>[Module R M]</code>.</p>
+</li>
+</ul><h2 class="markdown-heading" id="References">References <a class="hover-link" href="#References">#</a></h2><p>[JACM:LFKN92]</p><p>[C:BooChiSot21]</p></div><div class="decl" id="Sumcheck.Spec.pSpec"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L121-L125">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.pSpec"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">pSpec</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg </span><span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec">ProtocolSpec</a> <span class="fn">(<a href="../../../.././ArkLib/Data/Fin/Sigma.html#Fin.vsum">Fin.vsum</a> <span class="fn">fun (<span class="fn">x</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">n</span></span>) =&gt; <span class="fn">2</span></span>)</span></span></div></div><p>The protocol specification for the general sum-check protocol, which is the composition of the
+single-round protocol specifications</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Sumcheck.Spec.pSpec" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Sumcheck.Spec.StmtIn"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L133-L136">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.StmtIn"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">StmtIn</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../../.././foundational_types.html">Type</a></div></div><p>The input statement for the (full) sum-check protocol, which contains only the target sum value</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Sumcheck.Spec.StmtIn" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Sumcheck.Spec.verifier"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L146-L153">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.verifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">verifier</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/Basic.html#Verifier">Verifier</a> <span class="fn">oSpec</span> (<span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">0</span></span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <a href="../../../.././Init/Prelude.html#Unit">Unit</a>) → <span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">i</span></span>)</span>)
+  (<span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">(<a href="../../../.././Init/Data/Fin/Basic.html#Fin.last">Fin.last</a> <span class="fn">n</span>)</span></span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <a href="../../../.././Init/Prelude.html#Unit">Unit</a>) → <span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">i</span></span>)</span>) <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.pSpec">pSpec</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">n</span>)</span></span></div></div><p>The verifier for the (full) sum-check protocol</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Sumcheck.Spec.verifier" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Sumcheck.Spec.oracleVerifier"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L155-L163">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleVerifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleVerifier</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/Basic.html#OracleVerifier">OracleVerifier</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">0</span>)</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span>)</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">(<a href="../../../.././Init/Data/Fin/Basic.html#Fin.last">Fin.last</a> <span class="fn">n</span>)</span>)</span>
+  <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span>)</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.pSpec">pSpec</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">n</span>)</span></span></div></div><p>The oracle verifier for the (full) sum-check protocol</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Sumcheck.Spec.oracleVerifier" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Sumcheck.Spec.reduction"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L165-L175">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.reduction"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">reduction</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/Basic.html#Reduction">Reduction</a> <span class="fn">oSpec</span> (<span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">0</span></span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <a href="../../../.././Init/Prelude.html#Unit">Unit</a>) → <span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">i</span></span>)</span>) <a href="../../../.././Init/Prelude.html#Unit">Unit</a>
+  (<span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">(<a href="../../../.././Init/Data/Fin/Basic.html#Fin.last">Fin.last</a> <span class="fn">n</span>)</span></span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">((<span class="fn">i</span> : <a href="../../../.././Init/Prelude.html#Unit">Unit</a>) → <span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">i</span></span>)</span>) <a href="../../../.././Init/Prelude.html#Unit">Unit</a> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.pSpec">pSpec</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">n</span>)</span></span></div></div><p>The sum-check protocol as a reduction</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Sumcheck.Spec.reduction" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Sumcheck.Spec.oracleReduction"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L177-L188">source</a></div><div class="attributes">@[reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleReduction"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleReduction</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/Basic.html#OracleReduction">OracleReduction</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">0</span>)</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span>)</span> <a href="../../../.././Init/Prelude.html#Unit">Unit</a> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.StatementRound">StatementRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">(<a href="../../../.././Init/Data/Fin/Basic.html#Fin.last">Fin.last</a> <span class="fn">n</span>)</span>)</span>
+  <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.OracleStatement">OracleStatement</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span>)</span> <a href="../../../.././Init/Prelude.html#Unit">Unit</a> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.pSpec">pSpec</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">n</span>)</span></span></div></div><p>The sum-check protocol as an oracle reduction</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-Sumcheck.Spec.oracleReduction" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Sumcheck.Spec.reduction_verifier_eq_verifier"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L191-L194">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.reduction_verifier_eq_verifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">reduction_verifier_eq_verifier</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.reduction">reduction</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">n</span> <span class="fn">oSpec</span>)</span>.<a href="../../../.././ArkLib/OracleReduction/Basic.html#Reduction.verifier">verifier</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.verifier">verifier</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">n</span> <span class="fn">oSpec</span></span></div></div></div></div><div class="decl" id="Sumcheck.Spec.oracleReduction_verifier_eq_oracleVerifier"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L197-L200">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleReduction_verifier_eq_oracleVerifier"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleReduction_verifier_eq_oracleVerifier</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleReduction">oracleReduction</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">n</span> <span class="fn">oSpec</span>)</span>.<a href="../../../.././ArkLib/OracleReduction/Basic.html#OracleReduction.verifier">verifier</a></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleVerifier">oracleVerifier</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">n</span> <span class="fn">oSpec</span></span></div></div></div></div><div class="decl" id="Sumcheck.Spec.reduction_perfectCompleteness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L206-L213">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.reduction_perfectCompleteness"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">reduction_perfectCompleteness</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hInit</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/Traversal.html#OracleComp.neverFails">OracleComp.neverFails</a> <span class="fn">init</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/Security/Basic.html#Reduction.perfectCompleteness">Reduction.perfectCompleteness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.relationRound">relationRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">0</span>)</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.relationRound">relationRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">(<a href="../../../.././Init/Data/Fin/Basic.html#Fin.last">Fin.last</a> <span class="fn">n</span>)</span>)</span>
+  <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.reduction">reduction</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">n</span> <span class="fn">oSpec</span>)</span></span></div></div><p>Perfect completeness for the (full) sum-check protocol</p></div></div><div class="decl" id="Sumcheck.Spec.oracleVerifier_rbrKnowledgeSoundness"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/06102f457d5f1583099557f4cc414e62d6f68e6a/ArkLib/ProofSystem/Sumcheck/Spec/General.lean#L215-L224">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleVerifier_rbrKnowledgeSoundness"><span class="name">Sumcheck</span>.<span class="name">Spec</span>.<span class="name">oracleVerifier_rbrKnowledgeSoundness</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">D</span> : <span class="fn"><a href="../../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">m</span></span> <a href="../../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">R</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">n</span> : <a href="../../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oSpec</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././VCVio/OracleComp/Constructions/UniformSelect.html#OracleComp.SelectableType">OracleComp.SelectableType</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <a href="../../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">init</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a> <span class="fn">σ</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">impl</span> : <span class="fn"><a href="../../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">oSpec</span> <span class="fn">(<a href="../../../.././Init/Control/State.html#StateT">StateT</a> <span class="fn">σ</span> <a href="../../../.././VCVio/OracleComp/OracleComp.html#ProbComp">ProbComp</a>)</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././ArkLib/OracleReduction/Security/RoundByRound.html#OracleVerifier.rbrKnowledgeSoundness">OracleVerifier.rbrKnowledgeSoundness</a> <span class="fn">init</span> <span class="fn">impl</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.relationRound">relationRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">0</span>)</span> <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/SingleRound.html#Sumcheck.Spec.relationRound">relationRound</a> <span class="fn">R</span> <span class="fn">n</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">(<a href="../../../.././Init/Data/Fin/Basic.html#Fin.last">Fin.last</a> <span class="fn">n</span>)</span>)</span>
+  <span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.oracleVerifier">oracleVerifier</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">D</span> <span class="fn">n</span> <span class="fn">oSpec</span>)</span> <span class="fn">fun (<span class="fn">x</span> : <span class="fn"><span class="fn">(<a href="../../../.././ArkLib/ProofSystem/Sumcheck/Spec/General.html#Sumcheck.Spec.pSpec">pSpec</a> <span class="fn">R</span> <span class="fn">deg</span> <span class="fn">n</span>)</span>.<a href="../../../.././ArkLib/OracleReduction/ProtocolSpec/Basic.html#ProtocolSpec.ChallengeIdx">ChallengeIdx</a></span>) =&gt; <span class="fn">↑<span class="fn">deg</span></span> <a href="../../../.././Init/Prelude.html#HDiv.hDiv">/</a> <span class="fn">↑<span class="fn">(<a href="../../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">R</span>)</span></span></span></span></div></div><p>Round-by-round knowledge soundness with error <code>deg / |R|</code> per challenge for the (full)
+sum-check protocol</p></div></div></main>
+<nav class="nav"><iframe src="../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

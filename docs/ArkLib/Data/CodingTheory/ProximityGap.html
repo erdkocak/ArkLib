@@ -1,0 +1,242 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>ArkLib.Data.CodingTheory.ProximityGap</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="ArkLib.Data.CodingTheory.ProximityGap";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">ArkLib</span>.<span class="name">Data</span>.<span class="name">CodingTheory</span>.<span class="name">ProximityGap</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/RingTheory/Henselian.html">Mathlib.RingTheory.Henselian</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/Basic.html">ArkLib.Data.CodingTheory.Basic</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/Prelims.html">ArkLib.Data.CodingTheory.Prelims</a></li><li><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html">ArkLib.Data.CodingTheory.ReedSolomon</a></li><li><a href="../../.././ArkLib/Data/Probability/Notation.html">ArkLib.Data.Probability.Notation</a></li><li><a href="../../.././Mathlib/Algebra/Lie/OfAssociative.html">Mathlib.Algebra.Lie.OfAssociative</a></li><li><a href="../../.././Mathlib/Data/Finset/BooleanAlgebra.html">Mathlib.Data.Finset.BooleanAlgebra</a></li><li><a href="../../.././Mathlib/Data/Real/Basic.html">Mathlib.Data.Real.Basic</a></li><li><a href="../../.././Mathlib/Data/Real/Sqrt.html">Mathlib.Data.Real.Sqrt</a></li><li><a href="../../.././Mathlib/Data/Set/Defs.html">Mathlib.Data.Set.Defs</a></li><li><a href="../../.././Mathlib/Probability/Distributions/Uniform.html">Mathlib.Probability.Distributions.Uniform</a></li><li><a href="../../.././Mathlib/LinearAlgebra/AffineSpace/AffineSubspace/Defs.html">Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-ArkLib.Data.CodingTheory.ProximityGap" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#ProximityGap.proximityMeasure"><span class="name">ProximityGap</span>.<span class="name">proximityMeasure</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.proximityGap"><span class="name">ProximityGap</span>.<span class="name">proximityGap</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.correlatedAgreement"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.generalProximityGap"><span class="name">ProximityGap</span>.<span class="name">generalProximityGap</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.errorBound"><span class="name">ProximityGap</span>.<span class="name">errorBound</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.proximity_gap_RSCodes"><span class="name">ProximityGap</span>.<span class="name">proximity_gap_RSCodes</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.correlatedAgreement_lines"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement_lines</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.correlatedAgreement_affine_curves"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement_affine_curves</span></a></div><div class="nav_link"><a class="break_within" href="#ProximityGap.correlatedAgreement_affine_spaces"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement_affine_spaces</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Definitions-and-Theorems-about-Proximity-Gaps">Definitions and Theorems about Proximity Gaps <a class="hover-link" href="#Definitions-and-Theorems-about-Proximity-Gaps">#</a></h1><p>We define the proximity gap properties of linear codes over finite fields.</p><p>[BCIKS20] refers to the paper &quot;Proximity Gaps for Reed-Solomon Codes&quot; by Eli Ben-Sasson,
+Dan Carmon, Yuval Ishai, Swastik Kopparty, and Shubhangi Saraf.</p><h2 class="markdown-heading" id="Main-Definitions">Main Definitions <a class="hover-link" href="#Main-Definitions">#</a></h2></div><div class="decl" id="ProximityGap.proximityMeasure"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L48-L52">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.proximityMeasure"><span class="name">ProximityGap</span>.<span class="name">proximityMeasure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Module/Submodule/Defs.html#Submodule">Submodule</a> <span class="fn">F</span> <span class="fn">(<span class="fn">n</span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidablePred">DecidablePred</a> <span class="fn">fun (<span class="fn">x</span> : <span class="fn"><span class="fn">n</span> → <span class="fn">F</span></span>) =&gt; <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">u </span><span class="fn">v</span> : <span class="fn"><span class="fn">n</span> → <span class="fn">F</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">d</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Nat">ℕ</a></div></div><p>The proximity measure of two vectors <code>u</code> and <code>v</code> from a code <code>C</code> at distance <code>d</code> is the number
+of vectors at distance at most <code>d</code> from the linear combination of <code>u</code> and <code>v</code> with coefficients
+<code>r</code> in <code>F</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityGap.proximityMeasure" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityGap.proximityGap"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L54-L59">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.proximityGap"><span class="name">ProximityGap</span>.<span class="name">proximityGap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Module/Submodule/Defs.html#Submodule">Submodule</a> <span class="fn">F</span> <span class="fn">(<span class="fn">n</span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidablePred">DecidablePred</a> <span class="fn">fun (<span class="fn">x</span> : <span class="fn"><span class="fn">n</span> → <span class="fn">F</span></span>) =&gt; <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span></span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">d </span><span class="fn">bound</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A code <code>C</code> exhibits proximity gap at distance <code>d</code> and cardinality bound <code>bound</code> if for every
+pair of vectors <code>u</code> and <code>v</code>, whenever the proximity measure for <code>C u v d</code> is greater than
+<code>bound</code>, then the distance of <code>[u | v]</code> from the interleaved code <code>C ^⊗ 2</code> is at most <code>d</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityGap.proximityGap" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityGap.correlatedAgreement"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L61-L67">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<span class="fn">n</span> → <span class="fn">F</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">W</span> : <span class="fn"><span class="fn"><a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">k</span></span> → <span class="fn"><span class="fn">n</span> → <span class="fn">F</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A code <code>C</code> exhibits <code>δ</code>-correlated agreement with respect to a tuple of vectors <code>W_1, ..., W_k</code>
+if there exists a set <code>S</code> of coordinates such that the size of <code>S</code> is at least <code>(1 - δ) * |n|</code>,
+and there exists a tuple of codewords <code>v_1, ..., v_k</code> such that <code>v_i</code> agrees with <code>W_i</code> on <code>S</code>
+for all <code>i</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityGap.correlatedAgreement" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityGap.generalProximityGap"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L76-L82">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.generalProximityGap"><span class="name">ProximityGap</span>.<span class="name">generalProximityGap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">P</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<span class="fn">ι</span> → <span class="fn">α</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">(<span class="fn">ι</span> → <span class="fn">α</span>)</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">δ </span><span class="fn">ε</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p><code>Definition 1.1</code> in [BCIKS20].</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityGap.generalProximityGap" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityGap.errorBound"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L89-L102">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.errorBound"><span class="name">ProximityGap</span>.<span class="name">errorBound</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">domain</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a></div></div><p>The error bound <code>ε</code> in the pair of proximity and error parameters <code>(δ,ε)</code> for Reed-Solomon codes
+defined up to the Johnson bound. More precisely, let <code>ρ</code> be the rate of the Reed-Solomon code.
+Then for <code>δ ∈ (0, 1 - √ρ)</code>, we define the relevant error parameter <code>ε</code> for the unique decoding
+bound, i.e. <code>δ ∈ [0, (1-ρ)/2]</code> and Johnson bound, i.e. <code>δ ∈ [(1-ρ)/2 , 1 - √ρ]</code>. Otherwise,
+we set <code>ε = 0</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-ProximityGap.errorBound" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ProximityGap.proximity_gap_RSCodes"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L104-L111">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.proximity_gap_RSCodes"><span class="name">ProximityGap</span>.<span class="name">proximity_gap_RSCodes</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">k </span><span class="fn">t</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Data/NeZero.html#NeZero">NeZero</a> <span class="fn">k</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Data/NeZero.html#NeZero">NeZero</a> <span class="fn">t</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">domain</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><span class="fn"><a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">t</span></span> → <span class="fn"><span class="fn"><a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">k</span></span> → <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hδ</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.sqrtRate">ReedSolomonCode.sqrtRate</a> <span class="fn">deg</span> <span class="fn">domain</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.generalProximityGap">generalProximityGap</a> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.toFinset">ReedSolomonCode.toFinset</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/Prelims.html#Affine.AffSpanFinsetCol">Affine.AffSpanFinsetCol</a> <span class="fn">C</span>)</span> <span class="fn">δ</span> <span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.errorBound">errorBound</a> <span class="fn">δ</span> <span class="fn">deg</span> <span class="fn">domain</span>)</span></span></div></div><p><code>Theorem 1.2</code> (Proximity Gaps for Reed-Solomon Codes) in [BCIKS20].</p></div></div><div class="decl" id="ProximityGap.correlatedAgreement_lines"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L115-L122">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement_lines"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement_lines</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">u</span> : <span class="fn"><span class="fn"><a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">2</span></span> → <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">domain</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hδ</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.sqrtRate">ReedSolomonCode.sqrtRate</a> <span class="fn">deg</span> <span class="fn">domain</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hproximity</span> :
+  <span class="fn"><span class="fn">(do
+        let <span class="fn">z</span> ← <span class="fn"><a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <span class="fn">F</span></span>
+        <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> (<span class="fn">↑<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">δᵣ(</a><span class="fn"><span class="fn">u</span> <span class="fn">0</span></span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">z</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">u</span> <span class="fn">1</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">,</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">)</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">δ</span>)</span>)</span>
+      <a href="../../.././Init/Prelude.html#True">True</a></span> <a href="../../.././Init/Prelude.html#GT.gt">&gt;</a>     <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.errorBound">errorBound</a> <span class="fn">δ</span> <span class="fn">deg</span> <span class="fn">domain</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement">correlatedAgreement</a> <span class="fn">(↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span>)</span> <span class="fn">δ</span> <span class="fn">u</span></span></div></div><p><code>Theorem 1.4</code> (Main Theorem — Correlated agreement over lines) in [BCIKS20].</p></div></div><div class="decl" id="ProximityGap.correlatedAgreement_affine_curves"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L124-L133">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement_affine_curves"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement_affine_curves</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">u</span> : <span class="fn"><span class="fn"><a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">k</span></span> → <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">domain</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hδ</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.sqrtRate">ReedSolomonCode.sqrtRate</a> <span class="fn">deg</span> <span class="fn">domain</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hproximity</span> :
+  <span class="fn"><span class="fn">(do
+        let <span class="fn">y</span> ← <span class="fn"><a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <a href="../../.././Init/Prelude.html#Subtype">{</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Subtype">:</a> <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span> <a href="../../.././Init/Prelude.html#Subtype">//</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/Prelims.html#Curve.parametrisedCurveFinite">Curve.parametrisedCurveFinite</a> <span class="fn">u</span></span> <a href="../../.././Init/Prelude.html#Subtype">}</a></span>
+        <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> (<span class="fn">↑<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">δᵣ(</a><span class="fn">↑<span class="fn">y</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">,</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">)</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">δ</span>)</span>)</span>
+      <a href="../../.././Init/Prelude.html#True">True</a></span> <a href="../../.././Init/Prelude.html#GT.gt">&gt;</a>     <span class="fn">↑<span class="fn">k</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.errorBound">errorBound</a> <span class="fn">δ</span> <span class="fn">deg</span> <span class="fn">domain</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement">correlatedAgreement</a> <span class="fn">(↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span>)</span> <span class="fn">δ</span> <span class="fn">u</span></span></div></div><p><code>Theorem 1.5</code> (Correlated agreement for low-degree parameterised curves) in [BCIKS20].</p></div></div><div class="decl" id="ProximityGap.correlatedAgreement_affine_spaces"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/ArkLib/blob/2900119adfd5583275b4b44077407792c0e8a184/ArkLib/Data/CodingTheory/ProximityGap.lean#L136-L143">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement_affine_spaces"><span class="name">ProximityGap</span>.<span class="name">correlatedAgreement_affine_spaces</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">k</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Data/NeZero.html#NeZero">NeZero</a> <span class="fn">k</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">u</span> : <span class="fn"><span class="fn"><a href="../../.././Init/Prelude.html#Fin">Fin</a> (<span class="fn">k</span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">1</span>)</span> → <span class="fn"><span class="fn">ι</span> → <span class="fn">F</span></span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">deg</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">domain</span> : <span class="fn">ι</span> <a href="../../.././Mathlib/Logic/Embedding/Basic.html#Function.Embedding">↪</a> <span class="fn">F</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././Mathlib/Data/NNReal/Defs.html#NNReal">NNReal</a>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hδ</span> : <span class="fn">δ</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomonCode.sqrtRate">ReedSolomonCode.sqrtRate</a> <span class="fn">deg</span> <span class="fn">domain</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hproximity</span> :
+  <span class="fn"><span class="fn">(do
+        let <span class="fn">y</span> ← <span class="fn"><a href="../../.././Mathlib/Probability/Distributions/Uniform.html#PMF.uniformOfFintype">PMF.uniformOfFintype</a> <span class="fn">↥(<span class="fn"><span class="fn">u</span> <span class="fn">0</span></span> <a href="../../.././Mathlib/Algebra/Notation/Defs.html#HVAdd.hVAdd">+ᵥ</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/AffineSpace/AffineSubspace/Defs.html#affineSpan">affineSpan</a> <span class="fn">F</span> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Finset/Image.html#Finset.image">Finset.image</a> <span class="fn">(<a href="../../.././Mathlib/Data/Fin/Tuple/Basic.html#Fin.tail">Fin.tail</a> <span class="fn">u</span>)</span> <a href="../../.././Mathlib/Data/Fintype/Defs.html#Finset.univ">Finset.univ</a>)</span></span></span>)</span></span>
+        <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> (<span class="fn">↑<a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">δᵣ(</a><span class="fn">↑<span class="fn">y</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">,</a> <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span></span><a href="../../.././ArkLib/Data/CodingTheory/Basic.html#Code.relHammingDistToCode">)</a></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">δ</span>)</span>)</span>
+      <a href="../../.././Init/Prelude.html#True">True</a></span> <a href="../../.././Init/Prelude.html#GT.gt">&gt;</a>     <span class="fn">↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.errorBound">errorBound</a> <span class="fn">δ</span> <span class="fn">deg</span> <span class="fn">domain</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././ArkLib/Data/CodingTheory/ProximityGap.html#ProximityGap.correlatedAgreement">correlatedAgreement</a> <span class="fn">(↑<span class="fn">(<a href="../../.././ArkLib/Data/CodingTheory/ReedSolomon.html#ReedSolomon.code">ReedSolomon.code</a> <span class="fn">domain</span> <span class="fn">deg</span>)</span>)</span> <span class="fn">δ</span> <span class="fn">u</span></span></div></div><p><code>Theorem 1.6</code> (Correlated agreement over affine spaces) in [BCIKS20].</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

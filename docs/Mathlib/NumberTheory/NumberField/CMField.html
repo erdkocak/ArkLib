@@ -1,0 +1,459 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.NumberTheory.NumberField.CMField</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.NumberTheory.NumberField.CMField";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">NumberTheory</span>.<span class="name">NumberField</span>.<span class="name">CMField</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html">Mathlib.NumberTheory.NumberField.InfinitePlace.TotallyRealComplex</a></li><li><a href="../../.././Mathlib/NumberTheory/NumberField/Units/DirichletTheorem.html">Mathlib.NumberTheory.NumberField.Units.DirichletTheorem</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.NumberTheory.NumberField.CMField" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.card_infinitePlace_eq_card_infinitePlace"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">card_infinitePlace_eq_card_infinitePlace</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.units_rank_eq_units_rank"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">units_rank_eq_units_rank</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.exists_isConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">exists_isConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.isConj_eq_isConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">isConj_eq_isConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.isConj_complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">isConj_complexConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.complexConj_ne_one"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexConj_ne_one</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.complexEmbedding_complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexEmbedding_complexConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.complexConj_apply_apply"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexConj_apply_apply</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.orderOf_complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">orderOf_complexConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.zpowers_complexConj_eq_top"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">zpowers_complexConj_eq_top</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.eq_maximalRealSubfield"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">eq_maximalRealSubfield</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.equivMaximalRealSubfield"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">equivMaximalRealSubfield</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.equivMaximalRealSubfield_apply"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">equivMaximalRealSubfield_apply</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.CMExtension.algebraMap_equivMaximalRealSubfield_symm_apply"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">algebraMap_equivMaximalRealSubfield_symm_apply</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField"><span class="name">NumberField</span>.<span class="name">IsCMField</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.ofCMExtension"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">ofCMExtension</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.of_forall_isConj"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">of_forall_isConj</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.of_isMulCommutative"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">of_isMulCommutative</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.isQuadraticExtension"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">isQuadraticExtension</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.starRing"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">starRing</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.card_infinitePlace_eq_card_infinitePlace"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">card_infinitePlace_eq_card_infinitePlace</span></a></div><div class="nav_link"><a class="break_within" href="#NumberField.IsCMField.units_rank_eq_units_rank"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">units_rank_eq_units_rank</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="CM-extension-of-number-fields">CM-extension of number fields <a class="hover-link" href="#CM-extension-of-number-fields">#</a></h1><p>A CM-extension <code>K/F</code> of number fields is an extension where <code>K</code> is totally complex, <code>F</code> is
+totally real and <code>K</code> is a quadratic extension of <code>F</code>. In this situation, the totally real
+subfield <code>F</code> is (isomorphic to) the maximal real subfield of <code>K</code>.</p><h2 class="markdown-heading" id="Main-definitions">Main definitions <a class="hover-link" href="#Main-definitions">#</a></h2><ul>
+<li><p><code><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">NumberField.CMExtension.complexConj</a></code>: the complex conjugation of a CM-extension.</p>
+</li>
+<li><p><code><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.isConj_complexConj">NumberField.CMExtension.isConj_complexConj</a></code>: the complex conjugation is the conjugation
+of any complex embedding of a <code>CM</code>-extension.</p>
+</li>
+<li><p><code><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">NumberField.IsCMField</a></code>: A predicate that says that if a number field is CM, then it is a totally
+complex quadratic extension of its totally real subfield</p>
+</li>
+<li><p><code><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.equivMaximalRealSubfield">NumberField.CMExtension.equivMaximalRealSubfield</a></code>: Any field <code>F</code> such that <code>K/F</code> is a
+CM-extension is isomorphic to the maximal real subfield of <code>K</code>.</p>
+</li>
+<li><p><code>NumberField.IsCM.ofIsCMExtension</code>: Assume that there exists <code>F</code> such that <code>K/F</code> is a
+CM-extension. Then <code>K</code> is CM.</p>
+</li>
+<li><p><code><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.of_isMulCommutative">NumberField.IsCMField.of_isMulCommutative</a></code>: A totally complex abelian extension of <code>ℚ</code> is CM.</p>
+</li>
+</ul><h2 class="markdown-heading" id="Implementation-note">Implementation note <a class="hover-link" href="#Implementation-note">#</a></h2><p>Most result are proved under the general hypothesis: <code>K/F</code> quadratic extension of number fields
+with <code>F</code> totally real and <code>K</code> totally complex and then, if relevant, we deduce the special case
+<code>F = maximalRealSubfield K</code>. Results of the first kind live in the <code>NumberField.CMExtension</code>
+namespace whereas results of the second kind live in the <code><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">NumberField.IsCMField</a></code> namespace.</p></div><div class="decl" id="NumberField.CMExtension.card_infinitePlace_eq_card_infinitePlace"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L54-L60">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.card_infinitePlace_eq_card_infinitePlace"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">card_infinitePlace_eq_card_infinitePlace</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Basic.html#NumberField.InfinitePlace">InfinitePlace</a> <span class="fn">F</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Basic.html#NumberField.InfinitePlace">InfinitePlace</a> <span class="fn">K</span>)</span></span></div></div></div></div><div class="decl" id="NumberField.CMExtension.units_rank_eq_units_rank"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L62-L64">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.units_rank_eq_units_rank"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">units_rank_eq_units_rank</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Units/DirichletTheorem.html#NumberField.Units.rank">Units.rank</a> <span class="fn">F</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Units/DirichletTheorem.html#NumberField.Units.rank">Units.rank</a> <span class="fn">K</span></span></div></div></div></div><div class="decl" id="NumberField.CMExtension.exists_isConj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L68-L71">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.exists_isConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">exists_isConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Ring/Hom/Defs.html#RingHom">→+*</a> <a href="../../.././Mathlib/Data/Complex/Basic.html#Complex">ℂ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ (<span class="fn">σ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><span class="fn">F</span><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">K</span>), <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Embeddings.html#NumberField.ComplexEmbedding.IsConj">ComplexEmbedding.IsConj</a> <span class="fn">φ</span> <span class="fn">σ</span></span></span></div></div></div></div><div class="decl" id="NumberField.CMExtension.isConj_eq_isConj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L74-L84">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.isConj_eq_isConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">isConj_eq_isConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">φ </span><span class="fn">ψ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Ring/Hom/Defs.html#RingHom">→+*</a> <a href="../../.././Mathlib/Data/Complex/Basic.html#Complex">ℂ</a>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ </span><span class="fn">τ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><span class="fn">F</span><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">K</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hφ</span> : <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Embeddings.html#NumberField.ComplexEmbedding.IsConj">ComplexEmbedding.IsConj</a> <span class="fn">φ</span> <span class="fn">σ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hψ</span> : <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Embeddings.html#NumberField.ComplexEmbedding.IsConj">ComplexEmbedding.IsConj</a> <span class="fn">ψ</span> <span class="fn">τ</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">σ</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">τ</span></div></div><p>All the conjugations of a <code>CM</code>-extension are the same.</p></div></div><div class="decl" id="NumberField.CMExtension.complexConj"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L87-L91">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><span class="fn">F</span><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">K</span></div></div><p>The complex conjugation of a <code>CM</code>-extension.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-NumberField.CMExtension.complexConj" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="NumberField.CMExtension.isConj_complexConj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L93-L100">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.isConj_complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">isConj_complexConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Ring/Hom/Defs.html#RingHom">→+*</a> <a href="../../.././Mathlib/Data/Complex/Basic.html#Complex">ℂ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Embeddings.html#NumberField.ComplexEmbedding.IsConj">ComplexEmbedding.IsConj</a> <span class="fn">φ</span> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span>)</span></span></div></div><p>The complex conjugation is the conjugation of any complex embedding of a <code>CM</code>-extension.</p></div></div><div class="decl" id="NumberField.CMExtension.complexConj_ne_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L103-L107">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj_ne_one"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexConj_ne_one</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="NumberField.CMExtension.complexEmbedding_complexConj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L109-L112">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexEmbedding_complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexEmbedding_complexConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Ring/Hom/Defs.html#RingHom">→+*</a> <a href="../../.././Mathlib/Data/Complex/Basic.html#Complex">ℂ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">K</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">φ</span> <span class="fn">(<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span>)</span> <span class="fn">x</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Star/Basic.html#starRingEnd">starRingEnd</a> <a href="../../.././Mathlib/Data/Complex/Basic.html#Complex">ℂ</a>)</span> <span class="fn">(<span class="fn">φ</span> <span class="fn">x</span>)</span></span></div></div></div></div><div class="decl" id="NumberField.CMExtension.complexConj_apply_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L114-L118">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj_apply_apply"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">complexConj_apply_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">K</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span>)</span> <span class="fn">(<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span>)</span> <span class="fn">x</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">x</span></div></div></div></div><div class="decl" id="NumberField.CMExtension.orderOf_complexConj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L121-L126">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.orderOf_complexConj"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">orderOf_complexConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/GroupTheory/OrderOfElement.html#orderOf">orderOf</a> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">2</span></div></div><p>The complex conjugation is an automorphism of degree <code>2</code>.</p></div></div><div class="decl" id="NumberField.CMExtension.zpowers_complexConj_eq_top"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L129-L136">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.zpowers_complexConj_eq_top"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">zpowers_complexConj_eq_top</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/ZPowers/Basic.html#Subgroup.zpowers">Subgroup.zpowers</a> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.complexConj">complexConj</a> <span class="fn">F</span> <span class="fn">K</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Order/Notation.html#Top.top">⊤</a></div></div><p>The complex conjugation generates the Galois group of <code>K/F</code>.</p></div></div><div class="decl" id="NumberField.CMExtension.eq_maximalRealSubfield"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L138-L154">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.eq_maximalRealSubfield"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">eq_maximalRealSubfield</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">E</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Field/Subfield/Defs.html#Subfield">Subfield</a> <span class="fn">K</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">↥<span class="fn">E</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">(↥<span class="fn">E</span>)</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">E</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span></span></div></div></div></div><div class="decl" id="NumberField.CMExtension.equivMaximalRealSubfield"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L158-L169">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.equivMaximalRealSubfield"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">equivMaximalRealSubfield</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">F</span> <a href="../../.././Mathlib/Algebra/Ring/Equiv.html#RingEquiv">≃+*</a> <span class="fn">↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span></span></div></div><p>Any field <code>F</code> such that <code>K/F</code> is a CM-extension is isomorphic to the maximal real subfield of <code>K</code>.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-NumberField.CMExtension.equivMaximalRealSubfield" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="NumberField.CMExtension.equivMaximalRealSubfield_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L171-L173">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.equivMaximalRealSubfield_apply"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">equivMaximalRealSubfield_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.equivMaximalRealSubfield">equivMaximalRealSubfield</a> <span class="fn">F</span> <span class="fn">K</span>)</span> <span class="fn">x</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#algebraMap">algebraMap</a> <span class="fn">F</span> <span class="fn">K</span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="NumberField.CMExtension.algebraMap_equivMaximalRealSubfield_symm_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L175-L179">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.algebraMap_equivMaximalRealSubfield_symm_apply"><span class="name">NumberField</span>.<span class="name">CMExtension</span>.<span class="name">algebraMap_equivMaximalRealSubfield_symm_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#algebraMap">algebraMap</a> <span class="fn">F</span> <span class="fn">K</span>)</span> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.CMExtension.equivMaximalRealSubfield">equivMaximalRealSubfield</a> <span class="fn">F</span> <span class="fn">K</span>)</span>.<a href="../../.././Mathlib/Algebra/Ring/Equiv.html#RingEquiv.symm">symm</a></span> <span class="fn">x</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#algebraMap">algebraMap</a> <span class="fn">(↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span>)</span> <span class="fn">K</span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="NumberField.IsCMField"><div class="class"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L185-L190">source</a></div><div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField"><span class="name">NumberField</span>.<span class="name">IsCMField</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A number field <code>K</code> is <code>CM</code> if <code>K</code> is a totally complex quadratic extension of its maximal
+real subfield.</p><ul class="structure_fields" id="NumberField.IsCMField.mk"><li id="NumberField.IsCMField.is_quadratic" class="structure_field"><div class="structure_field_info">is_quadratic : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">(↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span>)</span> <span class="fn">K</span></span></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-NumberField.IsCMField" class="instances-list"></ul></details></div></div><div class="decl" id="NumberField.IsCMField.ofCMExtension"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L196-L200">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.ofCMExtension"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">ofCMExtension</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyReal">IsTotallyReal</a> <span class="fn">F</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">F</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span></div></div></div></div><div class="decl" id="NumberField.IsCMField.of_forall_isConj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L203-L218">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.of_forall_isConj"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">of_forall_isConj</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">σ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><a href="../../.././Batteries/Data/Rat/Basic.html#Rat">ℚ</a><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">K</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hσ</span> : <span class="fn">∀ (<span class="fn">φ</span> : <span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Ring/Hom/Defs.html#RingHom">→+*</a> <a href="../../.././Mathlib/Data/Complex/Basic.html#Complex">ℂ</a>), <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Embeddings.html#NumberField.ComplexEmbedding.IsConj">ComplexEmbedding.IsConj</a> <span class="fn">φ</span> <span class="fn">σ</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span></div></div><p>A totally complex field that has a unique complex conjugation is CM.</p></div></div><div class="decl" id="NumberField.IsCMField.of_isMulCommutative"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L220-L234">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.of_isMulCommutative"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">of_isMulCommutative</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/FieldTheory/Galois/Basic.html#IsGalois">IsGalois</a> <a href="../../.././Batteries/Data/Rat/Basic.html#Rat">ℚ</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#IsMulCommutative">IsMulCommutative</a> (<span class="fn">K</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><a href="../../.././Batteries/Data/Rat/Basic.html#Rat">ℚ</a><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">K</span>)</span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span></div></div><p>A totally complex abelian extension of <code>ℚ</code> is CM.</p></div></div><div class="decl" id="NumberField.IsCMField.isQuadraticExtension"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L238-L239">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.isQuadraticExtension"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">isQuadraticExtension</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/StrongRankCondition.html#Algebra.IsQuadraticExtension">Algebra.IsQuadraticExtension</a> <span class="fn">(↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span>)</span> <span class="fn">K</span></span></div></div></div></div><div class="decl" id="NumberField.IsCMField.starRing"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L241-L245">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.starRing"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">starRing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">K</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="NumberField.IsCMField.card_infinitePlace_eq_card_infinitePlace"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L247-L249">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.card_infinitePlace_eq_card_infinitePlace"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">card_infinitePlace_eq_card_infinitePlace</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Basic.html#NumberField.InfinitePlace">InfinitePlace</a> <span class="fn">↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span></span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/Basic.html#NumberField.InfinitePlace">InfinitePlace</a> <span class="fn">K</span>)</span></span></div></div></div></div><div class="decl" id="NumberField.IsCMField.units_rank_eq_units_rank"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/79e94a093aff4a60fb1b1f92d9681e407124c2ca/Mathlib/NumberTheory/NumberField/CMField.lean#L251-L253">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField.units_rank_eq_units_rank"><span class="name">NumberField</span>.<span class="name">IsCMField</span>.<span class="name">units_rank_eq_units_rank</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Basic.html#NumberField">NumberField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.IsTotallyComplex">IsTotallyComplex</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/CMField.html#NumberField.IsCMField">IsCMField</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Units/DirichletTheorem.html#NumberField.Units.rank">Units.rank</a> <span class="fn">↥<span class="fn">(<a href="../../.././Mathlib/NumberTheory/NumberField/InfinitePlace/TotallyRealComplex.html#NumberField.maximalRealSubfield">maximalRealSubfield</a> <span class="fn">K</span>)</span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/NumberTheory/NumberField/Units/DirichletTheorem.html#NumberField.Units.rank">Units.rank</a> <span class="fn">K</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

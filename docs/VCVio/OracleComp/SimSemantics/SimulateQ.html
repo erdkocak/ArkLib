@@ -1,0 +1,379 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>VCVio.OracleComp.SimSemantics.SimulateQ</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="VCVio.OracleComp.SimSemantics.SimulateQ";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">VCVio</span>.<span class="name">OracleComp</span>.<span class="name">SimSemantics</span>.<span class="name">SimulateQ</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././ToMathlib/Control/StateT.html">ToMathlib.Control.StateT</a></li><li><a href="../../.././VCVio/OracleComp/OracleComp.html">VCVio.OracleComp.OracleComp</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-VCVio.OracleComp.SimSemantics.SimulateQ" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#QueryImpl"><span class="name">QueryImpl</span></a></div><div class="nav_link"><a class="break_within" href="#QueryImpl.ext"><span class="name">QueryImpl</span>.<span class="name">ext</span></a></div><div class="nav_link"><a class="break_within" href="#QueryImpl.ext_iff"><span class="name">QueryImpl</span>.<span class="name">ext_iff</span></a></div><div class="nav_link"><a class="break_within" href="#QueryImpl.Inhabited"><span class="name">QueryImpl</span>.<span class="name">Inhabited</span></a></div><div class="nav_link"><a class="break_within" href="#QueryImpl.ext'"><span class="name">QueryImpl</span>.<span class="name">ext'</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ"><span class="name">OracleComp</span>.<span class="name">simulateQ</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_ite"><span class="name">OracleComp</span>.<span class="name">simulateQ_ite</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_failure"><span class="name">OracleComp</span>.<span class="name">simulateQ_failure</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_query"><span class="name">OracleComp</span>.<span class="name">simulateQ_query</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_pure"><span class="name">OracleComp</span>.<span class="name">simulateQ_pure</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_comp_pure_comp"><span class="name">OracleComp</span>.<span class="name">simulateQ_comp_pure_comp</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_query_bind"><span class="name">OracleComp</span>.<span class="name">simulateQ_query_bind</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_bind"><span class="name">OracleComp</span>.<span class="name">simulateQ_bind</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_map"><span class="name">OracleComp</span>.<span class="name">simulateQ_map</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_seq"><span class="name">OracleComp</span>.<span class="name">simulateQ_seq</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_seqLeft"><span class="name">OracleComp</span>.<span class="name">simulateQ_seqLeft</span></a></div><div class="nav_link"><a class="break_within" href="#OracleComp.simulateQ_seqRight"><span class="name">OracleComp</span>.<span class="name">simulateQ_seqRight</span></a></div><div class="nav_link"><a class="break_within" href="#idOracle"><span class="name">idOracle</span></a></div><div class="nav_link"><a class="break_within" href="#idOracle.apply_eq"><span class="name">idOracle</span>.<span class="name">apply_eq</span></a></div><div class="nav_link"><a class="break_within" href="#idOracle.simulateQ_eq_id"><span class="name">idOracle</span>.<span class="name">simulateQ_eq_id</span></a></div><div class="nav_link"><a class="break_within" href="#idOracle.simulateQ_eq"><span class="name">idOracle</span>.<span class="name">simulateQ_eq</span></a></div><div class="nav_link"><a class="break_within" href="#defaultOracle"><span class="name">defaultOracle</span></a></div><div class="nav_link"><a class="break_within" href="#defaultOracle.apply_eq"><span class="name">defaultOracle</span>.<span class="name">apply_eq</span></a></div><div class="nav_link"><a class="break_within" href="#defaultOracle.simulateQ_eq_getM_defaultResult"><span class="name">defaultOracle</span>.<span class="name">simulateQ_eq_getM_defaultResult</span></a></div><div class="nav_link"><a class="break_within" href="#defaultOracle.simulateQ_eq"><span class="name">defaultOracle</span>.<span class="name">simulateQ_eq</span></a></div></nav><main>
+<div class="mod_doc"><h1 class="markdown-heading" id="Simulation-Semantics-for-Oracles-in-a-Computation">Simulation Semantics for Oracles in a Computation <a class="hover-link" href="#Simulation-Semantics-for-Oracles-in-a-Computation">#</a></h1><p>This file defines a type <code>SimOracle spec specₜ σ</code> to represent a way to simulate
+oracles in <code>spec</code> using the oracles in <code>specₜ</code>, maintaining some state of type <code>σ</code>.
+We then define a function <code>simulate so oa s</code> to simulate the computation <code>oa</code>
+using <code>so</code> to answer oracle queries, with initial state <code>s</code>.</p><p>We mark lemmas regarding simulating specific computations as <code>@[simp low]</code>,
+so that lemmas specific to certain simulation oracles get applied firts.
+For example <code><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle">idOracle</a></code> has no effect upon simulation, and we should apply that fact first.</p></div><div class="decl" id="QueryImpl"><div class="structure"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L30-L35">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl"><span class="name">QueryImpl</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (max (max (u + 1) v) w)</div></div><p>Specifies a way to simulate a set of oracles using another set of oracles.
+e.g. using uniform selection oracles with a query cache to simulate a random oracle.
+<code><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a></code> gives a method for applying a simulation oracle to a specific computation.</p><ul class="structure_fields" id="QueryImpl.mk"><li id="QueryImpl.impl" class="structure_field"><div class="structure_field_info">impl<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+ : <span class="fn"><span class="fn">m</span> <span class="fn">α</span></span></div></li></ul><details id="instances-for-list-QueryImpl" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="QueryImpl.ext"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L33-L33">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.ext"><span class="name">QueryImpl</span>.<span class="name">ext</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">impl</span> : <span class="fn">@<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a> <span class="fn">ι</span> <span class="fn">spec</span> <span class="fn">m</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">@<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a> <span class="fn">ι</span> <span class="fn">spec</span> <span class="fn">m</span> <span class="fn">y</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">x</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">y</span></div></div></div></div><div class="decl" id="QueryImpl.ext_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L33-L33">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.ext_iff"><span class="name">QueryImpl</span>.<span class="name">ext_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> w}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">x</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">y</span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn">@<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a> <span class="fn">ι</span> <span class="fn">spec</span> <span class="fn">m</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">@<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a> <span class="fn">ι</span> <span class="fn">spec</span> <span class="fn">m</span> <span class="fn">y</span></span></div></div></div></div><div class="decl" id="QueryImpl.Inhabited"><div class="instance"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L37-L38">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.Inhabited"><span class="name">QueryImpl</span>.<span class="name">Inhabited</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>) → <span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">_root_.Inhabited</a> <span class="fn">(<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.range">range</a></span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Pure">Pure</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#Inhabited">_root_.Inhabited</a> <span class="fn">(<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span>)</span></span></div></div><details><summary>Equations</summary><ul class="equations"></ul></details></div></div><div class="decl" id="QueryImpl.ext'"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L40-L42">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.ext'"><span class="name">QueryImpl</span>.<span class="name">ext'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">so </span><span class="fn">so'</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ {<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u} (<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>), <span class="fn"><span class="fn"><span class="fn">so</span>.<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">so'</span>.<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a></span> <span class="fn">q</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">so</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">so'</span></div></div></div></div><div class="decl" id="OracleComp.simulateQ"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L46-L50">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ"><span class="name">OracleComp</span>.<span class="name">simulateQ</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">m</span> <span class="fn">α</span></span></div></div><p>Canonical lifting of a function <code>OracleQuery spec α → m α</code>
+to a new function <code><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> spec α</code> by preserving <code>bind</code>, <code>pure</code>, and <code>failure</code>.
+NOTE: could change the output type to <code><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> spec →ᵐ m</code>, makes some stuff below free</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-OracleComp.simulateQ" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="OracleComp.simulateQ_ite"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L54-L56">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_ite"><span class="name">OracleComp</span>.<span class="name">simulateQ_ite</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <a href="../../.././foundational_types.html">Prop</a>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Decidable">Decidable</a> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa </span><span class="fn">oa'</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> (<a href="../../.././Init/Prelude.html#ite">if</a> <span class="fn">p</span> <a href="../../.././Init/Prelude.html#ite">then</a> <span class="fn">oa</span> <a href="../../.././Init/Prelude.html#ite">else</a> <span class="fn">oa'</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#ite">if</a> <span class="fn">p</span> <a href="../../.././Init/Prelude.html#ite">then</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa</span></span> <a href="../../.././Init/Prelude.html#ite">else</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa'</span></span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_failure"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L60-L61">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_failure"><span class="name">OracleComp</span>.<span class="name">simulateQ_failure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <a href="../../.././Init/Control/Basic.html#Alternative.failure">failure</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Control/Basic.html#Alternative.failure">failure</a></div></div></div></div><div class="decl" id="OracleComp.simulateQ_query"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L63-L64">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_query"><span class="name">OracleComp</span>.<span class="name">simulateQ_query</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">(<a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">so</span>.<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a></span> <span class="fn">q</span></span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_pure"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L66-L67">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_pure"><span class="name">OracleComp</span>.<span class="name">simulateQ_pure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">(<a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_comp_pure_comp"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L69-L70">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_comp_pure_comp"><span class="name">OracleComp</span>.<span class="name">simulateQ_comp_pure_comp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span></span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">f</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">f</span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_query_bind"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L72-L75">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_query_bind"><span class="name">OracleComp</span>.<span class="name">simulateQ_query_bind</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ob</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">β</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> (<span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">ob</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">so</span>.<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span></span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">ob</span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_bind"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L79-L84">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_bind"><span class="name">OracleComp</span>.<span class="name">simulateQ_bind</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#LawfulAlternative">LawfulAlternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ob</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">β</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> (<span class="fn">oa</span> <a href="../../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn">ob</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa</span></span> <a href="../../.././Init/Prelude.html#Bind.bind">&gt;&gt;=</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span></span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">ob</span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L86-L87">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_map"><span class="name">OracleComp</span>.<span class="name">simulateQ_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#LawfulAlternative">LawfulAlternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> (<span class="fn">f</span> <a href="../../.././Init/Prelude.html#Functor.map">&lt;$&gt;</a> <span class="fn">oa</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">f</span> <a href="../../.././Init/Prelude.html#Functor.map">&lt;$&gt;</a> <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa</span></span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_seq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L89-L91">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_seq"><span class="name">OracleComp</span>.<span class="name">simulateQ_seq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#LawfulAlternative">LawfulAlternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">og</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">(<span class="fn">α</span> → <span class="fn">β</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">(<span class="fn">og</span> &lt;*&gt; <span class="fn">oa</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">og</span></span> &lt;*&gt; <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa</span></span></span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_seqLeft"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L93-L94">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_seqLeft"><span class="name">OracleComp</span>.<span class="name">simulateQ_seqLeft</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#LawfulAlternative">LawfulAlternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ob</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">(<span class="fn">oa</span> &lt;* <span class="fn">ob</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa</span></span> &lt;* <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">ob</span></span></span></div></div></div></div><div class="decl" id="OracleComp.simulateQ_seqRight"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L96-L97">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ_seqRight"><span class="name">OracleComp</span>.<span class="name">simulateQ_seqRight</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <span class="fn"><a href="../../.././foundational_types.html">Type</a> u → <a href="../../.././foundational_types.html">Type</a> v</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α </span><span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#AlternativeMonad">AlternativeMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">so</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">m</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Control/Lawful/Basic.html#LawfulMonad">LawfulMonad</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Batteries/Control/AlternativeMonad.html#LawfulAlternative">LawfulAlternative</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ob</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">(<span class="fn">oa</span> *&gt; <span class="fn">ob</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">oa</span></span> *&gt; <span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">simulateQ</a> <span class="fn">so</span> <span class="fn">ob</span></span></span></div></div></div></div><div class="decl" id="idOracle"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L109-L115">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle"><span class="name">idOracle</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <span class="fn">(<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span>)</span></span></div></div><p>Simulate a computation using the original oracles by &quot;replacing&quot; queries with queries.
+This operates as an actual identity for <code>simulate'</code>, in that we get an exact equality
+between the new and original computation.
+This can be useful especially with <code>SimOracle.append</code>, in order to simulate a single oracle
+in a larger set of oracles, leaving the behavior of other oracles unchanged.
+The relevant spec can usually be inferred automatically, so we leave it implicit.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-idOracle" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="idOracle.apply_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L119-L119">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle.apply_eq"><span class="name">idOracle</span>.<span class="name">apply_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle">idOracle</a>.<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Prelude.html#liftM">liftM</a> <span class="fn">q</span></span></div></div></div></div><div class="decl" id="idOracle.simulateQ_eq_id"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L121-L125">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle.simulateQ_eq_id"><span class="name">idOracle</span>.<span class="name">simulateQ_eq_id</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">OracleComp.simulateQ</a> <a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle">idOracle</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#id">id</a></div></div></div></div><div class="decl" id="idOracle.simulateQ_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L127-L127">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle.simulateQ_eq"><span class="name">idOracle</span>.<span class="name">simulateQ_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">OracleComp.simulateQ</a> <a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#idOracle">idOracle</a> <span class="fn">oa</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">oa</span></div></div></div></div><div class="decl" id="defaultOracle"><div class="def"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L131-L135">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle"><span class="name">defaultOracle</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl">QueryImpl</a> <span class="fn">spec</span> <a href="../../.././Init/Prelude.html#Option">Option</a></span></div></div><p>Simulate a computation by having each oracle return the default value of the query output type
+for all queries. This gives a way to run arbitrary computations to get <em>some</em> output.
+Mostly useful in some existence proofs, not usually used in an actual implementation.</p><details><summary>Equations</summary><ul class="equations"></ul></details><details id="instances-for-list-defaultOracle" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="defaultOracle.apply_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L139-L140">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle.apply_eq"><span class="name">defaultOracle</span>.<span class="name">apply_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery">OracleQuery</a></span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle">defaultOracle</a>.<a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#QueryImpl.impl">impl</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Init/Prelude.html#Pure.pure">pure</a> <span class="fn"><span class="fn">q</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleSpec.OracleQuery.defaultOutput">defaultOutput</a></span></span></div></div></div></div><div class="decl" id="defaultOracle.simulateQ_eq_getM_defaultResult"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L142-L147">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle.simulateQ_eq_getM_defaultResult"><span class="name">defaultOracle</span>.<span class="name">simulateQ_eq_getM_defaultResult</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">OracleComp.simulateQ</a> <a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle">defaultOracle</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Data/Option/Basic.html#Option.getM">Option.getM</a> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp.defaultResult">OracleComp.defaultResult</a></div></div></div></div><div class="decl" id="defaultOracle.simulateQ_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/Verified-zkEVM/VCV-io/blob/eda64ddc6cc3aff53b9dd6cbbc2f63a619309fe1/VCVio/OracleComp/SimSemantics/SimulateQ.lean#L149-L150">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle.simulateQ_eq"><span class="name">defaultOracle</span>.<span class="name">simulateQ_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">spec</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec">OracleSpec</a> <span class="fn">ι</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">spec</span>.<a href="../../.././VCVio/OracleComp/OracleSpec.html#OracleSpec.FiniteRange">FiniteRange</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">oa</span> : <span class="fn"><a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp">OracleComp</a> <span class="fn">spec</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#OracleComp.simulateQ">OracleComp.simulateQ</a> <a href="../../.././VCVio/OracleComp/SimSemantics/SimulateQ.html#defaultOracle">defaultOracle</a> <span class="fn">oa</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">oa</span>.<a href="../../.././VCVio/OracleComp/OracleComp.html#OracleComp.defaultResult">defaultResult</a></span>.<a href="../../.././Init/Data/Option/Basic.html#Option.getM">getM</a></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>
