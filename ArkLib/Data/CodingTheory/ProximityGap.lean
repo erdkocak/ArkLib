@@ -73,12 +73,19 @@ section
 variable {ι : Type} [Fintype ι] [Nonempty ι]
          {F : Type}
 
-/-- `Definition 1.1` in [BCIKS20]. -/
-noncomputable def generalProximityGap {α : Type} [DecidableEq α] [Nonempty α]
+/-- Definition 1.1 in [BCIKS20].
+Let `P` be a set `P` and `C` a collection of sets. We say that `C` displays a
+`(δ, ε)`-proximity gap with respect to `P` and the relative Hamming distance measure
+if for every `S ∈ C` exactly one of the following holds:
+1. The probability that a randomly sampled element from `S` is `δ`-close to `P` is `1`.
+2. The probability that a randomly sampled element from `S` is `δ`-close to `P` is at most
+`ε`.
+We call `δ` the proximity parameter and `ε` the error parameter. -/
+noncomputable def δ_ε_proximityGap {α : Type} [DecidableEq α] [Nonempty α]
   (P : Finset (ι → α)) (C : Set (Finset (ι → α))) (δ ε : ℝ≥0) : Prop :=
   ∀ S ∈ C, ∀ [Nonempty S],
-    Pr_{let x ← $ᵖ S}[Code.relHammingDistToCode x.1 P ≤ δ] = 1 ∨
-    Pr_{let x ← $ᵖ S}[Code.relHammingDistToCode x.1 P ≤ δ] ≤ ε
+    Pr_{let s ← $ᵖ S}[Code.relHammingDistToCode s.1 P ≤ δ] = 1 ∨
+    Pr_{let s ← $ᵖ S}[Code.relHammingDistToCode s.1 P ≤ δ] ≤ ε
 end
 
 section
@@ -100,27 +107,38 @@ noncomputable def errorBound (δ : ℝ≥0) (deg : ℕ) (domain : ι ↪ F) : �
             ⟨(deg ^ 2 : ℝ≥0) / ((2 * m) ^ 7 * (Fintype.card F : ℝ)), by positivity⟩
        else 0
 
-/-- `Theorem 1.2` (Proximity Gaps for Reed-Solomon Codes) in [BCIKS20]. -/
+/-- Theorem 1.2 (Proximity Gaps for Reed-Solomon Codes) in [BCIKS20].
+Let `C` be a collection of affine spaces. Then `C` displays a `(δ, ε)`-proximity gap with respect to
+a Reed-Solomon code, where `(δ,ε)` are the proximity and error parameters defined up to the
+Johnson bound. -/
 theorem proximity_gap_RSCodes {k t : ℕ} [NeZero k] [NeZero t] {deg : ℕ} {domain : ι ↪ F}
   (C : Fin t → (Fin k → (ι → F))) {δ : ℝ≥0} (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain)) :
-  generalProximityGap
+  δ_ε_proximityGap
     (ReedSolomonCode.toFinset domain deg)
-    (Affine.AffSpanFinsetCol C)
+    (Affine.AffSpanFinsetCollection C)
     δ
     (errorBound δ deg domain) := by sorry
 
 set_option linter.style.commandStart false
 
-/-- `Theorem 1.4` (Main Theorem — Correlated agreement over lines) in [BCIKS20]. -/
+/-- Theorem 1.4 (Main Theorem — Correlated agreement over lines) in [BCIKS20].
+Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
+pair `(δ, ε)` and two vectors `u₀` and `u₁`, such that
+the  probability that a random affine line passing through `u₀` and `u₁` is `δ`-close
+to Reed-Solomon code is at most `ε`. Then, the vectors `u₀` and `u₁` have correlated agreement. -/
 theorem correlatedAgreement_lines {u : Fin 2 → ι → F} {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0}
   (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain))
   (hproximity :
-    Pr_{ let z ← $ᵖ F}[
+    Pr_{let z ← $ᵖ F}[
         Code.relHammingDistToCode (u 0 + z • u 1) (ReedSolomon.code domain deg) ≤ δ
       ] > errorBound δ deg domain
   ) : correlatedAgreement (ReedSolomon.code domain deg) δ u := by sorry
 
-/-- `Theorem 1.5` (Correlated agreement for low-degree parameterised curves) in [BCIKS20]. -/
+/-- Theorem 1.5 (Correlated agreement for low-degree parameterised curves) in [BCIKS20].
+Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
+pair `(δ, ε)` and a curve passing through vectors `u₀, ..., uκ`, such that
+the  probability that a random point on the curve is `δ`-close to the Reed-Solomon code
+is at most `ε`. Then, the vectors `u₀, ..., uκ` have correlated agreement. -/
 theorem correlatedAgreement_affine_curves [DecidableEq ι] {k : ℕ} {u : Fin k → ι → F}
   {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0}
   (hδ : δ ≤ 1 - ReedSolomonCode.sqrtRate deg domain)
@@ -132,7 +150,16 @@ theorem correlatedAgreement_affine_curves [DecidableEq ι] {k : ℕ} {u : Fin k 
   correlatedAgreement (ReedSolomon.code domain deg) δ u := by sorry
 
 open Affine in
-/-- `Theorem 1.6` (Correlated agreement over affine spaces) in [BCIKS20]. -/
+/-- Theorem 1.6 (Correlated agreement over affine spaces) in [BCIKS20].
+Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
+pair `(δ, ε)` and an affine space with origin `u₀` and affine generting set `u₁, ..., uκ`
+such that the probability a random point in the affine space is `δ`-close to the Reed-Solomon
+code is at most `ε`. Then the vectors `u₀, ..., uκ` have correlated agreement.
+
+Note that we have `k+2` vectors to form the affine space. This an intricacy needed us to be
+able to isolate the affine origin from the affine span and to form a generating set of the
+correct size. The reason for taking an extra vector is that after isolating the affine origin,
+the affine span is formed as the span of the difference of the rest of the vector set. -/
 theorem correlatedAgreement_affine_spaces {k : ℕ} [NeZero k] {u : Fin (k + 1) → ι → F}
   {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0} (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain))
   (hproximity :

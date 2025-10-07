@@ -131,7 +131,7 @@ noncomputable def AffSpanFinset [NeZero k] (U : Fin k → ι → F) : Finset (ι
   (AffSpanSet.instFinite U).toFinset
 
 /-- A collection of affine subspaces in `F^ι`. -/
-noncomputable def AffSpanFinsetCol {t : ℕ} [NeZero k] [NeZero t]
+noncomputable def AffSpanFinsetCollection {t : ℕ} [NeZero k] [NeZero t]
   (C : Fin t → (Fin k → (ι → F))) : Set (Finset (ι → F)) :=
   Set.range (fun i => AffSpanFinset (C i))
 
