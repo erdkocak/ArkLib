@@ -25,7 +25,17 @@ import Mathlib.RingTheory.Henselian
   [BCIKS20] refers to the paper "Proximity Gaps for Reed-Solomon Codes" by Eli Ben-Sasson,
   Dan Carmon, Yuval Ishai, Swastik Kopparty, and Shubhangi Saraf.
 
-  ## Main Definitions
+  Using {https://eprint.iacr.org/2020/654}, version 20210703:203025.
+
+  ## Main Definitions and Statements
+
+  - proximity measure, proximity gap, correlated agreement, `(δ, ε)`-proximity gap, proximity
+  parameters
+  - statement of Theorem 1.2 (Proximity Gaps for Reed-Solomon codes) in [BCIKS20].
+  - statements of all the correlated agreement theorems from [BCIKS20]:
+  Theorem 1.4 (Main Theorem — Correlated agreement over lines),
+  Theorem 1.5 (Correlated agreement for low-degree parameterised curves)
+  Theorem 1.6 (Correlated agreement over affine spaces).
 
 -/
 
@@ -74,12 +84,15 @@ variable {ι : Type} [Fintype ι] [Nonempty ι]
          {F : Type}
 
 /-- Definition 1.1 in [BCIKS20].
+
 Let `P` be a set `P` and `C` a collection of sets. We say that `C` displays a
 `(δ, ε)`-proximity gap with respect to `P` and the relative Hamming distance measure
 if for every `S ∈ C` exactly one of the following holds:
-1. The probability that a randomly sampled element from `S` is `δ`-close to `P` is `1`.
-2. The probability that a randomly sampled element from `S` is `δ`-close to `P` is at most
+
+1. The probability that a randomly sampled element `s` from `S` is `δ`-close to `P` is `1`.
+2. The probability that a randomly sampled element `s` from `S` is `δ`-close to `P` is at most
 `ε`.
+
 We call `δ` the proximity parameter and `ε` the error parameter. -/
 noncomputable def δ_ε_proximityGap {α : Type} [DecidableEq α] [Nonempty α]
   (P : Finset (ι → α)) (C : Set (Finset (ι → α))) (δ ε : ℝ≥0) : Prop :=
@@ -95,7 +108,7 @@ variable {ι : Type} [Fintype ι] [Nonempty ι]
 /-- The error bound `ε` in the pair of proximity and error parameters `(δ,ε)` for Reed-Solomon codes
   defined up to the Johnson bound. More precisely, let `ρ` be the rate of the Reed-Solomon code.
   Then for `δ ∈ (0, 1 - √ρ)`, we define the relevant error parameter `ε` for the unique decoding
-  bound, i.e. `δ ∈ [0, (1-ρ)/2]` and Johnson bound, i.e. `δ ∈ [(1-ρ)/2 , 1 - √ρ]`. Otherwise,
+  bound, i.e. `δ ∈ (0, (1-ρ)/2]` and Johnson bound, i.e. `δ ∈ ((1-ρ)/2 , 1 - √ρ)`. Otherwise,
   we set `ε = 0`.
 -/
 noncomputable def errorBound (δ : ℝ≥0) (deg : ℕ) (domain : ι ↪ F) : ℝ≥0 :=
@@ -107,7 +120,8 @@ noncomputable def errorBound (δ : ℝ≥0) (deg : ℕ) (domain : ι ↪ F) : �
             ⟨(deg ^ 2 : ℝ≥0) / ((2 * m) ^ 7 * (Fintype.card F : ℝ)), by positivity⟩
        else 0
 
-/-- Theorem 1.2 (Proximity Gaps for Reed-Solomon Codes) in [BCIKS20].
+/-- Theorem 1.2 (Proximity Gaps for Reed-Solomon codes) in [BCIKS20].
+
 Let `C` be a collection of affine spaces. Then `C` displays a `(δ, ε)`-proximity gap with respect to
 a Reed-Solomon code, where `(δ,ε)` are the proximity and error parameters defined up to the
 Johnson bound. -/
@@ -122,10 +136,11 @@ theorem proximity_gap_RSCodes {k t : ℕ} [NeZero k] [NeZero t] {deg : ℕ} {dom
 set_option linter.style.commandStart false
 
 /-- Theorem 1.4 (Main Theorem — Correlated agreement over lines) in [BCIKS20].
+
 Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
-pair `(δ, ε)` and two vectors `u₀` and `u₁`, such that
-the  probability that a random affine line passing through `u₀` and `u₁` is `δ`-close
-to Reed-Solomon code is at most `ε`. Then, the vectors `u₀` and `u₁` have correlated agreement. -/
+pair `(δ, ε)` and two words `u₀` and `u₁`, such that the probability that a random affine
+line passing through `u₀` and `u₁` is `δ`-close to Reed-Solomon code is at most `ε`.
+Then, the words `u₀` and `u₁` have correlated agreement. -/
 theorem correlatedAgreement_lines {u : Fin 2 → ι → F} {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0}
   (hδ : δ ≤ 1 - (ReedSolomonCode.sqrtRate deg domain))
   (hproximity :
@@ -135,10 +150,11 @@ theorem correlatedAgreement_lines {u : Fin 2 → ι → F} {deg : ℕ} {domain :
   ) : correlatedAgreement (ReedSolomon.code domain deg) δ u := by sorry
 
 /-- Theorem 1.5 (Correlated agreement for low-degree parameterised curves) in [BCIKS20].
+
 Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
-pair `(δ, ε)` and a curve passing through vectors `u₀, ..., uκ`, such that
+pair `(δ, ε)` and a curve passing through words `u₀, ..., uκ`, such that
 the  probability that a random point on the curve is `δ`-close to the Reed-Solomon code
-is at most `ε`. Then, the vectors `u₀, ..., uκ` have correlated agreement. -/
+is at most `ε`. Then, the words `u₀, ..., uκ` have correlated agreement. -/
 theorem correlatedAgreement_affine_curves [DecidableEq ι] {k : ℕ} {u : Fin k → ι → F}
   {deg : ℕ} {domain : ι ↪ F} {δ : ℝ≥0}
   (hδ : δ ≤ 1 - ReedSolomonCode.sqrtRate deg domain)
@@ -151,10 +167,11 @@ theorem correlatedAgreement_affine_curves [DecidableEq ι] {k : ℕ} {u : Fin k 
 
 open Affine in
 /-- Theorem 1.6 (Correlated agreement over affine spaces) in [BCIKS20].
+
 Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
 pair `(δ, ε)` and an affine space with origin `u₀` and affine generting set `u₁, ..., uκ`
 such that the probability a random point in the affine space is `δ`-close to the Reed-Solomon
-code is at most `ε`. Then the vectors `u₀, ..., uκ` have correlated agreement.
+code is at most `ε`. Then the words `u₀, ..., uκ` have correlated agreement.
 
 Note that we have `k+2` vectors to form the affine space. This an intricacy needed us to be
 able to isolate the affine origin from the affine span and to form a generating set of the
