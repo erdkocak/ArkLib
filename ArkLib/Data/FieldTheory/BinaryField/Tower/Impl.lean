@@ -19,10 +19,7 @@ This file provides executable implementations for binary tower fields
   reprensented via bit vectors of size 2 ^ k
 
 ## TODOs
- - Proof of mul_inv_cancel
  - Optimization of multiplication via lookup
- - Proof of isomorphism with the abstract binary tower fields and derive theorems about multilinear
-  basis
 
 ## References
 
@@ -38,11 +35,14 @@ set_option linter.style.longFile 3000
 namespace ConcreteBinaryTower
 open Polynomial
 
-section BaseDefinitions
-
 def ConcreteBTField : ℕ → Type := fun k => BitVec (2 ^ k)
 
 section BitVecDCast
+lemma cast_ConcreteBTField_eq (k m : ℕ) (h_eq : k = m) :
+  ConcreteBTField k = ConcreteBTField m := by
+  subst h_eq
+  rfl
+
 instance BitVec.instDCast : DCast Nat BitVec where
   dcast h := BitVec.cast h
   dcast_id := by
@@ -237,6 +237,9 @@ theorem BitVec.eq_append_iff_extract {lo_size hi_size : ℕ} (lo : BitVec lo_siz
 
 end BitVecDCast
 
+/- Conversion utilities -/
+section ConversionUtils
+
 def bitVecToString (width : ℕ) (bv : BitVec width) : String :=
   Fin.foldl width (fun (s : String) (idx : Fin width) =>
     -- idx is the MSB - oriented loop index (0 to width - 1)
@@ -263,6 +266,45 @@ instance ConcreteBTField.instDCast_local : DCast ℕ ConcreteBTField where
   dcast_id := by
     intro k_idx; funext x
     simp only [id_eq, BitVec.cast, BitVec.ofNatLT_toNat]
+
+end ConversionUtils
+
+section NumericLemmas
+
+lemma one_le_sub_middle_of_pow2 {k : ℕ} (h_k : 1 ≤ k) : 1 ≤ 2 ^ k - 2 ^ (k - 1) := by
+  have l1 : 2 ^ (k - 1 + 1) = 2 ^ k := by congr 1; omega
+  have res := one_le_sub_consecutive_two_pow (n:=k - 1)
+  rw [l1] at res
+  exact res
+
+lemma sub_middle_of_pow2_with_one_canceled {k : ℕ} (h_k : 1 ≤ k) : 2 ^ k - 1 - 2 ^ (k - 1) + 1
+  = 2 ^ (k - 1) := by
+  calc 2 ^ k - 1 - 2 ^ (k - 1) + 1 = 2 ^ k - 2 ^ (k - 1) - 1 + 1 := by omega
+    _ = 2 ^ k - 2 ^ (k - 1) := by
+      rw [Nat.sub_add_cancel];exact one_le_sub_middle_of_pow2 (h_k:=h_k)
+    _ = 2 ^ (k - 1) * 2 - 2 ^ (k - 1):= by
+      congr 1
+      rw [← Nat.pow_succ]
+      congr
+      simp only [Nat.succ_eq_add_one]
+      rw [Nat.sub_add_cancel]
+      omega
+    _ = 2 ^ (k - 1) + 2 ^ (k - 1) - 2 ^ (k - 1) := by rw [Nat.mul_two]
+    _ = 2 ^ (k - 1) := Nat.add_sub_self_left (2 ^ (k - 1)) (2 ^ (k - 1))
+
+lemma h_sub_middle {k : ℕ} (h_pos : k > 0) : 2 ^ k - 1 - 2 ^ (k - 1) + 1 = 2 ^ (k - 1) := by
+  exact sub_middle_of_pow2_with_one_canceled (k:=k) (h_k:=h_pos)
+
+lemma h_middle_sub {k : ℕ} : 2 ^ (k - 1) - 1 - 0 + 1 = 2 ^ (k - 1) := by
+  rw [Nat.sub_zero, Nat.sub_add_cancel (h:=one_le_two_pow_n (n:=k - 1))]
+
+lemma h_sum_two_same_pow2 {k : ℕ} (h_pos : k > 0) : 2 ^ (k - 1) + 2 ^ (k - 1) = 2 ^ k := by
+  rw [← Nat.mul_two, Nat.mul_comm, Nat.mul_comm, Nat.two_pow_pred_mul_two h_pos]
+
+end NumericLemmas
+
+/- Field arithmetic operations and structure -/
+section FieldOperationsAndInstances
 
 -- Zero element
 def zero {k : ℕ} : ConcreteBTField k := BitVec.zero (2 ^ k)
@@ -464,67 +506,6 @@ by
     rw [if_neg neg_n_succ_mod_2_ne_0]
   }
 
-instance (k : ℕ) : AddCommGroup (ConcreteBTField k) where
-  toZero := inferInstance
-  neg := neg
-  sub := fun x y => add x y
-  add_assoc := add_assoc
-  add_comm := add_comm
-  zero_add := zero_add
-  add_zero := add_zero
-  nsmul := fun n x => if n % 2 = (0 : ℕ) then zero else x
-  zsmul := fun (n : ℤ) x => if n % 2 = 0 then zero else x  -- Changed to n : ℤ
-  neg_add_cancel := neg_add_cancel
-  nsmul_succ := nsmul_succ
-  zsmul_succ' := fun n a => zsmul_succ n a
-  add := add
-  zsmul_neg' := zsmul_neg' (k := k)
-
-lemma zero_is_0 {k : ℕ} : (zero (k:=k)) = (0 : ConcreteBTField k) := by rfl
-lemma one_is_1 {k : ℕ} : (one (k:=k)) = 1 := by rfl
-lemma concrete_one_ne_zero {k : ℕ} : (one (k:=k)) ≠ (zero (k:=k)) := by
-  intro h_eq
-  have h_toNat_eq : (one (k:=k)).toNat = (zero (k:=k)).toNat := congrArg BitVec.toNat h_eq
-  simp [one, zero, BitVec.toNat_ofNat] at h_toNat_eq
-
-instance {k : ℕ} : NeZero (1 : ConcreteBTField k) := by
-  unfold ConcreteBTField
-  exact {out := concrete_one_ne_zero (k:=k) }
-
-section NumericLemmas
-
-lemma one_le_sub_middle_of_pow2 {k : ℕ} (h_k : 1 ≤ k) : 1 ≤ 2 ^ k - 2 ^ (k - 1) := by
-  have l1 : 2 ^ (k - 1 + 1) = 2 ^ k := by congr 1; omega
-  have res := one_le_sub_consecutive_two_pow (n:=k - 1)
-  rw [l1] at res
-  exact res
-
-lemma sub_middle_of_pow2_with_one_canceled {k : ℕ} (h_k : 1 ≤ k) : 2 ^ k - 1 - 2 ^ (k - 1) + 1
-  = 2 ^ (k - 1) := by
-  calc 2 ^ k - 1 - 2 ^ (k - 1) + 1 = 2 ^ k - 2 ^ (k - 1) - 1 + 1 := by omega
-    _ = 2 ^ k - 2 ^ (k - 1) := by
-      rw [Nat.sub_add_cancel];exact one_le_sub_middle_of_pow2 (h_k:=h_k)
-    _ = 2 ^ (k - 1) * 2 - 2 ^ (k - 1):= by
-      congr 1
-      rw [← Nat.pow_succ]
-      congr
-      simp only [Nat.succ_eq_add_one]
-      rw [Nat.sub_add_cancel]
-      omega
-    _ = 2 ^ (k - 1) + 2 ^ (k - 1) - 2 ^ (k - 1) := by rw [Nat.mul_two]
-    _ = 2 ^ (k - 1) := Nat.add_sub_self_left (2 ^ (k - 1)) (2 ^ (k - 1))
-
-lemma h_sub_middle {k : ℕ} (h_pos : k > 0) : 2 ^ k - 1 - 2 ^ (k - 1) + 1 = 2 ^ (k - 1) := by
-  exact sub_middle_of_pow2_with_one_canceled (k:=k) (h_k:=h_pos)
-
-lemma h_middle_sub {k : ℕ} : 2 ^ (k - 1) - 1 - 0 + 1 = 2 ^ (k - 1) := by
-  rw [Nat.sub_zero, Nat.sub_add_cancel (h:=one_le_two_pow_n (n:=k - 1))]
-
-lemma h_sum_two_same_pow2 {k : ℕ} (h_pos : k > 0) : 2 ^ (k - 1) + 2 ^ (k - 1) = 2 ^ k := by
-  rw [← Nat.mul_two, Nat.mul_comm, Nat.mul_comm, Nat.two_pow_pred_mul_two h_pos]
-
-end NumericLemmas
-
 -- Split a field element into high and low parts
 def split {k : ℕ} (h : k > 0) (x : ConcreteBTField k) :
     ConcreteBTField (k - 1) × ConcreteBTField (k - 1) :=
@@ -547,6 +528,50 @@ def join {k : ℕ} (h_pos : k > 0) (hi lo : ConcreteBTField (k - 1)) : ConcreteB
   exact res
 
 notation "《" hi ", " lo "》" => join (h_pos:=by omega) hi lo
+
+lemma cast_join {k n : ℕ} (h_pos : k > 0) (hi lo : ConcreteBTField (k - 1)) (heq : k = n) :
+  join (k:=k) h_pos hi lo = cast (by rw [heq])
+    (join (k:=n) (by omega) (cast (by subst heq; rfl) hi) (lo:=cast (by subst heq; rfl) lo)) := by
+  subst heq
+  rfl
+
+-------------------------------------------------------------------------------------------
+structure ConcreteBTFAddCommGroupProps (k : ℕ) where
+  add_assoc : ∀ a b c : ConcreteBTField k, (a + b) + c = a + (b + c) := add_assoc
+  add_comm : ∀ a b : ConcreteBTField k, a + b = b + a := add_comm
+  add_zero : ∀ a : ConcreteBTField k, a + zero = a := add_zero
+  zero_add : ∀ a : ConcreteBTField k, zero + a = a := zero_add
+  add_neg : ∀ a : ConcreteBTField k, a + (neg a) = zero := neg_add_cancel
+
+lemma zero_is_0 {k : ℕ} : (zero (k:=k)) = (0 : ConcreteBTField k) := by rfl
+lemma one_is_1 {k : ℕ} : (one (k:=k)) = 1 := by rfl
+lemma concrete_one_ne_zero {k : ℕ} : (one (k:=k)) ≠ (zero (k:=k)) := by
+  intro h_eq
+  have h_toNat_eq : (one (k:=k)).toNat = (zero (k:=k)).toNat := congrArg BitVec.toNat h_eq
+  simp [one, zero, BitVec.toNat_ofNat] at h_toNat_eq
+
+instance {k : ℕ} : NeZero (1 : ConcreteBTField k) := by
+  unfold ConcreteBTField
+  exact {out := concrete_one_ne_zero (k:=k) }
+
+def mkAddCommGroupInstance {k : ℕ} : AddCommGroup (ConcreteBTField k) := {
+  zero := zero
+  neg := neg
+  sub := fun x y => add x y
+  add_assoc := add_assoc
+  add_comm := add_comm
+  zero_add := zero_add
+  add_zero := add_zero
+  nsmul := fun n x => if n % 2 = (0 : ℕ) then zero else x
+  zsmul := fun (n : ℤ) x => if n % 2 = 0 then zero else x  -- Changed to n : ℤ
+  neg_add_cancel := neg_add_cancel
+  nsmul_succ := nsmul_succ
+  zsmul_succ' := fun n a => zsmul_succ n a
+  add := add
+  zsmul_neg' := zsmul_neg' (k := k)
+}
+
+instance (k : ℕ) : AddCommGroup (ConcreteBTField k) := mkAddCommGroupInstance
 
 theorem BitVec.extractLsb_eq_shift_ofNat {n : Nat} (x : BitVec n) (l r : Nat) :
     BitVec.extractLsb r l x = BitVec.ofNat (r - l + 1) (x.toNat >>> l) := by
@@ -762,7 +787,7 @@ lemma split_join_eq_split {k : ℕ} (h_pos : k > 0)
     split h_pos (《 hi_btf, lo_btf 》) = (hi_btf, lo_btf) := by
   exact (split_of_join h_pos (《 hi_btf, lo_btf 》) hi_btf lo_btf rfl).symm
 
-lemma join_split_eq_join {k : ℕ} (h_pos : k > 0) (x : ConcreteBTField k):
+lemma join_split_eq_join {k : ℕ} (h_pos : k > 0) (x : ConcreteBTField k) :
   《 (split h_pos x).fst, (split h_pos x).snd 》 = x := by
   exact (join_of_split h_pos x (split h_pos x).fst (split h_pos x).snd rfl).symm
 
@@ -844,7 +869,7 @@ theorem split_zero {k : ℕ} (h_pos : k > 0) : split h_pos zero = (zero, zero) :
 
 -- Special element Z_k for each level k
 def Z (k : ℕ) : ConcreteBTField k :=
-  if h_k: k = 0 then one
+  if h_k : k = 0 then one
   else
     《 one (k:=k-1), zero (k:=k-1) 》
 #eval Z 3
@@ -854,7 +879,7 @@ theorem split_Z {k : ℕ} (h_pos : k > 0) :
   apply Eq.symm
   apply split_of_join
   unfold Z
-  have h_k_ne_0: k ≠ 0 := by omega
+  have h_k_ne_0 : k ≠ 0 := by omega
   simp only [h_k_ne_0, ↓reduceDIte]
 
 lemma one_bitvec_toNat {width : ℕ} (h_width : width > 0) : (1#width).toNat = 1 := by
@@ -910,19 +935,20 @@ def equivProd {k : ℕ} (h_k_pos : k > 0) :
 lemma Z_ne_zero {k : ℕ} : Z k ≠ zero := by
   unfold Z
   simp only [ne_eq]
-  if h_k: k = 0 then
+  if h_k : k = 0 then
     simp only [h_k, ↓reduceDIte]
     exact concrete_one_ne_zero
   else
-    have h_k_ne_0: k ≠ 0 := by omega
+    have h_k_ne_0 : k ≠ 0 := by omega
     simp only [h_k_ne_0, ↓reduceDIte, ne_eq]
     by_contra h_eq
     conv_rhs at h_eq =>
       rw [←join_zero_zero (k:=k) (h_k:=by omega)]
     rw [join_eq_join_iff] at h_eq
     have h_0_eq_1 := h_eq.1
-    have h_0_ne_1: one (k:=k-1) ≠ zero (k:=k-1) := by exact concrete_one_ne_zero
+    have h_0_ne_1 : one (k:=k-1) ≠ zero (k:=k-1) := by exact concrete_one_ne_zero
     contradiction
+instance Z_NeZero {k : ℕ} : NeZero (Z k) := { out := Z_ne_zero (k:=k) }
 
 lemma mul_trans_inequality {k : ℕ} (x : ℕ) (h_k : k ≤ 2) (h_x : x ≤ 2 ^ (2 ^ k) - 1) : x < 16 := by
   have x_le_1 : x ≤ 2 ^ (2 ^ k) - 1 := by omega
@@ -973,6 +999,39 @@ termination_by (k, a.toNat, b.toNat)
 -- Multiplication instance
 instance (k : ℕ) : HMul (ConcreteBTField k) (ConcreteBTField k) (ConcreteBTField k)
   where hMul := concrete_mul
+
+-- Multiplicative inverse
+def concrete_inv {k : ℕ} (a : ConcreteBTField k) : ConcreteBTField k :=
+  if h_k_zero : k = 0 then
+    if a = 0 then 0 else 1
+  else
+    if h_a_zero : a = 0 then 0
+    else if h_a_one : a = 1 then 1
+    else
+      let h_k_gt_0 : k > 0 := Nat.zero_lt_of_ne_zero h_k_zero
+      let (a_hi, a_lo) := split (k:=k) (h:=h_k_gt_0) a
+      let prevZ := Z (k - 1)
+      let a_lo_next := a_lo + concrete_mul a_hi prevZ
+      let delta := concrete_mul a_lo a_lo_next + concrete_mul a_hi a_hi
+      let delta_inverse := concrete_inv delta
+      let out_hi := concrete_mul delta_inverse a_hi
+      let out_lo := concrete_mul delta_inverse a_lo_next
+      let res := 《 out_hi, out_lo 》
+      res
+
+def concrete_pow_nat {k : ℕ} (x : ConcreteBTField k) (n : ℕ) : ConcreteBTField k :=
+  if n = 0 then one
+  else if n % 2 = 0 then concrete_pow_nat (concrete_mul x x) (n / 2)
+  else concrete_mul x (concrete_pow_nat (concrete_mul x x) (n / 2))
+
+lemma cast_mul (m n : ℕ) {x y : ConcreteBTField m} (h_eq : m = n) :
+  (cast (by exact cast_ConcreteBTField_eq m n h_eq) (x * y)) =
+  (cast (by exact cast_ConcreteBTField_eq m n h_eq) x) *
+  (cast (by exact cast_ConcreteBTField_eq m n h_eq) y) := by
+  subst h_eq
+  rfl
+
+/- Typeclass instances for algebraic structures -/
 
 instance {k : ℕ} : Mul (ConcreteBTField k) where
   mul := concrete_mul
@@ -1078,30 +1137,6 @@ lemma add_eq_one_iff (a b : ConcreteBTField 0) :
   · simp [ha, zero_is_0]  -- a = zero
   · simp [ha, one_is_1]
 
-def concrete_pow_nat {k : ℕ} (x : ConcreteBTField k) (n : ℕ) : ConcreteBTField k :=
-  if n = 0 then one
-  else if n % 2 = 0 then concrete_pow_nat (concrete_mul x x) (n / 2)
-  else concrete_mul x (concrete_pow_nat (concrete_mul x x) (n / 2))
-
--- Multiplicative inverse
-def concrete_inv {k : ℕ} (a : ConcreteBTField k) : ConcreteBTField k :=
-  if h_k_zero : k = 0 then
-    if a = 0 then 0 else 1
-  else
-    if h_a_zero : a = 0 then 0
-    else if h_a_one : a = 1 then 1
-    else
-      let h_k_gt_0 : k > 0 := Nat.zero_lt_of_ne_zero h_k_zero
-      let (a_hi, a_lo) := split (k:=k) (h:=h_k_gt_0) a
-      let prevZ := Z (k - 1)
-      let a_lo_next := a_lo + concrete_mul a_hi prevZ
-      let delta := concrete_mul a_lo a_lo_next + concrete_mul a_hi a_hi
-      let delta_inverse := concrete_inv delta
-      let out_hi := concrete_mul delta_inverse a_hi
-      let out_lo := concrete_mul delta_inverse a_lo_next
-      let res := 《 out_hi, out_lo 》
-      res
-
 instance instInvConcreteBTF {k : ℕ} : Inv (ConcreteBTField k) where
   inv := concrete_inv
 
@@ -1113,6 +1148,8 @@ lemma concrete_inv_zero {k : ℕ} : concrete_inv (k:=k) 0 = 0 := by
 
 lemma concrete_exists_pair_ne {k : ℕ} : ∃ x y : ConcreteBTField k, x ≠ y :=
   ⟨zero (k:=k), one (k:=k), (concrete_one_ne_zero (k:=k)).symm⟩
+
+section FieldLemmasOfLevel0
 
 lemma concrete_zero_mul0 (b : ConcreteBTField 0) :
   concrete_mul (zero (k:=0)) b = zero (k:=0) := by
@@ -1197,6 +1234,10 @@ lemma concrete_mul_right_distrib0 (a b c : ConcreteBTField 0) :
   rw [concrete_mul_comm0 (a:=b) (b:=c)]
   exact concrete_mul_left_distrib0 (a:=c) (b:=a) (c:=b)
 
+end FieldLemmasOfLevel0
+
+section NumericCasting
+
 -- Natural number casting
 def natCast {k : ℕ} (n : ℕ) : ConcreteBTField k := if n % 2 = 0 then zero else one
 def natCast_zero {k : ℕ} : natCast (k:=k) 0 = zero := by rfl
@@ -1278,7 +1319,7 @@ instance instHDivConcreteBTF {k : ℕ} : HDiv (ConcreteBTField k) (ConcreteBTFie
 lemma concrete_div_eq_mul_inv {k : ℕ} (a b : ConcreteBTField k) : a / b = a * (concrete_inv b) := by
   rfl
 
-instance instHPowConcreteBTF {k : ℕ} : HPow (ConcreteBTField k) ℤ (ConcreteBTField k) where
+instance instHPowConcreteBTFℤ {k : ℕ} : HPow (ConcreteBTField k) ℤ (ConcreteBTField k) where
   hPow a n :=
     match n with
     | Int.ofNat m => concrete_pow_nat a m
@@ -1287,40 +1328,49 @@ instance instHPowConcreteBTF {k : ℕ} : HPow (ConcreteBTField k) ℤ (ConcreteB
       if a = 0 then 0
       else concrete_pow_nat (concrete_inv a) (m + 1) -- a ^ ( - (m + 1)) = (a ^ ( - 1)) ^ (m + 1)
 
+end NumericCasting
+
 instance instDivConcreteBTF {k : ℕ} : Div (ConcreteBTField k) where
   div a b := a * (concrete_inv b)
 
--------------------------------------------------------------------------------------------
--- Structure to hold properties at a given level k
-structure ConcreteBTFStepResult (k : ℕ) where
+-- Ring properties structure
+structure ConcreteBTFRingProps (k : ℕ) extends (ConcreteBTFAddCommGroupProps k) where
+  -- Multiplication equations and basic properties
   mul_eq : ∀ (a b : ConcreteBTField k) (h_k : k > 0)
     {a₁ a₀ b₁ b₀ : ConcreteBTField (k - 1)}
     (_h_a : (a₁, a₀) = split h_k a) (_h_b : (b₁, b₀) = split h_k b),
     concrete_mul a b =
       《 concrete_mul a₀ b₁ + concrete_mul b₀ a₁ + concrete_mul (concrete_mul a₁ b₁) (Z (k - 1)),
       concrete_mul a₀ b₀ + concrete_mul a₁ b₁ 》
+
+  -- Zero and one laws
   zero_mul : ∀ a : ConcreteBTField k, concrete_mul zero a = zero
   zero_mul' : ∀ a : ConcreteBTField k, concrete_mul 0 a = 0
   mul_zero : ∀ a : ConcreteBTField k, concrete_mul a zero = zero
   mul_zero' : ∀ a : ConcreteBTField k, concrete_mul a 0 = 0
   one_mul : ∀ a : ConcreteBTField k, concrete_mul one a = a
   mul_one : ∀ a : ConcreteBTField k, concrete_mul a one = a
+
+  -- Associativity and distributivity (Ring axioms)
   mul_assoc : ∀ a b c : ConcreteBTField k, concrete_mul (concrete_mul a b) c
     = concrete_mul a (concrete_mul b c)
-  mul_comm : ∀ a b : ConcreteBTField k, concrete_mul a b = concrete_mul b a
   mul_left_distrib : ∀ a b c : ConcreteBTField k, concrete_mul a (b + c)
     = concrete_mul a b + concrete_mul a c
   mul_right_distrib : ∀ a b c : ConcreteBTField k, concrete_mul (a + b) c
     = concrete_mul a c + concrete_mul b c
-  add_assoc : ∀ a b c : ConcreteBTField k, (a + b) + c = a + (b + c)
-  add_comm : ∀ a b : ConcreteBTField k, a + b = b + a
-  add_zero : ∀ a : ConcreteBTField k, a + zero = a
-  zero_add : ∀ a : ConcreteBTField k, zero + a = a
-  add_neg : ∀ a : ConcreteBTField k, a + (neg a) = zero
+
+-- DivisionRing properties structure (extends Ring properties)
+structure ConcreteBTFDivisionRingProps (k : ℕ) extends (ConcreteBTFRingProps k) where
+  -- Multiplicative inverse property
   mul_inv_cancel : ∀ a : ConcreteBTField k, a ≠ zero → concrete_mul a (concrete_inv a) = one
 
-def mkRingInstance {k : ℕ} (props : ConcreteBTFStepResult k) : Ring (ConcreteBTField k) where
-  toAddCommGroup := inferInstance
+-- Field properties structure (extends DivisionRing properties)
+structure ConcreteBTFieldProps (k : ℕ) extends (ConcreteBTFDivisionRingProps k) where
+  -- Commutativity (what makes it a Field vs just a DivisionRing)
+  mul_comm : ∀ a b : ConcreteBTField k, concrete_mul a b = concrete_mul b a
+
+def mkRingInstance {k : ℕ} (props : ConcreteBTFieldProps k) : Ring (ConcreteBTField k) where
+  toAddCommGroup := mkAddCommGroupInstance
   toOne := inferInstance
   mul := concrete_mul
   mul_assoc := props.mul_assoc
@@ -1338,7 +1388,7 @@ def mkRingInstance {k : ℕ} (props : ConcreteBTFStepResult k) : Ring (ConcreteB
   intCast_ofNat n := intCast_ofNat n
   intCast_negSucc n := intCast_negSucc n
 
-def mkDivisionRingInstance {k : ℕ} (props : ConcreteBTFStepResult k)
+def mkDivisionRingInstance {k : ℕ} (props : ConcreteBTFieldProps k)
     : DivisionRing (ConcreteBTField k) where
   toRing := mkRingInstance (k:=k) props
   inv := concrete_inv
@@ -1348,137 +1398,37 @@ def mkDivisionRingInstance {k : ℕ} (props : ConcreteBTFStepResult k)
   qsmul := (Rat.castRec · * ·)
   nnqsmul := (NNRat.castRec · * ·)
 
-def mkFieldInstance {k : ℕ} (props : ConcreteBTFStepResult k) : Field (ConcreteBTField k) where
+def mkFieldInstance {k : ℕ} (props : ConcreteBTFieldProps k) : Field (ConcreteBTField k) where
   toDivisionRing := mkDivisionRingInstance (k:=k) props
   mul_comm := props.mul_comm
 
+structure ConcreteBTFStepResult (k : ℕ) extends (ConcreteBTFieldProps k) where
+  instFintype : Fintype (ConcreteBTField k)
+  fieldFintypeCard : Fintype.card (ConcreteBTField k) = 2^(2^k)
+  -- Additional field theory properties for irreducibility proof
+  sumZeroIffEq : ∀ (x y : ConcreteBTField k), x + y = 0 ↔ x = y
+  traceMapEvalAtRootsIs1 :
+    letI := mkFieldInstance (k:=k) (props:=toConcreteBTFieldProps)
+    TraceMapProperty (ConcreteBTField k) (u:=Z k) k
+  instIrreduciblePoly :
+    letI := mkFieldInstance (k:=k) (props:=toConcreteBTFieldProps)
+    (Irreducible (p := (definingPoly (s:=(Z k)))))
+
+end FieldOperationsAndInstances
 -------------------------------------------------------------------------------------------
-noncomputable def definingPoly {k : ℕ} [Field (ConcreteBTField k)] :=
-  -- it depends on 'Polynomial.add'', and it does not have executable code
-  (X: (ConcreteBTField k)[X]) ^ 2 + (Z k) • X + 1
 
-section DefiningPolyLemmas
+/-! Lemmas of field properties at level k that depends on field properties at level (k-1) -/
+section BTFieldPropsOneLevelLiftingLemmas
+variable {k : ℕ} {h_k : k > 0}
 
-theorem irreducible_definingPoly {k : ℕ} {props : ConcreteBTFStepResult k} :
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  Irreducible (p := (definingPoly (k:=k))) := by
-  sorry
-
-lemma degree_Z_k_smul_X {k: ℕ} {props : ConcreteBTFStepResult k}:
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  (Z k • (X: (ConcreteBTField k)[X])).degree = 1 := by
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  rw [←C_mul']
-  apply degree_C_mul_X (a:=Z k)
-  rw [←zero_is_0]
-  convert Z_ne_zero (k:=k)
-
-lemma degree_Z_k_smul_X_add_1 {k: ℕ} {props : ConcreteBTFStepResult k}:
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  (Z k • (X: (ConcreteBTField k)[X]) + 1).degree = 1 := by
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  rw [degree_add_eq_left_of_degree_lt]
-  · exact degree_Z_k_smul_X
-  · rw [degree_one]; rw [degree_Z_k_smul_X]; norm_num
-
-lemma definingPoly_is_monic {k: ℕ} {props : ConcreteBTFStepResult k}:
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  (definingPoly (k:=k)).Monic := by
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  rw [definingPoly]
-  -- Goal: ⊢ (X ^ 2 + (t1 * X + 1)).Monic
-  have leadingCoeffIs1 : (definingPoly (k:=k)).leadingCoeff = 1 := by
-    calc
-      (definingPoly (k:=k)).leadingCoeff
-        = ((Z k) • (X: (ConcreteBTField k)[X]) + 1 + X^2).leadingCoeff := by
-        rw [definingPoly, _root_.add_assoc, _root_.add_comm]
-      _ = (X^2).leadingCoeff := by
-        rw [leadingCoeff_add_of_degree_lt]
-        rw [degree_X_pow, degree_Z_k_smul_X_add_1]
-        norm_num
-      _ = 1 := by
-        rw [monic_X_pow]
-  exact leadingCoeffIs1
-
-lemma degree_definingPoly {k: ℕ} {props : ConcreteBTFStepResult k}:
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  (definingPoly (k:=k)).degree = 2 := by
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  rw [definingPoly, _root_.add_assoc, _root_.add_comm]
-  -- ⊢ (Z k • X + 1 + X ^ 2).degree = 2
-  rw [degree_add_eq_right_of_degree_lt]
-  · rw [degree_X_pow]; rfl
-  · have h_deg_left := degree_Z_k_smul_X_add_1 (k:=k) (props:=props)
-    rw [degree_X_pow];
-    rw [h_deg_left]
-    norm_num
-
-lemma definingPoly_ne_zero {k : ℕ} {props : ConcreteBTFStepResult k}:
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  (definingPoly (k:=k)) ≠ 0 := by
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  refine Monic.ne_zero_of_ne ?_ ?_
-  · exact zero_ne_one' (ConcreteBTField k)
-  · exact definingPoly_is_monic (k:=k) (props:=props)
-
-lemma definingPoly_is_not_unit {k : ℕ} {props : ConcreteBTFStepResult k}:
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  ¬IsUnit (definingPoly (k:=k)) := by
-  letI : Field (ConcreteBTField k) := mkFieldInstance (props)
-  by_contra h_unit
-  have deg_poly_is_0 := degree_eq_zero_of_isUnit h_unit
-  have deg_poly_is_2 : (definingPoly (k:=k)).degree = 2 := by
-    exact degree_definingPoly (k:=k) (props:=props)
-  have zero_is_two : (0: WithBot ℕ) = 2 := by
-    rw [deg_poly_is_0] at deg_poly_is_2
-    exact deg_poly_is_2
-  contradiction
-end DefiningPolyLemmas
-
-section Irr
-variable {R : Type*} [CommRing R] [IsDomain R]
-/--
-A polynomial with a degree greater than 1 is not irreducible if it has a root in `R`.
--/
-theorem not_irreducible_of_isRoot_of_degree_gt_one
-  (p : R[X]) (h_root : ∃ r : R, IsRoot p r) (h_deg : p.degree > 1) :
-  ¬ Irreducible p := by
-  -- Assume p is irreducible for a contradiction.
-  by_contra h_irreducible
-  -- From the hypothesis, there exists a root `r`.
-  obtain ⟨r, hr⟩ := h_root
-  -- By the Factor Theorem, if `r` is a root of `p`, then `(X - C r)` divides `p`.
-  have h_dvd : X - C r ∣ p := by
-    apply Polynomial.dvd_iff_isRoot.mpr
-    exact hr
-  obtain ⟨q, hq⟩ := h_dvd
-  have h_unit_or_unit := h_irreducible.isUnit_or_isUnit (a:=(X - C r)) (b:=q) (hq)
-  rcases h_unit_or_unit with h_factor1_is_unit | h_factor2_is_unit
-  · -- Case 1: `(X - C r)` is a unit.
-    have h := Polynomial.not_isUnit_X_sub_C (r:=r)
-    contradiction
-  · -- Case 2: The other factor `q` is a unit.
-    have h_deg_q : q.degree = 0 := by exact degree_eq_zero_of_isUnit h_factor2_is_unit
-    have h_deg_p : p.degree = 1 := by
-      rw [hq, degree_mul, degree_X_sub_C, h_deg_q, _root_.add_zero]
-    have h_deg_p_ne_1: p.degree ≠ 1 := by
-      exact Ne.symm (ne_of_lt h_deg)
-    exact h_deg_p_ne_1 h_deg_p -- contradiction
-end Irr
-
-section InductiveConcreteBTFPropertiesProofs -- for k > 0
-variable {k : ℕ}
-section DefiningPolyOG
-
-end DefiningPolyOG
-
-theorem concrete_mul_eq {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
-  (a b : ConcreteBTField k) (h_k : k > 0) {a₁ a₀ b₁ b₀ : ConcreteBTField (k - 1)}
+theorem concrete_mul_eq
+  (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
+  (a b : ConcreteBTField k) {a₁ a₀ b₁ b₀ : ConcreteBTField (k - 1)}
   (h_a : (a₁, a₀) = split h_k a) (h_b : (b₁, b₀) = split h_k b) :
   concrete_mul a b =
     《 concrete_mul a₀ b₁ + concrete_mul b₀ a₁ + concrete_mul (concrete_mul a₁ b₁) (Z (k - 1)),
       concrete_mul a₀ b₀ + concrete_mul a₁ b₁ 》 := by
-  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance (recArg (k-1) (by omega))
+  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance prevBTFieldProps
   have h_a₁ : (split h_k a).1 = a₁ := by rw [h_a.symm]
   have h_a₀ : (split h_k a).2 = a₀ := by rw [h_a.symm]
   have h_b₁ : (split h_k b).1 = b₁ := by rw [h_b.symm]
@@ -1508,7 +1458,8 @@ theorem concrete_mul_eq {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult 
       rw [add_comm (b:=a₁ * b₁), ←add_assoc, ←add_assoc, add_self_cancel, zero_add]
   · rfl
 
-lemma concrete_zero_mul {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
+lemma concrete_zero_mul
+  (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a : ConcreteBTField k) : concrete_mul (zero (k:=k)) a = zero (k:=k) := by
   unfold concrete_mul
   by_cases h_k_zero : k = 0
@@ -1525,11 +1476,11 @@ lemma concrete_zero_mul {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult 
     rw [h_zero_split]
     simp only
     -- Apply the inductive hypothesis to a₁ * b₁, a₀ * b₀, a₁ * b₀, a₀ * b₁
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k_gt_0_proof)
-    simp only [zero_is_0, zero_add, recArgPrevLevel.zero_mul']
+    simp only [zero_is_0, zero_add, prevBTFieldProps.zero_mul']
     simp only [← zero_is_0, join_zero_zero h_k_gt_0_proof]
 
-lemma concrete_mul_zero {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
+lemma concrete_mul_zero
+  (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a : ConcreteBTField k) : concrete_mul a (zero (k:=k)) = zero (k:=k) := by
   unfold concrete_mul
   by_cases h_k_zero : k = 0
@@ -1548,12 +1499,12 @@ lemma concrete_mul_zero {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult 
     rw [h_zero_split]
     simp only
     -- Apply the inductive hypothesis
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k_gt_0_proof)
-    simp only [zero_is_0, zero_add, recArgPrevLevel.mul_zero']
+    simp only [zero_is_0, zero_add, prevBTFieldProps.mul_zero']
     -- Use join_zero to complete the proof
-    simp only [← zero_is_0, recArgPrevLevel.zero_mul, join_zero_zero h_k_gt_0_proof]
+    simp only [← zero_is_0, prevBTFieldProps.zero_mul, join_zero_zero h_k_gt_0_proof]
 
-lemma concrete_one_mul {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
+lemma concrete_one_mul
+  (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a : ConcreteBTField k) : concrete_mul (one (k:=k)) a = a := by
   unfold concrete_mul
   by_cases h_k_zero : k = 0
@@ -1561,21 +1512,21 @@ lemma concrete_one_mul {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m
     simp [h_k_zero, ↓reduceDIte, one_is_1, zero_is_0]; intro h; exact h.symm
   · -- Inductive case : k > 0
     have h_k_gt_0 : k > 0 := by omega
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k_gt_0)
     simp only [dif_neg h_k_zero]
     let p := split h_k_gt_0 a
     let a₁ := p.fst
     let a₀ := p.snd
     have h_split_a : split h_k_gt_0 a = (a₁, a₀) := by rfl
     rw [split_one]
-    simp only [zero_is_0, zero_add, recArgPrevLevel.one_mul, recArgPrevLevel.zero_mul', add_zero]
+    simp only [zero_is_0, zero_add, prevBTFieldProps.one_mul, prevBTFieldProps.zero_mul', add_zero]
     simp [add_assoc, add_self_cancel]
     have join_result : 《 a₁, a₀ 》 = a := by
       have split_join := join_of_split h_k_gt_0 a a₁ a₀
       exact (split_join h_split_a).symm
     exact join_result
 
-lemma concrete_mul_one {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
+lemma concrete_mul_one
+  (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a : ConcreteBTField k) : concrete_mul a (one (k:=k)) = a := by
   unfold concrete_mul
   by_cases h_k_zero : k = 0
@@ -1586,22 +1537,22 @@ lemma concrete_mul_one {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m
       simp only [if_self_rfl]
   · -- Inductive case : k > 0
     have h_k_gt_0 : k > 0 := by omega
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k_gt_0)
     simp only [dif_neg h_k_zero]
     let p := split h_k_gt_0 a
     let a₁ := p.fst
     let a₀ := p.snd
     have h_split_a : split h_k_gt_0 a = (a₁, a₀) := by rfl
     rw [split_one]
-    simp only [zero_is_0, zero_add, recArgPrevLevel.mul_one, recArgPrevLevel.mul_zero',
-      recArgPrevLevel.zero_mul', add_zero]
+    simp only [zero_is_0, zero_add, prevBTFieldProps.mul_one, prevBTFieldProps.mul_zero',
+      prevBTFieldProps.zero_mul', add_zero]
     simp [add_assoc, add_self_cancel]
     have join_result : 《 a₁, a₀ 》 = a := by
       have split_join := join_of_split h_k_gt_0 a a₁ a₀
       exact (split_join h_split_a).symm
     exact join_result
 
-lemma concrete_pow_base_one {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m} (n : ℕ) :
+lemma concrete_pow_base_one
+  (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1)) (n : ℕ) :
   concrete_pow_nat (k:=k) (x:=1) n = 1 := by
   induction n using Nat.strong_induction_on with
   | h n ih =>
@@ -1618,7 +1569,7 @@ lemma concrete_pow_base_one {recArg : (m : ℕ) → m < k → ConcreteBTFStepRes
         rw [if_pos h_mod]
         have h_square : concrete_mul (1 : ConcreteBTField k) 1 = 1 := by
           rw [← one_is_1]
-          rw [concrete_one_mul (recArg:=recArg)]  -- Assume concrete_mul 1 1 = 1
+          rw [concrete_one_mul prevBTFieldProps]  -- Assume concrete_mul 1 1 = 1
         rw [h_square]
         have h_div_lt : n / 2 < n := by
           apply Nat.div_lt_self
@@ -1629,7 +1580,7 @@ lemma concrete_pow_base_one {recArg : (m : ℕ) → m < k → ConcreteBTFStepRes
         rw [if_neg h_mod]
         have h_square : concrete_mul (1 : ConcreteBTField k) 1 = 1 := by
           rw [← one_is_1]
-          rw [concrete_one_mul (recArg:=recArg)]  -- Assume concrete_mul 1 1 = 1
+          rw [concrete_one_mul prevBTFieldProps]  -- Assume concrete_mul 1 1 = 1
         rw [h_square]
         have h_div_lt : n / 2 < n := by
           apply Nat.div_lt_self
@@ -1637,16 +1588,17 @@ lemma concrete_pow_base_one {recArg : (m : ℕ) → m < k → ConcreteBTFStepRes
           exact Nat.le_refl 2
         rw [ih (n / 2) h_div_lt]  -- Use ih for n / 2 < n
         rw [← one_is_1]
-        rw [concrete_one_mul (recArg:=recArg)]  -- Assume concrete_mul 1 1 = 1
+        rw [concrete_one_mul prevBTFieldProps]  -- Assume concrete_mul 1 1 = 1
 
-lemma concrete_mul_comm {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m} {h_k : k > 0}
+lemma concrete_mul_comm
+  {h_k : k > 0} (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a b : ConcreteBTField k) :
   concrete_mul a b = concrete_mul b a := by
+  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance prevBTFieldProps
   by_cases h_k_zero : k = 0
   · linarith
   · -- Inductive case : k > 0
     -- Approach : utilize concrete_mul_eq of level (k - 1)
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k)
     let p1 := split h_k a
     let p2 := split h_k b
     let a₁ := p1.fst
@@ -1661,26 +1613,31 @@ lemma concrete_mul_comm {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult 
     have h_a₀ : (split h_k a).2 = a₀ := by rw [h_split_a]
     have h_b₁ : (split h_k b).1 = b₁ := by rw [h_split_b]
     have h_b₀ : (split h_k b).2 = b₀ := by rw [h_split_b]
-    have h_lhs := concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=b) (a₁:=a₁)
+    have h_lhs := concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=a) (b:=b) (a₁:=a₁)
       (a₀:=a₀) (b₁:=b₁) (b₀:=b₀) (h_a:=h_split_a) (h_b:=h_split_b)
-    have h_rhs := concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=b) (b:=a) (a₁:=b₁)
+    have h_rhs := concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=b) (b:=a) (a₁:=b₁)
       (a₀:=b₀) (b₁:=a₁) (b₀:=a₀) (h_a:=h_split_b) (h_b:=h_split_a)
     rw [h_lhs, h_rhs]
-    rw [join_eq_join_iff]
-    rw [recArgPrevLevel.mul_comm (a:=b₀) (b:=a₀), recArgPrevLevel.mul_comm (a:=a₁) (b:=b₁)]
-    split_ands
-    · rw [recArgPrevLevel.add_comm (a:=concrete_mul a₀ b₁) (b:=concrete_mul b₀ a₁)]
-    · rfl
+    change join h_k (a₀ * b₁ + b₀ * a₁ + (a₁ * b₁) * (Z (k - 1)))
+        (a₀ * b₀ + a₁ * b₁) =
+      join h_k (b₀ * a₁ + a₀ * b₁ + (b₁ * a₁) * (Z (k - 1)))
+        (b₀ * a₀ + b₁ * a₁)
+    rw [join_eq_join_iff (h_pos := h_k)]
+    rw [mul_comm (a:=b₀) (b:=a₀), mul_comm (a:=a₁) (b:=b₁)]
+    rw [add_comm (a:= a₀ * b₁) (b:= b₀ * a₁)]
+    simp only [and_self]
 
-lemma concrete_mul_assoc {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m} {h_k : k > 0}
+lemma concrete_mul_assoc
+  {h_k : k > 0} (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a b c : ConcreteBTField k) :
   concrete_mul (concrete_mul a b) c = concrete_mul a (concrete_mul b c) := by
+  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance prevBTFieldProps
+  have hmul : ∀ (a b : ConcreteBTField (k - 1)), concrete_mul a b = a * b := fun a b => rfl
   by_cases h_k_zero : k = 0
   · linarith
   · -- Inductive case : k > 0
     -- Approach : utilize concrete_mul_eq of level (k - 1)
     -- ⊢ concrete_mul (concrete_mul a b) c = concrete_mul a (concrete_mul b c)
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k)
     let p1 := split h_k a
     let p2 := split h_k b
     let p3 := split h_k c
@@ -1697,9 +1654,9 @@ lemma concrete_mul_assoc {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult
     have h_b₁_b₀ : b = 《 b₁, b₀ 》 := by exact (join_of_split h_k b b₁ b₀) h_split_b
     have h_c₁_c₀ : c = 《 c₁, c₀ 》 := by exact (join_of_split h_k c c₁ c₀) h_split_c
     -- ⊢ concrete_mul (concrete_mul a b) c = concrete_mul a (concrete_mul b c)
-    have a_mul_b_eq := concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=b) (a₁:=a₁)
+    have a_mul_b_eq := concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=a) (b:=b) (a₁:=a₁)
       (a₀:=a₀) (b₁:=b₁) (b₀:=b₀) (h_a:=h_split_a) (h_b:=h_split_b)
-    have b_mul_c_eq := concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=b) (b:=c) (a₁:=b₁)
+    have b_mul_c_eq := concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=b) (b:=c) (a₁:=b₁)
       (a₀:=b₀) (b₁:=c₁) (b₀:=c₀) (h_a:=h_split_b) (h_b:=h_split_c)
     set ab₁ := concrete_mul a₀ b₁ + concrete_mul b₀ a₁
  + concrete_mul (concrete_mul a₁ b₁) (Z (k - 1))
@@ -1716,9 +1673,9 @@ lemma concrete_mul_assoc {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult
     set bc := concrete_mul b c
     -- rw [a_mul_b_eq, b_mul_c_eq]
     -- ⊢ concrete_mul ab c = concrete_mul a bc
-    have a_mul_bc_eq := concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=bc) (a₁:=a₁)
+    have a_mul_bc_eq := concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=a) (b:=bc) (a₁:=a₁)
       (a₀:=a₀) (b₁:=bc₁) (b₀:=bc₀) (h_a:=h_split_a) (h_b:=h_split_b_mul_c.symm)
-    have ab_mul_c_eq := concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=ab) (b:=c) (a₁:=ab₁)
+    have ab_mul_c_eq := concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=ab) (b:=c) (a₁:=ab₁)
       (a₀:=ab₀) (b₁:=c₁) (b₀:=c₀) (h_a:=h_split_a_mul_b.symm) (h_b:=h_split_c)
     set a_bc₁ := concrete_mul a₀ bc₁ + concrete_mul bc₀ a₁
  + concrete_mul (concrete_mul a₁ bc₁) (Z (k - 1))
@@ -1735,85 +1692,21 @@ lemma concrete_mul_assoc {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult
     rw [join_eq_join_iff]
     -- ⊢ ab_c₁ = a_bc₁ ∧ ab_c₀ = a_bc₀
     unfold a_bc₁ ab_c₁ ab_c₀ a_bc₀ ab₀ ab₁ bc₀ bc₁ -- unfold all
-    simp only [recArgPrevLevel.mul_right_distrib,
-      recArgPrevLevel.mul_left_distrib] -- distribute all
-    split_ands
-    · -- ⊢ ab_c₁ = a_bc₁
-      have t0 : concrete_mul (concrete_mul a₀ b₀) c₁ = concrete_mul a₀ (concrete_mul b₀ c₁) := by
-        rw [recArgPrevLevel.mul_assoc (a:=a₀) (b:=b₀) (c:=c₁)]
-      have t1 : concrete_mul (concrete_mul a₁ b₁) c₁ = concrete_mul (concrete_mul b₁ c₁) a₁ := by
-        rw [recArgPrevLevel.mul_assoc (a:=a₁) (b:=b₁) (c:=c₁)]
-        rw [recArgPrevLevel.mul_comm (a:=a₁) (b:=concrete_mul b₁ c₁)]
-      have t2 : concrete_mul c₀ (concrete_mul a₀ b₁) = concrete_mul a₀ (concrete_mul c₀ b₁) := by
-        rw [← recArgPrevLevel.mul_assoc (a:=c₀) (b:=a₀) (c:=b₁),
-          ← recArgPrevLevel.mul_assoc (a:=a₀) (b:=c₀) (c:=b₁)]
-        rw [recArgPrevLevel.mul_comm (a:=c₀) (b:=a₀)]
-      have t3 : concrete_mul c₀ (concrete_mul b₀ a₁) = (concrete_mul (concrete_mul b₀ c₀) a₁) := by
-        rw [← recArgPrevLevel.mul_assoc (a:=c₀) (b:=b₀) (c:=a₁)]
-        rw [recArgPrevLevel.mul_comm (a:=c₀) (b:=b₀)]
-      have t4 : concrete_mul (concrete_mul a₁ (concrete_mul c₀ b₁)) (Z (k - 1))
-        = concrete_mul c₀ (concrete_mul (concrete_mul a₁ b₁) (Z (k - 1))) := by
-        rw [← recArgPrevLevel.mul_assoc (c:=Z (k - 1))]
-        rw [← recArgPrevLevel.mul_assoc (a:=c₀) (b:=a₁) (c:=b₁)]
-        rw [recArgPrevLevel.mul_comm (a:=c₀) (b:=a₁),
-          recArgPrevLevel.mul_assoc (a:=a₁) (b:=c₀) (c:=b₁)]
-      have t5 : concrete_mul a₀ (concrete_mul (concrete_mul b₁ c₁) (Z (k - 1)))
-        = concrete_mul (concrete_mul (concrete_mul a₀ b₁) c₁) (Z (k - 1)) := by
-        rw [← recArgPrevLevel.mul_assoc (c:=Z (k - 1))]
-        rw [← recArgPrevLevel.mul_assoc (a:=a₀) (b:=b₁) (c:=c₁)]
-      have t6 : concrete_mul (concrete_mul (concrete_mul b₀ a₁) c₁) (Z (k - 1))
-        =  concrete_mul (concrete_mul a₁ (concrete_mul b₀ c₁)) (Z (k - 1)) := by
-        rw [recArgPrevLevel.mul_comm (a:=b₀) (b:=a₁),
-          recArgPrevLevel.mul_assoc (a:=a₁) (b:=b₀) (c:=c₁)]
-      have t7 : concrete_mul (concrete_mul (concrete_mul (concrete_mul a₁ b₁)
-        (Z (k - 1))) c₁) (Z (k - 1)) = concrete_mul (concrete_mul a₁ (concrete_mul
-          (concrete_mul b₁ c₁) (Z (k - 1)))) (Z (k - 1)) := by
-        rw [← recArgPrevLevel.mul_assoc (c:=Z (k - 1))]
-        rw [recArgPrevLevel.mul_comm (a:=(concrete_mul (concrete_mul a₁ b₁) (Z (k - 1)))) (b:=c₁)]
-        rw [recArgPrevLevel.mul_comm (a:=a₁) (b:=b₁)]
-        rw [← recArgPrevLevel.mul_assoc (c:=Z (k - 1))]
-        -- c1 (b1 a1) vs a1 (b1 c1) => convert to (c1 b1) a1 vs (c1 b) a1
-        rw [recArgPrevLevel.mul_comm (a:=a₁) (b:=concrete_mul b₁ c₁)]
-        rw [← recArgPrevLevel.mul_assoc (a:=c₁) (b:=b₁) (c:=a₁)]
-        rw [recArgPrevLevel.mul_comm (a:=c₁) (b:=b₁)]
-      rw [t0, t1, t2, t3, t4, t5, t6, t7]
-      abel_nf
-    · -- ⊢ ab_c₀ = a_bc₀
-      have t_a₀_b₀_c₀ : concrete_mul (concrete_mul a₀ b₀) c₀
-        = concrete_mul a₀ (concrete_mul b₀ c₀) := by
-        rw [recArgPrevLevel.mul_assoc (a:=a₀) (b:=b₀) (c:=c₀)]
-      have t_a₁_b₁_c₀ : concrete_mul (concrete_mul a₁ b₁) c₀
-        = concrete_mul a₁ (concrete_mul c₀ b₁) := by
-        rw [recArgPrevLevel.mul_assoc (a:=a₁) (b:=b₁) (c:=c₀),
-        recArgPrevLevel.mul_comm (a:=c₀) (b:=b₁)]
-      have t_a₀_b₁_c₁ : concrete_mul (concrete_mul a₀ b₁) c₁
-        = concrete_mul a₀ (concrete_mul b₁ c₁) := by
-        rw [recArgPrevLevel.mul_assoc (a:=a₀) (b:=b₁) (c:=c₁)]
-      have t_b₀_a₁_c₁ : concrete_mul (concrete_mul b₀ a₁) c₁
-        = concrete_mul a₁ (concrete_mul b₀ c₁) := by
-        rw [recArgPrevLevel.mul_comm (a:=b₀) (b:=a₁),
-        recArgPrevLevel.mul_assoc (a:=a₁) (b:=b₀) (c:=c₁)]
-      have t_a₁_b₁_c₁_z : concrete_mul (concrete_mul (concrete_mul a₁ b₁) (Z (k - 1))) c₁
-        = concrete_mul a₁ (concrete_mul (concrete_mul b₁ c₁) (Z (k - 1))) := by
-        rw [recArgPrevLevel.mul_comm (a:=concrete_mul (concrete_mul a₁ b₁) (Z (k - 1))) (b:=c₁)]
-        rw [←recArgPrevLevel.mul_assoc (c:=Z (k - 1)), ←recArgPrevLevel.mul_assoc (c:=Z (k - 1))]
-        -- rewrite both sides
-        rw [recArgPrevLevel.mul_comm (a:=b₁) (b:=c₁)]
-        rw [←recArgPrevLevel.mul_assoc (a:=c₁) (b:=a₁)
-          (c:=b₁), recArgPrevLevel.mul_comm (a:=c₁) (b:=a₁)]
-        rw [recArgPrevLevel.mul_assoc (a:=a₁) (b:=c₁) (c:=b₁)]
-      rw [t_a₀_b₀_c₀, t_a₁_b₁_c₀, t_a₀_b₁_c₁, t_b₀_a₁_c₁, t_a₁_b₁_c₁_z]
-      abel_nf
+    simp_rw [hmul]
+    ring_nf
+    simp only [and_self]
 
-lemma concrete_mul_left_distrib {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m} {h_k : k > 0}
+lemma concrete_mul_left_distrib
+  {h_k : k > 0} (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a b c : ConcreteBTField k) :
     concrete_mul a (b + c) = concrete_mul a b + concrete_mul a c := by
+  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance prevBTFieldProps
+  have hmul : ∀ (a b : ConcreteBTField (k - 1)), concrete_mul a b = a * b := fun a b => rfl
   by_cases h_k_zero : k = 0
   · linarith
   · -- Inductive case : k > 0
     -- Approach : utilize concrete_mul_eq of level (k - 1)
     -- ⊢ concrete_mul (concrete_mul a b) c = concrete_mul a (concrete_mul b c)
-    let recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k)
     let p1 := split h_k a
     let p2 := split h_k b
     let p3 := split h_k c
@@ -1836,81 +1729,41 @@ lemma concrete_mul_left_distrib {recArg : (m : ℕ) → m < k → ConcreteBTFSte
     conv =>
       lhs
       -- rewrite a * (b + c)
-      rw [concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=b + c) (a₁:=a₁)
+      rw [concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=a) (b:=b + c) (a₁:=a₁)
         (a₀:=a₀) (b₁:=b₁ + c₁) (b₀:=b₀ + c₀) (h_a:=h_split_a) (h_b:=h_split_b_add_c.symm)]
     conv =>
       rhs
-      rw [concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=b) (a₁:=a₁)
+      rw [concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=a) (b:=b) (a₁:=a₁)
         (a₀:=a₀) (b₁:=b₁) (b₀:=b₀) (h_a:=h_split_a) (h_b:=h_split_b)]
-      rw [concrete_mul_eq (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=c) (a₁:=a₁)
+      rw [concrete_mul_eq prevBTFieldProps (h_k:=h_k) (a:=a) (b:=c) (a₁:=a₁)
         (a₀:=a₀) (b₁:=c₁) (b₀:=c₀) (h_a:=h_split_a) (h_b:=h_split_c)]
+    simp_rw [hmul]
     rw [join_add_join]
     rw [join_eq_join_iff]
-    split_ands
-    · -- ⊢ concrete_mul a₀ (b₁ + c₁) + concrete_mul (b₀ + c₀) a₁
-      --  + concrete_mul (concrete_mul a₁ (b₁ + c₁)) (Z (k - 1)) =
-      -- concrete_mul a₀ b₁ + concrete_mul b₀ a₁ + concrete_mul (concrete_mul a₁ b₁) (Z (k - 1)) +
-      -- (concrete_mul a₀ c₁ + concrete_mul c₀ a₁ + concrete_mul (concrete_mul a₁ c₁) (Z (k - 1)))
-      set a := concrete_mul a₀ b₁ + concrete_mul b₀ a₁
-      set b := concrete_mul (concrete_mul a₁ b₁) (Z (k - 1))
-      set c := (concrete_mul a₀ c₁ + concrete_mul c₀ a₁
- + concrete_mul (concrete_mul a₁ c₁) (Z (k - 1)))
-      -- rhs is like a + b + c, but we have to bring it to a + (b + c) then a + (c + b)
-      conv =>
-        rhs
-        rw [recArgPrevLevel.add_assoc (a:=a) (b:=b) (c:=c), recArgPrevLevel.add_comm (a:=b) (b:=c)]
-        unfold a b c
-        -- set t2 :=
-      set t1 := concrete_mul a₁ c₁
-      set t2 := concrete_mul a₁ b₁
-      rw [add_assoc (b:=concrete_mul t1 (Z (k - 1))) (c:=concrete_mul t2 (Z (k - 1)))]
-      have de_distrib := recArgPrevLevel.mul_right_distrib (a:=t1) (b:=t2) (c:=Z (k - 1))
-      rw [←de_distrib]
-      unfold t1 t2
-      have de_distrib_a₁_mul_sum_b₁_c₁ := recArgPrevLevel.mul_left_distrib (a:=a₁) (b:=b₁) (c:=c₁)
-      rw [add_comm (a:=concrete_mul a₁ b₁) (b:=concrete_mul a₁ c₁)] at de_distrib_a₁_mul_sum_b₁_c₁
-      rw [←de_distrib_a₁_mul_sum_b₁_c₁]
-      rw [←recArgPrevLevel.add_assoc]
-      have de_distrib_left_a₀_mul_sum_b₁_c₁ :=
-        recArgPrevLevel.mul_left_distrib (a:=a₀) (b:=b₁) (c:=c₁)
-      have de_distrib_right_a₁_mul_sum_b₀_c₀ :=
-        recArgPrevLevel.mul_right_distrib (a:=b₀) (b:=c₀) (c:=a₁)
-      conv =>
-        rhs
-        rw [←add_assoc, add_assoc (b:=concrete_mul b₀ a₁) (c:=concrete_mul a₀ c₁),
-           add_comm (a:=concrete_mul b₀ a₁) (b:=concrete_mul a₀ c₁)]
-        rw [←add_assoc, ←de_distrib_left_a₀_mul_sum_b₁_c₁]
-        rw [add_assoc (b:=concrete_mul b₀ a₁) (c:=concrete_mul c₀ a₁)]
-        rw [←de_distrib_right_a₁_mul_sum_b₀_c₀]
-    · -- ⊢ concrete_mul a₀ (b₀ + c₀) + concrete_mul a₁ (b₁ + c₁) =
-      -- concrete_mul a₀ b₀ + concrete_mul a₁ b₁ + (concrete_mul a₀ c₀ + concrete_mul a₁ c₁)
-      rw [recArgPrevLevel.mul_left_distrib, recArgPrevLevel.mul_left_distrib]
-      rw [←recArgPrevLevel.add_assoc, ←recArgPrevLevel.add_assoc]
-      conv =>
-        rhs
-        rw [recArgPrevLevel.add_assoc (a:=concrete_mul a₀ b₀) (b:=concrete_mul a₁ b₁)
-          (c:=concrete_mul a₀ c₀), recArgPrevLevel.add_comm (a:=concrete_mul a₁ b₁)
-          (b:=concrete_mul a₀ c₀), ←recArgPrevLevel.add_assoc]
+    ring_nf
+    simp only [and_self]
 
-lemma concrete_mul_right_distrib {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m} {h_k : k > 0}
+lemma concrete_mul_right_distrib
+  {h_k : k > 0} (prevBTFieldProps : ConcreteBTFieldProps (k := k - 1))
   (a b c : ConcreteBTField k) :
     concrete_mul (a + b) c = concrete_mul a c + concrete_mul b c := by
-  rw [concrete_mul_comm (recArg:=recArg) (h_k:=h_k) (a:=(a + b)) (b:=c)]
-  rw [concrete_mul_comm (recArg:=recArg) (h_k:=h_k) (a:=a) (b:=c)]
-  rw [concrete_mul_comm (recArg:=recArg) (h_k:=h_k) (a:=b) (b:=c)]
-  exact concrete_mul_left_distrib (recArg:=recArg) (h_k:=h_k) (a:=c) (b:=a) (c:=b)
-lemma norm_of_ne_zero_is_ne_zero {k : ℕ} {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
-  (a : ConcreteBTField k) (h_a_ne_zero : a ≠ 0) (h_k_gt_0 : k > 0) :
+  rw [concrete_mul_comm prevBTFieldProps (h_k:=h_k) (a:=(a + b)) (b:=c)]
+  rw [concrete_mul_comm prevBTFieldProps (h_k:=h_k) (a:=a) (b:=c)]
+  rw [concrete_mul_comm prevBTFieldProps (h_k:=h_k) (a:=b) (b:=c)]
+  exact concrete_mul_left_distrib prevBTFieldProps (h_k:=h_k) (a:=c) (b:=a) (c:=b)
+
+lemma norm_of_ne_zero_is_ne_zero {k : ℕ}
+  {h_k_gt_0 : k > 0} (prevBTFieldResult : ConcreteBTFStepResult (k := k - 1))
+  (a : ConcreteBTField k) (h_a_ne_zero : a ≠ 0) :
   let a₁ := (split h_k_gt_0 a).1
   let a₀ := (split h_k_gt_0 a).2
   concrete_mul a₀ (a₀ + concrete_mul a₁ (Z (k - 1))) + concrete_mul a₁ a₁ ≠ 0 := by
-  letI instFieldPrevLevel : Field (ConcreteBTField (k - 1)) :=
-    mkFieldInstance (recArg (k - 1) (by omega))
-  letI instMulZeroClassPrevLevel : MulZeroClass (ConcreteBTField (k - 1)) := inferInstance
+  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance prevBTFieldResult.toConcreteBTFieldProps
+  have hmul : ∀ (a b : ConcreteBTField (k - 1)), concrete_mul a b = a * b := fun a b => rfl
   -- Set up local variables for convenience
   set a₁ := (split h_k_gt_0 a).1
   set a₀ := (split h_k_gt_0 a).2
-  change a₀ * (a₀ + a₁ * Z (k - 1)) + a₁ * a₁ ≠ 0
+  simp_rw [hmul]
   rw [left_distrib]
   have ha : a = 《a₁, a₀》 := by
     apply (join_of_split h_k_gt_0 a a₁ a₀) rfl
@@ -1918,7 +1771,7 @@ lemma norm_of_ne_zero_is_ne_zero {k : ℕ} {recArg : (m : ℕ) → m < k → Con
   -- Main proof by contradiction
   by_contra h_Na_is_zero
   by_cases h_a₁_zero : a₁ = 0
-  · -- Case 1: a₁ = 0
+  · -- Case 1 : a₁ = 0
     have h_a₀_ne_zero : a₀ ≠ 0 := by
       intro h_a₀_zero
       have h_a_is_zero : a = 0 := by
@@ -1932,7 +1785,7 @@ lemma norm_of_ne_zero_is_ne_zero {k : ℕ} {recArg : (m : ℕ) → m < k → Con
     have h_a₀_is_zero_from_mul := (mul_self_eq_zero).mp h_Na_is_zero
     -- This contradicts our proof that a₀ is non-zero.
     exact h_a₀_ne_zero h_a₀_is_zero_from_mul
-  · -- Case 2: a₁ ≠ 0
+  · -- Case 2 : a₁ ≠ 0
     -- Since a₁ is a non-zero element of a field, its inverse exists.
     set a₁_inv := a₁⁻¹
     set r := a₀ * a₁_inv
@@ -1943,15 +1796,15 @@ lemma norm_of_ne_zero_is_ne_zero {k : ℕ} {recArg : (m : ℕ) → m < k → Con
       rw [show Na = a₀*a₀ + (a₀*a₁)*Z (k - 1) + a₁*a₁ by { simp [Na]; ring }] at h_manip
       rw [left_distrib, left_distrib] at h_manip
       rw [h_manip.symm]
-      have h1: r * r = a₁_inv * a₁_inv * (a₀ * a₀) := by ring
-      have h2: r * Z (k - 1) = a₁_inv * a₁_inv * (a₀ * a₁ * Z (k - 1)) := by
+      have h1 : r * r = a₁_inv * a₁_inv * (a₀ * a₀) := by ring
+      have h2 : r * Z (k - 1) = a₁_inv * a₁_inv * (a₀ * a₁ * Z (k - 1)) := by
         apply Eq.symm
         -- ⊢ a₁_inv * a₁_inv * (a₀ * a₁ * Z (k - 1)) = r * Z (k - 1)
         calc _ = (a₁ * a₁_inv) * (a₀ * a₁_inv) * Z (k - 1) := by ring
           _ = (a₀ * a₁_inv) * Z (k - 1) := by
             rw [mul_inv_cancel₀ (a:=a₁) (by omega)]; norm_num
           _ = _ := by rfl
-      have h3: a₁_inv * a₁_inv * (a₁ * a₁) = 1 := by
+      have h3 : a₁_inv * a₁_inv * (a₁ * a₁) = 1 := by
         calc _ = a₁_inv * (a₁_inv * a₁) * a₁ := by ring
           _ = a₁_inv * a₁ * (a₁_inv * a₁) := by ring
           _ = (a₁ * a₁_inv) * (a₁ * a₁_inv) := by ring
@@ -1961,26 +1814,29 @@ lemma norm_of_ne_zero_is_ne_zero {k : ℕ} {recArg : (m : ℕ) → m < k → Con
       simp only [pow_two, eval_add, eval_mul, eval_X, eval_C, eval_one, ←h_root]
       ring
     -- A polynomial that has a root in its base field cannot be irreducible.
-    have h_not_irreducible: ¬ Irreducible (X^2 + C (Z (k - 1)) * X + 1) := by
+    have h_not_irreducible : ¬ Irreducible (X^2 + C (Z (k - 1)) * X + 1) := by
       apply not_irreducible_of_isRoot_of_degree_gt_one (X^2 + C (Z (k - 1)) * X + 1)
       · use r
         simp only [IsRoot.def, eval_add, eval_pow, eval_X, eval_mul, eval_C, eval_one]
         rw [mul_comm, pow_two]
         exact h_root
-      · have h_deg := degree_definingPoly (k:=k-1) (props:=recArg (k-1) (by omega))
+      · letI := prevBTFieldResult.instFintype
+        have h_deg := degree_definingPoly (s:=Z (k - 1))
         unfold definingPoly at h_deg
-        rw [C_mul', h_deg]; norm_num
+        rw [h_deg]; norm_num
 
     -- This gives our final contradiction, because our field extension requires
     -- the defining polynomial to be irreducible.
-    have h:= irreducible_definingPoly (k:=k-1) (props:=recArg (k-1) (by omega))
+    have h:= prevBTFieldResult.instIrreduciblePoly
     unfold definingPoly at h
-    rw [C_mul'] at h_not_irreducible
     exact h_not_irreducible h
 
-lemma concrete_mul_inv_cancel {recArg : (m : ℕ) → m < k → ConcreteBTFStepResult m}
+lemma concrete_mul_inv_cancel
+  (prevBTFieldResult : ConcreteBTFStepResult (k := k - 1))
   (a : ConcreteBTField k) (h : a ≠ 0) :
   concrete_mul a (concrete_inv a) = one := by
+  letI : Field (ConcreteBTField (k - 1)) := mkFieldInstance prevBTFieldResult.toConcreteBTFieldProps
+  have hmul : ∀ (a b : ConcreteBTField (k - 1)), concrete_mul a b = a * b := fun a b => rfl
   unfold concrete_inv
   by_cases h_k_zero : k = 0
   · rw [dif_pos h_k_zero]
@@ -1997,21 +1853,19 @@ lemma concrete_mul_inv_cancel {recArg : (m : ℕ) → m < k → ConcreteBTFStepR
       have a_ne_0 : a ≠ 0 := by rw [a_is_1]; exact one_ne_zero
       rw [if_neg a_ne_0]
       rw [←one_is_1]
-      rw [concrete_mul_one (a:=a) (recArg:=recArg)]
+      rw [concrete_mul_one prevBTFieldResult.toConcreteBTFieldProps (a:=a)]
       rw [ha1]
   · by_cases h_a_zero : a = 0
     · contradiction
     · rw [dif_neg h_k_zero]
       rw [dif_neg h_a_zero]
-
       by_cases h_a_one : a = 1
       · rw [dif_pos h_a_one]
         rw [←one_is_1]
-        rw [concrete_mul_one (a:=a) (recArg:=recArg)]
+        rw [concrete_mul_one prevBTFieldResult.toConcreteBTFieldProps (a:=a)]
         rw [h_a_one, one_is_1]
       · rw [dif_neg h_a_one]
         have h_k_gt_0 : k > 0 := Nat.zero_lt_of_ne_zero h_k_zero
-        have recArgPrevLevel := recArg (k - 1) (Nat.sub_one_lt_of_lt h_k_gt_0)
         let split_a := split h_k_gt_0 a
         let a₁ := split_a.fst
         let a₀ := split_a.snd
@@ -2023,72 +1877,47 @@ lemma concrete_mul_inv_cancel {recArg : (m : ℕ) → m < k → ConcreteBTFStepR
         -- ⊢ a * b = 1
         -- Let `b = (b_hi, b_lo) = (a_hi * N(a)⁻¹, (a_lo + a_hi*X_{k-1}) * N(a)⁻¹)`
         -- be inverse of `a = (a_hi, a_lo)`. We need to prove that `a * b = 1`.
-        set Na := concrete_mul a₀ (a₀ + concrete_mul a₁ (Z (k - 1))) + concrete_mul a₁ a₁
-        have h_Na_ne_0 : Na ≠ 0 := by
-          apply norm_of_ne_zero_is_ne_zero a h_a_zero h_k_gt_0 (recArg:=recArg)
+        set Na := a₀ * (a₀ + a₁ * (Z (k - 1))) + a₁ * a₁
+        have h_Na_ne_0 : Na ≠ 0 := norm_of_ne_zero_is_ne_zero
+          prevBTFieldResult a h_a_zero
         change a * (《 Na⁻¹ * a₁, Na⁻¹ * (a₀ + a₁ * (Z (k - 1))) 》) = one
         set b := 《 Na⁻¹ * a₁, Na⁻¹ * (a₀ + a₁ * (Z (k - 1))) 》 with hb
         have h_b_split := split_of_join h_k_gt_0 b (h_join:=hb)
-        have h_mul_eq := concrete_mul_eq (recArg:=recArg) (h_k:=h_k_gt_0) (a:=a) (b:=b)
-          (a₁:=a₁) (a₀:=a₀) (b₁:=Na⁻¹ * a₁) (b₀:=Na⁻¹ * (a₀ + a₁ * (Z (k - 1))))
-          (h_a:=h_a_split) (h_b:=h_b_split)
+        have h_mul_eq := concrete_mul_eq prevBTFieldResult.toConcreteBTFieldProps
+          (h_k:=h_k_gt_0) (a:=a) (b:=b) (a₁:=a₁) (a₀:=a₀)
+          (b₁:=Na⁻¹ * a₁) (b₀:=Na⁻¹ * (a₀ + a₁ * (Z (k - 1)))) (h_a:=h_a_split) (h_b:=h_b_split)
         conv_lhs at h_mul_eq => change a * b
         rw [h_mul_eq]
-        have h_one_eq_join_0_1: one (k:=k) = 《 0, 1 》 := join_zero_one (k:=k) (h_k:=h_k_gt_0).symm
+        have h_one_eq_join_0_1 : one (k:=k) = 《 0, 1 》 := join_zero_one (k:=k) (h_k:=h_k_gt_0).symm
         conv_rhs => rw [h_one_eq_join_0_1]
         rw [join_eq_join_iff] -- split into equalities in each part in level (k-1)
+        simp_rw [hmul]
         constructor
-        · -- ⊢ concrete_mul a₀ (Na⁻¹ * a₁) + concrete_mul (Na⁻¹ * (a₀ + a₁ * Z (k - 1))) a₁ +
-          -- concrete_mul (concrete_mul a₁ (Na⁻¹ * a₁)) (Z (k - 1)) = 0
-          change concrete_mul a₀ (concrete_mul (concrete_inv Na) a₁) +
-                concrete_mul (concrete_mul (concrete_inv Na)
-                  (a₀ + concrete_mul a₁ (Z (k - 1)))) a₁ +
-                concrete_mul (concrete_mul a₁ (concrete_mul (concrete_inv Na) a₁)) (Z (k - 1)) = 0
-          --  a₀ * (Na⁻¹ * a₁) + (Na⁻¹ * (a₀ + a₁ * Z (k - 1))) * a₁ + a₁
-            -- * (Na⁻¹ * a₁) * (Z (k - 1)) = 0
-          rw [recArgPrevLevel.mul_left_distrib (a:=concrete_inv Na) (b:=a₀)
-            (c:=concrete_mul a₁ (Z (k - 1)))]
-          -- a₀ * (Na⁻¹ * a₁) + (Na⁻¹ * a₀ + Na⁻¹ * (a₁ * Z (k - 1))) * a₁ + a₁
-            -- * (Na⁻¹ * a₁) * (Z (k - 1)) = 0
-          rw [recArgPrevLevel.mul_right_distrib (c:=a₁)]
-          simp_rw [recArgPrevLevel.add_assoc (c:=concrete_mul (concrete_mul a₁
-            (concrete_mul (concrete_inv Na) a₁)) (Z (k - 1)))] -- this rw is done TWICE
-          -- change a₀ * (Na⁻¹ * a₁) +  (Na⁻¹ * a₀ * a₁ +
-          --   (Na⁻¹ * (a₁ * Z (k - 1)) * a₁ + a₁ * (Na⁻¹ * a₁) * Z (k - 1))) = 0
-          rw [←recArgPrevLevel.mul_assoc (a:=a₀) (b:=concrete_inv Na) (c:=a₁)]
-          rw [recArgPrevLevel.mul_comm (a:=a₀) (b:=concrete_inv Na)] -- swap a₀ and concrete_inv Na
-          rw [recArgPrevLevel.mul_assoc (a:=concrete_inv Na) (b:=a₀) (c:=a₁)]
-          rw [recArgPrevLevel.mul_assoc (a:=concrete_inv Na)
-            (b:=concrete_mul a₁ (Z (k - 1))) (c:=a₁)]
-          rw [recArgPrevLevel.mul_assoc (a:=a₁) (b:=concrete_mul
-            (concrete_inv Na) a₁) (c:=Z (k - 1))]
-          rw [← add_assoc (a:=concrete_mul (concrete_inv Na) (concrete_mul a₀ a₁))
-              (b:=concrete_mul (concrete_inv Na) (concrete_mul a₀ a₁))]
-          rw [add_self_cancel (a:=concrete_mul (concrete_inv Na) (concrete_mul a₀ a₁)), zero_add]
-          -- ⊢ concrete_mul (concrete_inv Na) (concrete_mul (concrete_mul a₁ (Z (k - 1))) a₁) +
-          -- concrete_mul a₁ (concrete_mul (concrete_mul (concrete_inv Na) a₁) (Z (k - 1))) =
+        · rw [left_distrib (a:=Na⁻¹) (b:=a₀) (c:=a₁ * (Z (k - 1)))]
+          rw [right_distrib (c:=a₁)]
+          simp_rw [add_assoc (c:=(a₁ * ((Na⁻¹) * a₁)) * (Z (k - 1)))] -- this rw is done TWICE
+          rw [←mul_assoc (a:=a₀) (b:=Na⁻¹) (c:=a₁)]
+          rw [mul_comm (a:=a₀) (b:=Na⁻¹)] -- swap a₀ and Na⁻¹
+          rw [mul_assoc (a:=Na⁻¹) (b:=a₀) (c:=a₁)]
+          rw [mul_assoc (a:=Na⁻¹) (b:=a₁ * (Z (k - 1))) (c:=a₁)]
+          rw [mul_assoc (a:=a₁) (b:=(Na⁻¹) * a₁) (c:=Z (k - 1))]
+          rw [← add_assoc (a:=(Na⁻¹) * (a₀ * a₁)) (b:=(Na⁻¹) * (a₀ * a₁))]
+          rw [add_self_cancel (a:=(Na⁻¹) * (a₀ * a₁)), zero_add]
           conv_lhs =>
             enter [1]
-            rw [recArgPrevLevel.mul_comm (a := concrete_inv Na)]
-            rw [recArgPrevLevel.mul_assoc]
-            rw [recArgPrevLevel.mul_comm (a := a₁) (b := concrete_inv Na)]
-            rw [recArgPrevLevel.mul_assoc]
-            rw [recArgPrevLevel.mul_comm (a := Z (k - 1))]
+            rw [mul_comm (a := Na⁻¹)]
+            rw [mul_assoc]
+            rw [mul_comm (a := a₁) (b := Na⁻¹)]
+            rw [mul_assoc]
+            rw [mul_comm (a := Z (k - 1))]
           rw [add_self_cancel]
-        · -- ⊢ concrete_mul a₀ (Na⁻¹ * (a₀ + a₁ * Z (k - 1))) + concrete_mul a₁ (Na⁻¹ * a₁) = 1
-          -- a₀ * (Na⁻¹ * (a₀ + a₁ * Z (k - 1))) + a₁ * (Na⁻¹ * a₁) = 1
-          change concrete_mul a₀ (concrete_mul (concrete_inv Na) (a₀ +
-          concrete_mul a₁ (Z (k - 1)))) + concrete_mul a₁ (concrete_mul (concrete_inv Na) a₁) = 1
-          rw [←recArgPrevLevel.mul_assoc (a:=a₀), ←recArgPrevLevel.mul_assoc (a:=a₁)]
-          rw [recArgPrevLevel.mul_comm (a:=a₀) (b:=concrete_inv Na),
-            recArgPrevLevel.mul_comm (a:=a₁) (b:=concrete_inv Na)]
-          simp_rw [recArgPrevLevel.mul_assoc (a:=concrete_inv Na)]
-          -- (Na⁻¹) * (a₀ * (a₀ + a₁ * Z (k - 1))) + (Na⁻¹) * (a₁ * a₁) = 1
-          rw [←recArgPrevLevel.mul_left_distrib (a:=concrete_inv Na)]
-          -- (Na⁻¹) * (a₀ * (a₀ + a₁ * Z (k - 1)) + a₁ * a₁) = 1
-          rw [recArgPrevLevel.mul_comm (a:=concrete_inv Na)];
-          -- Na * (Na⁻¹) = 1
-          rw [recArgPrevLevel.mul_inv_cancel (a:=Na) (h_Na_ne_0), one_is_1]
+        · rw [←mul_assoc (a:=a₀), ←mul_assoc (a:=a₁)]
+          rw [mul_comm (a:=a₀) (b:=Na⁻¹), mul_comm (a:=a₁) (b:=Na⁻¹)]
+          simp_rw [mul_assoc (a:=Na⁻¹)]
+          rw [←left_distrib (a:=Na⁻¹)]
+          rw [mul_comm (a:=Na⁻¹)];
+          change Na * Na⁻¹ = 1
+          exact CommGroupWithZero.mul_inv_cancel Na h_Na_ne_0
 
 lemma concrete_inv_one :
   concrete_inv (k:=k) 1 = 1 := by
@@ -2097,14 +1926,194 @@ lemma concrete_inv_one :
   · simp only [h_k_zero]; norm_num
   · simp only [h_k_zero]; norm_num
 
-end InductiveConcreteBTFPropertiesProofs
--------------------------------------------------------------------------------------------
+end BTFieldPropsOneLevelLiftingLemmas
 
-def InductiveConcreteBTFPropertiesAux (k : ℕ) (rec : ∀ m : ℕ, m < k → ConcreteBTFStepResult m) :
-  ConcreteBTFStepResult k :=
+/-! Inductive tower construction, using lemmas from `BTFieldPropsOneLevelLiftingLemmas` -/
+section TowerFieldsConstruction
+
+lemma Z_square_eq (k : ℕ) (prevBTFieldProps : ConcreteBTFieldProps (k := k))
+    (curBTFieldProps : ConcreteBTFieldProps (k := (k + 1))) :
+  letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance curBTFieldProps
+  (Z (k + 1)) ^ 2 = 《 Z (k), 1 》 := by
+  letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance curBTFieldProps
+  have hmul : ∀ (a b : ConcreteBTField (k - 1)), concrete_mul a b = a * b := fun a b => rfl
+  rw [pow_two]
+  change concrete_mul (Z (k + 1)) (Z (k + 1)) = 《 Z (k), 1 》
+  have h_split_Z_k_add_1 : split (k:=k+1) (h:=by omega) (Z (k + 1)) = (1, 0) := by
+    exact Eq.symm
+      (split_of_join (by omega) (Z (k + 1)) 1 0 rfl)
+  have h_mul_eq := curBTFieldProps.mul_eq (a:=Z (k+1)) (b:=Z (k+1))
+    (a₁:=1) (a₀:=0) (b₁:=1) (b₀:=0) (h_k:=by omega)
+    (by exact id (Eq.symm h_split_Z_k_add_1)) (by exact id (Eq.symm h_split_Z_k_add_1))
+  rw [h_mul_eq]
+  simp_rw [←zero_is_0, ←one_is_1]
+  simp only [Nat.add_one_sub_one]
+  simp_rw [prevBTFieldProps.mul_zero, prevBTFieldProps.mul_one,
+    prevBTFieldProps.add_zero, prevBTFieldProps.one_mul]
+  simp_rw [prevBTFieldProps.zero_add]
+
+def liftBTFieldProps (k : ℕ) (prevBTFResult : ConcreteBTFStepResult (k := k)) :
+  ConcreteBTFieldProps (k + 1) := {
+    zero_mul := concrete_zero_mul (prevBTFResult.toConcreteBTFieldProps),
+    zero_mul' := fun a => by
+      rw [←zero_is_0]; exact concrete_zero_mul (k := k + 1)
+        (prevBTFResult.toConcreteBTFieldProps) a
+    mul_zero := concrete_mul_zero (k := k + 1) (prevBTFResult.toConcreteBTFieldProps),
+    mul_zero' := fun a => by
+      rw [←zero_is_0]; exact concrete_mul_zero (k := k + 1)
+        (prevBTFResult.toConcreteBTFieldProps) a
+    one_mul := concrete_one_mul (k := k + 1) (prevBTFResult.toConcreteBTFieldProps),
+    mul_one := concrete_mul_one (k := k + 1) (prevBTFResult.toConcreteBTFieldProps),
+    mul_assoc := concrete_mul_assoc (k := k + 1)
+      (prevBTFResult.toConcreteBTFieldProps) (h_k := Nat.succ_pos k),
+    mul_comm := concrete_mul_comm (k := k + 1)
+      (prevBTFResult.toConcreteBTFieldProps) (h_k := Nat.succ_pos k),
+    mul_left_distrib := concrete_mul_left_distrib (k := k + 1)
+      (prevBTFResult.toConcreteBTFieldProps) (h_k := Nat.succ_pos k),
+    mul_right_distrib := concrete_mul_right_distrib (k := k + 1)
+      (prevBTFResult.toConcreteBTFieldProps) (h_k := Nat.succ_pos k),
+    add_assoc := add_assoc,
+    add_comm := add_comm,
+    add_zero := add_zero,
+    zero_add := zero_add,
+    add_neg := neg_add_cancel,
+    mul_inv_cancel := concrete_mul_inv_cancel (k:=k + 1)
+      (prevBTFResult),
+    mul_eq :=
+      fun a b h_k =>
+        concrete_mul_eq (k:=k + 1)
+          (prevBTFResult.toConcreteBTFieldProps) (a) (b)
+          (h_k:=h_k)
+  }
+
+def liftConcreteBTField (k : ℕ) (prevBTFResult : ConcreteBTFStepResult (k := k)) :
+  Field (ConcreteBTField (k + 1)) := by
+  exact mkFieldInstance (k:=k + 1) (props:=liftBTFieldProps (k:=k) (prevBTFResult:=prevBTFResult))
+
+/--
+The canonical ring homomorphism embedding `ConcreteBTField k` into
+`ConcreteBTField (k + 1)`.
+This is the `AdjoinRoot.of` map.
+-/
+def concreteCanonicalEmbedding (k : ℕ)
+    (prevBTFieldProps : ConcreteBTFieldProps (k := (k)))
+    (curBTFieldProps : ConcreteBTFieldProps (k := (k + 1))) :
+  letI := mkFieldInstance prevBTFieldProps
+  letI := mkFieldInstance curBTFieldProps
+  ConcreteBTField k →+* ConcreteBTField (k + 1) := by
+  letI := mkFieldInstance prevBTFieldProps
+  letI := mkFieldInstance curBTFieldProps
+  exact {
+    toFun := fun x => 《 zero (k:=k), x 》
+    map_one' := join_zero_one (k:=k + 1) (h_k:=by omega)
+    map_mul' := fun x y => by
+      -- ⊢ join ⋯ zero (x * y) = join ⋯ zero x * join ⋯ zero y
+      set hx := join (k:=k+1) (h_pos:=by omega) (hi:=zero (k:=k)) (lo:=x)
+      set hy := join (k:=k+1) (h_pos:=by omega) (hi:=zero (k:=k)) (lo:=y)
+      have h_mul_eq := curBTFieldProps.mul_eq
+
+      have h_x_split := split_of_join (k:=k + 1) (h_pos:=by omega)
+        (x:=hx) (zero (k:=k)) (x) (h_join:=rfl)
+      have h_y_split := split_of_join (k:=k + 1) (h_pos:=by omega)
+        (x:=hy) (zero (k:=k)) (y) (h_join:=rfl)
+      -- rhs
+      change join (by omega) zero (concrete_mul x y) = concrete_mul hx hy
+      have h_mul_eq_join_split := h_mul_eq hx hy (by omega) h_x_split h_y_split
+      rw [h_mul_eq_join_split]
+      simp only [Nat.add_one_sub_one]
+
+      have h_left : zero (k:=k) = concrete_mul x zero + concrete_mul y zero +
+        concrete_mul (concrete_mul zero zero) (Z k) := by
+        simp only [prevBTFieldProps.mul_zero, prevBTFieldProps.zero_mul]
+        rw! [zero_is_0]
+        norm_num
+
+      have h_right : concrete_mul x y = concrete_mul x y + concrete_mul zero zero:= by
+        rw [prevBTFieldProps.mul_zero, zero_is_0]
+        norm_num
+
+      rw [←h_left, ←h_right]
+    map_add' := fun x y => by
+      -- ⊢ join ⋯ zero (x + y) = join ⋯ zero x + join ⋯ zero y
+      simp only [join_add_join, Nat.add_one_sub_one]
+      rw [zero_is_0, zero_add]
+    map_zero' := by rw! [←zero_is_0, join_zero_zero, zero_is_0]
+  }
+
+instance instAlgebraLiftConcreteBTField (k : ℕ)
+  (prevBTFResult : ConcreteBTFStepResult (k := k)) :
+  letI := mkFieldInstance (prevBTFResult.toConcreteBTFieldProps)
+  letI := liftConcreteBTField (k:=k) prevBTFResult
+  Algebra (ConcreteBTField k) (ConcreteBTField (k + 1)) :=
+  letI := mkFieldInstance (prevBTFResult.toConcreteBTFieldProps)
+  letI := liftConcreteBTField (k:=k) prevBTFResult
+  RingHom.toAlgebra (R:=ConcreteBTField k) (S:=ConcreteBTField (k + 1))
+    (i:=(concreteCanonicalEmbedding (k:=k)
+      (prevBTFieldProps:=prevBTFResult.toConcreteBTFieldProps)
+      (curBTFieldProps:=liftBTFieldProps (k:=k) (prevBTFResult:=prevBTFResult))))
+
+lemma Z_square_mul_form
+  (k : ℕ)
+  (prev : ConcreteBTFStepResult (k := k)) :
+  letI : Field (ConcreteBTField k) := mkFieldInstance (prev.toConcreteBTFieldProps)
+  letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance (k:=k+1)
+    (props:=liftBTFieldProps (k:=k) (prevBTFResult:=prev))
+  letI : Algebra (ConcreteBTField k) (ConcreteBTField (k + 1)) :=
+    instAlgebraLiftConcreteBTField k prev
+  Z (k + 1) ^ 2
+    = Z (k + 1)
+      * (algebraMap (ConcreteBTField k) (ConcreteBTField (k + 1))) (Z k)
+      + 1 := by
+  let curProps := liftBTFieldProps (k:=k) (prevBTFResult:=prev)
+  letI : Field (ConcreteBTField k) := mkFieldInstance (prev.toConcreteBTFieldProps)
+  letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance (k:=k+1) (props:=curProps)
+  letI : Algebra (ConcreteBTField k) (ConcreteBTField (k + 1)) :=
+    instAlgebraLiftConcreteBTField k prev
+  -- use the join-form version and rewrite
+  have h := Z_square_eq (k:=k) (prevBTFieldProps:=prev.toConcreteBTFieldProps)
+    (curBTFieldProps:=curProps)
+  rw [h]
+  have h_Z_next: Z (k + 1) = 《 one (k:=k), zero (k:=k) 》 := rfl
+  change _ =  concrete_mul (a := Z (k + 1)) (b:=《 zero (k:=k), Z k 》) + 1
+  rw [h_Z_next]
+  rw [curProps.mul_eq (h_k:=by omega) (a:= 《 one (k:=k), zero (k:=k) 》)
+    (b:=《 zero (k:=k), Z k 》) (a₁:=1) (a₀:=0) (b₁:=0) (b₀:=Z k)
+    (_h_a:=by rw [split_of_join]; rfl) (_h_b:=by rw [split_of_join]; rfl)]
+  conv_rhs =>
+    enter [2]; change one; rw [←join_zero_one (k:=k + 1) (h_k:=by omega)];
+    simp only [Nat.add_one_sub_one]
+  rw [join_add_join]
+  simp only [Nat.add_one_sub_one]
+  have hmul : ∀ (a b : ConcreteBTField k), concrete_mul a b = a * b := fun a b => rfl
+  rw! [hmul, hmul, hmul, hmul, hmul]
+  simp only [mul_zero, mul_one, _root_.zero_add, zero_mul, _root_.add_zero, zero_is_0, one_is_1]
+
+lemma sum_inv_Z_next_eq
+  (k : ℕ)
+  (prev : ConcreteBTFStepResult (k := k)) :
+  letI : Field (ConcreteBTField k) := mkFieldInstance (prev.toConcreteBTFieldProps)
+  letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance (k:=k+1)
+    (props:=liftBTFieldProps (k:=k) (prevBTFResult:=prev))
+  letI : Algebra (ConcreteBTField k) (ConcreteBTField (k + 1)) :=
+    instAlgebraLiftConcreteBTField k prev
+  Z (k + 1) + (Z (k + 1))⁻¹ = (algebraMap (ConcreteBTField k) (ConcreteBTField (k + 1))) (Z k) := by
+  let curProps := liftBTFieldProps (k:=k) (prevBTFResult:=prev)
+  letI : Field (ConcreteBTField k) := mkFieldInstance (prev.toConcreteBTFieldProps)
+  letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance (k:=k+1) (props:=curProps)
+  letI : Algebra (ConcreteBTField k) (ConcreteBTField (k + 1)) :=
+    instAlgebraLiftConcreteBTField k prev
+  apply mul_left_cancel₀ (a := Z (k + 1)) (ha:=Z_ne_zero)
+  rw [mul_add, ←pow_two]
+  have h_mul_inv: Z (k + 1) * (Z (k + 1))⁻¹ = 1 := by
+    change concrete_mul (Z (k + 1)) (concrete_inv (Z (k + 1))) = one
+    exact curProps.mul_inv_cancel (a:= Z (k + 1)) (Z_ne_zero)
+  rw [h_mul_inv, Z_square_mul_form (k:=k) (prev:=prev), add_assoc]
+  rw [add_self_cancel, add_zero]
+-------------------------------------------------------------------------------------------
+def getBTFResult (k : ℕ) : ConcreteBTFStepResult k :=
   match k with
   | 0 =>
-    let result : ConcreteBTFStepResult 0 :={
+    let base : ConcreteBTFieldProps 0 := {
       mul_eq := fun a b h_k _ _ _ _ _ _ => by
         have h_l_ne_lt_0 := Nat.not_lt_zero 0
         exact absurd h_k h_l_ne_lt_0,
@@ -2123,194 +2132,211 @@ def InductiveConcreteBTFPropertiesAux (k : ℕ) (rec : ∀ m : ℕ, m < k → Co
       add_zero := add_zero,
       zero_add := zero_add,
       add_neg := neg_add_cancel,
-      mul_inv_cancel := concrete_mul_inv_cancel (k:=0) (recArg := rec)
+      mul_inv_cancel := fun a ha => by
+        rcases concrete_eq_zero_or_eq_one (a := a) (h_k_zero:=by omega) with (ha0 | ha1)
+        · subst ha0
+          simp only [concrete_zero_mul0]; exact False.elim (ha rfl)
+        · subst ha1
+          simp only [concrete_one_mul0];
+          simp only [concrete_inv, ↓reduceDIte]
+          exact rfl
     }
-    result
-  | k + 1 =>
-    -- rec : (m : ℕ) → m < k + 1 → ConcreteBTFStepResult m
-    let result : ConcreteBTFStepResult (k + 1) :={
-      zero_mul := concrete_zero_mul (recArg := rec),
-      zero_mul' := fun a => by rw [←zero_is_0]; exact concrete_zero_mul (recArg := rec) a
-      mul_zero := concrete_mul_zero (recArg := rec),
-      mul_zero' := fun a => by rw [←zero_is_0]; exact concrete_mul_zero (recArg := rec) a
-      one_mul := concrete_one_mul (recArg := rec),
-      mul_one := concrete_mul_one (recArg := rec),
-      mul_assoc := concrete_mul_assoc (recArg := rec) (h_k := Nat.succ_pos k),
-      mul_comm := concrete_mul_comm (recArg := rec) (h_k := Nat.succ_pos k),
-      mul_left_distrib := concrete_mul_left_distrib (recArg := rec) (h_k := Nat.succ_pos k),
-      mul_right_distrib := concrete_mul_right_distrib (recArg := rec) (h_k := Nat.succ_pos k),
-      add_assoc := add_assoc,
-      add_comm := add_comm,
-      add_zero := add_zero,
-      zero_add := zero_add,
-      add_neg := neg_add_cancel,
-      mul_inv_cancel := concrete_mul_inv_cancel (k:=k + 1) (recArg := rec),
-      mul_eq := concrete_mul_eq (k:=k + 1) (recArg := rec),
+    letI : Field (ConcreteBTField 0) := mkFieldInstance (k:=0) (props:=base)
+    letI instFintype0: Fintype (ConcreteBTField 0) := {
+      elems := {0, 1}
+      complete := fun x => by
+        rcases concrete_eq_zero_or_eq_one (a := x) (h_k_zero:=by omega) with (ha0 | ha1)
+        · rw [zero_is_0] at ha0
+          simp only [ha0, Finset.mem_insert, Finset.mem_singleton, zero_ne_one, or_false]
+        · rw [one_is_1] at ha1
+          simp only [ha1, Finset.mem_insert, one_ne_zero, Finset.mem_singleton, or_true]
     }
-    result
+    have hZ0_eq_1: Z 0 = 1 := rfl
+    let specialElement : ConcreteBTField 0 := 1
+    let specialElementNeZero : NeZero specialElement := instNeZeroConcreteBTFieldOfNat
+    let newPoly : (ConcreteBTField 0)[X] := definingPoly (F:=ConcreteBTField 0) (s:=specialElement)
+    have nat_deg_poly_is_2 : newPoly.natDegree = 2 := natDegree_definingPoly specialElement
+    have coeffOfX_0 : newPoly.coeff 0 = 1 := definingPoly_coeffOf0 specialElement
+    have coeffOfX_1 : newPoly.coeff 1 = specialElement := definingPoly_coeffOf1 specialElement
+    let instIrreduciblePoly : Irreducible newPoly := by
+      by_contra h_not_irreducible
+      -- ¬Irreducible p ↔ ∃ c₁ c₂, p.coeff 0 = c₁ * c₂ ∧ p.coeff 1 = c₁ + c₂
+      obtain ⟨c₁, c₂, h_mul, h_add⟩ :=
+        (Monic.not_irreducible_iff_exists_add_mul_eq_coeff
+          (definingPoly_is_monic specialElement) (nat_deg_poly_is_2)).mp h_not_irreducible
+      rw [coeffOfX_0] at h_mul -- 1 = c₁ * c₂
+      rw [coeffOfX_1] at h_add -- specialElement = c₁ + c₂
+      -- since c₁, c₂ ∈ GF(2), c₁ * c₂ = 1 => c₁ = c₂ = 1
+      have c1_c2_eq_one : c₁ = 1 ∧ c₂ = 1 := by
+        -- In GF(2), elements are only 0 or 1
+        have c1_cases : c₁ = 0 ∨ c₁ = 1 := by
+          exact concrete_eq_zero_or_eq_one (a:=c₁) (h_k_zero:=by omega)
+        have c2_cases : c₂ = 0 ∨ c₂ = 1 := by
+          exact concrete_eq_zero_or_eq_one (a:=c₂) (h_k_zero:=by omega)
+        -- Case analysis on c₁ and c₂
+        rcases c1_cases with c1_zero | c1_one
+        · -- If c₁ = 0
+          rw [c1_zero] at h_mul
+          -- Then 0 * c₂ = 1, contradiction
+          simp at h_mul
+        · -- If c₁ = 1
+          rcases c2_cases with c2_zero | c2_one
+          · -- If c₂ = 0
+            rw [c2_zero] at h_mul
+            -- Then 1 * 0 = 1, contradiction
+            simp at h_mul
+          · -- If c₂ = 1
+            -- Then we have our result
+            exact ⟨c1_one, c2_one⟩
+      -- Now we can show specialElement = 0
+      have specialElement_eq_zero : specialElement = 0 := by
+        rw [h_add]  -- Use c₁ + c₂ = specialElement
+        rw [c1_c2_eq_one.1, c1_c2_eq_one.2]  -- Replace c₁ and c₂ with 1
+        -- In GF(2), 1 + 1 = 0
+        exact rfl
+      -- But we know specialElement = 1
+      have specialElement_eq_one : specialElement = 1 := by rfl
+      rw [specialElement_eq_zero] at specialElement_eq_one
+      -- (0 : GF(2)) = (1 : GF(2))
+      have one_ne_zero_in_gf2 : (1 : ConcreteBTField 0) ≠ (0 : ConcreteBTField 0) := by
+        exact NeZero.out
+      exact one_ne_zero_in_gf2 specialElement_eq_zero -- contradiction
 
-def InductiveConcreteBTFProperties (k : ℕ) : ConcreteBTFStepResult k :=
-  WellFounded.fix (measure id).wf (fun k rec => InductiveConcreteBTFPropertiesAux k rec) k
+    let result : ConcreteBTFStepResult 0 := {
+      toConcreteBTFieldProps := base,
+      instFintype := instFintype0,
+      fieldFintypeCard := rfl,
+      sumZeroIffEq := fun x y => by
+        constructor
+        · -- (→) If x + y = 0, then x = y
+          intro h_sum_zero
+          -- Case analysis on x
+          rcases concrete_eq_zero_or_eq_one (a := x) (h_k_zero:=by omega) with x_zero | x_one
+          · -- Case x = 0
+            rcases concrete_eq_zero_or_eq_one (a := y) (h_k_zero:=by omega) with y_zero | y_one
+            · -- Case y = 0
+              rw [x_zero, y_zero]
+            · -- Case y = 1
+              simp only [x_zero, y_one] at h_sum_zero
+              contradiction
+          · -- Case x = 1
+            rcases concrete_eq_zero_or_eq_one (a := y) (h_k_zero:=by omega) with y_zero | y_one
+            · -- Case y = 0
+              simp only [x_one, y_zero] at h_sum_zero
+              contradiction
+            · -- Case y = 1
+              rw [x_one, y_one]
+        · -- (←) If x = y, then x + y = 0
+          intro h_eq
+          rw [h_eq]
+          -- In GF(2), x + x = 0 for any x
+          rcases concrete_eq_zero_or_eq_one (a := y) (h_k_zero:=by omega) with y_zero | y_one
+          · rw [y_zero]; rfl
+          · rw [y_one]; rfl
+      traceMapEvalAtRootsIs1 := by
+        exact {
+          element_trace := by
+            rw [Nat.pow_zero] -- 2^0 = 1
+            rw [Finset.range_one] -- range 1 = {0}
+            norm_num
+            exact hZ0_eq_1
+          inverse_trace := by
+            rw [Nat.pow_zero] -- 2^0 = 1
+            simp [Finset.range_one] -- range 1 = {0}
+            exact hZ0_eq_1
+        },
+      instIrreduciblePoly := instIrreduciblePoly
+    }
+    result
+  | k + 1 => by
+    let prevBTFResult := getBTFResult k
+    let baseProps := liftBTFieldProps (k:=k) (prevBTFResult:=prevBTFResult)
+
+    letI inst_Field_ConcreteBTField_k: Field (ConcreteBTField k) :=
+      mkFieldInstance (k:=k) (props:=prevBTFResult.toConcreteBTFieldProps)
+
+    letI instFintype_ConcreteBTField_k: Fintype (ConcreteBTField k) := prevBTFResult.instFintype
+    letI : Finite (ConcreteBTField k) := by exact Fintype.finite instFintype_ConcreteBTField_k
+    have equivRelation: ConcreteBTField (k + 1) ≃ ConcreteBTField (k) × ConcreteBTField (k)
+      := equivProd (k:=k + 1) (by omega)
+    letI: Fintype (ConcreteBTField k × ConcreteBTField k)
+      := instFintypeProd (α:=ConcreteBTField k) (β:=ConcreteBTField k)
+
+    let instFintype : Fintype (ConcreteBTField (k + 1)) := by
+      exact Fintype.ofEquiv (ConcreteBTField (k) × ConcreteBTField (k)) equivRelation.symm
+
+    let fieldFintypeCard : Fintype.card (ConcreteBTField (k + 1)) = 2^(2^(k + 1)) := by
+      let e := equivRelation.symm
+      have equivCard := Fintype.ofEquiv_card equivRelation.symm
+      let res := Fintype.card_prod (α:=ConcreteBTField k) (β:=ConcreteBTField k)
+      rw [Fintype.card_prod (α:=ConcreteBTField k) (β:=ConcreteBTField k)] at equivCard
+      rw [prevBTFResult.fieldFintypeCard] at equivCard
+      have card_simp : 2 ^ 2 ^ k * 2 ^ 2 ^ k = 2 ^ (2 ^ k + 2 ^ k) := by rw [Nat.pow_add]
+      have exp_simp : 2 ^ k + 2 ^ k = 2 ^ (k + 1) := by
+        rw [←Nat.mul_two, Nat.pow_succ]
+      rw [card_simp, exp_simp] at equivCard
+      exact equivCard
+
+    letI inst_Fintype_ConcreteBTField_k: Fintype (ConcreteBTField (k)) := prevBTFResult.instFintype
+    letI : Field (ConcreteBTField (k + 1)) := mkFieldInstance (k:=k + 1) (props:=baseProps)
+    let sumZeroIffEq := fun x y => -- due to our definition of addition = BitVec.xor
+        add_eq_zero_iff_eq (k:=(k + 1)) (a:=x) (b:=y)
+    letI instAlgebra: Algebra (ConcreteBTField k) (ConcreteBTField (k + 1)):=
+      instAlgebraLiftConcreteBTField k prevBTFResult
+    let traceMapEvalAtRootsIs1 := traceMapProperty_of_quadratic_extension
+      (F_prev:=ConcreteBTField k) (t1:=Z k) (k:=k)
+      (fintypeCardPrev:=prevBTFResult.fieldFintypeCard)
+      (F_cur:=ConcreteBTField (k + 1)) (u:=Z (k + 1)) (h_rel:= {
+        sum_inv_eq := sum_inv_Z_next_eq (k:=k) (prev:=prevBTFResult)
+        h_u_square := Z_square_mul_form (k:=k) (prev:=prevBTFResult)
+      }) (prev_trace_map := prevBTFResult.traceMapEvalAtRootsIs1
+      ) (sumZeroIffEq := sumZeroIffEq)
+
+    letI : CharP (ConcreteBTField (k + 1)) 2 :=
+      charP_eq_2_of_add_self_eq_zero (F:=(ConcreteBTField (k + 1)))
+      (sumZeroIffEq:=sumZeroIffEq)
+
+    let instIrreduciblePoly :=
+      irreducible_quadratic_defining_poly_of_traceMap_eq_1
+        (F:=(ConcreteBTField (k + 1))) (s:=Z (k + 1)) (k:=k+1)
+        (trace_map_prop := traceMapEvalAtRootsIs1) (fintypeCard := fieldFintypeCard)
+
+    let result : ConcreteBTFStepResult (k + 1) := {
+      toConcreteBTFieldProps := baseProps,
+      instFintype := instFintype,
+      fieldFintypeCard := fieldFintypeCard,
+      sumZeroIffEq := sumZeroIffEq,
+      traceMapEvalAtRootsIs1 := traceMapEvalAtRootsIs1,
+      instIrreduciblePoly := instIrreduciblePoly
+    }
+
+    exact result
 
 instance instFieldConcrete {k : ℕ} : Field (ConcreteBTField k) :=
-  mkFieldInstance (InductiveConcreteBTFProperties k)
-
-lemma cast_ConcreteBTField_eq (k m : ℕ) (h_eq : k = m) :
-  ConcreteBTField k = ConcreteBTField m := by
-  subst h_eq
-  rfl
-
-lemma cast_mul (m n : ℕ) {x y : ConcreteBTField m} (h_eq : m = n) :
-  (cast (by exact cast_ConcreteBTField_eq m n h_eq) (x * y)) =
-  (cast (by exact cast_ConcreteBTField_eq m n h_eq) x) *
-  (cast (by exact cast_ConcreteBTField_eq m n h_eq) y) := by
-  subst h_eq
-  rfl
+  mkFieldInstance (getBTFResult k).toConcreteBTFieldProps
 
 /-- adjoined root of poly k, generator of successor field BTField (k + 1) -/
 @[simp]
 def 𝕏 (k : ℕ) : ConcreteBTField (k + 1) := Z (k + 1)
 
-end BaseDefinitions
+end TowerFieldsConstruction
 
-section Tests
+/- Algebra structure and tower algebra maps -/
+section ConcreteBTFieldAlgebraConstruction
 
--- #check instFieldConcrete (k:=5)
--- #check instFieldConcrete (k:=2)
-
-#eval bitVecToString 5 (BitVec.ofNat 5 1)  -- 5 in 4 bits is 0101
-#eval split (k:=5) (by omega) (fromNat (k:=5) 1) -- 1 => (0, 1)
-#eval (Z 2).toBitString -- 01|00
-#eval (one (k:=2)).toBitString -- 0001
-#eval (zero (k:=2)).toBitString -- 0000
-
-#eval (fromNat (k:=2) 3).toBitString
-#eval (fromNat (k:=3) 3).toBitString
-#eval (fromNat (k:=4) 3).toBitString
-
-#eval Z (0)
-#eval Z (1)
-#eval Z (2)
-#eval Z (3)
-#eval Z (4)
-#eval Z (5)
-#eval Z (6)
-
-#eval (fromNat (k:=1) 3) * (fromNat (k:=1) 3) -- 9#4
-#eval (fromNat (k:=4) 3) * (fromNat (k:=4) 3) -- 9#4
-#eval (fromNat (k:=2) 3) * (fromNat (k:=2) 3) -- 9#4
-#eval (fromNat (k:=5) 7) * (fromNat (k:=5) 20) -- 9#4
-#eval add (fromNat (k:=9) 1) (fromNat (k:=9) 7) -- -- 000001 xor 001101 = 001100 = 6#512
-#eval (fromNat (k:=9) 1) + (fromNat (k:=9) 7)
-
--- Test function to bundle multiple evaluations
-def runTests : IO Unit := do
-  -- Test k = 0 (field of order 2, like GF(2))
-  let k0 : ℕ := 0
-  let zero0 := zero (k := k0)
-  let one0 := one (k := k0)
-  let five0 := fromNat (k := k0) 5  -- 5 mod 2 = 1 in k=0
-  IO.println s!"--- Tests for k = {k0} (width = {width k0}) ---"
-  IO.println s!"zero = {zero0.toBitString}"
-  IO.println s!"one = {one0.toBitString}"
-  IO.println s!"fromNat 5 = {five0.toBitString}"
-  IO.println s!"zero + one = {(add zero0 one0).toBitString}"
-  IO.println s!"one + one = {(add one0 one0).toBitString}"
-  IO.println s!"one * one = {(concrete_mul one0 one0).toBitString}"
-  IO.println s!"zero * one = {(concrete_mul zero0 one0).toBitString}"
-
-  -- Test k = 1 (field of order 4, like GF(4))
-  let k1 : ℕ := 1
-  let zero1 := zero (k := k1)
-  let one1 := one (k := k1)
-  let two1 := fromNat (k := k1) 2
-  let three1 := fromNat (k := k1) 3
-  IO.println s!"--- Tests for k = {k1} (width = {width k1}) ---"
-  IO.println s!"zero = {zero1.toBitString}"
-  IO.println s!"one = {one1.toBitString}"
-  IO.println s!"fromNat 2 = {two1.toBitString}"
-  IO.println s!"fromNat 3 = {three1.toBitString}"
-  IO.println s!"one + two = {(add one1 two1).toBitString}"
-  IO.println s!"two + three = {(add two1 three1).toBitString}"
-  IO.println s!"one * two = {(concrete_mul one1 two1).toBitString}"
-  IO.println s!"two * three = {(concrete_mul two1 three1).toBitString}"
-
-  -- Test k = 2 (field of order 16, like GF(16))
-  let k2 : ℕ := 2
-  let zero2 := zero (k := k2)
-  let one2 := one (k := k2)
-  let five2 := fromNat (k := k2) 5
-  let seven2 := fromNat (k := k2) 7
-  IO.println s!"--- Tests for k = {k2} (width = {width k2}) ---"
-  IO.println s!"zero = {zero2.toBitString}"
-  IO.println s!"one = {one2.toBitString}"
-  IO.println s!"fromNat 5 = {five2.toBitString}"
-  IO.println s!"fromNat 7 = {seven2.toBitString}"
-  IO.println s!"five + seven = {(add five2 seven2).toBitString}"
-  IO.println s!"five * one = {(concrete_mul five2 one2).toBitString}"
-  IO.println s!"five * seven = {(concrete_mul five2 seven2).toBitString}"
-
--- Run the tests
-#eval runTests
-
-end Tests
-
-section ConcreteBTFieldAlgebra
-/--
-The canonical ring homomorphism embedding `ConcreteBTField k` into
-`ConcreteBTField (k + 1)`.
-This is the `AdjoinRoot.of` map.
--/
-def concreteCanonicalEmbedding (k : ℕ) :
-    ConcreteBTField k →+* ConcreteBTField (k + 1) := by
-  exact {
-    toFun := fun x => 《 zero (k:=k), x 》
-    map_one' := join_zero_one (k:=k + 1) (h_k:=by omega)
-    map_mul' := fun x y => by
-      -- ⊢ join ⋯ zero (x * y) = join ⋯ zero x * join ⋯ zero y
-      set hx := join (k:=k+1) (h_pos:=by omega) (hi:=zero (k:=k)) (lo:=x)
-      set hy := join (k:=k+1) (h_pos:=by omega) (hi:=zero (k:=k)) (lo:=y)
-      have h_inductive_succ := InductiveConcreteBTFProperties (k:=k + 1)
-      have h_inductive_cur := InductiveConcreteBTFProperties (k:=k)
-      have h_mul_eq := h_inductive_succ.mul_eq
-
-      have h_x_split := split_of_join (k:=k + 1) (h_pos:=by omega)
-        (x:=hx) (zero (k:=k)) (x) (h_join:=rfl)
-      have h_y_split := split_of_join (k:=k + 1) (h_pos:=by omega)
-        (x:=hy) (zero (k:=k)) (y) (h_join:=rfl)
-      have h_mul_eq_join_split := h_mul_eq hx hy (by omega) h_x_split h_y_split
-      -- rhs
-      change join (by omega) zero (concrete_mul x y) = concrete_mul hx hy
-      rw [h_mul_eq_join_split]
-      simp only [Nat.add_one_sub_one]
-
-      have h_left : zero (k:=k) = concrete_mul x zero + concrete_mul y zero +
-        concrete_mul (concrete_mul zero zero) (Z k) := by
-        simp only [h_inductive_cur.mul_zero, h_inductive_cur.zero_mul]
-        rw! [zero_is_0]
-        norm_num
-
-      have h_right : concrete_mul x y = concrete_mul x y + concrete_mul zero zero:= by
-        rw [h_inductive_cur.mul_zero, zero_is_0]
-        norm_num
-
-      rw [←h_left, ←h_right]
-    map_add' := fun x y => by
-      -- ⊢ join ⋯ zero (x + y) = join ⋯ zero x + join ⋯ zero y
-      simp only [join_add_join, Nat.add_one_sub_one]
-      rw [zero_is_0, zero_add]
-    map_zero' := by rw! [←zero_is_0, join_zero_zero, zero_is_0]
-  }
+def canonicalAlgMap (k : ℕ) := concreteCanonicalEmbedding (k:=k)
+  (prevBTFieldProps:= ((getBTFResult k).toConcreteBTFieldProps))
+  (curBTFieldProps:= ((getBTFResult (k + 1)).toConcreteBTFieldProps))
 
 /-- `Z(k+1)` is the adjoined root of `poly k` to `ConcreteBTField (k+1)`, so it is not
-lifted to `ConcreteBTField (k+1)` by `concreteCanonicalEmbedding` -/
+lifted to `ConcreteBTField (k+1)` by `canonicalAlgMap` -/
 @[simp]
 theorem generator_is_not_lifted_to_succ (k : ℕ) :
-  ∀ x : ConcreteBTField k, concreteCanonicalEmbedding k x ≠ Z (k + 1) := by
+  ∀ x : ConcreteBTField k, canonicalAlgMap (k:=k) x ≠ Z (k + 1) := by
   by_contra hx
   simp only [ne_eq, not_forall, Decidable.not_not] at hx
-  -- unfold concreteCanonicalEmbedding at hx
-  have h_x_join: ∃ x: ConcreteBTField k,
+  -- unfold canonicalAlgMap at hx
+  have h_x_join : ∃ x : ConcreteBTField k,
     《 zero (k:=k), x 》 = Z (k + 1) := by
     exact hx
   have h_Z_split := split_Z (k:=k + 1) (h_pos:=by omega)
@@ -2338,10 +2364,25 @@ theorem ConcreteBTField.RingHom_eq_of_dest_eq (k m n : ℕ) (h_eq : m = n) :
   rfl
 
 @[simp]
+theorem ConcreteBTField.RingHom_eq_of_source_eq (k n m : ℕ) (h_eq : k = n) :
+    (ConcreteBTField k →+* ConcreteBTField m)
+    = (ConcreteBTField n →+* ConcreteBTField m) := by
+  subst h_eq
+  rfl
+
+@[simp]
 theorem ConcreteBTField.RingHom_cast_dest_apply (k m n : ℕ) (h_eq : m = n)
   (f : ConcreteBTField k →+* ConcreteBTField m) (x : ConcreteBTField k) :
     (cast (ConcreteBTField.RingHom_eq_of_dest_eq (k:=k) (m:=m) (n:=n) h_eq) f) x
     = cast (by apply cast_ConcreteBTField_eq (h_eq:=h_eq)) (f x) := by
+  subst h_eq
+  rfl
+
+@[simp]
+theorem ConcreteBTField.RingHom_cast_source_apply (k n m : ℕ) (h_eq : k = n)
+  (f : ConcreteBTField k →+* ConcreteBTField m) (x : ConcreteBTField n) :
+    (cast (ConcreteBTField.RingHom_eq_of_source_eq (k:=k) (n:=n) (m:=m) h_eq) f) x
+    = f (cast (by apply cast_ConcreteBTField_eq (h_eq:=h_eq.symm)) x) := by
   subst h_eq
   rfl
 
@@ -2361,7 +2402,7 @@ def concreteTowerAlgebraMap (l r : ℕ) (h_le : l ≤ r) :
     let next_embedding : ConcreteBTField (r - 1) →+* ConcreteBTField r := by
       have ringHomEq :=
         ConcreteBTField.RingHom_eq_of_dest_eq (k:=r - 1) (m:=r) (n:=r - 1 + 1) (by omega)
-      exact Eq.mp ringHomEq.symm (concreteCanonicalEmbedding (r - 1))
+      exact Eq.mp ringHomEq.symm (canonicalAlgMap (r - 1))
     exact next_embedding.comp map_to_r_sub_1
 
 lemma concreteTowerAlgebraMap_id (k : ℕ) :
@@ -2370,7 +2411,7 @@ lemma concreteTowerAlgebraMap_id (k : ℕ) :
   exact (Ne.dite_eq_left_iff fun h a ↦ h rfl).mpr rfl
 
 lemma concreteTowerAlgebraMap_succ_1 (k : ℕ) :
-  concreteTowerAlgebraMap (l:=k) (r:=k + 1) (h_le:=by omega) = concreteCanonicalEmbedding k := by
+  concreteTowerAlgebraMap (l:=k) (r:=k + 1) (h_le:=by omega) = canonicalAlgMap k := by
   unfold concreteTowerAlgebraMap
   simp only [Nat.left_eq_add, one_ne_zero, ↓reduceDIte,
     Nat.add_one_sub_one, eq_mp_eq_cast, cast_eq]
@@ -2460,10 +2501,10 @@ theorem concreteTowerAlgebraMap_assoc :
       -- A = (23) ∘ 1
       rw [←concreteTowerAlgebraMap_succ]
 /--
-**Formalization of Cross - Level Algebra**  : For any `k ≤ τ`, `ConcreteBTField τ` is an
+**Formalization of Cross - Level Algebra** : For any `k ≤ τ`, `ConcreteBTField τ` is an
 algebra over `ConcreteBTField k`.
 -/
-instance instAlgebraTowerConcreteBTF: AlgebraTower (ConcreteBTField) where
+instance instAlgebraTowerConcreteBTF : AlgebraTower (ConcreteBTField) where
   algebraMap := concreteTowerAlgebraMap
   commutes' := by
     intro i j h r x
@@ -2473,7 +2514,7 @@ instance instAlgebraTowerConcreteBTF: AlgebraTower (ConcreteBTField) where
     exact concreteTowerAlgebraMap_assoc k j i h1 h2
 
 def ConcreteBTFieldAlgebra {l r : ℕ} (h_le : l ≤ r) :
-    Algebra (ConcreteBTField l) (ConcreteBTField r) := by exact AlgebraTower.toAlgebra h_le
+    Algebra (ConcreteBTField l) (ConcreteBTField r) := instAlgebraTowerConcreteBTF.toAlgebra h_le
 
 -- Since `join_via_add_smul` is equal `join`, it is also inverse of `split`
 def join_via_add_smul (k : ℕ) (h_pos : k > 0) (hi_btf lo_btf : ConcreteBTField (k - 1)) :
@@ -2489,7 +2530,7 @@ lemma split_algebraMap_eq_zero_x {k : ℕ} (h_pos : k > 0) (x : ConcreteBTField 
   letI instAlgebra := ConcreteBTFieldAlgebra (l:=k-1) (r:=k) (h_le:=by omega)
   split h_pos (algebraMap (ConcreteBTField (k - 1)) (ConcreteBTField k) x) = (0, x) := by
   -- this one is long because of the `cast` stuff, but it should be quite straightforward
-  -- via def of `concreteCanonicalEmbedding` and `split_of_join`
+  -- via def of `canonicalAlgMap` and `split_of_join`
   apply Eq.symm
   letI instAlgebra := ConcreteBTFieldAlgebra (l:=k-1) (r:=k) (h_le:=by omega)
   set mappedVal := algebraMap (ConcreteBTField (k - 1)) (ConcreteBTField k) x
@@ -2506,14 +2547,17 @@ lemma split_algebraMap_eq_zero_x {k : ℕ} (h_pos : k > 0) (x : ConcreteBTField 
   rw! (castMode:=.all) [Nat.sub_one_add_one (by omega)] at h_concrete_embedding_succ_1
   rw! (castMode:=.all) [h_concrete_embedding_succ_1]
   rw [eqRec_eq_cast]
-  rw [ConcreteBTField.RingHom_cast_dest_apply (f:=concreteCanonicalEmbedding (k - 1))
+  rw [ConcreteBTField.RingHom_cast_dest_apply (f:=canonicalAlgMap (k - 1))
     (x:=x) (h_eq:=by omega)]
-  rw [concreteCanonicalEmbedding]
-  -- ⊢ cast ⋯ (join ⋯ zero x) = join h_pos zero x => How to get rid of these cast stuff?
-  simp only [RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk]
   have h_k_sub_1_add_1 : k - 1 + 1 = k := by omega
   conv_lhs => enter [2]; rw! (castMode:=.all) [h_k_sub_1_add_1]; simp only
-  rw [eqRec_eq_cast, eqRec_eq_cast, cast_cast, cast_eq, eqRec_eq_cast, cast_eq, cast_eq]
+  rw [eqRec_eq_cast, eqRec_eq_cast, cast_cast, cast_eq]
+  rw [ConcreteBTField.RingHom_cast_dest_apply (k:=k - 1) (m:=k - 1 + 1) (n:=k)
+    (h_eq:=by omega) (f:=canonicalAlgMap (k - 1)) (x:=x)]
+  simp only [canonicalAlgMap, concreteCanonicalEmbedding, RingHom.coe_mk, MonoidHom.coe_mk,
+    OneHom.coe_mk]
+  rw [cast_join (k:=k - 1 + 1) (h_pos:=by omega) (n:=k) (heq:=by omega)]
+  simp only [Nat.add_one_sub_one, cast_eq, cast_cast]
 
 lemma algebraMap_succ_eq_zero_x {k : ℕ} (h_pos : k > 0) (x : ConcreteBTField (k - 1)) :
   letI instAlgebra := ConcreteBTFieldAlgebra (l:=k-1) (r:=k) (h_le:=by omega)
@@ -2527,13 +2571,13 @@ lemma algebraMap_eq_zero_x {i j : ℕ} (h_le : i < j) (x : ConcreteBTField i) :
     algebraMap (ConcreteBTField i) (ConcreteBTField j) x
       = 《 0, algebraMap (ConcreteBTField i) (ConcreteBTField (j-1)) x 》 := by
   set d := j - i with d_eq
-  induction hd: d with
+  induction hd : d with
   | zero =>
-    have h_i_eq_j: i = j := by omega
-    have h_i_ne_j: i ≠ j := by omega
+    have h_i_eq_j : i = j := by omega
+    have h_i_ne_j : i ≠ j := by omega
     contradiction
   | succ d' => -- this one does not even use inductive hypothesis
-    have h_j_eq: j = i + d' + 1 := by omega
+    have h_j_eq : j = i + d' + 1 := by omega
     change (concreteTowerAlgebraMap (l:=i) (r:=j) (h_le:=by omega)) x =
       《 0, ((concreteTowerAlgebraMap (l:=i) (r:=j-1) (h_le:=by omega)) x) 》
     rw! [h_j_eq]
@@ -2555,8 +2599,8 @@ lemma split_smul_Z_eq_zero_x {k : ℕ} (h_pos : k > 0) (x : ConcreteBTField (k -
   set xLifted := algebraMap (ConcreteBTField (k - 1)) (ConcreteBTField k) x with h_xLifted
   -- ⊢ split h_pos (xLifted * Z k) = (0, x)
   -- {a₁ a₀ b₁ b₀ : ConcreteBTField (k - 1)},
-  have hCBTF := (InductiveConcreteBTFProperties k)
-  have hCBTFPrev := (InductiveConcreteBTFProperties (k-1))
+  have hCBTF := (getBTFResult k)
+  have hCBTFPrev := (getBTFResult (k-1))
   have h_x_mul_Z := hCBTF.mul_eq (k:=k) (a:=xLifted) (b:=Z k)
     (a₁:=0) (a₀:=x) (b₁:=1) (b₀:=0) (h_k := by omega)
     (by exact id (Eq.symm h_split_xLifted)) (by exact id (Eq.symm h_split_Z))
@@ -2600,7 +2644,7 @@ theorem join_eq_join_via_add_smul {k : ℕ} (h_pos : k > 0)
   simp only [_root_.add_zero, _root_.zero_add]
 
 lemma split_join_via_add_smul_eq_iff_split {k : ℕ} (h_pos : k > 0)
-    (hi_btf lo_btf : ConcreteBTField (k - 1)):
+    (hi_btf lo_btf : ConcreteBTField (k - 1)) :
     split (k:=k) (h:=by omega) (x:=join_via_add_smul (k:=k) (h_pos:=h_pos) hi_btf lo_btf) =
       (hi_btf, lo_btf) := by
   rw [split_of_join (k:=k) (h_pos:=h_pos)
@@ -2681,14 +2725,37 @@ instance (priority := 1000) algebra_adjacent_tower (l : ℕ) :
 
 lemma algebraMap_adjacent_tower_def (l : ℕ) :
     (algebraMap (ConcreteBTField l) (ConcreteBTField (l + 1))) =
-    concreteCanonicalEmbedding l := by
+    canonicalAlgMap l := by
   unfold algebra_adjacent_tower
   rw [ConcreteBTFieldAlgebra_def]
   exact concreteTowerAlgebraMap_succ_1 l
 
-end ConcreteBTFieldAlgebra
+lemma aeval_definingPoly_at_Z_succ (k : ℕ) :
+  (aeval (Z (k + 1))) (definingPoly (s:=Z (k))) = 0 := by
+  rw [aeval_def]
+  set f := algebraMap (ConcreteBTField k) (ConcreteBTField (k + 1))
+  have h_f_is_canonical_embedding :
+    f = concreteTowerAlgebraMap (l:=k) (r:=k+1) (h_le:=by omega) := by rfl
+  rw [definingPoly, eval₂_add, eval₂_add] -- break down into sum of terms
+  rw [eval₂_X_pow]
+  rw [C_mul']
+  -- ⊢ Z (k + 1) ^ 2 + eval₂ f (Z (k + 1)) (Z k • X) + eval₂ f (Z (k + 1)) 1 = 0
+  simp only [eval₂_one, eval₂_smul, eval₂_X]
+  -- Z_square_mul_form uses instAlgebraLiftConcreteBTField internally
+  rw [Z_square_mul_form (k:=k) (prev:=(getBTFResult (k:=k)))]
+  rw [add_assoc]
+  rw [algebraMap, Algebra.algebraMap, instAlgebraLiftConcreteBTField]
+  simp only
+  -- f uses ConcreteBTFieldAlgebra, it's same as instAlgebraLiftConcreteBTField at step = 1
+  rw [h_f_is_canonical_embedding, concreteTowerAlgebraMap_succ_1]
+  simp only [canonicalAlgMap]; rw [mul_comm]
+  rw [add_self_cancel]
+
+end ConcreteBTFieldAlgebraConstruction
 
 noncomputable section ConcreteMultilinearBasis
+/- Multilinear basis and defining polynomials -/
+
 open Module
 
 @[simp]
@@ -2755,7 +2822,7 @@ def basisSucc (k : ℕ) : Basis (Fin 2) (ConcreteBTField k) (ConcreteBTField (k 
   apply @Basis.mk (ι:=Fin 2) (R:=ConcreteBTField k) (M:=ConcreteBTField (k + 1))
     _ _ instAlgebra.toModule (v:=fun i => generator ^ (i : ℕ))
   · -- This proof now works smoothly.
-    set basisFunc := fun (i: Fin 2) => (generator) ^ (i: ℕ)
+    set basisFunc := fun (i : Fin 2) => (generator) ^ (i : ℕ)
     refine linearIndependent_fin2'.mpr ?_
     constructor
     · simp only [basisFunc]
@@ -2770,7 +2837,7 @@ def basisSucc (k : ℕ) : Basis (Fin 2) (ConcreteBTField k) (ConcreteBTField (k 
       change (¬(concreteTowerAlgebraMap (l:=k) (r:=k+1) (h_le:=by omega) a) * 1 = generator)
       rw [mul_one]
       rw [concreteTowerAlgebraMap_succ_1]
-      -- ⊢ ¬(concreteCanonicalEmbedding k) a = generator
+      -- ⊢ ¬(canonicalAlgMap k) a = generator
       exact generator_is_not_lifted_to_succ k a
   · intro x hx
     -- proof that the span of powers of generator is ConcreteBTField (k+1)
@@ -2845,72 +2912,21 @@ def powerBasisSucc (k : ℕ) :
 lemma powerBasisSucc_gen (k : ℕ) :
   (powerBasisSucc k).gen = (Z (k + 1)) := by rfl
 
-section DefiningPoly
-
-/-  This section proves the theorems related to the defining polynomial of `ConcreteBTField k`
-- `definingPoly k` is Monic, this is trivial
-- `definingPoly k` is irreducible over `ConcreteBTField k`
-- `definingPoly k` is the minimal polynomial of `Z (k+1)` over `ConcreteBTField (k+1)`,
-  i.e. the poly is lifted to `ConcreteBTField (k+1)`
--/
-
-lemma Z_square_eq (k : ℕ) :
-  Z (k + 1) ^ 2 = 《 Z (k), 1 》 := by
-  rw [pow_two]
-  change concrete_mul (Z (k + 1)) (Z (k + 1)) = 《 Z (k), 1 》
-  have hCBTFSucc := (InductiveConcreteBTFProperties (k+1))
-  have hCBTFCur := (InductiveConcreteBTFProperties k)
-  have h_split_Z_k_add_1: split (k:=k+1) (h:=by omega) (Z (k + 1)) = (1, 0) := by
-    exact Eq.symm
-      (split_of_join (Decidable.byContradiction fun a ↦ concreteCanonicalEmbedding._proof_1 k a)
-          (Z (k + 1)) 1 0 rfl)
-  have h_mul_eq := hCBTFSucc.mul_eq (a:=Z (k+1)) (b:=Z (k+1))
-    (a₁:=1) (a₀:=0) (b₁:=1) (b₀:=0) (h_k:=by omega)
-    (by exact id (Eq.symm h_split_Z_k_add_1)) (by exact id (Eq.symm h_split_Z_k_add_1))
-  rw [h_mul_eq]
-  simp_rw [←zero_is_0, ←one_is_1]
-  simp_rw [hCBTFCur.mul_zero, hCBTFCur.mul_one, hCBTFCur.add_zero, hCBTFCur.one_mul]
-  simp_rw [hCBTFCur.zero_add]
-  simp only [Nat.add_one_sub_one, join_eq_join_via_add_smul]
-
-lemma aeval_definingPoly_at_Z_succ (k : ℕ) :
-  (aeval (Z (k + 1))) (definingPoly (k:=k)) = 0 := by
-  rw [aeval_def]
-  set f := algebraMap (ConcreteBTField k) (ConcreteBTField (k + 1))
-  have h_f_is_canonical_embedding :
-    f = concreteTowerAlgebraMap (l:=k) (r:=k+1) (h_le:=by omega) := by rfl
-  rw [definingPoly, eval₂_add, eval₂_add] -- break down into sum of terms
-  rw [eval₂_X_pow]
-  -- ⊢ Z (k + 1) ^ 2 + eval₂ f (Z (k + 1)) (Z k • X) + eval₂ f (Z (k + 1)) 1 = 0
-  simp only [eval₂_one, eval₂_smul, eval₂_X]
-  change Z (k + 1) ^ 2 + (Z k) • Z (k + 1) + 1 = 0
-  have h_split_smul := split_smul_Z_eq_zero_x (k:=k+1) (h_pos:=by omega) (x:=Z k)
-  simp only [Nat.add_one_sub_one] at h_split_smul
-  have h_smul_eq: (Z k) • (Z (k + 1)) = 《 Z k, 0 》 := by
-    apply join_of_split
-    exact h_split_smul
-  rw [h_smul_eq]
-  have h_1_eq: (1 : ConcreteBTField (k + 1)) = 《0, 1》 := by
-    rw [←zero_is_0, ←one_is_1, ←one_is_1]
-    rw [join_zero_one]
-  rw [h_1_eq]
-  rw [add_assoc, join_add_join]
-  simp only [Nat.add_one_sub_one, _root_.add_zero, _root_.zero_add]
-  rw [Z_square_eq]
-  rw [add_self_cancel]
-
 @[simp]
 theorem minPoly_of_powerBasisSucc_generator (k : ℕ) :
   (minpoly (ConcreteBTField k) (powerBasisSucc k).gen) = X^2 + (Z k) • X + 1 := by
   unfold powerBasisSucc
   simp only
+  rw [←C_mul']
+  letI: Fintype (ConcreteBTField k) := (getBTFResult k).instFintype
   refine Eq.symm (minpoly.unique' (ConcreteBTField k) (Z (k + 1)) ?_ ?_ ?_)
-  · exact (definingPoly_is_monic (k:=k))
+  · exact (definingPoly_is_monic (s:=Z (k)))
   · exact aeval_definingPoly_at_Z_succ k
   · intro q h_degQ_lt_deg_minPoly
     -- h_degQ_lt_deg_minPoly : q.degree < (X ^ 2 + Z k • X + 1).degree
     -- ⊢ q = 0 ∨ (aeval (Z (k + 1))) q ≠ 0
-    have h_degree_definingPoly : (definingPoly (k:=k)).degree = 2 := by exact degree_definingPoly (k:=k)
+    have h_degree_definingPoly : (definingPoly (s:=Z (k))).degree = 2 := by
+      exact degree_definingPoly (s:=Z (k))
     rw [←definingPoly, h_degree_definingPoly] at h_degQ_lt_deg_minPoly
     if h_q_is_zero : q = 0 then
       rw [h_q_is_zero]
@@ -2925,9 +2941,9 @@ theorem minPoly_of_powerBasisSucc_generator (k : ℕ) :
       have q_natDegree_lt_2 : q.natDegree < 2 := by
         exact (natDegree_lt_iff_degree_lt h_q_is_zero).mpr h_degQ_lt_deg_minPoly
       -- do case analysis on q.degree
-      interval_cases hqNatDeg: q.natDegree
+      interval_cases hqNatDeg : q.natDegree
       · simp only [ne_eq]
-        have h_q_is_c: ∃ r : ConcreteBTField k, q = C r := by
+        have h_q_is_c : ∃ r : ConcreteBTField k, q = C r := by
           use q.coeff 0
           exact Polynomial.eq_C_of_natDegree_eq_zero hqNatDeg
         let hx := h_q_is_c.choose_spec
@@ -2935,7 +2951,7 @@ theorem minPoly_of_powerBasisSucc_generator (k : ℕ) :
         simp only [hx, aeval_C, map_eq_zero, ne_eq]
         -- ⊢ ¬x = 0
         by_contra h_x_eq_0
-        simp only [h_x_eq_0, map_zero] at hx -- hx: q = 0, h_q_is_not_zero: q ≠ 0
+        simp only [h_x_eq_0, map_zero] at hx -- hx : q = 0, h_q_is_not_zero : q ≠ 0
         contradiction
       · have h_q_natDeg_ne_0 : q.natDegree ≠ 0 := by exact ne_zero_of_eq_one hqNatDeg
         have h_q_deg_ne_0 : q.degree ≠ 0 := by
@@ -2953,13 +2969,13 @@ theorem minPoly_of_powerBasisSucc_generator (k : ℕ) :
           contradiction
         let c := q.coeff 1
         let r := q.coeff 0
-        have hc: c = q.leadingCoeff := by
+        have hc : c = q.leadingCoeff := by
           rw [Polynomial.leadingCoeff]
           exact congrArg q.toFinsupp.2 (id (Eq.symm hqNatDeg))
         have hc_ne_zero : c ≠ 0 := by
           rw [hc]
           by_contra h_c_eq_zero
-          simp only [leadingCoeff_eq_zero] at h_c_eq_zero -- h_c_eq_zero: q = 0
+          simp only [leadingCoeff_eq_zero] at h_c_eq_zero -- h_c_eq_zero : q = 0
           contradiction
         have hq_form : q = c • X + C r := by
           rw [Polynomial.eq_X_add_C_of_degree_eq_one (p:=q) (h:=by exact h_deg_q_is_1)]
@@ -2984,8 +3000,6 @@ theorem minPoly_of_powerBasisSucc_generator (k : ℕ) :
         rw [join_eq_join_iff] at h_join_eq_zero
         have h_c_eq_zero := h_join_eq_zero.1
         contradiction
-
-end DefiningPoly
 
 lemma powerBasisSucc_dim (k : ℕ) :
   powerBasisSucc (k:=k).dim = 2 := by
@@ -3138,6 +3152,11 @@ theorem PowerBasis.cast_basis_succ_of_eq_rec_apply
     exact powerBasisSucc_dim r1) (h_le:=by omega)]
   simp only [PowerBasis.coe_basis, Fin.coe_cast]
 
+@[simp]
+theorem coe_basis_apply {R S : Type*} [CommRing R] [Ring S] [Algebra R S]
+  (pb : PowerBasis R S) (i : Fin pb.dim) : ⇑pb.basis i = pb.gen ^ (i : ℕ) :=
+  pb.basis_eq_pow i
+
 /-!
 The basis element at index `j` is the product of the tower generators at
 the ON bits in binary representation of `j`.
@@ -3240,54 +3259,60 @@ theorem multilinearBasis_apply (r : ℕ) : ∀ l : ℕ, (h_le : l ≤ r) → ∀
         )
       ⟩
       unfold algebra_adjacent_tower
-      unfold indexLeft
+      -- unfold indexLeft
       -- All casts eliminated, now we prove equality on revFinProdFinEquiv and bit stuff
-      sorry
-      -- rw! [PowerBasis.coe_basis, powerBasisSucc_gen, ←𝕏, Fin.coe_cast]
-      -- conv_lhs =>
-      --   rw [ih_r1 (l:=l) (h_le:=by omega)] -- inductive hypothesis of level r - 1
-      --   rw [Fin.cast_val_eq_val (h_eq:=by omega)]
+      have h: b.basis indexLeft = b.gen ^ (indexLeft.val) := coe_basis_apply (pb:=b) (i:=indexLeft)
+      conv_lhs =>
+        enter [2];
+        -- @DFunLike.coe (Basis (Fin 2) ...
+        change b.basis indexLeft;
+        -- @DFunLike.coe (Basis (Fin b.dim) ...
+        rw! [h] -- `rw` can't work without `change` here
+      rw! [powerBasisSucc_gen, ←𝕏]
+      conv_lhs =>
+        rw [ih_r1 (l:=l) (h_le:=by omega)] -- inductive hypothesis of level r - 1
+        rw [Fin.cast_val_eq_val (h_eq:=by omega)]
 
-      -- conv_rhs =>
-      --   rw [←Fin.prod_congr' (b:=r - l) (a:=prevDiff + 1) (h:=by omega)]
-      --   rw [Fin.prod_univ_castSucc] -- split the prod of rhs
-      --   simp only [Fin.coe_cast, Fin.coe_castSucc, Fin.val_last]
-      -- · simp_rw [algebraMap.coe_prod] -- lhs
-      --   unfold Algebra.cast
-      --   rw! (castMode:=.all) [←algebraMap]
-      --   conv_lhs =>
-      --     rw [←Fin.prod_congr' (b:=r1 - l) (a:=prevDiff) (h:=by omega)]
-      --     simp only [Fin.coe_cast]
-      --   simp_rw [algebraMap, instAlgebraSucc]
-      --   rw [algebra_adjacent_tower]
-      --   rw [RingHom.map_pow]
-      --   ------------------ Equality of bit - based powers of generators -----------------
-      --   conv_rhs => rw! [←algebraMap, h_r1_eq_l_plus_prevDiff.symm]
-      --   -- algebraMap.coe_pow] -- rhs
-      --   --- The outtermost term
-      --   have hfinProd_msb := bit_revFinProdFinEquiv_symm_2_pow_succ (n:=prevDiff)
-      --     (i:=⟨prevDiff, by omega⟩) (j:=⟨j, by omega⟩)
-      --   simp only [lt_self_iff_false, ↓reduceIte,
-      --     revFinProdFinEquiv_symm_apply] at hfinProd_msb
-      --   conv_rhs =>
-      --     simp only [hfinProd_msb, leftDivNat];
-      --     simp only [h_prevDiff]
-      --     rw! [ConcreteBTFieldAlgebra_id (by omega), RingHom.id_apply]
-      --   --- Inner - prod term
-      --   congr
-      --   funext i
-      --   have hfinProd_lsb := bit_revFinProdFinEquiv_symm_2_pow_succ
-      --     (n:=prevDiff) (i:=⟨i, by omega⟩)
-      --     (j:=⟨j, by omega⟩)
-      --   simp only [Fin.is_lt, ↓reduceIte, revFinProdFinEquiv_symm_apply] at hfinProd_lsb
-      --   rw [hfinProd_lsb]
-      --   simp_rw [←ConcreteBTFieldAlgebra_apply_assoc]
-      --   rfl
-      -- · rfl
-
+      conv_rhs =>
+        rw [←Fin.prod_congr' (b:=r - l) (a:=prevDiff + 1) (h:=by omega)]
+        rw [Fin.prod_univ_castSucc] -- split the prod of rhs
+        simp only [Fin.coe_cast, Fin.coe_castSucc, Fin.val_last]
+      · simp_rw [algebraMap.coe_prod] -- lhs
+        unfold Algebra.cast
+        rw! (castMode:=.all) [←algebraMap]
+        conv_lhs =>
+          rw [←Fin.prod_congr' (b:=r1 - l) (a:=prevDiff) (h:=by omega)]
+          simp only [Fin.coe_cast]
+        simp_rw [algebraMap, instAlgebraSucc]
+        rw [algebra_adjacent_tower]
+        rw [RingHom.map_pow]
+        ------------------ Equality of bit - based powers of generators -----------------
+        conv_rhs => rw! [←algebraMap, h_r1_eq_l_plus_prevDiff.symm]
+        -- algebraMap.coe_pow] -- rhs
+        --- The outtermost term
+        have hfinProd_msb := bit_revFinProdFinEquiv_symm_2_pow_succ (n:=prevDiff)
+          (i:=⟨prevDiff, by omega⟩) (j:=⟨j, by omega⟩)
+        simp only [lt_self_iff_false, ↓reduceIte,
+          revFinProdFinEquiv_symm_apply] at hfinProd_msb
+        conv_rhs =>
+          simp only [hfinProd_msb, leftDivNat];
+          simp only [h_prevDiff]
+          rw! [ConcreteBTFieldAlgebra_id (by omega)]
+        --- Inner - prod term
+        congr
+        funext i
+        have hfinProd_lsb := bit_revFinProdFinEquiv_symm_2_pow_succ
+          (n:=prevDiff) (i:=⟨i, by omega⟩)
+          (j:=⟨j, by omega⟩)
+        simp only [Fin.is_lt, ↓reduceIte, revFinProdFinEquiv_symm_apply] at hfinProd_lsb
+        rw [hfinProd_lsb]
+        simp_rw [←ConcreteBTFieldAlgebra_apply_assoc]
+        rfl
 end ConcreteMultilinearBasis
 
-section BinaryTowerAlgebraEquiv
+section TowerEquivalence
+/- Tower equivalence between abstract and concrete constructions -/
+
 open BinaryTower
 
 noncomputable def towerEquiv_zero : RingEquiv (R:=GF(2)) (S:=ConcreteBTField 0) :=  {
@@ -3359,7 +3384,7 @@ lemma towerRingHomForwardMap0_eq :
   unfold towerRingHomForwardMap
   simp only [RingEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe, EquivLike.coe_coe, ↓reduceDIte]
 
-lemma towerRingHomForwardMap_zero {k: ℕ}:
+lemma towerRingHomForwardMap_zero {k : ℕ} :
   (towerRingHomForwardMap k) 0 = 0 := by
   induction k with
   | zero =>
@@ -3372,11 +3397,11 @@ lemma towerRingHomForwardMap_zero {k: ℕ}:
     simp only [BTField.eq_1, Nat.add_eq_zero, one_ne_zero, and_false, ↓reduceDIte,
       Nat.add_one_sub_one]
     rw! [←zero_is_0, split_zero]
-    simp only [Nat.add_one_sub_one]
+    simp only [Nat.add_one_sub_one, zero_is_0]
     rw! [ih]
     exact BinaryTower.join_via_add_smul_zero (k:=k+1) (h_pos:=by omega)
 
-lemma towerRingHomForwardMap_one {k: ℕ}:
+lemma towerRingHomForwardMap_one {k : ℕ} :
   (towerRingHomForwardMap k) 1 = 1 := by
   induction k with
   | zero =>
@@ -3389,7 +3414,7 @@ lemma towerRingHomForwardMap_one {k: ℕ}:
     simp only [BTField.eq_1, Nat.add_eq_zero, one_ne_zero, and_false, ↓reduceDIte,
       Nat.add_one_sub_one]
     rw! [←one_is_1, split_one]
-    simp only [Nat.add_one_sub_one]
+    simp only [Nat.add_one_sub_one, one_is_1, zero_is_0]
     rw! [ih, towerRingHomForwardMap_zero]
     exact BinaryTower.join_via_add_smul_one (k:=k+1) (h_pos:=by omega)
 
@@ -3406,7 +3431,7 @@ lemma towerRingHomForwardMap_Z (k : ℕ) :
     simp only [Nat.add_eq_zero, one_ne_zero, and_false, ↓reduceDIte,
       Nat.add_one_sub_one]
     rw! [split_Z]
-    simp only [Nat.add_one_sub_one]
+    simp only [Nat.add_one_sub_one, one_is_1, zero_is_0]
     rw! [towerRingHomForwardMap_zero, towerRingHomForwardMap_one]
     exact BinaryTower.join_via_add_smul_one_zero_eq_Z (k:=k+1) (h_pos:=by omega)
 
@@ -3473,8 +3498,8 @@ lemma towerRingHomForwardMap_add_eq (k : ℕ) (x y : ConcreteBTField k) :
     unfold towerRingHomForwardMap
     simp only [RingEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe, EquivLike.coe_coe,
       ↓reduceDIte, towerRingEquivFromConcrete0]
-    have h_map_0: towerRingEquiv0.symm 0 = 0 := by rfl
-    have h_map_1: towerRingEquiv0.symm 1 = 1 := by rfl
+    have h_map_0 : towerRingEquiv0.symm 0 = 0 := by rfl
+    have h_map_1 : towerRingEquiv0.symm 1 = 1 := by rfl
     rcases concrete_eq_zero_or_eq_one (a:=x) (by omega) with x_zero | x_one
     · simp only [x_zero, zero_is_0, _root_.zero_add]
       rw [h_map_0]
@@ -3514,7 +3539,7 @@ theorem split_mul_eq_mul_split {k : ℕ} (h_pos : k > 0) (x₀ x₁ : ConcreteBT
   split h_pos (x₀ * x₁) =
     (lo₀ * hi₁ + lo₁ * hi₀ + hi₀ * hi₁ * Z (k - 1), lo₀ * lo₁ + hi₀ * hi₁) := by
   rw [split_of_join]
-  have h_mul_eq := (InductiveConcreteBTFProperties k).mul_eq
+  have h_mul_eq := (getBTFResult k).mul_eq
   -- ⊢ x₀ * x₁ = join h_pos (hi₀ * hi₁ + hi₀ * lo₁ + lo₀ * hi₁) (lo₀ * lo₁)
   have h_mul_repr := h_mul_eq (a:=x₀) (b:=x₁) (h_k:=h_pos) (a₁:=hi₀) (a₀:=lo₀) (b₁:=hi₁) (b₀:=lo₁)
     (by exact Eq.symm h_split_x₀) (by exact Eq.symm h_split_x₁)
@@ -3530,8 +3555,8 @@ lemma towerRingHomForwardMap_mul_eq (k : ℕ) (x y : ConcreteBTField k) :
     unfold towerRingHomForwardMap
     simp only [RingEquiv.toEquiv_eq_coe, Equiv.toFun_as_coe, EquivLike.coe_coe,
       ↓reduceDIte, towerRingEquivFromConcrete0]
-    have h_map_0: towerRingEquiv0.symm 0 = 0 := by rfl
-    have h_map_1: towerRingEquiv0.symm 1 = 1 := by rfl
+    have h_map_0 : towerRingEquiv0.symm 0 = 0 := by rfl
+    have h_map_1 : towerRingEquiv0.symm 1 = 1 := by rfl
     rcases concrete_eq_zero_or_eq_one (a:=x) (by omega) with x_zero | x_one
     · simp only [x_zero, zero_is_0, zero_mul, h_map_0]
     · simp only [x_one, one_is_1]
@@ -3544,10 +3569,10 @@ lemma towerRingHomForwardMap_mul_eq (k : ℕ) (x y : ConcreteBTField k) :
       Nat.add_one_sub_one]
     rw [BinaryTower.mul_join_via_add_smul (k:=k+1) (h_pos:=by omega)]
     simp only [Nat.add_one_sub_one]
-    set x₁: ConcreteBTField k := (split (k:=k+1) (x:=x) (by omega)).fst
-    set x₀: ConcreteBTField k := (split (k:=k+1) (x:=x) (by omega)).snd
-    set y₁: ConcreteBTField k := (split (k:=k+1) (x:=y) (by omega)).fst
-    set y₀: ConcreteBTField k := (split (k:=k+1) (x:=y) (by omega)).snd
+    set x₁ : ConcreteBTField k := (split (k:=k+1) (x:=x) (by omega)).fst
+    set x₀ : ConcreteBTField k := (split (k:=k+1) (x:=x) (by omega)).snd
+    set y₁ : ConcreteBTField k := (split (k:=k+1) (x:=y) (by omega)).fst
+    set y₀ : ConcreteBTField k := (split (k:=k+1) (x:=y) (by omega)).snd
     have h_split_mul_x_add_y := split_mul_eq_mul_split (k:=k+1)
       (h_pos:=by omega) x y (hi₀:=x₁) (lo₀:=x₀) (hi₁:=y₁) (lo₁:=y₀) (by rfl) (by rfl)
     rw [h_split_mul_x_add_y]
@@ -3556,7 +3581,7 @@ lemma towerRingHomForwardMap_mul_eq (k : ℕ) (x y : ConcreteBTField k) :
     · rw [←ih, ←ih, ←ih];
       rw [towerRingHomForwardMap_add_eq, towerRingHomForwardMap_add_eq]
       simp only [Nat.add_one_sub_one]
-      have h: towerRingHomForwardMap k (x₁ * y₁ * Z k)
+      have h : towerRingHomForwardMap k (x₁ * y₁ * Z k)
         = towerRingHomForwardMap k (x₁ * y₁) * BinaryTower.Z k := by
         rw [ih, towerRingHomForwardMap_Z k]
       rw [h, mul_comm y₀ x₁]
@@ -3572,7 +3597,7 @@ lemma towerRingHomForwardMap_split_eq (k : ℕ) (h_pos : k > 0) (x : ConcreteBTF
   -- This lemma is actually due to the definition of `towerRingHomForwardMap` for `k > 0`
   simp only
   conv_lhs => unfold towerRingHomForwardMap -- not unfold in the rhs
-  have h_k_ne_0: k ≠ 0 := by omega
+  have h_k_ne_0 : k ≠ 0 := by omega
   set hi := (split (k:=k) (h:=h_pos) x).1 with hhi
   set lo := (split (k:=k) (h:=h_pos) x).2 with hlo
   simp only [h_k_ne_0, ↓reduceDIte]
@@ -3584,19 +3609,19 @@ lemma towerRingHomForwardMap_join {k : ℕ} (h_pos : k > 0) (hi lo : ConcreteBTF
       (hi_btf := towerRingHomForwardMap (k:=k-1) hi)
       (lo_btf := towerRingHomForwardMap (k:=k-1) lo) := by
   set x := 《 hi, lo 》
-  have h_split: (hi, lo) = (split (k:=k) (h:=h_pos) x) := by
+  have h_split : (hi, lo) = (split (k:=k) (h:=h_pos) x) := by
     apply split_of_join (k:=k)
     rfl
-  have h_hi: hi = (split (k:=k) (h:=h_pos) x).1 := by rw [←h_split]
-  have h_lo: lo = (split (k:=k) (h:=h_pos) x).2 := by rw [←h_split]
+  have h_hi : hi = (split (k:=k) (h:=h_pos) x).1 := by rw [←h_split]
+  have h_lo : lo = (split (k:=k) (h:=h_pos) x).2 := by rw [←h_split]
   rw [towerRingHomForwardMap_split_eq (k:=k) (h_pos:=h_pos) x]
   congr
   · rw [h_hi]
   · rw [h_lo]
 
 structure TowerEquivResult (k : ℕ) where
-  ringEquiv: ConcreteBTField k ≃+* BTField k
-  ringEquivForwardMapEq: ringEquiv = towerRingHomForwardMap k
+  ringEquiv : ConcreteBTField k ≃+* BTField k
+  ringEquivForwardMapEq : ringEquiv = towerRingHomForwardMap k
 
 noncomputable def towerEquiv (n : ℕ) : TowerEquivResult n := by
   induction n with
@@ -3633,17 +3658,16 @@ noncomputable def towerEquiv (n : ℕ) : TowerEquivResult n := by
         change curRingHom.toFun = towerRingHomForwardMap (n+1)
         rfl
     }
-
-lemma towerEquiv_commutes_left_diff (i d : ℕ): ∀ r: ConcreteBTField i,
+lemma towerEquiv_commutes_left_diff (i d : ℕ) : ∀ r : ConcreteBTField i,
   (AlgebraTower.algebraMap i (i+d) (by omega)) ((towerEquiv i).ringEquiv r) =
   (towerEquiv (i+d)).ringEquiv ((AlgebraTower.algebraMap i (i+d) (by omega)) r) := by
   -- If d = 0, then this is trivial
-  -- For d > 0: let j = i+d
-    -- lhs of goal: right => 《 0, ringMap x 》 => up => 《 algMap 0 = 0, algMap (ringMap x) 》
-    -- rhs of goal: up => 《 0, algMap x 》 => right => 《 ringMap 0 = 0, ringMap (algMap x) 》
+  -- For d > 0 : let j = i+d
+    -- lhs of goal : right => 《 0, ringMap x 》 => up => 《 algMap 0 = 0, algMap (ringMap x) 》
+    -- rhs of goal : up => 《 0, algMap x 》 => right => 《 ringMap 0 = 0, ringMap (algMap x) 》
     -- where both `algMap (ringMap x)` and `ringMap (algMap x)` are in `BTField (j-1)`
-  -- => Strategy: For each i => do induction upwards on d
-  change ∀ r: ConcreteBTField i,
+  -- => Strategy : For each i => do induction upwards on d
+  change ∀ r : ConcreteBTField i,
     (BinaryTower.towerAlgebraMap (l:=i) (r:=i+d) (h_le:=by omega)) ((towerEquiv i).ringEquiv r) =
     (towerEquiv (i+d)).ringEquiv ((concreteTowerAlgebraMap i (i+d) (by omega)) r)
   induction d using Nat.rec with
@@ -3654,9 +3678,11 @@ lemma towerEquiv_commutes_left_diff (i d : ℕ): ∀ r: ConcreteBTField i,
     rfl
   | succ d' ih =>
     intro r
-    letI instAbstractAlgebra: Algebra (BTField i) (BTField (i + d' + 1)) :=
+    letI instAbstractAlgebra : Algebra (BTField i) (BTField (i + d' + 1)) :=
       binaryAlgebraTower (by omega)
-    letI instConcreteAlgebra: Algebra (ConcreteBTField i) (ConcreteBTField (i + d' + 1)) :=
+    let : Algebra (ConcreteBTField i) (ConcreteBTField (i + d')) :=
+      ConcreteBTFieldAlgebra (l:=i) (r:=i+d') (h_le:=by omega)
+    letI instConcreteAlgebra : Algebra (ConcreteBTField i) (ConcreteBTField (i + d' + 1)) :=
       ConcreteBTFieldAlgebra (l:=i) (r:=i+d'+1) (h_le:=by omega)
     change (algebraMap (R:=BTField i) (A:=BTField (i + d' + 1))) ((towerEquiv i).ringEquiv r) =
       (towerEquiv (i + d' + 1)).ringEquiv ((algebraMap (R:=ConcreteBTField i)
@@ -3670,7 +3696,13 @@ lemma towerEquiv_commutes_left_diff (i d : ℕ): ∀ r: ConcreteBTField i,
     conv_lhs =>
       rw! [h_abstract_algMap_eq_zero_x]
     conv_rhs =>
+      rw [algebraMap, Algebra.algebraMap]
+      simp only [BTField.eq_1, CommRing.eq_1, BTFieldIsField.eq_1, instConcreteAlgebra]
       rw! [h_concrete_algMap_eq_zero_x] -- split algebraMap
+      -- Now change `BinaryTowerAux (i + d' + 1)).fst` back to `BTField (i + d' + 1)`
+      -- for definitional equality, otherwise we can't `rw [ringEquivForwardMapEq]`
+      change (towerEquiv (i + d' + 1)).ringEquiv (join (h_pos:=by omega) 0
+        ((algebraMap (ConcreteBTField i) (ConcreteBTField (i + d'))) r))
       rw [(towerEquiv (i+d'+1)).ringEquivForwardMapEq]
       -- now convert to BinaryTower.join_via_add_smul
       rw [towerRingHomForwardMap_join (k:=i+d'+1) (h_pos:=by omega)]
@@ -3694,7 +3726,7 @@ theorem towerEquiv_commutes_left (i j : ℕ) (h : i ≤ j) : ∀ r : ConcreteBTF
   rw! [h_j_eq]
   exact towerEquiv_commutes_left_diff (i:=i) (d:=d)
 
-noncomputable instance instAlgebraTowerEquiv: AlgebraTowerEquiv
+noncomputable instance instAlgebraTowerEquiv : AlgebraTowerEquiv
   (ConcreteBTField) (BTField) where
   toRingEquiv := fun i => (towerEquiv i).ringEquiv
   commutesLeft' := fun i j h r => by
@@ -3703,7 +3735,7 @@ noncomputable instance instAlgebraTowerEquiv: AlgebraTowerEquiv
 #check instAlgebraTowerEquiv.toAlgEquivOverLeft 7 100 (by omega)
 #check instAlgebraTowerEquiv.toAlgEquivOverRight 7 100 (by omega)
 
-end BinaryTowerAlgebraEquiv
+end TowerEquivalence
 
 end ConcreteBinaryTower
 
