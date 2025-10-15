@@ -1,0 +1,34 @@
+name: Sorry Tracker
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  track_sorries:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r ./scripts/requirements-sorry-tracker.txt
+
+      - name: Generate diff of changes
+        run: git diff ${{ github.event.before }} ${{ github.event.after }} > sorry-diff.txt
+
+      - name: Run sorry-tracker on the diff
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python ./scripts/sorry-tracker.py --diff-file sorry-diff.txt
