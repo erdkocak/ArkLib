@@ -274,8 +274,8 @@ section Security
 open NNReal
 
 variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl oSpec (StateT σ ProbComp)}
-  [inst₁ : ∀ i, SelectableType (pSpec₁.Challenge i)]
-  [inst₂ : ∀ i, SelectableType (pSpec₂.Challenge i)]
+  [inst₁ : ∀ i, SampleableType (pSpec₁.Challenge i)]
+  [inst₂ : ∀ i, SampleableType (pSpec₂.Challenge i)]
   (hChallenge : ∀ i, inst₁ i = dcast (by simp) (inst₂ (i.cast hn hSpec)))
 
 section Protocol

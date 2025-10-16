@@ -106,10 +106,10 @@ instance [Oₘ : ∀ i, OracleInterface (pSpec.Message i)] :
       · haveI := i.property; simp_all)
   }
 
---  (i : ChallengeIdx saltedPSpec) → SelectableType (Challenge saltedPSpec i)
+--  (i : ChallengeIdx saltedPSpec) → SampleableType (Challenge saltedPSpec i)
 
-instance [inst : ∀ i, SelectableType (pSpec.Challenge i)] :
-    ∀ i, SelectableType ((pSpec.addSalt Salt).Challenge i) :=
+instance [inst : ∀ i, SampleableType (pSpec.Challenge i)] :
+    ∀ i, SampleableType ((pSpec.addSalt Salt).Challenge i) :=
   fun i => by
     dsimp at i ⊢; split
     · haveI := i.property; simp_all

@@ -15,12 +15,12 @@ linter.style.longFile = 1500
 [[require]]
 name = "VCVio"
 git = "https://github.com/Verified-zkEVM/VCV-io"
-rev = "v4.24.0-rc1"
+rev = "upstream-pfun"
 
 [[require]]
 name = "«doc-gen4»"
 git = "https://github.com/leanprover/doc-gen4"
-rev = "v4.24.0-rc1"
+rev = "v4.24.0"
 
 [[require]]
 name = "checkdecls"

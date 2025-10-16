@@ -116,7 +116,7 @@ def VectorIOP
   OracleProof []ₒ Statement OStatement Witness (vPSpec.toProtocolSpec A)
 
 variable {n : ℕ} {vPSpec : ProtocolSpec.VectorSpec n} {A : Type}
-  [OracleComp.SelectableType A]
+  [OracleComp.SampleableType A]
 
 open scoped NNReal
 

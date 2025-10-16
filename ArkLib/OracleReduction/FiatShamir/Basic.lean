@@ -154,7 +154,7 @@ noncomputable section
 
 open scoped NNReal
 
-variable [∀ i, SelectableType (pSpec.Challenge i)]
+variable [∀ i, SampleableType (pSpec.Challenge i)]
   {σ : Type} (init : ProbComp σ) (impl : QueryImpl oSpec (StateT σ ProbComp))
 
 theorem fiatShamir_completeness (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))

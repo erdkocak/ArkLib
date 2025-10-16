@@ -361,11 +361,11 @@ variable {ι : Type} {oSpec : OracleSpec ι} {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt
 /-- If two protocols have sampleable challenges, then their concatenation also has sampleable
   challenges. -/
 @[inline]
-instance [h₁ : ∀ i, SelectableType (pSpec₁.Challenge i)]
-    [h₂ : ∀ i, SelectableType (pSpec₂.Challenge i)] :
-    ∀ i, SelectableType ((pSpec₁ ++ₚ pSpec₂).Challenge i) :=
+instance [h₁ : ∀ i, SampleableType (pSpec₁.Challenge i)]
+    [h₂ : ∀ i, SampleableType (pSpec₂.Challenge i)] :
+    ∀ i, SampleableType ((pSpec₁ ++ₚ pSpec₂).Challenge i) :=
   fun ⟨i, h⟩ => Fin.fappend₂ (A := Direction) (B := Type)
-    (F := fun dir type => (h : dir = .V_to_P) → SelectableType type)
+    (F := fun dir type => (h : dir = .V_to_P) → SampleableType type)
     (α₁ := pSpec₁.dir) (β₁ := pSpec₂.dir)
     (α₂ := pSpec₁.Type) (β₂ := pSpec₂.Type) (fun i h => h₁ ⟨i, h⟩) (fun i h => h₂ ⟨i, h⟩) i h
 
@@ -405,7 +405,7 @@ lemma challengeOracleInterface_append_range_inr (j : pSpec₂.ChallengeIdx) :
   simp [OracleSpec.range, ChallengeIdx.inr, ProtocolSpec.append, OracleInterface.toOracleSpec,
     instOracleInterfaceChallengeAppend, challengeOracleInterface]
 
-variable [∀ i, SelectableType (pSpec₁.Challenge i)] [∀ i, SelectableType (pSpec₂.Challenge i)]
+variable [∀ i, SampleableType (pSpec₁.Challenge i)] [∀ i, SampleableType (pSpec₂.Challenge i)]
 
 instance instSubSpecOfProtocolSpecAppendChallenge :
     SubSpec ([pSpec₁.Challenge]ₒ ++ₒ [pSpec₂.Challenge]ₒ) ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
@@ -475,10 +475,10 @@ def seqComposeMessageEquiv {m : ℕ} {n : Fin m → ℕ} {pSpec : ∀ i, Protoco
   right_inv := by intro; simp [seqComposeMessageIdxToSigma, sigmaMessageIdxToSeqCompose]
 
 instance {m : ℕ} {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
-    [inst : ∀ i, ∀ j, SelectableType ((pSpec i).Challenge j)] :
-    ∀ k, SelectableType ((seqCompose pSpec).Challenge k) :=
+    [inst : ∀ i, ∀ j, SampleableType ((pSpec i).Challenge j)] :
+    ∀ k, SampleableType ((seqCompose pSpec).Challenge k) :=
   fun ⟨k, h⟩ => Fin.fflatten₂
-    (A := Direction) (B := Type) (F := fun dir type => (h : dir = .V_to_P) → SelectableType type)
+    (A := Direction) (B := Type) (F := fun dir type => (h : dir = .V_to_P) → SampleableType type)
     (fun i' j' h' => inst i' ⟨j', h'⟩) k h
 
 /-- If all protocols' messages have oracle interfaces, then the messages of their sequential

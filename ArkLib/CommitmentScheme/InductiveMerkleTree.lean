@@ -299,7 +299,7 @@ The proof proceeds by reducing to the functional completeness theorem by a theor
 the OracleComp monad,
 and then applying the functional version of the completeness theorem.
 -/
-theorem completeness [DecidableEq α] [SelectableType α] {s}
+theorem completeness [DecidableEq α] [SampleableType α] {s}
     (leaf_data_tree : LeafData α s) (idx : BinaryTree.SkeletonLeafIndex s)
     (preexisting_cache : (spec α).QueryCache) :
     (((do
