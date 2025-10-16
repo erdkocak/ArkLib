@@ -82,7 +82,7 @@ set_option maxHeartbeats 1000000 in
 -- it takes more heartbeats to prove this theorem
 def binary_tower_inductive_step
   (k : Nat)
-  (prevBTField : Type _) [Field prevBTField]
+  (prevBTField : Type _) --[Field prevBTField]
   (prevBTResult : BinaryTowerResult prevBTField k)
 :  Σ' (F : Type _), BinaryTowerInductiveStepResult (k:=k) (prevBTField:=prevBTField)
   (prevBTResult:=prevBTResult) (prevPoly:=prevBTResult.newPoly) (F:=F)

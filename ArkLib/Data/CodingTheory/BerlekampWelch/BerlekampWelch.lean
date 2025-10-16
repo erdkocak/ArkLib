@@ -65,8 +65,7 @@ noncomputable def decoder (e k : ℕ) [NeZero n] (ωs f : Fin n → F) : Option 
       else
         none
 
-/--
-If the Berlekamp-Welch decoder succeeds, the decoded polynomial is within the error bound.
+/-- If the Berlekamp-Welch decoder succeeds, the decoded polynomial is within the error bound.
 
 ### Parameters:
 - `[NeZero n]` - Typeclass ensuring non-zero codeword length

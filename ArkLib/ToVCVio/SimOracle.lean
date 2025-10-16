@@ -13,11 +13,8 @@ universe u v
 
 open OracleComp OracleSpec
 
-variable {ι ι' ιₜ : Type*} {spec : OracleSpec ι}
-    {spec' : OracleSpec ι'} {specₜ : OracleSpec ιₜ}
+variable {spec spec' specₜ: OracleSpec}
     {m : Type u → Type v} {α β γ σ : Type u}
-
-#check SubSpec
 
 instance : IsEmpty (OracleQuery []ₒ α) where
   false := by simp only [IsEmpty.forall_iff]

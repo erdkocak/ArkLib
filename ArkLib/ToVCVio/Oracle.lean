@@ -142,11 +142,12 @@ theorem randomOracle_cache_neverFails_iff_runWithOracle_neverFails {β}
     [spec.DecidableEq] [(t : spec.domain) → SampleableType (spec.range t)]
     (oa : OracleComp (spec) β) (preexisting_cache : spec.QueryCache)
     :
-    ((simulateQ randomOracle oa).run preexisting_cache).neverFails
+    HasEvalSPMF.NeverFail ((simulateQ randomOracle oa).run preexisting_cache)
     ↔
     (∀ (f : (t : spec.domain) → spec.range t),
       Oracle.containsCache f preexisting_cache →
       (runWithOracle f oa).isSome) := by
+  stop
   haveI : (i : ι) → Inhabited (OracleSpec.range spec i) := by
     sorry
   -- todo
@@ -181,7 +182,7 @@ theorem runWithOracle_succeeds_iff_simulateQ_randomOracle_neverFails
      {β} [spec.DecidableEq] [(t : spec.domain) → SampleableType (spec.range t)]
     (oa : OracleComp (spec) β) (f : (t : spec.domain) → spec.range t) :
     (runWithOracle f oa).isSome ↔
-    ((simulateQ oa randomOracle).run (fun i q => some (f i q))).neverFails := by
+    (HasEvalSPMF.NeverFail ((simulateQ randomOracle oa).run (fun q => some (f q)))) := by
   sorry
 
 /--
@@ -189,18 +190,18 @@ The oracle never fails on any cache
 iff it never fails when run with any oracle function.
 -/
 theorem randomOracle_neverFails_iff_runWithOracle_neverFails {β}
-    [DecidableEq ι] [spec.DecidableEq] [(i : ι) → SampleableType (OracleSpec.range spec i)]
+    [spec.DecidableEq] [(t : spec.domain) → SampleableType (spec.range t)]
     (oa : OracleComp (spec) β)
     :
-    (∀ (preexisting_cache : spec.QueryCache),
-      ((oa.simulateQ randomOracle).run preexisting_cache).neverFails)
+    (∀ (preexisting_cache : spec.QueryCache), HasEvalSPMF.NeverFail
+      ((simulateQ randomOracle oa).run preexisting_cache))
     ↔
     (∀ (f : (t : spec.domain) → spec.range t),
       (runWithOracle f oa).isSome) := by
   constructor
   · intro h f
     rw [runWithOracle_succeeds_iff_simulateQ_randomOracle_neverFails]
-    exact h fun i q ↦ some (f i q)
+    exact h fun q ↦ some (f q)
   · intro h preexisting_cache
     sorry
 
@@ -211,13 +212,13 @@ variable {m : Type u → Type v} [Monad m] [LawfulMonad m]
 
 namespace QueryImpl
 
-variable {ι : Type u} [DecidableEq ι] {spec : OracleSpec ι} [spec.DecidableEq] {m : Type u → Type v}
+variable {ι : Type u} [DecidableEq ι] {spec : OracleSpec} [spec.DecidableEq] {m : Type u → Type v}
   [Monad m]
 
 /-- Compose a query implementation from `spec` to some monad `m`, with a further monad homomorphism
   from `m` to `m'`. -/
 def composeM {m' : Type u → Type v} [Monad m'] (hom : m →ᵐ m') (so : QueryImpl spec m) :
-    QueryImpl spec m' where
-  impl | query i t => hom (so.impl (query i t))
+    QueryImpl spec m' :=
+  fun t => hom (so t)
 
 end QueryImpl

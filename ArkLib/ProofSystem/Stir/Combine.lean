@@ -152,7 +152,7 @@ lemma combine_theorem
                    (1 - (rate (code φ degree)) - 1 / Fintype.card ι)))
   (hProb : Pr_{ let r ← $ᵖ F}[δᵣ((combine φ dstar r fs degs), (code φ dstar)) ≤ δ] >
     ENNReal.ofReal (proximityError F dstar (rate (code φ degree)) δ (m * (dstar + 1) - ∑ i, degs i))) :
-      correlatedAgreement (code φ degree) ⟨δ, by linarith⟩ fs
+      ProximityGap.correlatedAgreement (code φ degree) ⟨δ, by linarith⟩ fs
       := by sorry
 
 end Combine

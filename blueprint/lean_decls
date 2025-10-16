@@ -180,8 +180,8 @@ ReedSolomon.code
 smoothCode
 constrainedCode
 multiConstrainedCode
-proximityMeasure
-proximityGap
+ProximityGap.proximityMeasure
+ProximityGap.proximityGap
 ListDecodable.listDecodable
 ListDecodable.relHammingBall
 OracleSpec
