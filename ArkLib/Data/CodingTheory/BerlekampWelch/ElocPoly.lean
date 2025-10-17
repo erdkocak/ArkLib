@@ -11,9 +11,9 @@ import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.Data.Finset.Insert
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Matrix.Mul
-
 import ArkLib.Data.CodingTheory.Basic
 import ArkLib.Data.Fin.Lift
+import Mathlib.Tactic.Cases
 
 namespace BerlekampWelch
 
