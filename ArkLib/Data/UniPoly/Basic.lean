@@ -239,6 +239,7 @@ lemma coeff_eq_zero {p : UniPoly Q} :
   · cases Nat.lt_or_ge i p.size <;> simp [*]
   · intro hi; specialize h i; simp [hi] at h; assumption
 
+-- TODO does this belong in here?
 lemma coeff_impl_zero [LawfulBEq R] {p : UniPoly R}
     (hcoeffs : ∀ i, p.coeff i = 0) : p.trim = #[] := by
   have h_all_zero : ∀ i, (hi : i < p.size) → p[i] = 0 := by
