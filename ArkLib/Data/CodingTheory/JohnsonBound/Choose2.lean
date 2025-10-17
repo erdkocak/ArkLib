@@ -39,8 +39,8 @@ private lemma choose_2_eq_half_f :
 theorem choose_2_convex : ConvexOn ℚ Set.univ choose_2 := by
   rw [choose_2_eq_half_f]
   refine ⟨convex_univ, fun x₁ _ x₂ _ α₁ α₂ hα₁ hα₂ h ↦ ?p₁⟩
-  have := f_convex (x₁ := x₁) (x₂ := x₂) hα₁ hα₂ h
+  simp_all only [Set.mem_univ, one_div, smul_eq_mul, Pi.mul_apply, Pi.inv_apply, Pi.ofNat_apply]
   field_simp
-  linarith
+  exact f_convex hα₁ hα₂ h
 
 end JohnsonBound
