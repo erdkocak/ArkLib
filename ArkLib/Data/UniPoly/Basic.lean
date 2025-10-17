@@ -239,6 +239,13 @@ lemma coeff_eq_zero {p : UniPoly Q} :
   · cases Nat.lt_or_ge i p.size <;> simp [*]
   · intro hi; specialize h i; simp [hi] at h; assumption
 
+lemma coeff_impl_zero [LawfulBEq R] {p : UniPoly R}
+    (hcoeffs : ∀ i, p.coeff i = 0) : p.trim = #[] := by
+  have h_all_zero : ∀ i, (hi : i < p.size) → p[i] = 0 := by
+    intro i hi
+    simpa [hi] using hcoeffs i
+  simp [trim, Trim.last_nonzero_none h_all_zero]
+
 lemma eq_degree_of_equiv [LawfulBEq R] {p q : UniPoly R} : equiv p q → p.degree = q.degree := by
   unfold equiv degree
   intro h_equiv
