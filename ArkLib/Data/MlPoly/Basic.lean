@@ -460,17 +460,18 @@ lemma forwardRange_0_eq_finRange (n : ℕ) [NeZero n] : forwardRange n ⟨n - 1,
   apply List.ext_get
   · rw [forwardRange_length, List.length_finRange]
     simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, tsub_zero]
-    sorry
+    have : n ≥ 1 := by
+      exact NeZero.one_le
+    simp_all only [ge_iff_le, Nat.sub_add_cancel]
   · intro i hi h₂
     have h_fr_get := forwardRange_getElem (n:=n) (r:=⟨n - 1, by grind only⟩) (l:=0) (k:=⟨i, by
       rw [forwardRange_length] at hi
       simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, tsub_zero] at hi
       exact hi
     ⟩)
-    simp only [List.get_eq_getElem, zero_add] at h_fr_get
-    have h_lr_get := List.getElem_ofFn (f:=fun i => i) (i:=⟨i, h₂⟩)
-    rw [h_fr_get, h_lr_get]
-    rfl
+    simp_all only [List.get_eq_getElem, Fin.coe_ofNat_eq_mod, Nat.zero_mod, zero_add,
+                  List.getElem_finRange, Fin.cast_mk]
+
 
 /- 0 ≤ l ≤ r < n - where n is the number of bits -/
 def monoToLagrange_segment (n : ℕ) (r : Fin n) (l : Fin (r.val + 1)) :
