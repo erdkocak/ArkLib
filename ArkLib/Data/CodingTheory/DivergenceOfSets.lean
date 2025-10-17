@@ -66,9 +66,12 @@ end Defs
 
 section Theorems
 
+-- For theorems, since we are using the probability notation `Pr_{let x ← $ᵖ S}[...]` which is
+-- not universe-polymorphic, we need to put everything in `Type` and not `Type*`.
+
 variable {ι : Type} [Fintype ι] [Nonempty ι]
          {F : Type} [Fintype F] [Field F]
-         {U V : Set (ι → F)}
+         {U V C : Set (ι → F)}
 
 open Classical in
 /-- Corollary 1.3 (Concentration bounds) from [BCIKS20].
@@ -79,9 +82,10 @@ Reed-Solomon code (`δ^*` in [BCIKS20]). If `δ' ∈ (0, 1 − √ρ)`, then nea
 at distance exactly `δ'` from the Reed-Solomon code. -/
 lemma concentration_bounds {deg : ℕ} {domain : ι ↪ F}
   {U : AffineSubspace F (ι → F)} [Nonempty U]
-  (hdiv : (divergence U (RScodeSet domain deg) : ℝ≥0) ≤ 1 - ReedSolomonCode.sqrtRate deg domain)
+  (hdiv_pos : 0 < (divergence U (RScodeSet domain deg) : ℝ≥0))
+  (hdiv_lt : (divergence U (RScodeSet domain deg) : ℝ≥0) < 1 - ReedSolomonCode.sqrtRate deg domain)
   : let δ' := divergence U (RScodeSet domain deg)
-    Pr_{let u ← $ᵖ U}[Code.relHammingDistToCode u (RScodeSet domain deg) ≠ δ']
+    Pr_{let y ← $ᵖ U}[Code.relHammingDistToCode y (RScodeSet domain deg) ≠ δ']
     ≤ errorBound δ' deg domain := by sorry
 
 end Theorems
