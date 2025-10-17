@@ -77,16 +77,8 @@ theorem commit_eq {a : ZMod p} (hpG1 : Nat.card G₁ = p)
     intro x
     exact mul_comm _ _
 
-#check sum_eq_of_subset
-#check Polynomial.supp_subset_range_natDegree_succ
-#check Polynomial.supp_subset_range
-#check degree_eq_natDegree
-#check natDegree_lt_iff_degree_lt
-#check WithBot.coe_le_coe
-#check WithBot.coe_lt_coe
-
 theorem commit_eq_UniPoly {a : ZMod p} (hpG1 : Nat.card G₁ = p)
-    (poly : UniPoly (ZMod p)) (hn : poly.degree ≤ n) :
+    (poly : UniPoly (ZMod p)) (hn : poly.degree ≤ n + 1) :
     commit (towerOfExponents g₁ a n)
     ((coeff poly) ∘ Fin.val)
   = g₁ ^ (poly.eval a).val := by
@@ -109,18 +101,16 @@ theorem commit_eq_UniPoly {a : ZMod p} (hpG1 : Nat.card G₁ = p)
     intro i
     simp_all only [zero_mul, f]
   have hs : poly.toPoly.support ⊆ Finset.range (n + 1) := by
-    -- TODO this should be a lemma in UniPoly.
-    have hdeg: poly.toPoly.degree = poly.degree := by
-      sorry
     have hnatDeg : poly.toPoly.natDegree < (n+1) := by
-      by_cases hpolyn0 : poly.toPoly ≠ 0
-      · have hle : poly.degree ≤ (n : WithBot ℕ) := by
-          simpa [hdeg] using hn
-        have hlt : (n : WithBot ℕ) < (n + 1 : WithBot ℕ) := by
-          simpa using (WithBot.coe_lt_coe.mpr (Nat.lt_succ_self n))
-        simp_rw [natDegree_lt_iff_degree_lt hpolyn0, hdeg]
-        exact (lt_of_le_of_lt hle hlt)
-      · simp_all only [Decidable.not_not, natDegree_zero,add_pos_iff, zero_lt_one, or_true]
+      by_cases hcoeff: ∃ i, poly.coeff i ≠ 0
+      · calc poly.toPoly.natDegree = poly.degree - 1 := by simp_rw [degree_toPoly' hcoeff]
+        _ ≤ n := by exact Nat.sub_le_sub_right hn 1
+        _ < n + 1 := Nat.lt_succ_self n
+      · have hcoeff: ∀i, poly.toPoly.coeff i = 0 := by
+          simp_all [coeff_toPoly]
+        have hpoly: poly.toPoly = 0 := by
+          ext n; exact hcoeff n
+        simp [hpoly]
     simp_rw [Polynomial.supp_subset_range hnatDeg]
 
   rcases hordg₁ with ord1 | ordp
@@ -154,17 +144,17 @@ def verifyOpening (verifySrs : Vector G₂ 2) (commitment : G₁) (opening : G�
 -- e ( C / g₁ ^ v , g₂ ) = e ( O , g₂ ^ a / g₂ ^ z)
 
 -- theorem correctness {g : G} {a : ZMod p} {coeffs : Fin n → ZMod p} {z : ZMod p} :
-theorem correctness (n : ℕ) (a : ZMod p) (coeffs : Fin (n + 1) → ZMod p) (z : ZMod p) :
+theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p) (coeffs : Fin (n + 1) → ZMod p) (z : ZMod p) :
   let poly : UniPoly (ZMod p) := UniPoly.mk (Array.ofFn coeffs)
   let v : ZMod p := poly.eval z
   let (psrs,vsrs) : Vector G₁ (n + 1) × Vector G₂ 2 := generateSrs (g₁:=g₁) (g₂:=g₂) n a
   let C : G₁ := commit psrs coeffs
   let opening: G₁ := generateOpening psrs coeffs z
   verifyOpening pairing (g₁:=g₁) (g₂:=g₂) vsrs C opening z v := by
+
   intro poly v
-  rcases generateSrs (g₁:=g₁) (g₂:=g₂) n a with ⟨psrs, vsrs⟩
+  unfold verifyOpening generateSrs
   simp
-  unfold verifyOpening
 
   have hcoeffs : coeffs = (coeff poly) ∘ Fin.val := by
     simp_all only [poly]
@@ -173,15 +163,14 @@ theorem correctness (n : ℕ) (a : ZMod p) (coeffs : Fin (n + 1) → ZMod p) (z 
     simp only [Array.getD_eq_getD_getElem?, Array.size_ofFn, Fin.is_lt, getElem?_pos,
     Array.getElem_ofFn, Fin.eta, Option.getD_some]
 
+
   have hpdeg : degree poly ≤ n+1 := by
     simp_rw [←Trim.size_eq_degree]
     apply le_trans (Trim.size_le_size (p := poly))
     simp_rw [poly]
     simp
 
-
-
-
+  simp_rw [hcoeffs, commit_eq_UniPoly hpG1 poly hpdeg]
   sorry
 
 
