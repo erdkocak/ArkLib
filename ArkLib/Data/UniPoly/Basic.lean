@@ -890,6 +890,68 @@ theorem eval_toImpl_eq_eval [LawfulBEq R] (x : R) (p : R[X]) : p.toImpl.eval x =
 lemma eval_trim_eq_eval [LawfulBEq R] (x : R) (p : UniPoly R) : p.trim.eval x = p.eval x := by
   rw [← toImpl_toPoly, eval_toImpl_eq_eval, eval_toPoly_eq_eval]
 
+-- TODO is this the right place?
+/-- degree is the mathlib degree + 1 -/
+theorem degree_toPoly {p : UniPoly R} [LawfulBEq R]
+    (hnz : ∃ i, p.coeff i ≠ 0) : p.degree = p.toPoly.natDegree + 1 := by
+  let q := p.trim
+  have deg_p_eq_sz_q : p.degree = q.size := by simpa [q] using (Trim.size_eq_degree (p := p)).symm
+  have q_nonempty : 0 < q.size := by
+    rcases hnz with ⟨i, hi⟩
+    cases Trim.elim p with
+    | inl h =>
+        have : ∀ j, p.coeff j = 0 := by
+          intro j
+          rcases lt_or_ge j p.size with hj | hj
+          · simpa [UniPoly.coeff, Array.getD_eq_getD_getElem?, hj] using h.2 j hj
+          · simp [UniPoly.coeff, Array.getD_eq_getD_getElem?, Array.getElem?_eq_none hj]
+        exact (hi (this i)).elim
+    | inr h =>
+        rcases h with ⟨k, h_extract, h_nz, -⟩
+        have : q.size = k + 1 := by
+          have := congrArg Array.size h_extract
+          simpa [q, Array.size_extract, Nat.succ_le_of_lt k.is_lt] using this
+        simp [this]
+  have coeff_last_nonzero : p.toPoly.coeff (q.size - 1) ≠ 0 := by
+    have q_canon : q.trim = q := by simpa [q] using Trim.trim_twice (p := p)
+    have hlast : q.getLast q_nonempty ≠ 0 := (Trim.canonical_iff (p := q)).mp q_canon q_nonempty
+    have hqcoeff : q.coeff (q.size - 1) ≠ 0 := by
+      have hlt : q.size - 1 < q.size := Nat.pred_lt_self q_nonempty
+      have hget : q[q.size - 1] ≠ 0 := by simpa [Array.getLast] using hlast
+      have hcoeff : q.coeff (q.size - 1) = q[q.size - 1] := by
+        simp [hlt]
+      simpa [hcoeff]
+    have hpq : p.coeff (q.size - 1) = q.coeff (q.size - 1) := by
+      have := Trim.coeff_eq_coeff (p := p) (i := q.size - 1)
+      simpa [q] using this.symm
+    have hpcoeff : p.coeff (q.size - 1) ≠ 0 := by simpa [hpq] using hqcoeff
+    simpa [coeff_toPoly] using hpcoeff
+  have natDeg_eq : p.toPoly.natDegree = q.size - 1 := by
+    apply le_antisymm
+    · exact Polynomial.natDegree_le_iff_coeff_eq_zero.mpr (fun m hm => by
+        have hsucc : (q.size - 1).succ ≤ m := Nat.succ_le_of_lt hm
+        have hadd : (q.size - 1).succ = q.size := Nat.succ_pred_eq_of_pos q_nonempty
+        have hge : q.size ≤ m := by
+          simp_all only [Nat.succ_eq_add_one]
+        have hq : q.coeff m = 0 := by
+          simp [UniPoly.coeff, Array.getD_eq_getD_getElem?, Array.getElem?_eq_none hge]
+        have hpq : p.coeff m = q.coeff m := by
+          have := Trim.coeff_eq_coeff (p := p) (i := m)
+          simpa [q] using this.symm
+        have hp : p.coeff m = 0 := by simpa [hpq] using hq
+        simp [coeff_toPoly, hp])
+    · exact Polynomial.le_natDegree_of_ne_zero coeff_last_nonzero
+  calc
+    p.degree = q.size := deg_p_eq_sz_q
+    _ = (q.size - 1) + 1 := (Nat.succ_pred_eq_of_pos q_nonempty).symm
+    _ = p.toPoly.natDegree + 1 := by simp [natDeg_eq]
+
+/-- variant of `degree_toPoly` solving for `p.toPoly.natDegree` -/
+theorem degree_toPoly' {p : UniPoly R} [LawfulBEq R]
+    (hnz : ∃ i, p.coeff i ≠ 0) : p.degree - 1 = p.toPoly.natDegree := by
+  simp_all only [Array.getD_eq_getD_getElem?, ne_eq, degree_toPoly, add_tsub_cancel_right]
+
+
 end ToPoly
 
 section Equiv
@@ -989,59 +1051,6 @@ def sub {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : Q
   Quotient.lift₂ sub_descending sub_descends p q
 
 -- TODO the other operations ...
-
-/-- degree is the mathlib degree + 1 -/
-theorem degree_toPoly_nz {p : UniPoly R} [LawfulBEq R]
-    (hnz : ∃ i, p.coeff i ≠ 0) : p.degree = p.toPoly.natDegree + 1 := by
-  classical
-  let q := p.trim
-  have deg_p_eq_sz_q : p.degree = q.size := by simpa [q] using (Trim.size_eq_degree (p := p)).symm
-  have q_nonempty : 0 < q.size := by
-    rcases hnz with ⟨i, hi⟩
-    cases Trim.elim p with
-    | inl h =>
-        have : ∀ j, p.coeff j = 0 := by
-          intro j
-          rcases lt_or_ge j p.size with hj | hj
-          · simpa [UniPoly.coeff, Array.getD_eq_getD_getElem?, hj] using h.2 j hj
-          · simp [UniPoly.coeff, Array.getD_eq_getD_getElem?, Array.getElem?_eq_none hj]
-        exact (hi (this i)).elim
-    | inr h =>
-        rcases h with ⟨k, h_extract, h_nz, -⟩
-        have : q.size = k + 1 := by
-          have := congrArg Array.size h_extract
-          simpa [q, Array.size_extract, Nat.succ_le_of_lt k.is_lt] using this
-        simp [this]
-  have coeff_last_nonzero : p.toPoly.coeff (q.size - 1) ≠ 0 := by
-    have q_canon : q.trim = q := by simpa [q] using Trim.trim_twice (p := p)
-    have hlast : q.getLast q_nonempty ≠ 0 := (Trim.canonical_iff (p := q)).mp q_canon q_nonempty
-    have hqcoeff : q.coeff (q.size - 1) ≠ 0 := by
-      have hlt : q.size - 1 < q.size := by simp [q_nonempty]
-      simpa [coeff_eq_getElem (p := q) (i := q.size - 1) hlt, Array.getLast] using hlast
-    have hpq : p.coeff (q.size - 1) = q.coeff (q.size - 1) := by
-      have := Trim.coeff_eq_coeff (p := p) (i := q.size - 1)
-      simpa [q] using this.symm
-    have hpcoeff : p.coeff (q.size - 1) ≠ 0 := by simpa [hpq] using hqcoeff
-    simpa [coeff_toPoly] using hpcoeff
-  have natDeg_eq : p.toPoly.natDegree = q.size - 1 := by
-    apply le_antisymm
-    · exact Polynomial.natDegree_le_iff_coeff_eq_zero.mpr (fun m hm => by
-        have hsucc : (q.size - 1).succ ≤ m := Nat.succ_le_of_lt hm
-        have hadd : (q.size - 1).succ = q.size := Nat.succ_pred_eq_of_pos q_nonempty
-        have hge : q.size ≤ m := by
-          simp_all only [Nat.succ_eq_add_one]
-        have hq : q.coeff m = 0 := by
-          simp [UniPoly.coeff, Array.getD_eq_getD_getElem?, Array.getElem?_eq_none hge]
-        have hpq : p.coeff m = q.coeff m := by
-          have := Trim.coeff_eq_coeff (p := p) (i := m)
-          simpa [q] using this.symm
-        have hp : p.coeff m = 0 := by simpa [hpq] using hq
-        simp [coeff_toPoly, hp])
-    · exact Polynomial.le_natDegree_of_ne_zero coeff_last_nonzero
-  calc
-    p.degree = q.size := deg_p_eq_sz_q
-    _ = (q.size - 1) + 1 := (Nat.succ_pred_eq_of_pos q_nonempty).symm
-    _ = p.toPoly.natDegree + 1 := by simp [natDeg_eq]
 
 end QuotientUniPoly
 
