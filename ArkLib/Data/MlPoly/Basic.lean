@@ -460,7 +460,9 @@ lemma forwardRange_0_eq_finRange (n : ℕ) [NeZero n] : forwardRange n ⟨n - 1,
   apply List.ext_get
   · rw [forwardRange_length, List.length_finRange]
     simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, tsub_zero]
-    sorry
+    have : n ≥ 1 := by
+      exact NeZero.one_le
+    simp_all only [ge_iff_le, Nat.sub_add_cancel]
   · intro i hi h₂
     have h_fr_get := forwardRange_getElem (n:=n) (r:=⟨n - 1, by grind only⟩) (l:=0) (k:=⟨i, by
       rw [forwardRange_length] at hi
