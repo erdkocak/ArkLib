@@ -79,7 +79,7 @@ def backwardPermutationOracle (α : Type*) : OracleSpec Unit := α →ₒ α
   for the forward and backward directions. -/
 @[reducible]
 def permutationOracle (α : Type*) : OracleSpec PermuteDir :=
-  forwardPermutationOracle α ++ₒ backwardPermutationOracle α
+  forwardPermutationOracle α + backwardPermutationOracle α
 
 end OracleSpec
 

@@ -223,7 +223,7 @@ namespace Prover
 
 theorem cast_processRound (j : Fin n₁)
     (P : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec₁)
-    (currentResult : OracleComp (oSpec ++ₒ [pSpec₁.Challenge]ₒ)
+    (currentResult : OracleComp (oSpec + [pSpec₁.Challenge]ₒ)
       (Transcript j.castSucc pSpec₁ × P.PrvState j.castSucc)) :
     P.processRound j currentResult =
       cast (sorry) ((P.cast hn hSpec).processRound (Fin.cast hn j) sorry) := by

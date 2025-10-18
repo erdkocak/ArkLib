@@ -408,7 +408,7 @@ lemma challengeOracleInterface_append_range_inr (j : pSpec₂.ChallengeIdx) :
 variable [∀ i, SampleableType (pSpec₁.Challenge i)] [∀ i, SampleableType (pSpec₂.Challenge i)]
 
 instance instSubSpecOfProtocolSpecAppendChallenge :
-    SubSpec ([pSpec₁.Challenge]ₒ ++ₒ [pSpec₂.Challenge]ₒ) ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
+    SubSpec ([pSpec₁.Challenge]ₒ + [pSpec₂.Challenge]ₒ) ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
   monadLift | query i t => match i with
     | Sum.inl j => by
       simpa using query (spec := [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) j.inl ()

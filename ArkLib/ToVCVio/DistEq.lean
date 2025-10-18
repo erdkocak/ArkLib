@@ -10,6 +10,8 @@ import ArkLib.ToVCVio.SimOracle
 
   We define distributional equality of oracle computations (or more generally, any monad `m` with
   an `HasEvalDist` instance).
+
+  TODO: This should maybe be generalized with the new distribution stuff
 -/
 
 universe u v w
@@ -18,7 +20,7 @@ open OracleComp SimOracle
 
 namespace HasEvalDist
 
-variable {m : Type u → Type v} [Monad m] [HasEvalDist m]
+variable {m : Type u → Type v} [Monad m] [HasEvalSPMF m]
 
 def eq {α : Type u} (mx my : m α) : Prop :=
   evalDist mx = evalDist my
@@ -40,7 +42,7 @@ namespace OracleComp
 
 -- Shouldn't have to define this separately once we have an instance `HasEvalDist (OracleComp spec)`
 
-variable {ι : Type u} {spec : OracleSpec ι} [spec.FiniteRange] {α : Type u}
+variable {spec : OracleSpec} [spec.Fintype] [spec.Inhabited] {α : Type u}
 
 def distEq (mx my : OracleComp spec α) : Prop :=
   evalDist mx = evalDist my

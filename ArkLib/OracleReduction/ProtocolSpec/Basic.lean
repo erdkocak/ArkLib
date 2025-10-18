@@ -772,7 +772,7 @@ namespace MessagesUpTo
 def deriveTranscriptSRAux {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmt : StmtIn) (k : Fin (n + 1)) (messages : pSpec.MessagesUpTo k)
     (j : Fin (k + 1)) :
-    OracleComp (oSpec ++ₒ fsChallengeOracle StmtIn pSpec)
+    OracleComp (oSpec + fsChallengeOracle StmtIn pSpec)
       (pSpec.Transcript (j.castLE (by omega))) := do
   Fin.induction (n := k)
     (pure (fun i => i.elim0))
@@ -791,7 +791,7 @@ def deriveTranscriptSRAux {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
     state-restoration / Fiat-Shamir oracle for the challenges. -/
 def deriveTranscriptSR {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmt : StmtIn) (k : Fin (n + 1)) (messages : pSpec.MessagesUpTo k) :
-    OracleComp (oSpec ++ₒ fsChallengeOracle StmtIn pSpec) (pSpec.Transcript k) := do
+    OracleComp (oSpec + fsChallengeOracle StmtIn pSpec) (pSpec.Transcript k) := do
   deriveTranscriptSRAux stmt k messages (Fin.last k)
 
 alias deriveTranscriptFS := deriveTranscriptSR
@@ -804,7 +804,7 @@ namespace Messages
     state-restoration / Fiat-Shamir oracle for the challenges. -/
 def deriveTranscriptSR {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmt : StmtIn) (messages : pSpec.Messages) :
-    OracleComp (oSpec ++ₒ fsChallengeOracle StmtIn pSpec) pSpec.FullTranscript := do
+    OracleComp (oSpec + fsChallengeOracle StmtIn pSpec) pSpec.FullTranscript := do
   MessagesUpTo.deriveTranscriptSR stmt (Fin.last n) messages
 
 alias deriveTranscriptFS := deriveTranscriptSR

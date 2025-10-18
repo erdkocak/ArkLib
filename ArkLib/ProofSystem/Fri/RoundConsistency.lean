@@ -156,7 +156,6 @@ lemma generalised_round_consistency_completeness
       rw [this]
       exact (Fin.heq_fun_iff this).mpr (congrFun rfl)
       exact (Fin.heq_fun_iff this).mpr (congrFun rfl)
-      rw [this]
       exact (Fin.heq_fun_iff this).mpr (congrFun rfl)
       exact (Fin.heq_fun_iff this).mpr (congrFun rfl)
     have h₂ : (∑ (j : Fin n), X ^ j.1 * C (eval (s₀ ^ n) (splitNth f n j))).degree < .some n := by

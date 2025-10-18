@@ -284,13 +284,13 @@ structure OracleVerifier {ι : Type} (oSpec : OracleSpec ι)
   access to external oracles `oSpec`, input statement oracles `OStmtIn`, and prover message
   oracles `pSpec.Message`. -/
   verify : StmtIn → pSpec.Challenges →
-    OracleComp (oSpec ++ₒ ([OStmtIn]ₒ ++ₒ [pSpec.Message]ₒ)) StmtOut
+    OracleComp (oSpec + ([OStmtIn]ₒ + [pSpec.Message]ₒ)) StmtOut
 
   -- TODO: this seems like the right way for compositionality
   -- Makes it potentially more difficult for compilation with commitment schemes
   -- Can recover the old version (with `embed` and `hEq`) via a constructor `QueryImpl.ofEmbed`
 
-  -- simOStmt : QueryImpl [OStmtOut]ₒ (OracleComp ([OStmtIn]ₒ ++ₒ [pSpec.Message]ₒ))
+  -- simOStmt : QueryImpl [OStmtOut]ₒ (OracleComp ([OStmtIn]ₒ + [pSpec.Message]ₒ))
 
   /-- An embedding that specifies how each output oracle statement (indexed by `ιₛₒ`) is derived.
   It maps an index `i : ιₛₒ` to either an index `j : ιₛᵢ` (meaning `OStmtOut i` comes from
@@ -342,7 +342,7 @@ def toVerifier : Verifier oSpec (StmtIn × ∀ i, OStmtIn i) (StmtOut × (∀ i,
   TODO: define once `numQueries` is defined in `OracleComp` -/
 def numQueries (stmt : StmtIn) (challenges : ∀ i, pSpec.Challenge i)
     (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec) :
-  OracleComp (oSpec ++ₒ ([OStmtIn]ₒ ++ₒ [pSpec.Message]ₒ)) ℕ := sorry
+  OracleComp (oSpec + ([OStmtIn]ₒ + [pSpec.Message]ₒ)) ℕ := sorry
 
 /-- A **non-adaptive** oracle verifier is an oracle verifier that makes a **fixed** list of queries
     to the input oracle statements and the prover's messages. These queries can depend on the input

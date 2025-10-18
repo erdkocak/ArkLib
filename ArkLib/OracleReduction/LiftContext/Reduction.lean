@@ -212,7 +212,7 @@ theorem liftContext_processRound
                         OuterWitIn OuterWitOut InnerWitIn InnerWitOut}
     {i : Fin n}
     {P : Prover oSpec InnerStmtIn InnerWitIn InnerStmtOut InnerWitOut pSpec}
-    {resultRound : OracleComp (oSpec ++ₒ [pSpec.Challenge]ₒ)
+    {resultRound : OracleComp (oSpec + [pSpec.Challenge]ₒ)
       (pSpec.Transcript i.castSucc × (P.liftContext lens).PrvState i.castSucc)} :
       (P.liftContext lens).processRound i resultRound
       = do

@@ -32,7 +32,7 @@ def randSpec (β : Type) : OracleSpec Unit := fun _ => (Unit, β)
 def ROspec (α β γ : Type) : OracleSpec Unit := fun _ => (α × β, γ)
 
 @[reducible]
-def oSpec (α β γ : Type) : OracleSpec (Unit ⊕ Unit) := randSpec β ++ₒ ROspec α β γ
+def oSpec (α β γ : Type) : OracleSpec (Unit ⊕ Unit) := randSpec β + ROspec α β γ
 
 variable {α β γ : Type}
 

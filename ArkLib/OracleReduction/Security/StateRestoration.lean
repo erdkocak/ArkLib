@@ -31,7 +31,7 @@ This is different from the state-restoration prover type in the knowledge soundn
 additionally needs to output an output witness. -/
 def StateRestoration.Soundness (oSpec : OracleSpec ι) (StmtIn : Type)
     {n : ℕ} (pSpec : ProtocolSpec n) :=
-  OracleComp (oSpec ++ₒ (srChallengeOracle StmtIn pSpec)) (StmtIn × pSpec.Messages)
+  OracleComp (oSpec + (srChallengeOracle StmtIn pSpec)) (StmtIn × pSpec.Messages)
 
 /-- The type for the **state-restoration** prover in the knowledge soundness game.
 
@@ -43,7 +43,7 @@ Note that the output witness is an addition compared to the state-restoration so
 type. -/
 def StateRestoration.KnowledgeSoundness (oSpec : OracleSpec ι) (StmtIn WitOut : Type)
     {n : ℕ} (pSpec : ProtocolSpec n) :=
-  OracleComp (oSpec ++ₒ (srChallengeOracle StmtIn pSpec)) (StmtIn × pSpec.Messages × WitOut)
+  OracleComp (oSpec + (srChallengeOracle StmtIn pSpec)) (StmtIn × pSpec.Messages × WitOut)
 
 end Prover
 
@@ -81,7 +81,7 @@ def StateRestoration (oSpec : OracleSpec ι)
   StmtIn → -- input statement
   WitOut → -- output witness
   pSpec.FullTranscript → -- transcript
-  QueryLog (oSpec ++ₒ (srChallengeOracle StmtIn pSpec)) → -- prover's query log
+  QueryLog (oSpec + (srChallengeOracle StmtIn pSpec)) → -- prover's query log
   QueryLog oSpec → -- verifier's query log
   OracleComp oSpec WitIn -- an oracle computation that outputs an input witness
 
@@ -101,7 +101,7 @@ variable {oSpec : OracleSpec ι}
   prover to derive the full transcript from the messages output by the prover, with the challenges
   computed from the state-restoration oracle. -/
 def srSoundnessGame (P : Prover.StateRestoration.Soundness oSpec StmtIn pSpec) :
-    OracleComp (oSpec ++ₒ (srChallengeOracle StmtIn pSpec))
+    OracleComp (oSpec + (srChallengeOracle StmtIn pSpec))
       (pSpec.FullTranscript × StmtIn) := do
   let ⟨stmtIn, messages⟩ ← P
   let transcript ← messages.deriveTranscriptSR stmtIn
@@ -113,7 +113,7 @@ def srSoundnessGame (P : Prover.StateRestoration.Soundness oSpec StmtIn pSpec) :
 -/
 def srKnowledgeSoundnessGame
     (P : Prover.StateRestoration.KnowledgeSoundness oSpec StmtIn WitOut pSpec) :
-    OracleComp (oSpec ++ₒ (srChallengeOracle StmtIn pSpec))
+    OracleComp (oSpec + (srChallengeOracle StmtIn pSpec))
       (pSpec.FullTranscript × StmtIn × WitOut) := do
   let ⟨stmtIn, messages, witOut⟩ ← P
   let transcript ← messages.deriveTranscriptSR stmtIn

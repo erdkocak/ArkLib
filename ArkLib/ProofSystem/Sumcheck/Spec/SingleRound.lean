@@ -847,11 +847,11 @@ def oracleVerifier (i : Fin n) : OracleVerifier oSpec
     let evals : List R ← (List.finRange m).mapM
       (fun i => do
         return ← query
-          (spec := (oSpec ++ₒ ([OracleStatement R n deg]ₒ ++ₒ [(pSpec R deg).Message]ₒ)))
+          (spec := (oSpec + ([OracleStatement R n deg]ₒ + [(pSpec R deg).Message]ₒ)))
             (Sum.inr <| Sum.inr default) (D i))
     guard (evals.sum = target)
     let newTarget ← query
-      (spec := (oSpec ++ₒ ([OracleStatement R n deg]ₒ ++ₒ [(pSpec R deg).Message]ₒ)))
+      (spec := (oSpec + ([OracleStatement R n deg]ₒ + [(pSpec R deg).Message]ₒ)))
         (Sum.inr <| Sum.inr default) (by simpa only using chal default)
     letI newTarget : R := by simpa only
     pure ⟨newTarget, Fin.snoc challenges (chal default)⟩
