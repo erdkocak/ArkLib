@@ -355,7 +355,7 @@ end FullTranscript
 
 section Append
 
-variable {ι : Type} {oSpec : OracleSpec ι} {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type}
+variable {oSpec : OracleSpec} {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type}
   {m n : ℕ} {pSpec₁ : ProtocolSpec m} {pSpec₂ : ProtocolSpec n}
 
 /-- If two protocols have sampleable challenges, then their concatenation also has sampleable
@@ -383,43 +383,46 @@ instance : ∀ i, OracleInterface ((pSpec₁ ++ₚ pSpec₂).Challenge i) := cha
 
 @[simp]
 lemma challengeOracleInterface_append_domain_inl (j : pSpec₁.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ.domain (.inl j) = Unit := by
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.domain = Unit := by
   simp [OracleSpec.domain, ChallengeIdx.inl, ProtocolSpec.append, OracleInterface.toOracleSpec,
     instOracleInterfaceChallengeAppend, challengeOracleInterface]
 
 @[simp]
 lemma challengeOracleInterface_append_range_inl (j : pSpec₁.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ.range (.inl j) = pSpec₁.Challenge j := by
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.range () = pSpec₁.Challenge j := by
   simp [OracleSpec.range, ChallengeIdx.inl, ProtocolSpec.append, OracleInterface.toOracleSpec,
     instOracleInterfaceChallengeAppend, challengeOracleInterface]
 
 @[simp]
 lemma challengeOracleInterface_append_domain_inr (j : pSpec₂.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ.domain (.inr j) = Unit := by
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.domain = Unit := by
   simp [OracleSpec.domain, ChallengeIdx.inr, ProtocolSpec.append, OracleInterface.toOracleSpec,
     instOracleInterfaceChallengeAppend, challengeOracleInterface]
 
 @[simp]
 lemma challengeOracleInterface_append_range_inr (j : pSpec₂.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ.range (.inr j) = pSpec₂.Challenge j := by
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.range () = pSpec₂.Challenge j := by
   simp [OracleSpec.range, ChallengeIdx.inr, ProtocolSpec.append, OracleInterface.toOracleSpec,
     instOracleInterfaceChallengeAppend, challengeOracleInterface]
 
 variable [∀ i, SampleableType (pSpec₁.Challenge i)] [∀ i, SampleableType (pSpec₂.Challenge i)]
 
-instance instSubSpecOfProtocolSpecAppendChallenge :
-    SubSpec ([pSpec₁.Challenge]ₒ + [pSpec₂.Challenge]ₒ) ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
-  monadLift | query i t => match i with
-    | Sum.inl j => by
-      simpa using query (spec := [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) j.inl ()
-    | Sum.inr j => by
-      simpa using query (spec := [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) j.inr ()
+-- instance instSubSpecOfProtocolSpecAppendChallenge (j : pSpec₁.ChallengeIdx) (j' : pSpec₂.ChallengeIdx) :
+--     SubSpec ([pSpec₁.Challenge j]ₒ + [pSpec₂.Challenge j']ₒ) ([(pSpec₁ ++ₚ pSpec₂).Challenge (by
+--       simp
+--       sorry
+--     )]ₒ) where
+--   monadLift | query i t => match i with
+--     | Sum.inl j => by
+--       simpa using query (spec := [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) j.inl ()
+--     | Sum.inr j => by
+--       simpa using query (spec := [(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) j.inr ()
 
-instance : SubSpec [pSpec₁.Challenge]ₒ ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
-  monadLift | query i t => instSubSpecOfProtocolSpecAppendChallenge.monadLift (query (Sum.inl i) t)
+-- instance : SubSpec [pSpec₁.Challenge]ₒ ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
+--   monadLift | query i t => instSubSpecOfProtocolSpecAppendChallenge.monadLift (query (Sum.inl i) t)
 
-instance : SubSpec [pSpec₂.Challenge]ₒ ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
-  monadLift | query i t => instSubSpecOfProtocolSpecAppendChallenge.monadLift (query (Sum.inr i) t)
+-- instance : SubSpec [pSpec₂.Challenge]ₒ ([(pSpec₁ ++ₚ pSpec₂).Challenge]ₒ) where
+--   monadLift | query i t => instSubSpecOfProtocolSpecAppendChallenge.monadLift (query (Sum.inr i) t)
 
 end Append
 

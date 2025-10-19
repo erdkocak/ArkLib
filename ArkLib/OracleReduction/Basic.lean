@@ -59,7 +59,7 @@ We note that this file only defines the type signature of IORs. The semantics of
 can be found in `Execution.lean`, while the security notions are found in the `Security` folder.
 
 Note the appearance of the various dependencies in the type signatures:
-- `oSpec : OracleSpec ι` comes first, as we expect this to be the ambient (fixed) shared oracle
+- `oSpec : OracleSpec` comes first, as we expect this to be the ambient (fixed) shared oracle
   specification for the protocol
 - `StmtIn` comes next, as the type of the input statement to the protocol
 - Then we have `OStmtIn` for the type of the oracle input statements (for oracle reductions),
@@ -78,7 +78,7 @@ verifier).
 open OracleComp OracleSpec SubSpec ProtocolSpec
 
 -- Add an indexer?
-structure Indexer {ι : Type} (oSpec : OracleSpec ι) {n : ℕ} (pSpec : ProtocolSpec n) (Index : Type)
+structure Indexer (oSpec : OracleSpec) {n : ℕ} (pSpec : ProtocolSpec n) (Index : Type)
     (Encoding : Type) where
   encode : Index → OracleComp oSpec Encoding
   [OracleInterface : OracleInterface Encoding]
@@ -147,7 +147,7 @@ For maximum simplicity, we only define the `sendMessage` function as an oracle c
 other functions are pure. We may revisit this decision in the future.
 -/
 @[ext]
-structure ProverRound {ι : Type} (oSpec : OracleSpec ι) {n : ℕ} (pSpec : ProtocolSpec n)
+structure ProverRound (oSpec : OracleSpec) {n : ℕ} (pSpec : ProtocolSpec n)
     extends ProverState n where
   /-- Send a message and update the prover's state -/
   sendMessage (i : MessageIdx pSpec) :
@@ -164,7 +164,7 @@ structure ProverRound {ι : Type} (oSpec : OracleSpec ι) {n : ℕ} (pSpec : Pro
   witness.
 -/
 @[ext]
-structure ProverOutput {ι : Type} (oSpec : OracleSpec ι) (Output PrvState : Type) where
+structure ProverOutput (oSpec : OracleSpec) (Output PrvState : Type) where
   output : PrvState → OracleComp oSpec Output
 
 /-- The type of algorithms that participates in an (interactive) reduction in the role of the
@@ -178,7 +178,7 @@ structure ProverOutput {ι : Type} (oSpec : OracleSpec ι) (Output PrvState : Ty
 
 This is useful when modeling soundness, since we do not want to mandate that adversarial provers in
 the soundness game need to input or output anything. -/
-structure ProverInteraction {ι : Type} (oSpec : OracleSpec ι) {n : ℕ} (pSpec : ProtocolSpec n)
+structure ProverInteraction  (oSpec : OracleSpec) {n : ℕ} (pSpec : ProtocolSpec n)
     extends ProverState n, ProverInit (PrvState 0), ProverRound oSpec pSpec
 
 /-- The type of algorithms that participates in an (interactive) reduction in the role of the
@@ -193,7 +193,7 @@ provers in the knowledge soundness game need to input the input statement or wit
 need the adversarial prover to output any output statement, as such values are sourced from the
 verifier.
 -/
-structure ProverInteractionWithOutput {ι : Type} (oSpec : OracleSpec ι) (Output : Type)
+structure ProverInteractionWithOutput (oSpec : OracleSpec) (Output : Type)
     {n : ℕ} (pSpec : ProtocolSpec n) extends
       ProverState n,
       ProverInit (PrvState 0),
@@ -215,7 +215,7 @@ together. For completeness, we will require that the prover's output statement i
 the verifier's output statement. For soundness and knowledge soundness, we will use more restricted
 types of provers (see `ProverInteraction` and `ProverInteractionWithOutput`). -/
 @[ext]
-structure Prover {ι : Type} (oSpec : OracleSpec ι)
+structure Prover (oSpec : OracleSpec)
     (StmtIn WitIn StmtOut WitOut : Type)
     {n : ℕ} (pSpec : ProtocolSpec n) extends
       ProverState n,
@@ -240,7 +240,7 @@ prove knowledge soundness implies soundness.
 /-- A verifier of an interactive protocol is a function that takes in the input statement and the
   transcript, and performs an oracle computation that outputs a new statement -/
 @[ext]
-structure Verifier {ι : Type} (oSpec : OracleSpec ι)
+structure Verifier (oSpec : OracleSpec)
     (StmtIn StmtOut : Type) {n : ℕ} (pSpec : ProtocolSpec n) where
   verify : StmtIn → FullTranscript pSpec → OracleComp oSpec StmtOut
 
@@ -248,7 +248,7 @@ structure Verifier {ι : Type} (oSpec : OracleSpec ι)
       reduction whose input statement also consists of the underlying messages for the oracle
       statements -/
 @[reducible, inline]
-def OracleProver {ι : Type} (oSpec : OracleSpec ι)
+def OracleProver (oSpec : OracleSpec)
     (StmtIn : Type) {ιₛᵢ : Type} (OStmtIn : ιₛᵢ → Type) (WitIn : Type)
     (StmtOut : Type) {ιₛₒ : Type} (OStmtOut : ιₛₒ → Type) (WitOut : Type)
     {n : ℕ} (pSpec : ProtocolSpec n) :=
@@ -268,12 +268,12 @@ def OracleProver {ι : Type} (oSpec : OracleSpec ι)
 Intuitively, the oracle verifier cannot do anything more in returning the output oracle statements,
 other than specifying a subset of the ones it has received (and dropping the rest). -/
 @[ext]
-structure OracleVerifier {ι : Type} (oSpec : OracleSpec ι)
+structure OracleVerifier (oSpec : OracleSpec)
     (StmtIn : Type) {ιₛᵢ : Type} (OStmtIn : ιₛᵢ → Type)
     (StmtOut : Type) {ιₛₒ : Type} (OStmtOut : ιₛₒ → Type)
     {n : ℕ} (pSpec : ProtocolSpec n)
-    [Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)]
-    [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
+    [Oₛᵢ : OracleInterface ((i : ιₛᵢ) × OStmtIn i)]
+    [Oₘ : OracleInterface ((i : pSpec.MessageIdx) × pSpec.Message i)]
     where
     -- This will be needed after the switch to `simOStmt`
     -- [Oₛₒ : ∀ i, OracleInterface (OStmtOut i)]
@@ -284,7 +284,8 @@ structure OracleVerifier {ι : Type} (oSpec : OracleSpec ι)
   access to external oracles `oSpec`, input statement oracles `OStmtIn`, and prover message
   oracles `pSpec.Message`. -/
   verify : StmtIn → pSpec.Challenges →
-    OracleComp (oSpec + ([OStmtIn]ₒ + [pSpec.Message]ₒ)) StmtOut
+    OracleComp (oSpec + ([(i : ιₛᵢ) × OStmtIn i]ₒ +
+      [(i : pSpec.MessageIdx) × pSpec.Message i]ₒ)) StmtOut
 
   -- TODO: this seems like the right way for compositionality
   -- Makes it potentially more difficult for compilation with commitment schemes
@@ -314,23 +315,26 @@ structure OracleVerifier {ι : Type} (oSpec : OracleSpec ι)
 
 namespace OracleVerifier
 
-variable {ι : Type} {oSpec : OracleSpec ι}
+variable {oSpec : OracleSpec}
     {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type}
     {StmtOut : Type} {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
     {n : ℕ} {pSpec : ProtocolSpec n}
-    [Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)]
-    [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
+    [Oₛᵢ : OracleInterface ((i : ιₛᵢ) × OStmtIn i)]
+    [Oₘ : OracleInterface ((i : pSpec.MessageIdx) × pSpec.Message i)]
     (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec)
 
 /-- An oracle verifier can be seen as a (non-oracle) verifier by providing the oracle interface
   using its knowledge of the oracle statements and the transcript messages in the clear -/
-def toVerifier : Verifier oSpec (StmtIn × ∀ i, OStmtIn i) (StmtOut × (∀ i, OStmtOut i)) pSpec where
+def toVerifier : Verifier oSpec (StmtIn × (i : ιₛᵢ) × OStmtIn i)
+    (StmtOut × ((i : pSpec.MessageIdx) × pSpec.Message i)) pSpec where
   verify := fun ⟨stmt, oStmt⟩ transcript => do
     let stmtOut ← simulateQ (OracleInterface.simOracle2 oSpec oStmt transcript.messages)
       (verifier.verify stmt transcript.challenges)
-    letI oStmtOut := fun i => match h : verifier.embed i with
-      | Sum.inl j => by simpa only [verifier.hEq, h] using (oStmt j)
-      | Sum.inr j => by simpa only [verifier.hEq, h] using (transcript j)
+    letI oStmtOut :=
+      sorry
+      -- fun i => match h : verifier.embed i with
+      -- | Sum.inl j => by simpa only [verifier.hEq, h] using (oStmt)
+      -- | Sum.inr j => by simpa only [verifier.hEq, h] using (transcript, _ )
     return (stmtOut, oStmtOut)
 
 /-- The number of queries made to the oracle statements and the prover's messages, for a given input
@@ -361,7 +365,7 @@ def numQueries (stmt : StmtIn) (challenges : ∀ i, pSpec.Challenge i)
   Finally, we also allow for choosing a subset of the input oracle statements + the prover's
   messages to retain for the output oracle statements.
 -/
-structure NonAdaptive {ι : Type} (oSpec : OracleSpec ι)
+structure NonAdaptive (oSpec : OracleSpec)
     (StmtIn : Type) {ιₛᵢ : Type} (OStmtIn : ιₛᵢ → Type)
     (StmtOut : Type) {ιₛₒ : Type} (OStmtOut : ιₛₒ → Type)
     {n : ℕ} (pSpec : ProtocolSpec n)
@@ -442,7 +446,7 @@ end OracleVerifier
 /-- An **interactive reduction** for a given protocol specification `pSpec`, and relative to oracles
   defined by `oSpec`, consists of a prover and a verifier. -/
 @[ext]
-structure Reduction {ι : Type} (oSpec : OracleSpec ι)
+structure Reduction (oSpec : OracleSpec)
     (StmtIn WitIn StmtOut WitOut : Type) {n : ℕ} (pSpec : ProtocolSpec n) where
   prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec
   verifier : Verifier oSpec StmtIn StmtOut pSpec
@@ -450,7 +454,7 @@ structure Reduction {ι : Type} (oSpec : OracleSpec ι)
 /-- An **interactive oracle reduction** for a given protocol specification `pSpec`, and relative to
   oracles defined by `oSpec`, consists of a prover and an **oracle** verifier. -/
 @[ext]
-structure OracleReduction {ι : Type} (oSpec : OracleSpec ι)
+structure OracleReduction (oSpec : OracleSpec)
     (StmtIn : Type) {ιₛᵢ : Type} (OStmtIn : ιₛᵢ → Type) (WitIn : Type)
     (StmtOut : Type) {ιₛₒ : Type} (OStmtOut : ιₛₒ → Type) (WitOut : Type)
     {n : ℕ} (pSpec : ProtocolSpec n)
@@ -461,7 +465,7 @@ structure OracleReduction {ι : Type} (oSpec : OracleSpec ι)
 
 /-- An interactive oracle reduction can be seen as an interactive reduction, via coercing the
   oracle verifier to a (normal) verifier -/
-def OracleReduction.toReduction {ι : Type} {oSpec : OracleSpec ι}
+def OracleReduction.toReduction {oSpec : OracleSpec}
     {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type} {WitIn : Type}
     {StmtOut : Type} {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type} {WitOut : Type}
     {n : ℕ} {pSpec : ProtocolSpec n}
@@ -474,7 +478,7 @@ def OracleReduction.toReduction {ι : Type} {oSpec : OracleSpec ι}
 /-- An **interactive proof (IP)** is an interactive reduction where the output statement is a
     boolean, the output witness is trivial (a `Unit`), and the relation checks whether the output
     statement is true. -/
-@[reducible] def Proof {ι : Type} (oSpec : OracleSpec ι)
+@[reducible] def Proof (oSpec : OracleSpec)
     (Statement Witness : Type) {n : ℕ} (pSpec : ProtocolSpec n) :=
   Reduction oSpec Statement Witness Bool Unit pSpec
 
@@ -484,7 +488,7 @@ def OracleReduction.toReduction {ι : Type} {oSpec : OracleSpec ι}
 
     As a consequence, the output relation in an IOP is effectively a function `Bool → Prop`, which
     we can again assume to be the trivial one (sending `true` to `True`). -/
-@[reducible] def OracleProof {ι : Type} (oSpec : OracleSpec ι)
+@[reducible] def OracleProof (oSpec : OracleSpec)
     (Statement : Type) {ιₛᵢ : Type} (OStatement : ιₛᵢ → Type) (Witness : Type)
     {n : ℕ} (pSpec : ProtocolSpec n)
     [Oₛᵢ : ∀ i, OracleInterface (OStatement i)]
@@ -492,25 +496,25 @@ def OracleReduction.toReduction {ι : Type} {oSpec : OracleSpec ι}
   OracleReduction oSpec Statement OStatement Witness Bool (fun _ : Empty => Unit) Unit pSpec
 
 /-- A **non-interactive prover** is a prover that only sends a single message to the verifier. -/
-@[reducible] def NonInteractiveProver (Message : Type) {ι : Type} (oSpec : OracleSpec ι)
+@[reducible] def NonInteractiveProver (Message : Type) (oSpec : OracleSpec)
     (StmtIn WitIn StmtOut WitOut : Type) :=
   Prover oSpec StmtIn WitIn StmtOut WitOut ⟨!v[.P_to_V], !v[Message]⟩
 
 /-- A **non-interactive verifier** is a verifier that only receives a single message from the
   prover. -/
-@[reducible] def NonInteractiveVerifier (Message : Type) {ι : Type} (oSpec : OracleSpec ι)
+@[reducible] def NonInteractiveVerifier (Message : Type) (oSpec : OracleSpec)
     (StmtIn StmtOut : Type) :=
   Verifier oSpec StmtIn StmtOut ⟨!v[.P_to_V], !v[Message]⟩
 
 /-- A **non-interactive reduction** is an interactive reduction with only a single message from the
   prover to the verifier (and none in the other direction). -/
-@[reducible] def NonInteractiveReduction (Message : Type) {ι : Type} (oSpec : OracleSpec ι)
+@[reducible] def NonInteractiveReduction (Message : Type) (oSpec : OracleSpec)
     (StmtIn WitIn StmtOut WitOut : Type) :=
   Reduction oSpec StmtIn WitIn StmtOut WitOut ⟨!v[.P_to_V], !v[Message]⟩
 
 section Trivial
 
-variable {ι : Type} {oSpec : OracleSpec ι}
+variable {oSpec : OracleSpec}
     {Statement : Type} {ιₛ : Type} {OStatement : ιₛ → Type} {Witness : Type}
     [Oₛ : ∀ i, OracleInterface (OStatement i)]
 
@@ -733,7 +737,7 @@ end ProtocolSpec
 
 section IsPure
 
-variable {ι : Type} {oSpec : OracleSpec ι}
+variable {oSpec : OracleSpec}
     {StmtIn WitIn StmtOut WitOut : Type} {n : ℕ} {pSpec : ProtocolSpec n}
 
 class Prover.IsPure (P : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) where
