@@ -68,37 +68,38 @@ namespace OracleSpec
 /-- The oracle specification for the forward permutation of a type `α`. Just a wrapper around
 `α →ₒ α` -/
 @[reducible]
-def forwardPermutationOracle (α : Type*) : OracleSpec Unit := α →ₒ α
+def forwardPermutationOracle (α : Type*) : OracleSpec := α →ₒ α
 
 /-- The oracle specification for the backward permutation of a type `α`. Just a wrapper around
 `α →ₒ α` -/
 @[reducible]
-def backwardPermutationOracle (α : Type*) : OracleSpec Unit := α →ₒ α
+def backwardPermutationOracle (α : Type*) : OracleSpec := α →ₒ α
 
 /-- Oracle specification for an ideal permutation, which is the concatenation of the specifications
   for the forward and backward directions. -/
 @[reducible]
-def permutationOracle (α : Type*) : OracleSpec PermuteDir :=
+def permutationOracle (α : Type*) : OracleSpec :=
   forwardPermutationOracle α + backwardPermutationOracle α
 
 end OracleSpec
 
 /-- Canonical implementation of the forward permutation oracle spec with an actual permutation. -/
 def forwardPermutationOracleImpl {α : Type*} [Permute α] :
-    QueryImpl (forwardPermutationOracle α) Id where
-  impl | query () q => Permute.permute (α := α) q
+    QueryImpl (forwardPermutationOracle α) Id
+  | q => Permute.permute (α := α) q
 
 /-- Canonical implementation of the backward permutation oracle spec with an actual (lawful)
   permutation. -/
 def backwardPermutationOracleImpl {α : Type*} [Permute α] [LawfulPermute α] :
-    QueryImpl (backwardPermutationOracle α) Id where
-  impl | query () q => LawfulPermute.permuteInv (α := α) q
+    QueryImpl (backwardPermutationOracle α) Id
+  | q => LawfulPermute.permuteInv (α := α) q
 
 /-- Canonical implementation of the permutation oracle spec with an actual permutation.
 (of course, during proofs, we would idealize the permutation as being random) -/
 def permutationOracleImpl {α : Type*} [Permute α] [LawfulPermute α] :
-    QueryImpl (permutationOracle α) Id :=
-  SimOracle.append forwardPermutationOracleImpl backwardPermutationOracleImpl
+    QueryImpl (permutationOracle α) Id
+  | .inl q => forwardPermutationOracleImpl q
+  | .inr q => backwardPermutationOracleImpl q
 
 end move_elsewhere
 

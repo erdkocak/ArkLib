@@ -49,8 +49,8 @@ However, this won't be possible until `OracleSpec` is changed to be an alias for
 @[ext]
 class OracleInterface (Message : Type u) where
   Query : Type v
-  Response : Type w
-  answer : Message → Query → Response
+  Response : Query → Type w
+  answer : Message → (t : Query) → Response t
 
 namespace OracleInterface
 
@@ -60,7 +60,7 @@ namespace OracleInterface
 -/
 def instDefault {Message : Type u} : OracleInterface Message where
   Query := Unit
-  Response := Message
+  Response _ := Message
   answer := fun m _ => m
 
 instance {Message : Type u} : Inhabited (OracleInterface Message) :=
@@ -73,7 +73,7 @@ open SimOracle
 Notation: `[v]ₒ` for when the oracle interfaces can be inferred, and `[v]ₒ'O` for when the oracle
 interfaces need to be specified. -/
 def toOracleSpec (v : Type v) [O : OracleInterface v] :
-    OracleSpec := ⟨O.Query, fun _ => O.Response⟩
+    OracleSpec := { A := O.Query, B := O.Response }
 
 @[inherit_doc] notation "[" v "]ₒ" => toOracleSpec v
 @[inherit_doc] notation "[" v "]ₒ'" oI:max => toOracleSpec v (O := oI)
@@ -84,30 +84,30 @@ def toOracleImpl (v : Type v) [O : OracleInterface v]
     (data : v) : QueryImpl [v]ₒ Id :=
   fun t => O.answer data t
 
-/-- Any function type has a canonical `OracleInterface` instance, whose `answer` is the function
-  itself. -/
+/-- Any (dependent) function type has a canonical `OracleInterface` instance,
+whose `answer` is the function itself. -/
 @[reducible, inline]
-instance instFunction {α β : Type*} : OracleInterface (α → β) where
+instance instDFun {α : Type*} {β : α → Type*} : OracleInterface ((t : α) → β t) where
   Query := α
   Response := β
   answer := id
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : DecidableEq (Query v)]
-    [h' : DecidableEq (Response v)] :
+    [h : DecidableEq (O.Query)]
+    [h' : ∀ t, DecidableEq (O.Response t)] :
     [v]ₒ.DecidableEq where
   decidableEq_A := h
-  decidableEq_B := fun _ => h'
+  decidableEq_B := h'
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : Fintype (Response v)] :
+    [h : ∀ t, Fintype (O.Response t)] :
     [v]ₒ.Fintype where
-  fintype_B := fun _ => h
+  fintype_B := h
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : Inhabited (Response v)] :
+    [h : ∀ t, Inhabited (O.Response t)] :
     [v]ₒ.Inhabited where
-  inhabited_B := fun _ => h
+  inhabited_B := h
 
 @[reducible, inline]
 instance {ι₁ : Type u} {T₁ : ι₁ → Type v} [inst₁ : ∀ i, OracleInterface (T₁ i)]
@@ -128,7 +128,7 @@ for the sum behavior on the interface. -/
 instance (priority := low) instTensorProd {α β : Type*}
     [Oα : OracleInterface α] [Oβ : OracleInterface β] : OracleInterface (α × β) where
   Query := Oα.Query × Oβ.Query
-  Response := Oα.Response × Oβ.Response
+  Response t := (Oα.Response t.1) × (Oβ.Response t.2)
   answer := fun (a, b) (q₁, q₂) => (Oα.answer a q₁, Oβ.answer b q₂)
 
 /-- The product oracle interface for the product of two types `α` and `β`, each with its own oracle
@@ -142,10 +142,10 @@ See `instTensor` for the tensor product behavior on the interface. -/
 instance instProd {α β : Type*} [Oα : OracleInterface α] [Oβ : OracleInterface β] :
     OracleInterface (α × β) where
   Query := Oα.Query ⊕ Oβ.Query
-  Response := Oα.Response ⊕ Oβ.Response
+  Response := fun | .inl t => Oα.Response t | .inr t => Oβ.Response t
   answer := fun (a, b) q => match q with
-    | .inl q => .inl (Oα.answer a q)
-    | .inr q => .inr (Oβ.answer b q)
+    | .inl q => (Oα.answer a q)
+    | .inr q => (Oβ.answer b q)
 
 /-- The indexed tensor product oracle interface for the dependent product of a type family `v`,
     indexed by `ι`, each having an oracle interface, is defined as:
@@ -161,7 +161,7 @@ response types). -/
 instance (priority := low) instTensorForall {ι : Type u} (v : ι → Type v)
     [O : ∀ i, OracleInterface (v i)] : OracleInterface (∀ i, v i) where
   Query := (i : ι) → (O i).Query
-  Response := (i : ι) → (O i).Response
+  Response t := (i : ι) → (O i).Response (t i)
   answer := fun f q i => (O i).answer (f i) (q i)
 
 /-- The indexed product oracle interface for the dependent product of a type family `v`, indexed by
@@ -177,11 +177,12 @@ See `instTensorForall` for the tensor product behavior on the interface. -/
 instance instProdForall {ι : Type u} (v : ι → Type v) [O : ∀ i, OracleInterface (v i)] :
     OracleInterface (∀ i, v i) where
   Query := (i : ι) × (O i).Query
-  Response := (i : ι) × (O i).Response
-  answer := fun f ⟨i, q⟩ => ⟨i, (O i).answer (f i) q⟩
+  Response t := (O t.1).Response t.2
+  answer := fun f ⟨i, q⟩ => (O i).answer (f i) q
 
-def append {T₁ T₂ : Type v} [OracleInterface T₁] [OracleInterface T₂] : OracleSpec :=
-  [_]ₒ
+-- def append {ι₁ : Type u} {T₁ : ι₁ → Type v} [∀ i, OracleInterface (T₁ i)]
+--     {ι₂ : Type u} {T₂ : ι₂ → Type v} [∀ i, OracleInterface (T₂ i)] : OracleSpec (ι₁ ⊕ ι₂) :=
+--   [Sum.rec T₁ T₂]ₒ
 
 /-- Combines multiple oracle specifications into a single oracle by routing queries to the
       appropriate underlying oracle. Takes:
@@ -189,10 +190,11 @@ def append {T₁ T₂ : Type v} [OracleInterface T₁] [OracleInterface T₂] : 
     - An indexed type family `T` with `OracleInterface` instances
     - Values of that type family
   Returns a stateless oracle that routes queries to the appropriate underlying oracle. -/
-def simOracle {ι : Type u} (oSpec : OracleSpec ι) {ι' : Type v} {T : ι' → Type w}
-    [∀ i, OracleInterface (T i)] (t : (i : ι') → T i) :
-    SimOracle.Stateless (oSpec + [T]ₒ) oSpec :=
-  idOracle ++ₛₒ (fnOracle [T]ₒ (fun i => answer (t i)))
+def simOracle (oSpec : OracleSpec) {T : Type w}
+    [O : OracleInterface T] (t : T) :
+    QueryImpl (oSpec + [T]ₒ) (OracleComp oSpec)
+  | .inl t => do query t
+  | .inr q => do return (O.answer t q)
 
 /-- Combines multiple oracle specifications into a single oracle by routing queries to the
       appropriate underlying oracle. Takes:
@@ -200,14 +202,13 @@ def simOracle {ι : Type u} (oSpec : OracleSpec ι) {ι' : Type v} {T : ι' → 
     - Two indexed type families `T₁` and `T₂` with `OracleInterface` instances
     - Values of those type families
   Returns a stateless oracle that routes queries to the appropriate underlying oracle. -/
-def simOracle2 {ι : Type u} (oSpec : OracleSpec ι)
-    {ι₁ : Type v} {T₁ : ι₁ → Type w} [∀ i, OracleInterface (T₁ i)]
-    {ι₂ : Type v} {T₂ : ι₂ → Type w} [∀ i, OracleInterface (T₂ i)]
-    (t₁ : ∀ i, T₁ i) (t₂ : ∀ i, T₂ i) : SimOracle.Stateless (oSpec + ([T₁]ₒ + [T₂]ₒ)) oSpec :=
-  idOracle ++ₛₒ
-    fnOracle ([T₁]ₒ + [T₂]ₒ) (fun i => match i with
-      | .inl i => answer (t₁ i)
-      | .inr i => answer (t₂ i))
+def simOracle2 (oSpec : OracleSpec)
+    {T₁ : Type w} [O₁ : OracleInterface T₁]
+    {T₂ : Type w} [O₂ : OracleInterface T₂]
+    (t₁ : T₁) (t₂ : T₂) : QueryImpl (oSpec + ([T₁]ₒ + [T₂]ₒ)) (OracleComp oSpec)
+  | .inl t => do query t
+  | .inr (.inl q) => do return (O₁.answer t₁ q)
+  | .inr (.inr q) => do return (O₂.answer t₂ q)
 
 open Finset in
 /-- A message type together with a `OracleInterface` instance is said to have **oracle distance**
@@ -220,7 +221,7 @@ open Finset in
   message and the query is a position of the codeword. In particular, it applies to
   `(Mv)Polynomial`. -/
 def distanceLE (Message : Type*) [O : OracleInterface Message]
-    [Fintype (O.Query)] [DecidableEq (O.Response)] (d : ℕ) : Prop :=
+    [Fintype (O.Query)] [∀ t, DecidableEq (O.Response t)] (d : ℕ) : Prop :=
   ∀ a b : Message, a ≠ b → #{q | OracleInterface.answer a q = OracleInterface.answer b q} ≤ d
 
 section Polynomial
@@ -233,28 +234,28 @@ variable {R : Type*} [CommSemiring R] {d : ℕ} {σ : Type*}
 @[reducible, inline]
 instance instPolynomial : OracleInterface R[X] where
   Query := R
-  Response := R
+  Response _ := R
   answer := fun poly point => poly.eval point
 
 /-- Univariate polynomials with degree at most `d` can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instPolynomialDegreeLE : OracleInterface (R⦃≤ d⦄[X]) where
   Query := R
-  Response := R
+  Response _ := R
   answer := fun ⟨poly, _⟩ point => poly.eval point
 
 /-- Univariate polynomials with degree less than `d` can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instPolynomialDegreeLT : OracleInterface (R⦃< d⦄[X]) where
   Query := R
-  Response := R
+  Response _ := R
   answer := fun ⟨poly, _⟩ point => poly.eval point
 
 /-- Multivariate polynomials can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instMvPolynomial : OracleInterface (R[X σ]) where
   Query := σ → R
-  Response := R
+  Response _ := R
   answer := fun poly point => eval point poly
 
 /-- Multivariate polynomials with individual degree at most `d` can be accessed via evaluation
@@ -262,7 +263,7 @@ queries. -/
 @[reducible, inline]
 instance instMvPolynomialDegreeLE : OracleInterface (R⦃≤ d⦄[X σ]) where
   Query := σ → R
-  Response := R
+  Response _ := R
   answer := fun ⟨poly, _⟩ point => eval point poly
 
 instance [Fintype σ] [DecidableEq σ] [Fintype R] : Fintype (OracleInterface.Query (R⦃≤ d⦄[X σ])) :=
@@ -282,13 +283,13 @@ variable {n : ℕ} {α : Type*}
 /-- Vectors of the form `List.Vector α n` can be accessed via queries on their indices. -/
 instance instListVector : OracleInterface (List.Vector α n) where
   Query := Fin n
-  Response := α
+  Response _ := α
   answer := fun vec i => vec[i]
 
 /-- Vectors of the form `Vector α n` can be accessed via queries on their indices. -/
 instance instVector : OracleInterface (Vector α n) where
   Query := Fin n
-  Response := α
+  Response _ := α
   answer := fun vec i => vec[i]
 
 end Vector
