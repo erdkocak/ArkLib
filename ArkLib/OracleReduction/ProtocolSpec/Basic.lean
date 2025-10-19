@@ -651,8 +651,8 @@ end OracleInterfaces
 @[reducible, inline, specialize]
 instance challengeOracleInterface {pSpec : ProtocolSpec n} :
     ∀ i, OracleInterface (pSpec.Challenge i) := fun i =>
-  { Query := Unit
-    Response _ := pSpec.Challenge i
+  { domain := Unit
+    range _ := pSpec.Challenge i
     answer := fun c _ => c }
 
 /-- Query a verifier's challenge for a given challenge round `i`, given the default challenge
@@ -685,8 +685,8 @@ the point of deriving a new challenge. To be precise:
 @[reducible, inline, specialize]
 def challengeOracleInterfaceSR (StmtIn : Type) (pSpec : ProtocolSpec n) :
     ∀ i, OracleInterface (pSpec.Challenge i) := fun i =>
-  { Query := StmtIn × pSpec.MessagesUpTo i.1.castSucc
-    Response _ := pSpec.Challenge i
+  { domain := StmtIn × pSpec.MessagesUpTo i.1.castSucc
+    range _ := pSpec.Challenge i
     answer := fun c _ => c }
 
 alias challengeOracleInterfaceFS := challengeOracleInterfaceSR
@@ -724,12 +724,12 @@ alias fsChallengeOracle := srChallengeOracle
 instance {pSpec : ProtocolSpec n} {Statement : Type}
     (i : pSpec.ChallengeIdx) [VCVCompatible (pSpec.Challenge i)] :
     PFunctor.Fintype (srChallengeOracle Statement pSpec i) where
-  fintype_B := fun i => by simp [OracleInterface.toOracleSpec]; infer_instance
+  fintype_B := fun i => by simp; infer_instance
 
 instance {pSpec : ProtocolSpec n} {Statement : Type}
     (i : pSpec.ChallengeIdx) [VCVCompatible (pSpec.Challenge i)] :
     PFunctor.Inhabited (srChallengeOracle Statement pSpec i) where
-  inhabited_B := fun i => by simp [OracleInterface.toOracleSpec]; infer_instance
+  inhabited_B := fun i => by simp; infer_instance
 
 instance {pSpec : ProtocolSpec n} {Statement : Type}
     (i : pSpec.ChallengeIdx) [VCVCompatible (pSpec.Challenge i)] :

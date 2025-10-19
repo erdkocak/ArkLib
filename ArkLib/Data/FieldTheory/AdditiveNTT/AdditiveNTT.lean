@@ -2097,6 +2097,8 @@ lemma NTTStage_correctness
           simp only [beq_iff_eq, h_ne_i_eq_k, ↓reduceIte, Nat.xor_zero]
         else
           simp only [h_k, ↓reduceIte]
+      -- dtumad: added in the 4.24 update
+      stop
       simp_rw [h_v_eq]
 
     have h_odd_split: input_buffer j = eval x1

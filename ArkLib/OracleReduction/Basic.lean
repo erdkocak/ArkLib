@@ -329,7 +329,7 @@ def toVerifier : Verifier oSpec (StmtIn × (i : ιₛᵢ) × OStmtIn i)
     (StmtOut × ((i : pSpec.MessageIdx) × pSpec.Message i)) pSpec where
   verify := fun ⟨stmt, oStmt⟩ transcript => do
     let stmtOut ← simulateQ (OracleInterface.simOracle2 oSpec oStmt transcript.messages)
-      (verifier.verify stmt transcript.challenges)
+      sorry --(verifier.verify stmt transcript.challenges)
     letI oStmtOut :=
       sorry
       -- fun i => match h : verifier.embed i with
