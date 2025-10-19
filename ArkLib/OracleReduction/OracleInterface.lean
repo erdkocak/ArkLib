@@ -52,6 +52,15 @@ class OracleInterface (Message : Type u) where
   Response : Query → Type w
   answer : Message → (t : Query) → Response t
 
+/--
+Devon: I think this is what we should really be working with now.
+Would be nice if `domain`/`range` notation worked, I think that is possible somehow
+-/
+class OracleInterface' (Message : Type u) extends
+    OracleSpec where
+  answer : Message → (t : A) → B t
+  -- answer : Message → (t : domain) → range t
+
 namespace OracleInterface
 
 /-- The default instance for `OracleInterface`, where the query is trivial (a `Unit`) and the
