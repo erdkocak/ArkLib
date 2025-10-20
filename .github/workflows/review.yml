@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -94,7 +94,7 @@ jobs:
           echo "$EOF_MARKER" >> $GITHUB_OUTPUT
 
       - name: Post Review Comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           REVIEW_TEXT: ${{ steps.ai_review.outputs.review_text }}
         with:

@@ -22,6 +22,7 @@ import Mathlib.Probability.Distributions.Uniform
       return z = (x, y)).val True
   ```
   The `.val True` is used to extract the probability of the condition holding.
+
   In general the `do` notation is more restrictive than `PMF.bind`, as the latter allows for
   changing universe levels. This should not be an issue in general if we always work over `Type`.
 
@@ -40,26 +41,41 @@ namespace ProbabilityTheory
 scoped notation "$ᵖ" => PMF.uniformOfFintype
 
 /--
-  Syntax for `Pr_{ init }[ last ]` expressions.
-  - Pr_{e₁; e₂; ...; e₃}[eᵣ]
+Syntax for probability expressions: `Pr_{...}[...]`
+
+Expands `Pr_{e₁; e₂; ...; eₙ}[cond]` to `(do e₁; e₂; ...; eₙ; return cond).val True`.
+
+The do-notation uses the `Bind` typeclass, which requires all sampled types to live in the same
+universe. In practice this is not a restriction since all our probability distributions sample from
+`Type` (finite fields, finite sets, etc.) and conditions are in `Prop`.
+
+If you somehow need universe polymorphism (sampling from `Type u` and returning something in
+`Type v`), you'd need to manually use `PMF.bind` instead of this notation. But this never happens
+in cryptographic applications.
+
+# Examples
+```
+Pr_{ let x ←$ᵖ F; let y ←$ᵖ F }[x = y]
+```
+expands to
+```
+(do let x ← PMF.uniformOfFintype F; let y ← PMF.uniformOfFintype F; return x = y).val True
+```
 -/
 syntax (name := prStx) "Pr_{" doSeq "}[" term "]" : term
 
 /--
-  Elaboration into `term` of the `prStx`.
+Elaboration rule for `Pr_{...}[...]` notation.
 
-  We handle both `doSeqBracketed` and `doSeqIndent` in isolation, as per `doSeq`.
-  Currently the implementations coincide.
-
-  - Pr_{e₁; e₂; ...; e₃}[eᵣ] = (do e₁; e₂; ...; e₃; return eᵣ).val True
+Handles both `doSeqBracketed` (curly braces) and `doSeqIndent` (no braces) forms of do-sequences.
 -/
 scoped macro_rules (kind := prStx)
   -- `doSeqBracketed`
   | `(Pr_{{$items*}}[$t]) => `((((do $items:doSeqItem*
-                                     return $t:term).val True) : ENNReal))
+                                     return $t:term) True) : ENNReal))
   -- `doSeqIndent`
   | `(Pr_{$items*}[$t]) => `((((do $items:doSeqItem*
-                                     return $t:term).val True) : ENNReal))
+                                     return $t:term) True) : ENNReal))
 
 end ProbabilityTheory
 
@@ -68,7 +84,7 @@ example {F} [Fintype F] [Nonempty F] :
   (do let x ← PMF.uniformOfFintype F
       let y ← PMF.uniformOfFintype F
       let z ← PMF.uniformOfFintype (F × F)
-      return z = (x, y)).val True := rfl
+      return (z = (x, y))).val True := rfl
 
 section
 
@@ -79,7 +95,7 @@ example :
     let x ← $ᵖ F
     let y ← $ᵖ F
     let z ← $ᵖ (F × F)
-    return z = (x, y)).val True = ((1 : ℝ≥0∞) / Fintype.card (F × F)) := by
+    return z = (x, y) : PMF Prop).1 True = ((1 : ℝ≥0∞) / Fintype.card (F × F)) := by
   classical
   simp [Bind.bind, Pure.pure, PMF.bind]
   simp [DFunLike.coe]
@@ -94,6 +110,7 @@ example :
     let x ← $ᵖ F
     let y ← $ᵖ F
     let z ← $ᵖ (F × F)
-    return z = (x, y)).val True = ((1 : ℝ≥0∞) / Fintype.card (F × F)) := by rfl
+    return z = (x, y)).val True = ((1 : ℝ≥0∞) / Fintype.card (F × F)) := by
+  rfl
 
 end

@@ -5,12 +5,10 @@ Authors: Quang Dao, Katerina Hristova, František Silváši, Julian Sutherland, 
 Mirco Richter
 -/
 
-import ArkLib.Data.CodingTheory.Basic
-import Mathlib.LinearAlgebra.Lagrange
-import Mathlib.RingTheory.Henselian
-import ArkLib.Data.Fin.Lift
 import ArkLib.Data.MvPolynomial.LinearMvExtension
 import ArkLib.Data.Polynomial.Interface
+import Mathlib.LinearAlgebra.Lagrange
+import Mathlib.RingTheory.Henselian
 
 /-!
   # Reed-Solomon Codes
@@ -23,7 +21,7 @@ import ArkLib.Data.Polynomial.Interface
 
 namespace ReedSolomon
 
-open Polynomial
+open Polynomial NNReal
 
 variable {F : Type*} {ι : Type*} (domain : ι ↪ F)
 
@@ -113,24 +111,25 @@ variable [IsDomain F]
 -/
 lemma rank_nonsquare_eq_deg_of_deg_le (inj : Function.Injective α) (h : n ≤ m) :
   (Vandermonde.nonsquare (ι' := n) α).rank = n := by
-  rw [
-    Matrix.rank_eq_iff_subUpFull_eq h,
+  suffices ((Vandermonde.nonsquare (ι' := n) α).subUpFull (Fin.castLE h)).rank = n by
+    exact Matrix.rank_eq_if_subUpFull_eq h this
+  rw[
     ←subUpFull_of_vandermonde_is_vandermonde,
-    Matrix.rank_eq_iff_det_ne_zero,
-    Matrix.det_vandermonde_ne_zero_iff
+    Matrix.rank_eq_if_det_ne_zero
   ]
+  rw [@Matrix.det_vandermonde_ne_zero_iff F _ n _ (α ∘ Fin.castLE h)]
   apply Function.Injective.comp <;> aesop (add simp Fin.castLE_injective)
 
 /-- The rank of a non-square Vandermonde matrix with more columns than rows is the number of rows.
 -/
 lemma rank_nonsquare_eq_deg_of_ι_le (inj : Function.Injective α) (h : m ≤ n) :
   (Vandermonde.nonsquare (ι' := n) α).rank = m := by
-  rw [
-    Matrix.full_row_rank_via_rank_subLeftFull h,
-    ← subLeftFull_of_vandermonde_is_vandermonde,
-    Matrix.rank_eq_iff_det_ne_zero,
-    Matrix.det_vandermonde_ne_zero_iff
-  ]
+  suffices ((Vandermonde.nonsquare (ι' := n) α).subLeftFull (Fin.castLE h)).rank = m by
+    exact Matrix.full_row_rank_via_rank_subLeftFull h this
+  rw[
+    ←subLeftFull_of_vandermonde_is_vandermonde,
+    Matrix.rank_eq_if_det_ne_zero]
+  rw[Matrix.det_vandermonde_ne_zero_iff]
   exact inj
 
 @[simp]
@@ -167,6 +166,23 @@ end
 end Vandermonde
 
 namespace ReedSolomonCode
+
+section
+
+open Finset Function
+
+open scoped BigOperators
+
+variable {ι : Type*} [Fintype ι] [Nonempty ι]
+         {F : Type*} [Field F] [Fintype F]
+
+abbrev RScodeSet (domain : ι ↪ F) (deg : ℕ) : Set (ι → F) := (ReedSolomon.code domain deg).carrier
+
+open Classical in
+def toFinset (domain : ι ↪ F) (deg : ℕ) : Finset (ι → F) :=
+  (RScodeSet domain deg).toFinset
+
+end
 
 section
 
@@ -219,6 +235,8 @@ lemma genMatIsVandermonde [Fintype ι] [Field F] [DecidableEq F] [inst : NeZero 
 
 section
 
+open NNReal
+
 variable [Field F]
 
 lemma dim_eq_deg_of_le [NeZero n] (inj : Function.Injective α) (h : n ≤ m) :
@@ -242,6 +260,9 @@ lemma dist_le_length [DecidableEq F] (inj : Function.Injective α) :
     minDist ((ReedSolomon.code ⟨α, inj⟩ n) : Set (Fin m → F)) ≤ m := by
   convert dist_UB
   simp
+
+abbrev sqrtRate [Fintype ι] (deg : ℕ) (domain : ι ↪ F) : ℝ≥0 :=
+  (LinearCode.rate (ReedSolomon.code domain deg) : ℝ≥0).sqrt
 
 end
 
@@ -348,7 +369,8 @@ noncomputable def decode : (ReedSolomon.code domain deg) →ₗ[F] F[X] :=
     (interpolate (domain := domain))
     (ReedSolomon.code domain deg)
 
-/- ReedSolomon codewords are decoded into degree < deg polynomials-/
+/-- ReedSolomon codewords are decoded into degree < deg polynomials
+-/
 lemma decoded_polynomial_lt_deg (c : ReedSolomon.code domain deg) :
   decode c ∈ (degreeLT F deg : Submodule F F[X]) := by
   -- Unpack the witness polynomial for this codeword

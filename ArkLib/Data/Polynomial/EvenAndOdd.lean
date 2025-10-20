@@ -7,11 +7,21 @@ import ArkLib.ToMathlib.Finset.Basic
 import ArkLib.Data.FieldTheory.NonBinaryField.Basic
 
 /-!
-  # Even and odd parts of polynomial
+# Even and odd parts of polynomial
 
-  The FFT-style splitting of a polynomial `f`
-  of the degree `n` into two polynomials
-  `evenPart` and `oddPart` of degree `< n/2`  such that `f = evenPart + X * oddPart`.
+The FFT-style splitting of a polynomial `f` of degree `n` into two polynomials
+`evenPart` and `oddPart` of degree `< n/2` such that `f = evenPart + X * oddPart`.
+
+This is the special case `n = 2` of the generalized n-way splitting defined in
+`Polynomial/SplitFold.lean`. The formal connection between the two will be
+established in future PRs.
+
+## Main definitions
+
+* `evenPart f`: Extracts the even-powered terms of `f`
+* `oddPart f`: Extracts the odd-powered terms of `f` (divided by X)
+* `evenPart_x f`, `oddPart_x f`: The above with substitution `X² ↦ X` applied
+
 -/
 
 namespace Polynomial
