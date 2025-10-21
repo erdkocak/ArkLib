@@ -36,12 +36,12 @@ open OracleComp OracleSpec OracleQuery
 
 /-- `OracleInterface` is a type class that provides an oracle interface for a type `Message`.
   It consists of:
-  - a query type `domain`,
-  - a response type `range`,
+  - a query type `Domain`,
+  - a response type `Range`,
   - a function `answer` that given a message `m : Message` and a query `q : Query`,
-  returns a response `r : range`.
+  returns a response `r : Range`.
 
-TODO: turn `(Query, range)` into a general `PFunctor` (i.e. `range : Query → Type`) This
+TODO: turn `(Query, Range)` into a general `PFunctor` (i.e. `Range : Query → Type`) This
 allows for better compositionality of `OracleInterface`, including (indexed) sum, instead of
 requiring indexed family of `OracleInterface`s.
 
@@ -49,7 +49,7 @@ However, this won't be possible until `OracleSpec` is changed to be an alias for
 @[ext]
 class OracleInterface (Message : Type u) extends
     OracleSpec where
-  answer : Message → (t : domain) → range t
+  answer : Message → (t : Domain) → Range t
 
 namespace OracleInterface
 
@@ -58,8 +58,8 @@ namespace OracleInterface
   where necessary.
 -/
 def instDefault {Message : Type u} : OracleInterface Message where
-  domain := Unit
-  range _ := Message
+  Domain := Unit
+  Range _ := Message
   answer := fun m _ => m
 
 instance {Message : Type u} : Inhabited (OracleInterface Message) :=
@@ -86,24 +86,24 @@ def toOracleImpl (v : Type v) [O : OracleInterface v]
 whose `answer` is the function itself. -/
 @[reducible, inline]
 instance instDFun {α : Type*} {β : α → Type*} : OracleInterface ((t : α) → β t) where
-  domain := α
-  range := β
+  Domain := α
+  Range := β
   answer := id
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : DecidableEq (O.domain)]
-    [h' : ∀ t, DecidableEq (O.range t)] :
+    [h : DecidableEq (O.Domain)]
+    [h' : ∀ t, DecidableEq (O.Range t)] :
     [v]ₒ.DecidableEq where
   decidableEq_A := h
   decidableEq_B := h'
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : ∀ t, Fintype (O.range t)] :
+    [h : ∀ t, Fintype (O.Range t)] :
     [v]ₒ.Fintype where
   fintype_B := h
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : ∀ t, Inhabited (O.range t)] :
+    [h : ∀ t, Inhabited (O.Range t)] :
     [v]ₒ.Inhabited where
   inhabited_B := h
 
@@ -125,8 +125,8 @@ for the sum behavior on the interface. -/
 @[reducible, inline]
 instance (priority := low) instTensorProd {α β : Type*}
     [Oα : OracleInterface α] [Oβ : OracleInterface β] : OracleInterface (α × β) where
-  domain := Oα.domain × Oβ.domain
-  range t := (Oα.range t.1) × (Oβ.range t.2)
+  Domain := Oα.Domain × Oβ.Domain
+  Range t := (Oα.Range t.1) × (Oβ.Range t.2)
   answer := fun (a, b) (q₁, q₂) => (Oα.answer a q₁, Oβ.answer b q₂)
 
 /-- The product oracle interface for the product of two types `α` and `β`, each with its own oracle
@@ -139,8 +139,8 @@ See `instTensor` for the tensor product behavior on the interface. -/
 @[reducible, inline]
 instance instProd {α β : Type*} [Oα : OracleInterface α] [Oβ : OracleInterface β] :
     OracleInterface (α × β) where
-  domain := Oα.domain ⊕ Oβ.domain
-  range := fun | .inl t => Oα.range t | .inr t => Oβ.range t
+  Domain := Oα.Domain ⊕ Oβ.Domain
+  Range := fun | .inl t => Oα.Range t | .inr t => Oβ.Range t
   answer := fun (a, b) q => match q with
     | .inl q => (Oα.answer a q)
     | .inr q => (Oβ.answer b q)
@@ -158,8 +158,8 @@ response types). -/
 @[reducible, inline]
 instance (priority := low) instTensorForall {ι : Type u} (v : ι → Type v)
     [O : ∀ i, OracleInterface (v i)] : OracleInterface (∀ i, v i) where
-  domain := (i : ι) → (O i).domain
-  range t := (i : ι) → (O i).range (t i)
+  Domain := (i : ι) → (O i).Domain
+  Range t := (i : ι) → (O i).Range (t i)
   answer := fun f q i => (O i).answer (f i) (q i)
 
 /-- The indexed product oracle interface for the dependent product of a type family `v`, indexed by
@@ -174,8 +174,8 @@ See `instTensorForall` for the tensor product behavior on the interface. -/
 @[reducible, inline]
 instance instProdForall {ι : Type u} (v : ι → Type v) [O : ∀ i, OracleInterface (v i)] :
     OracleInterface (∀ i, v i) where
-  domain := (i : ι) × (O i).domain
-  range t := (O t.1).range t.2
+  Domain := (i : ι) × (O i).Domain
+  Range t := (O t.1).Range t.2
   answer := fun f ⟨i, q⟩ => (O i).answer (f i) q
 
 -- def append {ι₁ : Type u} {T₁ : ι₁ → Type v} [∀ i, OracleInterface (T₁ i)]
@@ -219,7 +219,7 @@ open Finset in
   message and the query is a position of the codeword. In particular, it applies to
   `(Mv)Polynomial`. -/
 def distanceLE (Message : Type*) [O : OracleInterface Message]
-    [Fintype (O.domain)] [∀ t, DecidableEq (O.range t)] (d : ℕ) : Prop :=
+    [Fintype (O.Domain)] [∀ t, DecidableEq (O.Range t)] (d : ℕ) : Prop :=
   ∀ a b : Message, a ≠ b → #{q | OracleInterface.answer a q = OracleInterface.answer b q} ≤ d
 
 section Polynomial
@@ -231,41 +231,41 @@ variable {R : Type*} [CommSemiring R] {d : ℕ} {σ : Type*}
 /-- Univariate polynomials can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instPolynomial : OracleInterface R[X] where
-  domain := R
-  range _ := R
+  Domain := R
+  Range _ := R
   answer := fun poly point => poly.eval point
 
 /-- Univariate polynomials with degree at most `d` can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instPolynomialDegreeLE : OracleInterface (R⦃≤ d⦄[X]) where
-  domain := R
-  range _ := R
+  Domain := R
+  Range _ := R
   answer := fun ⟨poly, _⟩ point => poly.eval point
 
 /-- Univariate polynomials with degree less than `d` can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instPolynomialDegreeLT : OracleInterface (R⦃< d⦄[X]) where
-  domain := R
-  range _ := R
+  Domain := R
+  Range _ := R
   answer := fun ⟨poly, _⟩ point => poly.eval point
 
 /-- Multivariate polynomials can be accessed via evaluation queries. -/
 @[reducible, inline]
 instance instMvPolynomial : OracleInterface (R[X σ]) where
-  domain := σ → R
-  range _ := R
+  Domain := σ → R
+  Range _ := R
   answer := fun poly point => eval point poly
 
 /-- Multivariate polynomials with individual degree at most `d` can be accessed via evaluation
 queries. -/
 @[reducible, inline]
 instance instMvPolynomialDegreeLE : OracleInterface (R⦃≤ d⦄[X σ]) where
-  domain := σ → R
-  range _ := R
+  Domain := σ → R
+  Range _ := R
   answer := fun ⟨poly, _⟩ point => eval point poly
 
 instance [Fintype σ] [DecidableEq σ] [Fintype R] :
-    Fintype ((@instMvPolynomialDegreeLE R _ d σ).domain) :=
+    Fintype ((@instMvPolynomialDegreeLE R _ d σ).Domain) :=
   inferInstanceAs (Fintype (σ → R))
 
 end Polynomial
@@ -281,14 +281,14 @@ variable {n : ℕ} {α : Type*}
 
 /-- Vectors of the form `List.Vector α n` can be accessed via queries on their indices. -/
 instance instListVector : OracleInterface (List.Vector α n) where
-  domain := Fin n
-  range _ := α
+  Domain := Fin n
+  Range _ := α
   answer := fun vec i => vec[i]
 
 /-- Vectors of the form `Vector α n` can be accessed via queries on their indices. -/
 instance instVector : OracleInterface (Vector α n) where
-  domain := Fin n
-  range _ := α
+  Domain := Fin n
+  Range _ := α
   answer := fun vec i => vec[i]
 
 end Vector
