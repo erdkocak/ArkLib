@@ -375,16 +375,16 @@ structure NonAdaptive (oSpec : OracleSpec)
 
   /-- Makes a list of queries to each of the oracle statements, given the input statement and the
     challenges -/
-  queryOStmt : StmtIn → (∀ i, pSpec.Challenge i) → List ((i : ιₛᵢ) × (Oₛᵢ i).Query)
+  queryOStmt : StmtIn → (∀ i, pSpec.Challenge i) → List ((i : ιₛᵢ) × (Oₛᵢ i).Domain)
 
   /-- Makes a list of queries to each of the prover's messages, given the input statement and the
     challenges -/
-  queryMsg : StmtIn → (∀ i, pSpec.Challenge i) → List ((i : pSpec.MessageIdx) × (Oₘ i).Query)
+  queryMsg : StmtIn → (∀ i, pSpec.Challenge i) → List ((i : pSpec.MessageIdx) × (Oₘ i).Domain)
 
   /-- From the query-response pairs, returns a computation that outputs the new output statement -/
   verify : StmtIn → (∀ i, pSpec.Challenge i) →
-    List ((i : ιₛᵢ) × ((Oₛᵢ i).Query × (Oₛᵢ i).Response)) →
-    List ((i : pSpec.MessageIdx) × ((Oₘ i).Query × (Oₘ i).Response)) → OracleComp oSpec StmtOut
+    List ((i : ιₛᵢ) × ((Oₛᵢ i).Domain × (Oₛᵢ i).Range)) →
+    List ((i : pSpec.MessageIdx) × ((Oₘ i).Domain × (Oₘ i).Range)) → OracleComp oSpec StmtOut
 
   embed : ιₛₒ ↪ ιₛᵢ ⊕ pSpec.MessageIdx
 
@@ -402,12 +402,12 @@ def toOracleVerifier
     (naVerifier : OracleVerifier.NonAdaptive oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec) :
     OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec where
   verify := fun stmt challenges => do
-    let queryResponsesOStmt : List ((i : ιₛᵢ) × ((Oₛᵢ i).Query × (Oₛᵢ i).Response)) ←
+    let queryResponsesOStmt : List ((i : ιₛᵢ) × ((Oₛᵢ i).Domain × (Oₛᵢ i).Range)) ←
       (naVerifier.queryOStmt stmt challenges).mapM
       (fun q => do
         let resp ← liftM <| query (spec := [OStmtIn]ₒ) q.1 q.2
         return ⟨q.1, (q.2, by simpa only using resp)⟩)
-    let queryResponsesOMsg : List ((i : pSpec.MessageIdx) × ((Oₘ i).Query × (Oₘ i).Response)) ←
+    let queryResponsesOMsg : List ((i : pSpec.MessageIdx) × ((Oₘ i).Domain × (Oₘ i).Range)) ←
       (naVerifier.queryMsg stmt challenges).mapM
       (fun q => do
         let resp ← liftM <| query (spec := [pSpec.Message]ₒ) q.1 q.2

@@ -62,7 +62,7 @@ theorem runWithOracle_bind (f : (t : spec.Domain) → spec.Range t)
   rfl
 
 -- Oracle with bounded use; returns `default` if the oracle is used more than `bound` times.
--- We could then have the range be an `Option` type, so that `default` is `none`.
+-- We could then have the Range be an `Option` type, so that `default` is `none`.
 -- def boundedUseOracle {ι : Type} [DecidableEq ι] {spec : OracleSpec ι} (bound : ι → ℕ) :
 --     spec →[ι → ℕ]ₛₒ spec := fun i query queryCount =>
 --   if queryCount i > bound i then
@@ -163,7 +163,7 @@ theorem randomOracle_cache_neverFails_iff_runWithOracle_neverFails {β}
     | none =>
       simp_all only [StateT.run_bind, StateT.run_monadLift, monadLift_self, bind_pure_comp,
         StateT.run_modifyGet, Functor.map_map, neverFails_map_iff, neverFails_uniformOfFintype,
-        support_map, support_uniformOfFintype, Set.image_univ, Set.mem_range, Prod.mk.injEq,
+        support_map, support_uniformOfFintype, Set.image_univ, Set.mem_Range, Prod.mk.injEq,
         exists_eq_left, forall_eq', true_and]
       constructor
       · intro h f hf
