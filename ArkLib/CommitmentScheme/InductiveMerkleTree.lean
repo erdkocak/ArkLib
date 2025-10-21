@@ -65,10 +65,10 @@ variable (α : Type)
 def spec : OracleSpec Unit := fun _ => (α × α, α)
 
 @[simp]
-lemma domain_def : (spec α).domain () = (α × α) := rfl
+lemma domain_def : (spec α).Domain () = (α × α) := rfl
 
 @[simp]
-lemma range_def : (spec α).range () = α := rfl
+lemma range_def : (spec α).Range () = α := rfl
 
 end spec
 

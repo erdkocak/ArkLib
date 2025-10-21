@@ -49,7 +49,7 @@ However, this won't be possible until `OracleSpec` is changed to be an alias for
 @[ext]
 class OracleInterface (Message : Type u) extends
     OracleSpec where
-  answer : Message → (t : domain) → range t
+  answer : QueryImpl toOracleSpec (ReaderT Message Id)
 
 namespace OracleInterface
 
@@ -58,9 +58,9 @@ namespace OracleInterface
   where necessary.
 -/
 def instDefault {Message : Type u} : OracleInterface Message where
-  domain := Unit
-  range _ := Message
-  answer := fun m _ => m
+  Domain := Unit
+  Range _ := Message
+  answer _ := do return (← read)
 
 instance {Message : Type u} : Inhabited (OracleInterface Message) :=
   ⟨instDefault⟩
@@ -78,42 +78,65 @@ def toOracleSpec' (v : Type v) [O : OracleInterface v] : OracleSpec := O.toOracl
 
 /-- Given an underlying data for an indexed type family of oracle interfaces `v`,
     we can give an implementation of all queries to the interface defined by `v` -/
-def toOracleImpl (v : Type v) [O : OracleInterface v]
-    (data : v) : QueryImpl [v]ₒ Id :=
-  fun t => O.answer data t
+def toOracleImpl (v : Type v) [O : OracleInterface v] :
+    QueryImpl [v]ₒ (ReaderT v Id) :=
+  O.answer
 
 /-- Any (dependent) function type has a canonical `OracleInterface` instance,
 whose `answer` is the function itself. -/
 @[reducible, inline]
-instance instDFun {α : Type*} {β : α → Type*} : OracleInterface ((t : α) → β t) where
-  domain := α
-  range := β
-  answer := id
+instance instDFun {α : Type u} {β : α → Type u} :
+    OracleInterface ((t : α) → β t) where
+  Domain := α
+  Range := β
+  answer t := do return (← read) t
 
 instance (v : Type v) [O : OracleInterface v]
-    [h : DecidableEq (O.domain)]
-    [h' : ∀ t, DecidableEq (O.range t)] :
+    [h : DecidableEq (O.Domain)] [h' : ∀ t, DecidableEq (O.Range t)] :
     [v]ₒ.DecidableEq where
   decidableEq_A := h
   decidableEq_B := h'
 
-instance (v : Type v) [O : OracleInterface v]
-    [h : ∀ t, Fintype (O.range t)] :
+instance (v : Type v) [O : OracleInterface v] [h : ∀ t, Fintype (O.Range t)] :
     [v]ₒ.Fintype where
   fintype_B := h
 
-instance (v : Type v) [O : OracleInterface v]
-    [h : ∀ t, Inhabited (O.range t)] :
+instance (v : Type v) [O : OracleInterface v] [h : ∀ t, Inhabited (O.Range t)] :
     [v]ₒ.Inhabited where
   inhabited_B := h
 
-@[reducible, inline]
+@[reducible, inline] -- dtumad: I'm not sure if this makes sense to have still?
 instance {ι₁ : Type u} {T₁ : ι₁ → Type v} [inst₁ : ∀ i, OracleInterface (T₁ i)]
     {ι₂ : Type u} {T₂ : ι₂ → Type v} [inst₂ : ∀ i, OracleInterface (T₂ i)] :
     ∀ i, OracleInterface (Sum.rec T₁ T₂ i) :=
   fun i => match i with
     | .inl i => inst₁ i
     | .inr i => inst₂ i
+
+@[reducible, inline]
+protected def tensorProd {α β : Type _} (O₁ : OracleInterface α) (O₂ : OracleInterface β) :
+    OracleInterface (α × β) where
+  Domain := O₁.Domain × O₂.Domain
+  Range t := O₁.Range t.1 × O₂.Range t.2
+  answer | (q₁, q₂) => do
+    let (a, b) ← read
+    return ((O₁.answer q₁).run a, (O₂.answer q₂).run b)
+
+@[reducible, inline]
+instance prod {α β : Type _} (O₁ : OracleInterface α) (O₂ : OracleInterface β) :
+    OracleInterface (α × β) where
+  Domain := O₁.Domain ⊕ O₂.Domain
+  Range
+    | .inl t => O₁.Range t
+    | .inr t => O₂.Range t
+  answer
+    | .inl q => do (O₁.answer q).run (← read).1
+    | .inr q => do (O₂.answer q).run (← read).2
+
+@[reducible, inline]
+protected def tensorProdForall {ι : Type u} (v : ι → Type v)
+    [O : ∀ i, OracleInterface (v i)] : OracleInterface (∀ i, v i)
+
 
 /-- The tensor product oracle interface for the product of two types `α` and `β`, each with its own
   oracle interface, is defined as:
@@ -123,11 +146,9 @@ instance {ι₁ : Type u} {T₁ : ι₁ → Type v} [inst₁ : ∀ i, OracleInte
 This is a low priority instance since we do not expect to have this behavior often. See `instProd`
 for the sum behavior on the interface. -/
 @[reducible, inline]
-instance (priority := low) instTensorProd {α β : Type*}
-    [Oα : OracleInterface α] [Oβ : OracleInterface β] : OracleInterface (α × β) where
-  domain := Oα.domain × Oβ.domain
-  range t := (Oα.range t.1) × (Oβ.range t.2)
-  answer := fun (a, b) (q₁, q₂) => (Oα.answer a q₁, Oβ.answer b q₂)
+instance (priority := low) instTensorProd {α β : Type _}
+    [O₁ : OracleInterface α] [O₂ : OracleInterface β] : OracleInterface (α × β) :=
+  OracleInterface.tensorProd O₁ O₂
 
 /-- The product oracle interface for the product of two types `α` and `β`, each with its own oracle
   interface, is defined as:
@@ -137,13 +158,9 @@ instance (priority := low) instTensorProd {α β : Type*}
 This is the behavior more often assumed, i.e. when we send multiple oracle messages in a round.
 See `instTensor` for the tensor product behavior on the interface. -/
 @[reducible, inline]
-instance instProd {α β : Type*} [Oα : OracleInterface α] [Oβ : OracleInterface β] :
-    OracleInterface (α × β) where
-  domain := Oα.domain ⊕ Oβ.domain
-  range := fun | .inl t => Oα.range t | .inr t => Oβ.range t
-  answer := fun (a, b) q => match q with
-    | .inl q => (Oα.answer a q)
-    | .inr q => (Oβ.answer b q)
+instance instProd {α β : Type _}
+    [O₁ : OracleInterface α] [O₂ : OracleInterface β] : OracleInterface (α × β) :=
+  OracleInterface.prod O₁ O₂
 
 /-- The indexed tensor product oracle interface for the dependent product of a type family `v`,
     indexed by `ι`, each having an oracle interface, is defined as:
@@ -158,9 +175,12 @@ response types). -/
 @[reducible, inline]
 instance (priority := low) instTensorForall {ι : Type u} (v : ι → Type v)
     [O : ∀ i, OracleInterface (v i)] : OracleInterface (∀ i, v i) where
-  domain := (i : ι) → (O i).domain
-  range t := (i : ι) → (O i).range (t i)
-  answer := fun f q i => (O i).answer (f i) (q i)
+  Domain := (i : ι) → (O i).Domain
+  Range t := (i : ι) → (O i).Range (t i)
+  answer := by
+
+    sorry
+  -- fun f i => do (O i).answer (f i) ((← read) i)
 
 /-- The indexed product oracle interface for the dependent product of a type family `v`, indexed by
     `ι`, each having an oracle interface, is defined as:
@@ -174,8 +194,8 @@ See `instTensorForall` for the tensor product behavior on the interface. -/
 @[reducible, inline]
 instance instProdForall {ι : Type u} (v : ι → Type v) [O : ∀ i, OracleInterface (v i)] :
     OracleInterface (∀ i, v i) where
-  domain := (i : ι) × (O i).domain
-  range t := (O t.1).range t.2
+  Domain := (i : ι) × (O i).Domain
+  Range t := (O t.1).Range t.2
   answer := fun f ⟨i, q⟩ => (O i).answer (f i) q
 
 -- def append {ι₁ : Type u} {T₁ : ι₁ → Type v} [∀ i, OracleInterface (T₁ i)]
@@ -219,7 +239,7 @@ open Finset in
   message and the query is a position of the codeword. In particular, it applies to
   `(Mv)Polynomial`. -/
 def distanceLE (Message : Type*) [O : OracleInterface Message]
-    [Fintype (O.domain)] [∀ t, DecidableEq (O.range t)] (d : ℕ) : Prop :=
+    [Fintype (O.Domain)] [∀ t, DecidableEq (O.Range t)] (d : ℕ) : Prop :=
   ∀ a b : Message, a ≠ b → #{q | OracleInterface.answer a q = OracleInterface.answer b q} ≤ d
 
 section Polynomial
@@ -265,7 +285,7 @@ instance instMvPolynomialDegreeLE : OracleInterface (R⦃≤ d⦄[X σ]) where
   answer := fun ⟨poly, _⟩ point => eval point poly
 
 instance [Fintype σ] [DecidableEq σ] [Fintype R] :
-    Fintype ((@instMvPolynomialDegreeLE R _ d σ).domain) :=
+    Fintype ((@instMvPolynomialDegreeLE R _ d σ).Domain) :=
   inferInstanceAs (Fintype (σ → R))
 
 end Polynomial

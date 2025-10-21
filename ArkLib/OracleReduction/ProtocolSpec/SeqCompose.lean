@@ -383,22 +383,22 @@ instance : ∀ i, OracleInterface ((pSpec₁ ++ₚ pSpec₂).Challenge i) := cha
 
 @[simp]
 lemma challengeOracleInterface_append_domain_inl (j : pSpec₁.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.domain = Unit := rfl
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.Domain = Unit := rfl
 
 @[simp]
 lemma challengeOracleInterface_append_range_inl (j : pSpec₁.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.range () = pSpec₁.Challenge j := by
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.Range () = pSpec₁.Challenge j := by
   simp only [append, ChallengeIdx.inl, Challenge, instOracleInterfaceChallengeAppend,
     challengeOracleInterface, OracleInterface.toOracleSpec', OracleInterface.toOracleSpec,
     Fin.vappend_left]
 
 @[simp]
 lemma challengeOracleInterface_append_domain_inr (j : pSpec₂.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.domain = Unit := rfl
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.Domain = Unit := rfl
 
 @[simp]
 lemma challengeOracleInterface_append_range_inr (j : pSpec₂.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.range () = pSpec₂.Challenge j := by
+    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.Range () = pSpec₂.Challenge j := by
   simp only [append, ChallengeIdx.inr, Challenge, instOracleInterfaceChallengeAppend,
     challengeOracleInterface, OracleInterface.toOracleSpec', OracleInterface.toOracleSpec,
     Fin.vappend_right]

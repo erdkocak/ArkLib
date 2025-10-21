@@ -990,7 +990,7 @@ namespace Lagrange
 
 -- unique polynomial of degree n that has nodes at ω^i for i = 0, 1, ..., n-1
 def nodal {R : Type*} [Ring R] (n : ℕ) (ω : R) : UniPoly R := sorry
-  -- .mk (Array.range n |>.map (fun i => ω^i))
+  -- .mk (Array.Range n |>.map (fun i => ω^i))
 
 /--
 This function produces the polynomial which is of degree n and is equal to r i at ω^i for i = 0, 1,
@@ -1048,7 +1048,7 @@ end UniPoly
 -- def TropicallyBoundPolynomial.toUniPoly {R : Type} [Ring R]
 --     (p : TropicallyBoundPoly (R)) : UniPoly R :=
 --   match p.val with
---   | (p, n) => UniPoly.mk (Array.range (degBound n.untrop) |>.map (fun i => p.coeff i))
+--   | (p, n) => UniPoly.mk (Array.Range (degBound n.untrop) |>.map (fun i => p.coeff i))
 
 -- noncomputable def Equiv.UniPoly.TropicallyBoundPolynomial {R : Type} [BEq R] [Ring R] :
 --     UniPoly R ≃+* TropicallyBoundPoly R where

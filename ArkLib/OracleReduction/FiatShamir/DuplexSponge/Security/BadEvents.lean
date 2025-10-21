@@ -30,7 +30,7 @@ section
 variable {ι : Type*} [DecidableEq ι] {spec : OracleSpec ι} [spec.DecidableEq]
 
 /-- A query tuple `(i, q, r)` is redundant in a query log if it appears more than once -/
-def redundantQuery (log : QueryLog spec) (i : ι) (q : spec.domain i) (r : spec.range i) : Prop :=
+def redundantQuery (log : QueryLog spec) (i : ι) (q : spec.Domain i) (r : spec.Range i) : Prop :=
   (log.getQ i).count (q, r) > 1
 
 def existPriorSameQuery (log : QueryLog spec) (idx : Fin log.length) : Prop :=

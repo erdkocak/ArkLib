@@ -108,12 +108,12 @@ variable {spec spec₁ spec₂ specₜ specₜ₁ specₜ₂ : OracleSpec} {σ �
 
 open OracleSpec
 
--- def fnOracle (spec : OracleSpec) (f : (t : spec.domain i → spec.range i) :
+-- def fnOracle (spec : OracleSpec) (f : (t : spec.Domain i → spec.Range i) :
 --     SimOracle.Impl spec where
 --   impl | query i t => pure (f i t)
 
 -- def statelessOracle (baseSpec : OracleSpec ιₜ) (spec : OracleSpec ι)
---     (f : (i : ι) → spec.domain i → spec.range i) :
+--     (f : (i : ι) → spec.Domain i → spec.Range i) :
 --     SimOracle.Stateless (baseSpec + spec) baseSpec where
 --   impl
 --   | query (.inl i) t => query i t
@@ -142,7 +142,7 @@ open OracleSpec
 -- -- /-- Answer all oracle queries to `oSpec` with a deterministic function `f` having the same domain
 -- --   and range as `oSpec`. -/
 -- -- def fnOracle {ι : Type} (spec : OracleSpec ι)
--- --     (f : (i : ι) → spec.domain i → spec.range i) : SimOracle spec []ₒ PUnit :=
+-- --     (f : (i : ι) → spec.Domain i → spec.Range i) : SimOracle spec []ₒ PUnit :=
 -- --   statelessOracle fun (query i q) ↦ pure (f i q)
 
 -- def lift {ι₁ ι₂ ι : Type} {σ : Type} (oSpec₁ : OracleSpec ι₁) (oSpec₂ : OracleSpec ι₂)

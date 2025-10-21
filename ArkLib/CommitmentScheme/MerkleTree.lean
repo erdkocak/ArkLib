@@ -32,13 +32,13 @@ variable (α : Type)
   We may instantiate `α` with `BitVec n` or `Fin (2 ^ n)` to construct a Merkle tree for boolean
   vectors of length `n`. -/
 @[reducible]
-def spec : OracleSpec := {domain := α × α, range := fun _ => α}
+def spec : OracleSpec := { Domain := α × α, Range := fun _ => α }
 
 @[simp]
-lemma domain_def : (spec α).domain = (α × α) := rfl
+lemma domain_def : (spec α).Domain = (α × α) := rfl
 
 @[simp]
-lemma range_def {x} : (spec α).range x = α := rfl
+lemma range_def {x} : (spec α).Range x = α := rfl
 
 section
 

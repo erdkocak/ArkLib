@@ -17,7 +17,7 @@ namespace loggingOracle
 variable {ι : Type u} {spec : OracleSpec ι} {α β : Type u}
 
 @[simp]
-theorem impl_run {i : ι} {t : spec.domain i} :
+theorem impl_run {i : ι} {t : spec.Domain i} :
     (loggingOracle.impl (query i t)).run = (do let u ← query i t; return (u, [⟨i, ⟨t, u⟩⟩])) :=
   rfl
 

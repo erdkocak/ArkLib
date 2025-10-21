@@ -138,8 +138,8 @@ instance : ∀ j, OracleInterface (FinalOracleStatement D x s k j) :=
 @[simp]
 lemma range_lem₁ {F : Type} [NonBinaryField F] {D : Subgroup Fˣ}
   [DIsCyclicC : IsCyclicWithGen ↥D] {x : Fˣ} {s k : ℕ} {i : Fin (k + 1)} :
-    [FinalOracleStatement D x s k]ₒ.range ⟨i.1, Nat.lt_succ_of_lt i.2⟩ = F := by
-  unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
+    [FinalOracleStatement D x s k]ₒ.Range ⟨i.1, Nat.lt_succ_of_lt i.2⟩ = F := by
+  unfold OracleSpec.Range FinalOracleStatement OracleInterface.toOracleSpec
   unfold OracleInterface.Query
   unfold instOracleInterfaceFinalOracleStatement
   simp [Nat.ne_of_lt i.2]
@@ -147,17 +147,17 @@ lemma range_lem₁ {F : Type} [NonBinaryField F] {D : Subgroup Fˣ}
 @[simp]
 lemma domain_lem₁ {F : Type} [NonBinaryField F] {D : Subgroup Fˣ}
   [DIsCyclicC : IsCyclicWithGen ↥D] {x : Fˣ} {k : ℕ} {s : ℕ} {i : Fin (k + 1)} :
-    [FinalOracleStatement D x s k]ₒ.domain ⟨i.1, Nat.lt_succ_of_lt i.2⟩ =
+    [FinalOracleStatement D x s k]ₒ.Domain ⟨i.1, Nat.lt_succ_of_lt i.2⟩ =
       evalDomain D x (s * i.1) := by
-  unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
+  unfold OracleSpec.Domain FinalOracleStatement OracleInterface.toOracleSpec
   unfold OracleInterface.Query
   unfold instOracleInterfaceFinalOracleStatement
   simp [Nat.ne_of_lt i.2]
 
 @[simp]
 lemma range_lem₂ {F : Type} [NonBinaryField F] {D : Subgroup Fˣ} [DIsCyclicC : IsCyclicWithGen ↥D]
-  {x : Fˣ} {s k : ℕ} : [FinalOracleStatement D x s k]ₒ.range (Fin.last (k + 1)) = F[X] := by
-  unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
+  {x : Fˣ} {s k : ℕ} : [FinalOracleStatement D x s k]ₒ.Range (Fin.last (k + 1)) = F[X] := by
+  unfold OracleSpec.Range FinalOracleStatement OracleInterface.toOracleSpec
   unfold OracleInterface.Query
   unfold instOracleInterfaceFinalOracleStatement
   simp
@@ -165,8 +165,8 @@ lemma range_lem₂ {F : Type} [NonBinaryField F] {D : Subgroup Fˣ} [DIsCyclicC 
 @[simp]
 lemma domain_lem₂ {F : Type} [NonBinaryField F] (D : Subgroup Fˣ)
   [DIsCyclicC : IsCyclicWithGen D] {x : Fˣ} {s k : ℕ} :
-  [FinalOracleStatement D x s k]ₒ.domain (Fin.last (k + 1)) = Unit := by
-  unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
+  [FinalOracleStatement D x s k]ₒ.Domain (Fin.last (k + 1)) = Unit := by
+  unfold OracleSpec.Domain FinalOracleStatement OracleInterface.toOracleSpec
   unfold OracleInterface.Query
   unfold instOracleInterfaceFinalOracleStatement
   simp

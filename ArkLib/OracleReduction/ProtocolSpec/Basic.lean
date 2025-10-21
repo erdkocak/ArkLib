@@ -714,11 +714,11 @@ alias fsChallengeOracle := srChallengeOracle
 --     [DecidableEq (pSpec.Message i)] [DecidableEq (pSpec.Challenge i)] :
 --     PFunctor.DecidableEq (srChallengeOracle Statement pSpec i) where
 --   decidableEq_A := fun i => by
---     dsimp only [OracleSpec.domain, srChallengeOracle, challengeOracleInterfaceSR,
+--     dsimp only [OracleSpec.Domain, srChallengeOracle, challengeOracleInterfaceSR,
 --       OracleInterface.toOracleSpec]
 --     infer_instance
 --   decidableEq_B := fun i => by
---     unfold OracleSpec.range
+--     unfold OracleSpec.Range
 --     infer_instance
 
 instance {pSpec : ProtocolSpec n} {Statement : Type}
