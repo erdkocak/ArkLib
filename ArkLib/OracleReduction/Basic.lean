@@ -383,8 +383,8 @@ structure NonAdaptive (oSpec : OracleSpec)
 
   /-- From the query-response pairs, returns a computation that outputs the new output statement -/
   verify : StmtIn → (∀ i, pSpec.Challenge i) →
-    List ((i : ιₛᵢ) × ((Oₛᵢ i).Domain × (Oₛᵢ i).Range)) →
-    List ((i : pSpec.MessageIdx) × ((Oₘ i).Domain × (Oₘ i).Range)) → OracleComp oSpec StmtOut
+    List ((i : ιₛᵢ) × ((d : (Oₛᵢ i).Domain) × (Oₛᵢ i).Range d)) →
+    List ((i : pSpec.MessageIdx) × ((d : (Oₘ i).Domain) × (Oₘ i).Range d)) → OracleComp oSpec StmtOut
 
   embed : ιₛₒ ↪ ιₛᵢ ⊕ pSpec.MessageIdx
 
@@ -402,7 +402,7 @@ def toOracleVerifier
     (naVerifier : OracleVerifier.NonAdaptive oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec) :
     OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec where
   verify := fun stmt challenges => do
-    let queryResponsesOStmt : List ((i : ιₛᵢ) × ((Oₛᵢ i).Domain × (Oₛᵢ i).Range)) ←
+    let queryResponsesOStmt : List ((i : ιₛᵢ) × ((d : (Oₛᵢ i).Domain) × (Oₛᵢ i).Range d)) ←
       (naVerifier.queryOStmt stmt challenges).mapM
       (fun q => do
         let resp ← liftM <| query (spec := [OStmtIn]ₒ) q.1 q.2

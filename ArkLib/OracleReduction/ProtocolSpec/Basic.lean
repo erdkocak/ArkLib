@@ -651,8 +651,8 @@ end OracleInterfaces
 @[reducible, inline, specialize]
 instance challengeOracleInterface {pSpec : ProtocolSpec n} :
     ∀ i, OracleInterface (pSpec.Challenge i) := fun i =>
-  { domain := Unit
-    range _ := pSpec.Challenge i
+  { Domain := Unit
+    Range _ := pSpec.Challenge i
     answer := fun c _ => c }
 
 /-- Query a verifier's challenge for a given challenge round `i`, given the default challenge
@@ -685,8 +685,8 @@ the point of deriving a new challenge. To be precise:
 @[reducible, inline, specialize]
 def challengeOracleInterfaceSR (StmtIn : Type) (pSpec : ProtocolSpec n) :
     ∀ i, OracleInterface (pSpec.Challenge i) := fun i =>
-  { domain := StmtIn × pSpec.MessagesUpTo i.1.castSucc
-    range _ := pSpec.Challenge i
+  { Domain := StmtIn × pSpec.MessagesUpTo i.1.castSucc
+    Range _ := pSpec.Challenge i
     answer := fun c _ => c }
 
 alias challengeOracleInterfaceFS := challengeOracleInterfaceSR
