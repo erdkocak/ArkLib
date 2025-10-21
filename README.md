@@ -46,4 +46,4 @@ We welcome outside contributions to the library! Please see [CONTRIBUTING](./CON
 If you're interested in working on any of the items mentioned in the list of issues or the roadmap, please see [verified-zkevm.org](https://verified-zkevm.org/), contact [the authors](mailto:qvd@andrew.cmu.edu), or open a new issue.
 
 ## Release Schedule
-New releases are planned around the middle of each month, in line with the Lean and mathlib release cycles. 
+New releases are planned in line with the Lean and mathlib stable release cycles. 
