@@ -236,12 +236,9 @@ theorem correctness' (a : ZMod p) {g₁ : G₁} {g₂ : G₂}
     [Fintype G₁] [Inhabited G₁] :
     Commitment.perfectCorrectness (kzg (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)
     (generateSrs (g₁:=g₁) (g₂:=g₂) n a)) := by
-    unfold perfectCorrectness Commitment.correctness
     intro data randomness query
-    set pSpec : ProtocolSpec 1 := ⟨!v[.P_to_V], !v[G₁]⟩
-    have hpSpec : ProverOnly pSpec := by
-      refine { prover_first' := ?_ }
-      simp [pSpec]
+    have hpSpec : ProverOnly ⟨!v[.P_to_V], !v[G₁]⟩ := by
+      refine { prover_first' := ?_ }; simp
     simp only [Reduction.run_of_prover_first]
     simp [kzg]
 
