@@ -139,6 +139,7 @@ import ArkLib.OracleReduction.Security.SpecialSoundness
 import ArkLib.OracleReduction.Security.StateRestoration
 import ArkLib.OracleReduction.VectorIOR
 import ArkLib.ProofSystem.Binius.Basic
+import ArkLib.ProofSystem.Binius.ProximityGap
 import ArkLib.ProofSystem.Component.CheckClaim
 import ArkLib.ProofSystem.Component.DoNothing
 import ArkLib.ProofSystem.Component.NoInteraction
