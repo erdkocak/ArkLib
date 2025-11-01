@@ -304,8 +304,7 @@ private lemma sum_sum_K_i_eq_n_sub_d
               nsmul_eq_mul]
   field_simp
   simp_all only [sub_sub_cancel]
-  unfold sum_choose_K_i
-  simp [choose_2]
+  unfold sum_choose_K_i choose_2
   field_simp
   rw [Finset.mul_sum]
 
