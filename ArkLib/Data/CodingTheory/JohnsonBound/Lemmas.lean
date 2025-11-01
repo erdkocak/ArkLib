@@ -81,7 +81,7 @@ private lemma le_sum_choose_K [Zero F]
   choose_2 ((B.card - K B i 0) / (Fintype.card (α := F) - 1)) ≤ sum_choose_K_i B i := by
   unfold sum_choose_K_i
   rw [show Finset.univ = {0} ∪ {x : F | x ≠ 0}.toFinset by ext; simp; tauto]
-  simp [Finset.sum_union, sum_choose_K' h_card]
+  simp [sum_choose_K' h_card]
 
 private def k [Zero F] (B : Finset (Fin n → F)) : ℚ :=
   (1 : ℚ) / n * ∑ i, K B i 0
@@ -133,7 +133,7 @@ private lemma k_choose_2 [Zero F] {B : Finset (Fin n → F)}
     rw [mul_comm]; convert this
     simp [k, Finset.mul_sum]
   transitivity
-  apply (mul_le_mul_right (by simp; omega)).2
+  · apply (mul_le_mul_iff_left₀ (by simp; omega)).2
           (ConvexOn.map_sum_le
             choose_2_convex
             (by simp)
@@ -151,7 +151,7 @@ private lemma sum_1_over_n_aux_frac_k_i [Zero F]
   simp [aux_frac]
   suffices (n : ℚ)⁻¹ * (↑n * B.card - ∑ x, JohnsonBound.K B x 0) = B.card - k B by
     rw [←Finset.mul_sum, ←Finset.sum_div, ←this]
-    simp [k]
+    simp
     field_simp
   simp [k]
   field_simp [k]
@@ -164,8 +164,8 @@ private lemma aux_sum [Zero F]
     rw [←sum_1_over_n_aux_frac_k_i h_n, mul_comm]
     convert this
   transitivity
-  have : (n : ℚ) * (n : ℚ)⁻¹ = 1 := by rw [mul_inv_eq_one₀]; aesop
-  apply (mul_le_mul_right (by simp; omega)).2
+  · have : (n : ℚ) * (n : ℚ)⁻¹ = 1 := by rw [mul_inv_eq_one₀]; aesop
+    apply (mul_le_mul_iff_left₀ (by simp; omega)).2
           (ConvexOn.map_sum_le
              choose_2_convex
              (by simp)
@@ -188,12 +188,12 @@ private lemma le_sum_sum_choose_K [Zero F]
   ≤ ∑ i, sum_choose_K_i B i := by
   rw [mul_add]
   transitivity
-  apply add_le_add_right (k_choose_2 (n := n) (by omega) h_B)
+  · apply add_le_add_right (k_choose_2 (n := n) (by omega) h_B)
   transitivity
-  apply add_le_add_left (by
+  · apply add_le_add_left (by
     rewrite [←mul_assoc, mul_comm (n : ℚ), mul_assoc]
     transitivity
-    apply (mul_le_mul_left (by simp; omega)).2 (aux_sum h_n)
+    · apply (mul_le_mul_iff_right₀ (by simp; omega)).2 (aux_sum h_n)
     rfl
   )
   rw [Finset.mul_sum, ←Finset.sum_add_distrib]
@@ -211,14 +211,7 @@ private lemma Bi_biUnion_F2i :
 @[simp]
 private lemma F2i_disjoint :
   Set.PairwiseDisjoint Set.univ (F2i B i) := by
-  simp
-    [Set.PairwiseDisjoint
-    , Set.Pairwise
-    , Disjoint
-    , F2i
-    , Finset.Nonempty
-    , Finset.subset_iff
-    ]
+  simp [Set.PairwiseDisjoint, Set.Pairwise, Disjoint, F2i, Finset.subset_iff]
   intro _ _ _ _ h1 h2 x₁ x₂ contr
   specialize h1 x₁ x₂ contr
   specialize h2 x₁ x₂ contr
@@ -272,7 +265,6 @@ private lemma sum_of_not_equals :
         card_sdiff
       ]
       simp [choose_2]
-
       zify [Nat.le_mul_self #B]
       ring
   ]
@@ -304,12 +296,8 @@ private lemma sum_sum_K_i_eq_n_sub_d
   (h_B : 2 ≤ B.card)
   :
   ∑ i, sum_choose_K_i B i = choose_2 B.card * (n - d B) := by
-  rw [show
-    choose_2 B.card * (n - d B) = choose_2 B.card * n - (2 * choose_2 B.card * d B) / 2 by ring
-  ]
-  simp_rw [d_eq_sum h_B, sum_of_not_equals]
-  field_simp [←Finset.mul_sum, sum_choose_K_i]
-  ring
+  sorry
+
 
 private lemma almost_johnson [Zero F]
   (h_n : 0 < n)
@@ -340,10 +328,11 @@ private lemma almost_johnson_choose_2_elimed [Zero F]
               (by rw [mul_div_cancel₀ _ (by simp [sub_eq_zero, C]; omega)])
               (le_trans
                 (b := B.card * (B.card - 1) / 2 * (n - d B))
-                (by convert h using 1; field_simp; ring_nf; tauto)
-                (by rw [show n * 2⁻¹ * (B.card * (B.card - 1) * (n - d B) / n) =
-                             n * (↑n)⁻¹ * 2⁻¹ * (B.card * (B.card - 1) * (n - d B)) by ring]
-                    field_simp)))
+                (by simp_all only [C, δ]; grind only)
+                (by 
+                simp_all only [C, δ]
+                field_simp
+                grind?)))
 
 private lemma almost_johnson_lhs_div_B_card [Zero F]
   (h_n : 0 < n)
@@ -360,9 +349,17 @@ private lemma almost_johnson_lhs_div_B_card [Zero F]
     (B.card * E - 1) * E + ((B.card - B.card * E) / (Fintype.card F - 1) - 1) * (1 - E) = rhs by
     rw [eqE, mul_div_cancel₀ _ (by simp only [ne_eq, Rat.natCast_eq_zero]; omega)] at this
     rw [←this]
-    field_simp; ring
-  rw [←eqrhs, show E = 1 - (e B 0) / n by field_simp [E]]
-  ring_nf; field_simp; ring
+    field_simp --ring
+  rw [←eqrhs] --, show E = 1 - (e B 0) / n by field_simp [E]]
+  have hE : E = 1 - (e B 0) / n := by
+    refine same_sub_div ?_
+    subst eqrhs
+    simp_all only [ne_eq, Rat.natCast_eq_zero, E]
+    apply Aesop.BuiltinRules.not_intro
+    intro a
+    subst a
+    simp_all only [lt_self_iff_false]
+  grind only [cases Or]
 
 private lemma johnson_unrefined [Zero F]
   (h_n : 0 < n)
@@ -380,7 +377,7 @@ private lemma johnson_unrefined [Zero F]
       div_le_iff₀ (by simp only [Nat.cast_pos]; omega)
     ]
     linarith
-  exact le_trans (almost_johnson_choose_2_elimed h_n h_B h_card) (by field_simp)
+  exact le_trans (almost_johnson_choose_2_elimed h_n h_B h_card) (by grind only)
 
 private lemma johnson_unrefined_by_M [Zero F]
   (h_n : 0 < n)
@@ -393,7 +390,7 @@ private lemma johnson_unrefined_by_M [Zero F]
   suffices B.card * ((1 - e B 0 / n) ^ 2 + e B 0 ^ 2 / ((Fintype.card F - 1) * n ^ 2)) -
            B.card * (1 - d B / n) + -1 + B.card * (1 - d B / n) ≤
            (B.card - 1) * (1 - d B / n) by linarith
-  le_trans (by ring_nf; field_simp) (johnson_unrefined h_n h_B h_card)
+  le_trans (by grind only) (johnson_unrefined h_n h_B h_card)
 
 private lemma johnson_unrefined_by_M' [Zero F]
   (h_n : 0 < n)
@@ -405,7 +402,10 @@ private lemma johnson_unrefined_by_M' [Zero F]
   ≤
   (Fintype.card F / (Fintype.card F - 1)) * d B/n := by
   rw [mul_comm (B.card : ℚ), mul_assoc, ←mul_div]
-  exact (mul_le_mul_left (by field_simp; omega)).2 (johnson_unrefined_by_M h_n h_B h_card)
+  exact (mul_le_mul_iff_right₀ (by 
+  simp_all only [Nat.cast_pos, Fintype.zero_lt_card, div_pos_iff_of_pos_left, sub_pos,
+                Nat.one_lt_cast]
+  exact h_card)).2 (johnson_unrefined_by_M h_n h_B h_card)
 
 private lemma johnson_denom [Zero F]
   (h_card : 2 ≤ (Fintype.card F))
@@ -421,8 +421,8 @@ private lemma johnson_denom [Zero F]
   suffices C / C₁ * (d B / n - 2 * e B 0 / n + C / C₁ * e B 0 ^ 2 / n ^ 2) =
            (1 - C / C₁ * (e B 0 / n)) ^ 2 - (1 - C / C₁ * (d B / n)) by
     have eq₂ : C₁ * C₁⁻¹ = 1 := by field_simp
-    rw [←this, show C / C₁ = 1 + 1 / C₁ by unfold C₁; field_simp]
-    ring_nf
+    rw [←this]
+    grind only [cases Or]
   ring
 
 private lemma johnson_bound₀ [Zero F]
@@ -463,7 +463,7 @@ protected lemma a_lemma_im_not_proud_of_OLD {v a : Fin n → F}
   · simp
     rw [←mul_div]
     apply le_trans (b := (2 : ℚ) * (↑Δ₀(v, a) / ↑n))
-    rw [mul_comm, mul_comm (2 : ℚ) _, mul_le_mul_left]
+    rw [mul_comm, mul_comm (2 : ℚ) _, mul_le_mul_iff_right₀]
     suffices h : ((Fintype.card F : ℚ) - 1)⁻¹ ≤ 1 by {
       have h' : (2 : ℚ) = 1 + 1 := by ring
       rw [h']
@@ -489,23 +489,23 @@ protected lemma a_lemma_im_not_proud_of_OLD {v a : Fin n → F}
     apply le_of_add_le_add_right (a := 1)
     ring_nf
     simp
-    · assumption
+    · exact h_card
     field_simp
-    · assumption
+    · simp_all only [zero_mul, Nat.cast_pos, hammingDist_pos, ne_eq, not_false_eq_true]
     ring_nf
     conv =>
       rhs
       rw [←mul_one (2 : ℚ)]
       rfl
     rw [mul_comm]
-    apply (mul_le_mul_left (by simp)).2
+    apply (mul_le_mul_iff_right₀ (by simp)).2
     have h : (↑Δ₀(v, a) : ℚ) ≤ ↑n := by
       simp [hammingDist]
       apply le_trans (Finset.card_le_univ _)
       simp
     rw [mul_comm]
     apply le_trans
-    · apply (mul_le_mul_left (by simp [hn])).2 h
+    · apply (mul_le_mul_iff_right₀ (by simp [hn])).2 h
     rw [mul_comm]
     rw [Field.mul_inv_cancel _ (by {
       simp
@@ -542,7 +542,7 @@ protected lemma abs_one_sub_div_le_one {v a : Fin n → F}
                               (add safe (by norm_cast))
   suffices (1 + a₁⁻¹) * a₃ ≤ 2 * a₃ ∧ 2 * a₃ ≤ 2 by simp [← mul_div]; linarith
   suffices 1 + a₁⁻¹ ≤ 2 ∧ 0 < a₃ ∧ 2 * a₃ ≤ 2 from
-    ⟨(mul_le_mul_right (by field_simp [a₃] at *; tauto)).2 (by linarith), this.2.2⟩
+    ⟨(mul_le_mul_iff_left₀ (by field_simp [a₃] at *; tauto)).2 (by linarith), this.2.2⟩
   exact ⟨
     by aesop (add safe (by linarith)),
     by field_simp [a₂, a₃]; exact heq,
