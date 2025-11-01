@@ -15,8 +15,8 @@ universe u v
 
 open OracleComp OracleSpec
 
-variable {spec spec' specₜ: OracleSpec}
-    {m : Type u → Type v} {α β γ σ : Type u}
+-- variable {spec spec' specₜ: OracleSpec}
+--     {m : Type u → Type v} {α β γ σ : Type u}
 
 -- section SimulateNeverFails
 
@@ -104,7 +104,7 @@ variable {spec spec' specₜ: OracleSpec}
 
 namespace SimOracle
 
-variable {spec spec₁ spec₂ specₜ specₜ₁ specₜ₂ : OracleSpec} {σ τ α β : Type}
+-- variable {spec spec₁ spec₂ specₜ specₜ₁ specₜ₂ : OracleSpec} {σ τ α β : Type}
 
 open OracleSpec
 

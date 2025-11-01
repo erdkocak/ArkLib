@@ -42,7 +42,7 @@ variable (ι : Type) (p : ℕ)
 /-- The group operation oracle allows an adversary to perform the group operation on group elements
   stored at the indices `i` and `j` (if they are both defined), storing the result at index `k`. -/
 @[reducible]
-def GroupOpOracle : OracleSpec := ⟨ι × ι × ι, fun _ => Unit⟩
+def GroupOpOracle : OracleSpec (ι × ι × ι) := fun _ => Unit
 
 /-- The group exponent oracle allows an adversary to compute the group element at the index `i`
   raised to the power `a`, storing the result at index `j`.
@@ -50,23 +50,23 @@ def GroupOpOracle : OracleSpec := ⟨ι × ι × ι, fun _ => Unit⟩
   Technically, this oracle can be implemented with just the group operation oracle, but we allow
   this for faster implementation. -/
 @[reducible]
-def GroupExpOracle : OracleSpec := ⟨ι × ZMod p × ι, fun _ => Unit⟩
+def GroupExpOracle : OracleSpec (ι × ZMod p × ι) := fun _ => Unit
 
 /-- The group equality oracle allows an adversary to check if the group elements stored at the
   indices `i` and `j` are equal. -/
 @[reducible]
-def GroupEqOracle : OracleSpec := ⟨ι × ι, fun _ => Bool⟩
+def GroupEqOracle : OracleSpec (ι × ι) := fun _ => Bool
 
 variable (bitLength : ℕ)
 
 /-- The group encoding oracle allows an adversary to get the bit encoding of a group element. -/
 @[reducible]
-def GroupEncodeOracle : OracleSpec := ⟨ι, fun _ => BitVec bitLength⟩
+def GroupEncodeOracle : OracleSpec ι := fun _ => BitVec bitLength
 
 /-- The group decoding oracle allows an adversary to insert a group element corresponding to a
   bit encoding into the table, if the bit encoding is valid. -/
 @[reducible]
-def GroupDecodeOracle : OracleSpec := ⟨BitVec bitLength × ι, fun _ => Unit⟩
+def GroupDecodeOracle : OracleSpec (BitVec bitLength × ι) := fun _ => Unit
 
 end OracleSpec
 

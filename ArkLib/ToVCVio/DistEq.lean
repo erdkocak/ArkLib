@@ -42,7 +42,7 @@ namespace OracleComp
 
 -- Shouldn't have to define this separately once we have an instance `HasEvalDist (OracleComp spec)`
 
-variable {spec : OracleSpec} [spec.Fintype] [spec.Inhabited] {α : Type u}
+variable {ι} {spec : OracleSpec ι} [spec.Fintype] [spec.Inhabited] {α : Type u}
 
 def distEq (mx my : OracleComp spec α) : Prop :=
   evalDist mx = evalDist my

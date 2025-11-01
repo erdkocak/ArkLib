@@ -19,11 +19,11 @@ variable {α β γ : Type}
 /-- A function that implements the oracle interface specified by `spec`, and queries no further
   oracles.
 -/
-def OracleSpec.FunctionType (spec : OracleSpec) := (t : spec.Domain) → spec.Range t
+def OracleSpec.FunctionType {ι} (spec : OracleSpec ι) := (t : spec.Domain) → spec.Range t
 
 namespace OracleSpec
 
-variable {spec : OracleSpec}
+variable {ι} {spec : OracleSpec ι}
 
 -- def QueryLog.getQueriesFromIdx (log : QueryLog spec) (i : ι) :
 --     List (spec.Domain i × spec.Range i) :=
@@ -33,7 +33,7 @@ end OracleSpec
 
 namespace OracleComp
 
-variable {spec : OracleSpec} {α σ : Type}
+variable {ι} {spec : OracleSpec ι} {α σ : Type}
 
 /-- Run an oracle computation `OracleComp spec α` with an oracle coming from
   a (deterministic) function `f` that queries no further oracles.
@@ -114,13 +114,13 @@ theorem runWithOracle_bind (f : (t : spec.Domain) → spec.Range t)
 --     | failure' _ => by sorry
 
 /-- True if every non-`none` element of the cache has that same value in the oracle -/
-def Oracle.containsCache {spec : OracleSpec}
+def Oracle.containsCache {spec : OracleSpec ι}
     (f : (t : spec.Domain) → spec.Range t) (cache : spec.QueryCache) :
     Prop :=
   ∀ q r, cache q = some r → f q = r
 
 /-- For any cache, there is a function to contain it -/
-lemma Oracle.containsCache_of_cache {spec : OracleSpec}
+lemma Oracle.containsCache_of_cache {spec : OracleSpec ι}
     [spec.Inhabited]
     (cache : spec.QueryCache) :
     ∃ (f : (t : spec.Domain) → spec.Range t), Oracle.containsCache f cache := by
@@ -212,7 +212,7 @@ variable {m : Type u → Type v} [Monad m] [LawfulMonad m]
 
 namespace QueryImpl
 
-variable {ι : Type u} [DecidableEq ι] {spec : OracleSpec} [spec.DecidableEq] {m : Type u → Type v}
+variable {ι : Type u} [DecidableEq ι] {spec : OracleSpec ι} [spec.DecidableEq] {m : Type u → Type v}
   [Monad m]
 
 /-- Compose a query implementation from `spec` to some monad `m`, with a further monad homomorphism

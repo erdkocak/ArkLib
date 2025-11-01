@@ -68,17 +68,17 @@ namespace OracleSpec
 /-- The oracle specification for the forward permutation of a type `α`. Just a wrapper around
 `α →ₒ α` -/
 @[reducible]
-def forwardPermutationOracle (α : Type*) : OracleSpec := α →ₒ α
+def forwardPermutationOracle (α : Type*) : OracleSpec α := α →ₒ α
 
 /-- The oracle specification for the backward permutation of a type `α`. Just a wrapper around
 `α →ₒ α` -/
 @[reducible]
-def backwardPermutationOracle (α : Type*) : OracleSpec := α →ₒ α
+def backwardPermutationOracle (α : Type*) : OracleSpec α := α →ₒ α
 
 /-- Oracle specification for an ideal permutation, which is the concatenation of the specifications
   for the forward and backward directions. -/
 @[reducible]
-def permutationOracle (α : Type*) : OracleSpec :=
+def permutationOracle (α : Type*) : OracleSpec (α ⊕ α) :=
   forwardPermutationOracle α + backwardPermutationOracle α
 
 end OracleSpec
