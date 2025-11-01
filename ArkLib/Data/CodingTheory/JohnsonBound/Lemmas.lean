@@ -296,7 +296,18 @@ private lemma sum_sum_K_i_eq_n_sub_d
   (h_B : 2 ≤ B.card)
   :
   ∑ i, sum_choose_K_i B i = choose_2 B.card * (n - d B) := by
-  sorry
+  rw [show
+    choose_2 B.card * (n - d B) = choose_2 B.card * n - (2 * choose_2 B.card * d B) / 2 by ring
+  ]
+  simp_rw [d_eq_sum h_B, sum_of_not_equals]
+  simp_all only [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+              nsmul_eq_mul]
+  field_simp
+  simp_all only [sub_sub_cancel]
+  unfold sum_choose_K_i
+  simp [choose_2]
+  field_simp
+  rw [Finset.mul_sum]
 
 
 private lemma almost_johnson [Zero F]
@@ -329,7 +340,7 @@ private lemma almost_johnson_choose_2_elimed [Zero F]
               (le_trans
                 (b := B.card * (B.card - 1) / 2 * (n - d B))
                 (by simp_all only [C, δ]; grind only)
-                (by 
+                (by
                 simp_all only [C, δ]
                 field_simp
                 grind?)))
@@ -402,7 +413,7 @@ private lemma johnson_unrefined_by_M' [Zero F]
   ≤
   (Fintype.card F / (Fintype.card F - 1)) * d B/n := by
   rw [mul_comm (B.card : ℚ), mul_assoc, ←mul_div]
-  exact (mul_le_mul_iff_right₀ (by 
+  exact (mul_le_mul_iff_right₀ (by
   simp_all only [Nat.cast_pos, Fintype.zero_lt_card, div_pos_iff_of_pos_left, sub_pos,
                 Nat.one_lt_cast]
   exact h_card)).2 (johnson_unrefined_by_M h_n h_B h_card)
@@ -544,9 +555,14 @@ protected lemma abs_one_sub_div_le_one {v a : Fin n → F}
   suffices 1 + a₁⁻¹ ≤ 2 ∧ 0 < a₃ ∧ 2 * a₃ ≤ 2 from
     ⟨(mul_le_mul_iff_left₀ (by field_simp [a₃] at *; tauto)).2 (by linarith), this.2.2⟩
   exact ⟨
-    by aesop (add safe (by linarith)),
-    by field_simp [a₂, a₃]; exact heq,
-    by aesop (add safe [(by rw [div_le_one]), (by omega)])
+    by grind only,
+    by
+    simp_all only [Nat.cast_le, Nat.cast_pos, hammingDist_pos, ne_eq, not_false_eq_true,
+      div_pos_iff_of_pos_left,
+      Nat.ofNat_pos, mul_le_iff_le_one_right, a₂, a₁, a₃]
+    apply And.intro
+    · exact Nat.zero_lt_of_ne_zero eq
+    · field_simp; simp_all only [Nat.cast_le]
   ⟩
 
 end
