@@ -219,7 +219,7 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
     simp only [UniPoly.eval_X, UniPoly.eval_C]
 
   have hmonic : monic (UniPoly.X - UniPoly.C z) := by
-    sorry
+    simp only [UniPoly.monic_X_sub_C]
 
   have hpoly: mk (Array.ofFn coeffs) = poly := by
     simp [poly]
@@ -230,7 +230,21 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
 
   set q := (mk poly - UniPoly.C (UniPoly.eval z (mk poly))).divByMonic (UniPoly.X - UniPoly.C z)
   have hqdeg : degree q ≤ n+1 := by
-    sorry
+    have hCdeg : degree (UniPoly.C (UniPoly.eval z (mk poly))) ≤ 1 := by
+      by_cases h0 : UniPoly.eval z (mk poly) = 0
+      · simp only [h0, degree_C_zero, zero_le]
+      · simp [UniPoly.degree_C (x := UniPoly.eval z (mk poly)) (by simpa using h0)]
+    calc
+      degree q ≤ degree (mk poly - UniPoly.C (UniPoly.eval z (mk poly))) := by
+        simp [q, degree_divByMonic hmonic]
+      _ ≤ max (degree (mk poly)) (degree (UniPoly.C (UniPoly.eval z (mk poly)))) :=
+        UniPoly.degree_sub _ _
+      _ ≤ max (n+1) 1 := by
+        apply max_le_max
+        · exact hpdeg
+        · exact hCdeg
+      _ = n+1 := by
+        simp only [Nat.succ_le_succ (Nat.zero_le n), sup_of_le_left]
   have hfun: (fun i ↦ q.coeff ↑i : Fin (n+1) → ZMod p) = (coeff q) ∘ Fin.val := by rfl
   simp_rw [hfun, commit_eq_UniPoly hpG1 q hqdeg]
   simp only [towerOfExponents, Nat.reduceAdd, Vector.getElem_ofFn, pow_zero, pow_one]

@@ -676,6 +676,54 @@ theorem eval_C (x : R) (y : R) : UniPoly.eval x (UniPoly.C y) = y := by
   unfold eval eval₂ C
   simp [Array.zipIdx, pow_zero]
 
+theorem monic_X_sub_C (x : R) : monic (UniPoly.X - UniPoly.C x) := by
+  unfold monic
+  sorry
+
+-- lemmas about degree
+
+theorem degree_C [LawfulBEq R] (x : R) (hx : x ≠ 0) : degree (UniPoly.C x) = 1 := by
+  let p : UniPoly R := #[x]
+  have k : Fin p.size := ⟨0, by simp [p]⟩
+  have h_some : p.last_nonzero = some k := by
+    refine Trim.last_nonzero_some_iff.mpr ?_;
+    constructor
+    · simpa [p] using hx
+    · intro j hj hjgt
+      have hjlt1 : j < 1 := by simpa [p] using hj
+      have hj0 : j = 0 := Nat.lt_one_iff.mp hjlt1
+      have : False := by
+        subst hj0
+        simp_all only [ne_eq, List.size_toArray, List.length_cons, List.length_nil, _root_.zero_add,
+        Fin.val_eq_zero, gt_iff_lt, lt_self_iff_false, p]
+      exact False.elim this
+  unfold degree C
+  simp [p, h_some]
+
+theorem degree_C_zero [LawfulBEq R] : degree (UniPoly.C (0 : R)) = 0 := by
+  have : (UniPoly.C (0 : R)).last_nonzero = none := by
+    apply Trim.last_nonzero_none
+    intro i hi
+    -- for C 0 the only possible index is 0, whose value is 0
+    have hi' : i < 1 := by simpa [C] using hi
+    have : i = 0 := Nat.lt_one_iff.mp hi'
+    subst this
+    simp [C]
+  unfold degree
+  simp [this]
+
+theorem degree_sub [Field R] (p q : UniPoly R) : degree (p - q) ≤ max (degree p) (degree q) := by
+  sorry
+
+-- this could and should be much stronger i.e. using trim ≤ deg p - deg q + 1
+theorem degree_divByMonic [Field R] {p q : UniPoly R} (hq : monic q = true) :
+  degree (p.divByMonic q) ≤ degree p := by
+  sorry
+
+-- this could and should be much stronger i.e. using trim ≤ deg p - deg q + 1
+theorem degree_div [Field R] {p q : UniPoly R} (hq : q.trim ≠ 0) : degree (p.div q) ≤ degree p := by
+  sorry
+
 end Operations
 
 namespace OperationsC
