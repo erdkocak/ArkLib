@@ -31,6 +31,37 @@ variable {G₁ : Type} [Group G₁] [PrimeOrderWith G₁ p] {g₁ : G₁}
   [Module (ZMod p) (Additive G₁)] [Module (ZMod p) (Additive G₂)] [Module (ZMod p) (Additive Gₜ)]
   (pairing : (Additive G₁) →ₗ[ZMod p] (Additive G₂) →ₗ[ZMod p] (Additive Gₜ))
 
+omit [DecidableEq Gₜ] in
+lemma lin_fst (g₁ : G₁) (g₂ : G₂) (a : ℤ) : a • (pairing g₁ g₂) =  pairing (g₁ ^ a) (g₂) := by
+  change a • (pairing (Additive.ofMul g₁) (Additive.ofMul g₂))
+    = pairing (Additive.ofMul (g₁ ^ a)) (Additive.ofMul g₂)
+  simp [ofMul_zpow]
+
+omit [DecidableEq Gₜ] in
+lemma lin_snd (g₁ : G₁) (g₂ : G₂) (a : ℤ) : a • (pairing g₁ g₂) =  pairing (g₁) (g₂ ^ a) := by
+  change a • (pairing (Additive.ofMul g₁) (Additive.ofMul g₂))
+    = pairing (Additive.ofMul g₁) (Additive.ofMul (g₂ ^ a))
+  simp [ofMul_zpow]
+
+lemma modp_eq (x y : ℤ) (g : G) (hxy : x ≡ y [ZMOD p]) : g ^ x = g ^ y := by
+  have hordg : g = 1 ∨ orderOf g = p := by
+    have ord_g_dvd : orderOf g ∣ p := by
+      have hc : Nat.card G = p := (PrimeOrderWith.hCard : Nat.card G = p)
+      simpa [hc] using (orderOf_dvd_natCard g)
+    have hdisj : orderOf g = 1 ∨ orderOf g = p := (Nat.dvd_prime hp.out).1 ord_g_dvd
+    simpa [orderOf_eq_one_iff] using hdisj
+  rcases hordg with ord1 | ordp
+  · simp [ord1]
+  · have hxmy : (orderOf g : ℤ) ∣ x - y := by
+      have hxmy_p : (p : ℤ) ∣ x - y := by
+        simpa using (Int.modEq_iff_dvd.mp hxy.symm)
+      simpa [ordp] using hxmy_p
+    exact (orderOf_dvd_sub_iff_zpow_eq_zpow).1 hxmy
+
+lemma modp_eq_additive (x y : ℤ) (g : Additive G) (hxy : x ≡ y [ZMOD p]) : x • g = y • g := by
+  have hxyeq : (Additive.toMul g) ^ x = (Additive.toMul g) ^ y :=
+    modp_eq (G:=G) (p:=p) (g:=(Additive.toMul g)) x y hxy
+  simpa [ofMul_toMul, ofMul_zpow] using congrArg Additive.ofMul hxyeq
 
 /-- The vector of length `n + 1` that consists of powers:
   `#v[1, g, g ^ a.val, g ^ (a.val ^ 2), ..., g ^ (a.val ^ n)` -/
@@ -136,7 +167,7 @@ theorem commit_eq_UniPoly {a : ZMod p} (hpG1 : Nat.card G₁ = p)
 def generateOpening [Fact (Nat.Prime p)] (srs : Vector G₁ (n + 1))
     (coeffs : Fin (n + 1) → ZMod p) (z : ZMod p) : G₁ :=
     letI poly : UniPoly (ZMod p) := UniPoly.mk (Array.ofFn coeffs)
-    letI q : UniPoly (ZMod p) := UniPoly.div (poly - UniPoly.C (poly.eval z))
+    letI q : UniPoly (ZMod p) := UniPoly.divByMonic (poly - UniPoly.C (poly.eval z))
       (UniPoly.X - UniPoly.C z)
     commit srs (fun i : Fin (n + 1) => q.coeff i)
 
@@ -145,7 +176,15 @@ evaluation `v`, we use the pairing to check "in the exponent" that `p(a) - p(z) 
   where `p` is the polynomial and `q` is the quotient of `p` at `z` -/
 def verifyOpening (verifySrs : Vector G₂ 2) (commitment : G₁) (opening : G₁)
     (z : ZMod p) (v : ZMod p) : Bool :=
-  pairing (commitment / g₁ ^ v.val) (verifySrs[0]) = pairing opening (verifySrs[1] / g₂ ^ z.val)
+  pairing (commitment / g₁ ^ v.val) (verifySrs[0]) =
+    pairing opening (verifySrs[1] / g₂ ^ z.val)
+
+-- Division algorithm identity specialized to polynomials over `ZMod p`.
+lemma poly_quotient_mul_add_remainder_eq
+  (P d : Polynomial (ZMod p)) :
+  P = (P / d) * d + (P % d) := by
+  simpa [_root_.mul_comm] using
+    ((EuclideanDomain.quotient_mul_add_remainder_eq (R := Polynomial (ZMod p)) P d).symm)
 
 -- p(a) - p(z) = q(a) * (a - z)
 -- e ( C / g₁ ^ v , g₂ ) = e ( O , g₂ ^ a / g₂ ^ z)
@@ -153,14 +192,13 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
   (coeffs : Fin (n + 1) → ZMod p) (z : ZMod p) :
   let poly : UniPoly (ZMod p) := UniPoly.mk (Array.ofFn coeffs)
   let v : ZMod p := poly.eval z
-  let (psrs,vsrs) : Vector G₁ (n + 1) × Vector G₂ 2 := generateSrs (g₁:=g₁) (g₂:=g₂) n a
-  let C : G₁ := commit psrs coeffs
-  let opening: G₁ := generateOpening psrs coeffs z
-  verifyOpening pairing (g₁:=g₁) (g₂:=g₂) vsrs C opening z v := by
-
+  let srs : Vector G₁ (n + 1) × Vector G₂ 2 := generateSrs (g₁:=g₁) (g₂:=g₂) n a
+  let C : G₁ := commit srs.1 coeffs
+  let opening: G₁ := generateOpening srs.1 coeffs z
+  verifyOpening pairing (g₁:=g₁) (g₂:=g₂) srs.2 C opening z v := by
   intro poly v
   unfold verifyOpening generateSrs
-  simp
+  simp only [decide_eq_true_eq]
 
   have hcoeffs : coeffs = (coeff poly) ∘ Fin.val := by
     simp_all only [poly]
@@ -169,15 +207,46 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
     simp only [Array.getD_eq_getD_getElem?, Array.size_ofFn, Fin.is_lt, getElem?_pos,
     Array.getElem_ofFn, Fin.eta, Option.getD_some]
 
-
   have hpdeg : degree poly ≤ n+1 := by
     simp_rw [←Trim.size_eq_degree]
     apply le_trans (Trim.size_le_size (p := poly))
     simp_rw [poly]
     simp
 
+  have haz : (a-z) = UniPoly.eval a (UniPoly.X - UniPoly.C z) := by
+    simp_rw [←eval_toPoly_eq_eval, toPoly_sub, eval_sub,
+    eval_toPoly_eq_eval]
+    simp only [UniPoly.eval_X, UniPoly.eval_C]
+
+  have hmonic : monic (UniPoly.X - UniPoly.C z) := by
+    sorry
+
+  have hpoly: mk (Array.ofFn coeffs) = poly := by
+    simp [poly]
+
   simp_rw [hcoeffs, commit_eq_UniPoly hpG1 poly hpdeg]
-  sorry
+  simp_rw [generateOpening, ←hcoeffs]
+  simp_rw [hpoly]
+
+  set q := (mk poly - UniPoly.C (UniPoly.eval z (mk poly))).divByMonic (UniPoly.X - UniPoly.C z)
+  have hqdeg : degree q ≤ n+1 := by
+    sorry
+  have hfun: (fun i ↦ q.coeff ↑i : Fin (n+1) → ZMod p) = (coeff q) ∘ Fin.val := by rfl
+  simp_rw [hfun, commit_eq_UniPoly hpG1 q hqdeg]
+  simp only [towerOfExponents, Nat.reduceAdd, Vector.getElem_ofFn, pow_zero, pow_one]
+  simp_rw [←zpow_natCast_sub_natCast, ←zpow_natCast, ←lin_snd, ←lin_fst, smul_smul]
+
+  apply modp_eq_additive
+  refine (Int.modEq_iff_dvd).2 ?_
+  let x : ℤ := (↑(UniPoly.eval a poly).val) - (↑v.val)
+  let y : ℤ := (↑(a.val) - ↑(z.val)) * ↑(UniPoly.eval a q).val
+  refine (Iff.mp (ZMod.intCast_eq_intCast_iff_dvd_sub (a := x) (b := y) (c := p))) ?_
+  subst x y; simp
+  subst v q
+  simp_rw [haz]
+  simp_rw [←eval_toPoly_eq_eval, toPoly_divByMonic hmonic,toPoly_sub, ←eval_mul, toPoly_C, toPoly_X]
+  simp_rw [X_sub_C_mul_divByMonic_eq_sub_modByMonic, modByMonic_X_sub_C_eq_C_eval]
+  simp only [eval_sub, Polynomial.eval_C, sub_self, map_zero, sub_zero]
 
 open Commitment
 
@@ -232,14 +301,25 @@ def kzg (srs : Vector G₁ (n + 1) × Vector G₂ 2) :
 
 open OracleSpec OracleComp SubSpec ProtocolSpec
 
-theorem correctness' (a : ZMod p) {g₁ : G₁} {g₂ : G₂}
-    [Fintype G₁] [Inhabited G₁] :
-    Commitment.perfectCorrectness (kzg (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)
+theorem correctness' (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂} :
+    Commitment.perfectCorrectness (pure ()) ⟨isEmptyElim⟩
+    (kzg (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)
     (generateSrs (g₁:=g₁) (g₂:=g₂) n a)) := by
     intro data randomness query
+    unfold Proof.completeness Reduction.completeness
     have hpSpec : ProverOnly ⟨!v[.P_to_V], !v[G₁]⟩ := by
       refine { prover_first' := ?_ }; simp
     simp only [Reduction.run_of_prover_first]
     simp [kzg]
+    intro a_1 a_2 b a_3 a_4 a_5
+    change ZMod p at a_2
+    change ZMod p at b
+    simp [acceptRejectRel]
+    set coeffs := a_3
+    set z := a_2
+    set v := b
+    simp only [OracleInterface.answer] at *
+    subst a_4 a_5 v
+    simpa using correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a coeffs z
 
 end KZG

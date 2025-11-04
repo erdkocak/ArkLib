@@ -5,6 +5,7 @@ Authors: Quang Dao
 -/
 
 import Mathlib.Algebra.Tropical.Basic
+import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.RingTheory.Polynomial.Basic
 import ArkLib.Data.Array.Lemmas
 
@@ -663,6 +664,18 @@ theorem neg_add_cancel [LawfulBEq R] (p : UniPoly R) : -p + p = 0 := by
   rw [add_coeff?]
   rcases (Nat.lt_or_ge i p.size) with hi | hi <;> simp [hi, Neg.neg, neg]
 
+omit [BEq R] in
+@[simp]
+theorem eval_X (a : R) : UniPoly.eval a UniPoly.X = a := by
+  unfold eval eval₂ X
+  simp [Array.zipIdx, pow_zero, pow_one]
+
+omit [BEq R] in
+@[simp]
+theorem eval_C (x : R) (y : R) : UniPoly.eval x (UniPoly.C y) = y := by
+  unfold eval eval₂ C
+  simp [Array.zipIdx, pow_zero]
+
 end Operations
 
 namespace OperationsC
@@ -826,6 +839,31 @@ theorem toPoly_add {p q : UniPoly Q} : (add_raw p q).toPoly = p.toPoly + q.toPol
   ext n
   rw [coeff_add, coeff_toPoly, coeff_toPoly, coeff_toPoly, add_coeff?]
 
+/-- `UniPoly` subtraction is mapped to `Polynomial` substraction -/
+theorem toPoly_sub {p q : UniPoly Q} [BEq Q] [LawfulBEq Q] :
+    (p - q).toPoly = p.toPoly - q.toPoly := by
+  ext n
+  rw [coeff_toPoly, coeff_sub, coeff_toPoly, coeff_toPoly]
+  change (UniPoly.sub p q).coeff n = p.coeff n - q.coeff n
+  rw [UniPoly.sub, UniPoly.add]
+  rw [Trim.coeff_eq_coeff (p := p.add_raw q.neg)]
+  rw [add_coeff? p q.neg n]
+  rw [neg_coeff q n]
+  rw [sub_eq_add_neg]
+
+theorem toPoly_divByMonic {R : Type*} [Field R] [BEq R] {p q : UniPoly R} (hq : monic q) :
+    (divByMonic p q).toPoly = p.toPoly /ₘ q.toPoly := by
+  sorry
+
+/-- `UniPoly` division is mapped to `Polynomial` division -/
+theorem toPoly_div {R : Type*} [Field R] [BEq R] {p q : UniPoly R} :
+    (div p q).toPoly = Polynomial.div p.toPoly q.toPoly := by
+  unfold div Polynomial.div
+  simp only [smul_eq_mul]
+  -- simp_rw [toPoly_mul]
+  sorry
+
+
 /-- trimming doesn't change the `toPoly` image -/
 lemma toPoly_trim [LawfulBEq R] {p : UniPoly R} : p.trim.toPoly = p.toPoly := by
   ext n
@@ -942,6 +980,35 @@ theorem degree_toPoly {p : UniPoly R} [LawfulBEq R]
 theorem degree_toPoly' {p : UniPoly R} [LawfulBEq R]
     (hnz : ∃ i, p.coeff i ≠ 0) : p.degree - 1 = p.toPoly.natDegree := by
   simp_all only [Array.getD_eq_getD_getElem?, ne_eq, degree_toPoly, add_tsub_cancel_right]
+
+
+omit [BEq R] in
+/-- a constant `UniPoly` `toPoly` is a constant `Polynomial` -/
+@[simp]
+theorem toPoly_C {x : R} : (UniPoly.C x).toPoly = Polynomial.C x := by
+  ext n
+  rw [coeff_toPoly, Polynomial.coeff_C]
+  cases n with
+  | zero =>
+      simp [UniPoly.C, coeff, Array.getD_eq_getD_getElem?]
+  | succ k =>
+      simp [UniPoly.C, coeff, Array.getD_eq_getD_getElem?]
+
+omit [BEq R] in
+/-- the X `UniPoly` `toPoly` is the X `Polynomial` -/
+@[simp]
+theorem toPoly_X : (UniPoly.X).toPoly = (Polynomial.X : R[X]) := by
+  ext n
+  rw [coeff_toPoly, Polynomial.coeff_X]
+  cases n with
+  | zero =>
+      simp [UniPoly.X, coeff, Array.getD_eq_getD_getElem?]
+  | succ k =>
+      cases k with
+      | zero =>
+          simp [UniPoly.X, coeff, Array.getD_eq_getD_getElem?]
+      | succ k' =>
+          simp [UniPoly.X, coeff, Array.getD_eq_getD_getElem?]
 
 
 end ToPoly

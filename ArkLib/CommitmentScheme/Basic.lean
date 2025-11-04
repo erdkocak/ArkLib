@@ -57,29 +57,34 @@ noncomputable section
 
 open scoped NNReal
 
-variable [∀ i, VCVCompatible (pSpec.Challenge i)] [DecidableEq ι]
+variable [DecidableEq ι]
   {oSpec : OracleSpec ι} {Data : Type} [O : OracleInterface Data] {Randomness : Type}
   [Fintype Randomness]
   {Commitment : Type} [oSpec.FiniteRange] {n : ℕ} {pSpec : ProtocolSpec n}
   [∀ i, VCVCompatible (pSpec.Challenge i)]
+  [∀ i, SelectableType (pSpec.Challenge i)]
+  {σ : Type} (init : ProbComp σ) (impl : QueryImpl oSpec (StateT σ ProbComp))
 
 /-- A commitment scheme satisfies **correctness** with error `correctnessError` if for all
   `data : Data`, `randomness : Randomness`, and `query : O.Query`, the probability of accepting upon
-  executing the commitment and opening procedures honestly is at least `1 - correctnessError`. -/
+  executing the commitment and opening procedures honestly is at least `1 - correctnessError`.
+-/
 def correctness (scheme : Scheme oSpec Data Randomness Commitment pSpec)
     (correctnessError : ℝ≥0) : Prop :=
-  ∀ data : Data,
-  ∀ randomness : Randomness,
-  ∀ query : O.Query,
-    [ fun x => x.2.1 | do
-        let cm ← liftComp (scheme.commit data randomness) _
-        let ⟨result, _⟩ ← scheme.opening.run ⟨cm, query, O.answer data query⟩ ⟨data, randomness⟩
-        return result] ≥ 1 - correctnessError
+    ∀ data : Data,
+    ∀ randomness : Randomness,
+    ∀ query : O.Query,
+      let rel : Set ((Commitment × O.Query × O.Response) × (Data × Randomness))
+        := {((cm, query, answer), (data, randomness))|
+          answer = O.answer data query ∧ cm ∈ (scheme.commit data randomness).support}
+      Proof.completeness init impl rel correctnessError scheme.opening
+
+
 
 /-- A commitment scheme satisfies **perfect correctness** if it satisfies correctness with no error.
 -/
 def perfectCorrectness (scheme : Scheme oSpec Data Randomness Commitment pSpec) : Prop :=
-  correctness scheme 0
+  correctness init impl scheme 0
 
 /-- An adversary in the (evaluation) binding game returns a commitment `cm`, a query `q`, two
   purported responses `r₁, r₂` to the query, and an auxiliary private state (to be passed to the
