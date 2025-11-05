@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Chung Thai Nguyen, Quang Dao
 -/
 
-import Mathlib
+import Mathlib.LinearAlgebra.Matrix.Reindex
 
 /-!
   # Tower of Algebras and Tower of Algebra Equivalences
@@ -70,7 +70,7 @@ instance AlgebraTower.toIsScalarTower (a : AlgebraTower C) {i j k : ι}
 structure AlgebraTowerEquiv (A : ι → Type*) [∀ i, CommSemiring (A i)] [a : AlgebraTower A]
   (B : ι → Type*) [∀ i, CommSemiring (B i)] [b : AlgebraTower B]
   where
-    toRingEquiv: ∀ i, (A i ≃+* B i)
+    toRingEquiv : ∀ i, (A i ≃+* B i)
     commutesLeft' : ∀ (i j : ι) (h : i ≤ j) (r : A i),
       (b.algebraMap (i:=i) (j:=j) (h:=h)) ((toRingEquiv i) r) =
       (toRingEquiv j) (a.algebraMap (i:=i) (j:=j) (h:=h) r)
@@ -91,26 +91,26 @@ def AlgebraTowerEquiv.symm (e : AlgebraTowerEquiv A B) : AlgebraTowerEquiv B A w
   commutesLeft' := fun i j h r => by exact commutesRight' e h r
 
 def AlgebraTowerEquiv.algebraMapRightUp (e : AlgebraTowerEquiv A B) (i j : ι)
-    (h : i ≤ j): (A i) →+* (B j) := by
+    (h : i ≤ j) : (A i) →+* (B j) := by
   have hBij: B i →+* B j := AlgebraTower.algebraMap (AT:=B) (i:=i) (j:=j) (h:=h)
   have hiRingEquiv: RingEquiv (A i) (B i) := e.toRingEquiv i
   exact hBij.comp hiRingEquiv.toRingHom
 
 def AlgebraTowerEquiv.algebraMapLeftUp (e : AlgebraTowerEquiv A B) (i j : ι)
-    (h : i ≤ j): (B i) →+* (A j) := by
+    (h : i ≤ j) : (B i) →+* (A j) := by
   have hAij: A i →+* A j := AlgebraTower.algebraMap (AT:=A) (i:=i) (j:=j) (h:=h)
   have hjRingEquiv: RingEquiv (B i) (A i) := (e.toRingEquiv i).symm
   exact hAij.comp hjRingEquiv.toRingHom
 
 def AlgebraTowerEquiv.toAlgebraOverLeft (e : AlgebraTowerEquiv A B) (i j : ι)
-    (h : i ≤ j): Algebra (A i) (B j) := by
+    (h : i ≤ j) : Algebra (A i) (B j) := by
   exact (e.algebraMapRightUp i j h).toAlgebra
 
 def AlgebraTowerEquiv.toAlgebraOverRight (e : AlgebraTowerEquiv A B) (i j : ι)
-    (h : i ≤ j): Algebra (B i) (A j) := by
+    (h : i ≤ j) : Algebra (B i) (A j) := by
   exact (e.algebraMapLeftUp i j h).toAlgebra
 
-def AlgebraTowerEquiv.toAlgEquivOverLeft (e : AlgebraTowerEquiv A B) (i j : ι) (h : i ≤ j):
+def AlgebraTowerEquiv.toAlgEquivOverLeft (e : AlgebraTowerEquiv A B) (i j : ι) (h : i ≤ j) :
   letI : Algebra (A i) (A j) := by exact AlgebraTower.toAlgebra h
   letI : Algebra (A i) (B j) := by exact e.toAlgebraOverLeft i j h
   AlgEquiv (A i) (A j) (B j) := by
@@ -134,7 +134,7 @@ def AlgebraTowerEquiv.toAlgEquivOverLeft (e : AlgebraTowerEquiv A B) (i j : ι) 
   }
   exact instAlgEquiv
 
-def AlgebraTowerEquiv.toAlgEquivOverRight (e : AlgebraTowerEquiv A B) (i j : ι) (h : i ≤ j):
+def AlgebraTowerEquiv.toAlgEquivOverRight (e : AlgebraTowerEquiv A B) (i j : ι) (h : i ≤ j) :
   letI : Algebra (B i) (B j) := by exact AlgebraTower.toAlgebra h
   letI : Algebra (B i) (A j) := by exact e.toAlgebraOverRight i j h
   AlgEquiv (B i) (B j) (A j) := (e.symm.toAlgEquivOverLeft i j h)

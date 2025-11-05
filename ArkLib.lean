@@ -100,8 +100,6 @@ import ArkLib.Data.Polynomial.SplitFold
 import ArkLib.Data.Probability.Instances
 import ArkLib.Data.Probability.Notation
 import ArkLib.Data.RingTheory.AlgebraTower
-import ArkLib.Data.Tree.Binary
-import ArkLib.Data.Tree.General
 import ArkLib.Data.UniPoly.Basic
 import ArkLib.Data.Vector.Basic
 import ArkLib.OracleReduction.BCS.Basic

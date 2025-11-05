@@ -5,9 +5,8 @@ Authors : Quang Dao, Chung Thai Nguyen
 -/
 
 import ArkLib.Data.FieldTheory.BinaryField.Tower.Prelude
-import ArkLib.Data.Classes.DCast
-import ArkLib.Data.Nat.Bitwise
 import ArkLib.Data.RingTheory.AlgebraTower
+import Mathlib.Tactic.DepRewrite
 
 /-!
 # Binary Tower Fields
@@ -899,7 +898,7 @@ def join_via_add_smul {k : ℕ} (h_pos : k > 0) (hi_btf lo_btf : BTField (k - 1)
   letI instAlgebra := binaryAlgebraTower (l:=k-1) (r:=k) (h_le:=by omega)
   exact hi_btf • Z k + (algebraMap (BTField (k - 1)) (BTField k) lo_btf)
 
-notation "⋘" hi ", " lo "⋙" => join_via_add_smul (h_pos:=by omega) hi lo
+scoped[BinaryTower] notation "⋘" hi ", " lo "⋙" => join_via_add_smul (h_pos:=by omega) hi lo
 
 lemma join_via_add_smul_zero {k : ℕ} (h_pos : k > 0) :
   ⋘ 0, 0 ⋙ = 0 := by

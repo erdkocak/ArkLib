@@ -4,9 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors : Chung Thai Nguyen, Quang Dao
 -/
 
-import ArkLib.Data.FieldTheory.BinaryField.Tower.Basic
 import ArkLib.Data.Classes.DCast
-import Mathlib.Data.Finsupp.Defs
+import ArkLib.Data.FieldTheory.BinaryField.Tower.Basic
 
 /-!
 # Computable Binary Tower Fields
@@ -527,7 +526,7 @@ def join {k : ℕ} (h_pos : k > 0) (hi lo : ConcreteBTField (k - 1)) : ConcreteB
   rw [h_sum_two_same_pow2 (h_pos:=h_pos)] at res
   exact res
 
-notation "《" hi ", " lo "》" => join (h_pos:=by omega) hi lo
+scoped[ConcreteBinaryTower] notation "《" hi ", " lo "》" => join (h_pos:=by omega) hi lo
 
 lemma cast_join {k n : ℕ} (h_pos : k > 0) (hi lo : ConcreteBTField (k - 1)) (heq : k = n) :
   join (k:=k) h_pos hi lo = cast (by rw [heq])
@@ -2337,7 +2336,7 @@ theorem generator_is_not_lifted_to_succ (k : ℕ) :
   simp only [ne_eq, not_forall, Decidable.not_not] at hx
   -- unfold canonicalAlgMap at hx
   have h_x_join : ∃ x : ConcreteBTField k,
-    《 zero (k:=k), x 》 = Z (k + 1) := by
+    join (k:=k + 1) (h_pos:=by omega) (zero (k:=k)) x = Z (k + 1) := by
     exact hx
   have h_Z_split := split_Z (k:=k + 1) (h_pos:=by omega)
   have hx := h_x_join.choose_spec
