@@ -62,13 +62,13 @@ variable (α : Type)
   We may instantiate `α` with `BitVec n` or `Fin (2 ^ n)` to construct a Merkle tree for boolean
   vectors of length `n`. -/
 @[reducible]
-def spec : OracleSpec Unit := fun _ => (α × α, α)
+def spec : OracleSpec (α × α) := (α × α) →ₒ α
 
 @[simp]
-lemma domain_def : (spec α).Domain () = (α × α) := rfl
+lemma domain_def : (spec α).Domain = (α × α) := rfl
 
 @[simp]
-lemma range_def : (spec α).Range () = α := rfl
+lemma range_def (z) : (spec α).Range z = α := rfl
 
 end spec
 
@@ -77,7 +77,7 @@ variable {α : Type}
 
 /-- Example: a single hash computation -/
 def singleHash (left : α) (right : α) : OracleComp (spec α) α := do
-  let out ← query (spec := spec α) () ⟨left, right⟩
+  let out ← query (spec := spec α) ⟨left, right⟩
   return out
 
 /-- Build the full Merkle tree, returning the tree populated with data on all its nodes -/
@@ -112,7 +112,7 @@ with the same oracle function.
 lemma runWithOracle_buildMerkleTree {s} (leaf_data_tree : LeafData α s) (f) :
     (runWithOracle f (buildMerkleTree leaf_data_tree))
     = buildMerkleTree_with_hash leaf_data_tree fun (left right : α) =>
-      (f () ⟨left, right⟩) := by
+      (f ⟨left, right⟩) := by
   induction s with
   | leaf =>
     match leaf_data_tree with
@@ -124,6 +124,7 @@ lemma runWithOracle_buildMerkleTree {s} (leaf_data_tree : LeafData α s) (f) :
     | LeafData.internal left right =>
       unfold buildMerkleTree
       simp [left_ih, right_ih, runWithOracle_bind]
+      stop
       rfl
 
 /--
@@ -223,7 +224,7 @@ lemma runWithOracle_getPutativeRoot {s} (idx : BinaryTree.SkeletonLeafIndex s)
     (leafValue : α) (proof : List α) (f) :
     (runWithOracle f (getPutativeRoot idx leafValue proof))
       =
-    getPutativeRoot_with_hash idx leafValue proof fun (left right : α) => (f () ⟨left, right⟩) := by
+    getPutativeRoot_with_hash idx leafValue proof fun (left right : α) => (f ⟨left, right⟩) := by
   induction proof generalizing s with
   | nil =>
     unfold getPutativeRoot
@@ -239,7 +240,7 @@ lemma runWithOracle_getPutativeRoot {s} (idx : BinaryTree.SkeletonLeafIndex s)
       cases idx with
       | ofLeft idxLeft =>
         simp [runWithOracle_bind, ih]
-        rfl
+        sorry
       | ofRight idxRight =>
         simp only [runWithOracle_bind, ih]
         rfl
@@ -252,7 +253,7 @@ Outputs `failure` if the proof is invalid.
 -/
 def verifyProof {α} [DecidableEq α] {s}
     (idx : BinaryTree.SkeletonLeafIndex s) (leafValue : α) (rootValue : α)
-    (proof : List α) : OracleComp (spec α) Unit := do
+    (proof : List α) : OptionT (OracleComp (spec α)) Unit := do
   let putative_root ← getPutativeRoot idx leafValue proof
   guard (putative_root = rootValue)
 
@@ -302,11 +303,12 @@ and then applying the functional version of the completeness theorem.
 theorem completeness [DecidableEq α] [SampleableType α] {s}
     (leaf_data_tree : LeafData α s) (idx : BinaryTree.SkeletonLeafIndex s)
     (preexisting_cache : (spec α).QueryCache) :
-    (((do
+    HasEvalSPMF.NeverFail ((simulateQ (randomOracle) (do
       let cache ← buildMerkleTree leaf_data_tree
       let proof := generateProof cache idx
       let _ ← verifyProof idx (leaf_data_tree.get idx) (cache.getRootValue) proof
-      ).simulateQ (randomOracle)).run preexisting_cache).neverFails := by
+      )).run preexisting_cache) := by
+  stop
   -- An OracleComp is never failing on any preexisting cache
   -- if it never fails when run with any oracle function.
   revert preexisting_cache

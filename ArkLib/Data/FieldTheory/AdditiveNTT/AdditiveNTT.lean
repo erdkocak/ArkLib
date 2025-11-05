@@ -2754,23 +2754,11 @@ lemma NTTStage_correctness (i : Fin (ℓ))
 
 omit [DecidableEq 𝔽q] hF₂ in
 -- foldl k times would result in the additiveNTTInvariant holding for the `ℓ - k`-th stage
-<<<<<<< HEAD
-lemma foldl_NTTStage_inductive_aux
-    (h_W₀_eq_X : W 𝔽q β 0 = X) (h_β₀_eq_1 : β 0 = 1)
-    (h_Fq_card_gt_1 : Fintype.card 𝔽q > 1) (h_Fq_char_prime : Fact (Nat.Prime (ringChar 𝔽q)))
-    (hβ_lin_indep : LinearIndependent 𝔽q β)
-    (h_ℓ : ℓ ≤ r) (k : Fin (ℓ + 1))
-    (original_coeffs : Fin (2 ^ ℓ) → L) :
-    additiveNTTInvariant 𝔽q β ℓ R_rate h_ℓ_add_R_rate
-    (Fin.foldl k (fun current_b i ↦ NTTStage 𝔽q β ℓ R_rate h_ℓ_add_R_rate
-      ⟨ℓ - i -1, by omega⟩ current_b) (tileCoeffs ℓ R_rate original_coeffs))
-=======
 lemma foldl_NTTStage_inductive_aux (h_ℓ : ℓ ≤ r) (k : Fin (ℓ + 1))
     (original_coeffs : Fin (2 ^ ℓ) → L) :
     additiveNTTInvariant 𝔽q β h_ℓ_add_R_rate
     (Fin.foldl k (fun current_b i ↦ NTTStage 𝔽q β h_ℓ_add_R_rate
       ⟨ℓ - i -1, by omega⟩ current_b) (tileCoeffs original_coeffs))
->>>>>>> 4cf4e0984d3b74c4b4800f3349a389c8e1c11188
     original_coeffs ⟨ℓ - k, by omega⟩ := by
   have invariant_init := initial_tiled_coeffs_correctness 𝔽q β h_ℓ_add_R_rate  h_ℓ original_coeffs
   simp only at invariant_init
