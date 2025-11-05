@@ -655,10 +655,15 @@ end OracleInterfaces
   This is the default instance for the challenge oracle interface. It may be overridden by
   `challengeOracleInterface{SR/FS}` for state-restoration and/or Fiat-Shamir. -/
 @[reducible, inline, specialize]
-instance challengeOracleInterface {pSpec : ProtocolSpec n} (i : pSpec.ChallengeIdx) :
+def challengeOracleInterface {pSpec : ProtocolSpec n} (i : pSpec.ChallengeIdx) :
     OracleContext Unit (ReaderM (pSpec.Challenge i)) where
   spec := Unit →ₒ pSpec.Challenge i
   impl _ := do return (← read)
+
+def challengeOracleInterface' (pSpec : ProtocolSpec n) :
+    OracleContext pSpec.ChallengeIdx (ReaderM ((i : _) → pSpec.Challenge i)) where
+  spec i := pSpec.Challenge i
+  impl i := do return (← read) i
 
 /-- Query a verifier's challenge for a given challenge round `i`, given the default challenge
   oracle interface `challengeOracleInterface`.
@@ -668,8 +673,8 @@ instance challengeOracleInterface {pSpec : ProtocolSpec n} (i : pSpec.ChallengeI
   requires an input statement and prior messages up to that round. -/
 @[reducible, inline, specialize]
 def getChallenge (pSpec : ProtocolSpec n) (i : pSpec.ChallengeIdx) :
-    OracleQuery (challengeOracleInterface i).spec (pSpec.Challenge i) :=
-  query ()
+    OracleQuery (challengeOracleInterface' pSpec).spec (pSpec.Challenge i) :=
+  query i
   -- (query ()  : OracleQuery ((challengeOracleInterface i).1) (pSpec.Challenge i))
 
 /-- Define the query implementation for the verifier's challenge in terms of `ProbComp`.

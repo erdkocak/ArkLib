@@ -116,23 +116,26 @@ private lemma witness_lift {F : Type} [NonBinaryField F]
     · rw [Polynomial.degree_eq_natDegree h'', cast_lemma, WithBot.coe_lt_coe]
       exact h'
 
-instance {i : Fin (k + 1)} : ∀ j, OracleInterface (OracleStatement D x s i j) :=
-  fun _ => inferInstance
+def roundOracleContext {i : Fin (k + 1)} :
+    OracleContext (Fin (i + 1)) (ReaderM (OracleStatement D x s i j))
 
-instance : ∀ j, OracleInterface (FinalOracleStatement D x s k j) :=
+instance {i : Fin (k + 1)} : ∀ j,
+    OracleContext Unit (ReaderM (OracleStatement D x s i j)) where
+  spec := sorry
+  impl := sorry
+
+instance : ∀ j, OracleContext Unit (ReaderM (FinalOracleStatement D x s k j)) :=
   fun j =>
     if h : j = k + 1
     then {
-           Query := Unit
-           Response := F[X]
-           answer := cast (by simp [h, FinalOracleStatement])
-                          (id (α := Unit → F[X]))
+           spec := Unit →ₒ F[X]
+           impl _ := sorry
          }
     else {
-           Query := ↑(evalDomain D x (s * ↑j))
-           Response := F
-           answer := cast (by simp [h, FinalOracleStatement])
-                          (id (α := ↑(evalDomain D x (s * ↑j)) → F))
+           spec := (evalDomain D x (s * ↑j)) →ₒ F
+           impl _ := sorry
+          --  cast (by simp [h, FinalOracleStatement])
+          --                 (id (α := ↑(evalDomain D x (s * ↑j)) → F))
          }
 
 @[simp]

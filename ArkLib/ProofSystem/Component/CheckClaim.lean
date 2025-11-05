@@ -26,7 +26,7 @@ import ArkLib.OracleReduction.Security.RoundByRound
   of `ReduceClaim`.
 -/
 
-open OracleComp OracleInterface ProtocolSpec Function
+open OracleComp ProtocolSpec Function
 
 namespace CheckClaim
 

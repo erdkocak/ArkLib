@@ -63,7 +63,7 @@ universe u v
 
 -- end loggingOracle
 
-section Execution
+-- section Execution
 
 variable {ι : Type} {oSpec : OracleSpec ι}
   {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type}
@@ -74,39 +74,40 @@ variable {ι : Type} {oSpec : OracleSpec ι}
 
 namespace Prover
 
--- /--
--- Prover's function for processing the next round, given the current result of the previous round, and
--- a function for getting the challenge.
--- -/
--- @[inline, specialize]
--- def processRound (j : Fin n)
---     (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec)
---     (currentResult : OracleComp (oSpec + (Oₛᵢ j).spec)
---       (pSpec.Transcript j.castSucc × prover.PrvState j.castSucc)) :
---       OracleComp (oSpec + Oₛᵢ.spec)
---         (pSpec.Transcript j.succ × prover.PrvState j.succ) := do
---   let ⟨transcript, state⟩ ← currentResult
---   match hDir : pSpec.dir j with
---   | .V_to_P => do
---     let challenge ← pSpec.getChallenge ⟨j, hDir⟩
---     letI newState := (← prover.receiveChallenge ⟨j, hDir⟩ state) challenge
---     return ⟨transcript.concat challenge, newState⟩
---   | .P_to_V => do
---     let ⟨msg, newState⟩ ← prover.sendMessage ⟨j, hDir⟩ state
---     return ⟨transcript.concat msg, newState⟩
+/--
+Prover's function for processing the next round, given the current result of the previous round, and
+a function for getting the challenge.
+-/
+@[inline, specialize]
+def processRound (j : Fin n)
+    (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec)
+    (currentResult : OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
+      (pSpec.Transcript j.castSucc × prover.PrvState j.castSucc)) :
+      OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
+        (pSpec.Transcript j.succ × prover.PrvState j.succ) := do
+  let ⟨transcript, state⟩ ← currentResult
+  match hDir : pSpec.dir j with
+  | .V_to_P => do
+    let challenge ← pSpec.getChallenge ⟨j, hDir⟩
+    letI newState := (← prover.receiveChallenge ⟨j, hDir⟩ state) challenge
+    return ⟨transcript.concat challenge, newState⟩
+  | .P_to_V => do
+    let ⟨msg, newState⟩ ← prover.sendMessage ⟨j, hDir⟩ state
+    return ⟨transcript.concat msg, newState⟩
 
--- /-- Run the prover in an interactive reduction up to round index `i`, via first inputting the
---   statement and witness, and then processing each round up to round `i`. Returns the transcript up
---   to round `i`, and the prover's state after round `i`.
--- -/
--- @[inline, specialize]
--- def runToRound (i : Fin (n + 1))
---     (stmt : StmtIn) (wit : WitIn) (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ) (pSpec.Transcript i × prover.PrvState i) :=
---   Fin.induction
---     (pure ⟨default, prover.input (stmt, wit)⟩)
---     (prover.processRound)
---     i
+/-- Run the prover in an interactive reduction up to round index `i`, via first inputting the
+  statement and witness, and then processing each round up to round `i`. Returns the transcript up
+  to round `i`, and the prover's state after round `i`.
+-/
+@[inline, specialize]
+def runToRound (i : Fin (n + 1))
+    (stmt : StmtIn) (wit : WitIn) (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
+      OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
+        (pSpec.Transcript i × prover.PrvState i) :=
+  Fin.induction
+    (pure ⟨default, prover.input (stmt, wit)⟩)
+    (prover.processRound)
+    i
 
 -- /-- Run the prover in an interactive reduction up to round `i`, logging all the queries made by the
 --   prover. Returns the transcript up to that round, the prover's state after that round, and the
@@ -116,8 +117,8 @@ namespace Prover
 -- @[inline, specialize]
 -- def runWithLogToRound (i : Fin (n + 1))
 --     (stmt : StmtIn) (wit : WitIn) (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ)
---         ((pSpec.Transcript i × prover.PrvState i) × QueryLog (oSpec + [pSpec.Challenge]ₒ)) :=
+--       OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
+--         ((pSpec.Transcript i × prover.PrvState i) × QueryLog (oSpec + (challengeOracleInterface' pSpec).spec)) :=
 --   (simulateQ loggingOracle (prover.runToRound i stmt wit)).run
 
 -- @[simp]
@@ -127,109 +128,113 @@ namespace Prover
 --         prover.runToRound i stmt wit := by
 --   simp [runWithLogToRound, runToRound]
 
--- /-- Run the prover in an interactive reduction. Returns the output statement and witness, and the
---   transcript. See `runWithLog` for a version that additionally returns the log of the
---   prover's oracle queries.
--- -/
--- @[inline, specialize]
--- def run (stmt : StmtIn) (wit : WitIn)
---     (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ) (FullTranscript pSpec × StmtOut × WitOut) := do
---   let ⟨transcript, state⟩ ← prover.runToRound (Fin.last n) stmt wit
---   return ⟨transcript, ← prover.output state⟩
+/-- Run the prover in an interactive reduction. Returns the output statement and witness, and the
+  transcript. See `runWithLog` for a version that additionally returns the log of the
+  prover's oracle queries.
+-/
+@[inline, specialize]
+def run (stmt : StmtIn) (wit : WitIn)
+    (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
+      OracleComp (oSpec + (challengeOracleInterface' pSpec).spec) (FullTranscript pSpec × StmtOut × WitOut) := do
+  let ⟨transcript, state⟩ ← prover.runToRound (Fin.last n) stmt wit
+  return ⟨transcript, ← prover.output state⟩
 
--- /-- Run the prover in an interactive reduction, logging all the queries made by the prover. Returns
---   the transcript, the output statement and witness, and the log of the prover's oracle queries.
+/-- Run the prover in an interactive reduction, logging all the queries made by the prover. Returns
+  the transcript, the output statement and witness, and the log of the prover's oracle queries.
 
--- Note: this is just a wrapper around `run` that logs the queries made by the prover.
--- -/
--- @[inline, specialize]
--- def runWithLog (stmt : StmtIn) (wit : WitIn)
---     (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ)
---         ((FullTranscript pSpec × StmtOut × WitOut) × QueryLog (oSpec + [pSpec.Challenge]ₒ)) :=
---   (simulateQ loggingOracle (prover.run stmt wit)).run
+Note: this is just a wrapper around `run` that logs the queries made by the prover.
+-/
+@[inline, specialize]
+def runWithLog (stmt : StmtIn) (wit : WitIn)
+    (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
+      OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
+        ((FullTranscript pSpec × StmtOut × WitOut) × QueryLog (oSpec + (challengeOracleInterface' pSpec).spec)) :=
+  (simulateQ loggingOracle (prover.run stmt wit)).run
 
--- @[simp]
--- lemma runWithLog_discard_log_eq_run (stmt : StmtIn) (wit : WitIn)
---     (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       Prod.fst <$> prover.runWithLog stmt wit = prover.run stmt wit := by
---   simp [runWithLog]
+@[simp]
+lemma runWithLog_discard_log_eq_run (stmt : StmtIn) (wit : WitIn)
+    (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
+      Prod.fst <$> prover.runWithLog stmt wit = prover.run stmt wit := by
+  simp [runWithLog]
+  sorry
 
--- end Prover
+end Prover
 
--- /-- Run the (non-oracle) verifier in an interactive reduction. It takes in the input statement and
---   the transcript, and return the output statement.
--- -/
--- @[inline, specialize, reducible]
--- def Verifier.run (stmt : StmtIn) (transcript : FullTranscript pSpec)
---     (verifier : Verifier oSpec StmtIn StmtOut pSpec) : OracleComp oSpec StmtOut :=
---   verifier.verify stmt transcript
+/-- Run the (non-oracle) verifier in an interactive reduction. It takes in the input statement and
+  the transcript, and return the output statement.
+-/
+@[inline, specialize, reducible]
+def Verifier.run (stmt : StmtIn) (transcript : FullTranscript pSpec)
+    (verifier : Verifier oSpec StmtIn StmtOut pSpec) : OptionT (OracleComp oSpec) StmtOut :=
+  verifier.verify stmt transcript
 
--- /-- Run the oracle verifier in the interactive protocol. Returns the verifier's output, including
---     both the output statement and oracle statements, and the log of queries made by the verifier.
--- -/
--- @[inline, specialize]
--- def OracleVerifier.run [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
---     (stmt : StmtIn) (oStmtIn : ∀ i, OStmtIn i) (transcript : FullTranscript pSpec)
---     (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec) :
---       OracleComp oSpec (StmtOut × (∀ i, OStmtOut i)) := do
---   let f := OracleInterface.simOracle2 oSpec oStmtIn transcript.messages
---   let stmtOut ← simulateQ f (verifier.verify stmt transcript.challenges)
---   let oStmtOut : ∀ i, OStmtOut i := fun i => match h : verifier.embed i with
---   | .inl j => by simp only [h, verifier.hEq i]; exact oStmtIn j
---   | .inr j => by simp only [h, verifier.hEq i]; exact transcript j
---   return ⟨stmtOut, oStmtOut⟩
+/-- Run the oracle verifier in the interactive protocol. Returns the verifier's output, including
+    both the output statement and oracle statements, and the log of queries made by the verifier.
+-/
+@[inline, specialize]
+def OracleVerifier.run (Oₘ : ∀ i, OracleContext Unit (ReaderM (pSpec.Message i)))
+    (stmt : StmtIn) (oStmtIn : ∀ i, OStmtIn i) (transcript : FullTranscript pSpec)
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec sorry) :
+      OracleComp oSpec (StmtOut × (∀ i, OStmtOut i)) := do
+  sorry
+  -- let f := OracleInterface.simOracle2 oSpec oStmtIn transcript.messages
+  -- let stmtOut ← simulateQ f (verifier.verify stmt transcript.challenges)
+  -- let oStmtOut : ∀ i, OStmtOut i := fun i => match h : verifier.embed i with
+  -- | .inl j => by simp only [h, verifier.hEq i]; exact oStmtIn j
+  -- | .inr j => by simp only [h, verifier.hEq i]; exact transcript j
+  -- return ⟨stmtOut, oStmtOut⟩
 
 -- /-- Running an oracle verifier then is equal to running its non-oracle counterpart -/
 -- @[simp]
--- theorem OracleVerifier.run_eq_run_verifier [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
+-- theorem OracleVerifier.run_eq_run_verifier
+--     (Oₘ : ∀ i, OracleContext Unit (ReaderM (pSpec.Message i)))
 --     {stmt : StmtIn} {oStmt : ∀ i, OStmtIn i} {transcript : FullTranscript pSpec}
---     {verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec} :
+--     {verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec sorry sorry} :
 --       verifier.run stmt oStmt transcript =
 --         verifier.toVerifier.run ⟨stmt, oStmt⟩ transcript := by
 --   simp only [run, Verifier.run, toVerifier, eq_mpr_eq_cast, bind_pure_comp]
 --   rfl
 
--- /-- An execution of an interactive reduction on a given initial statement and witness. Consists of
---   first running the prover, and then the verifier. Returns the full transcript, the output statement
---   and witness from the prover, and the output statement from the verifier.
+/-- An execution of an interactive reduction on a given initial statement and witness. Consists of
+  first running the prover, and then the verifier. Returns the full transcript, the output statement
+  and witness from the prover, and the output statement from the verifier.
 
---   See `Reduction.runWithLog` for a version that additionally returns the logs of the prover's and
---   the verifier's oracle queries.
--- -/
--- @[inline, specialize]
--- def Reduction.run (stmt : StmtIn) (wit : WitIn)
---     (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ)
---         ((FullTranscript pSpec × StmtOut × WitOut) × StmtOut) := do
---   -- `ctxOut` contains both the output statement and witness after running the prover
---   let proverResult ← reduction.prover.run stmt wit
---   let stmtOut ← liftM (reduction.verifier.run stmt proverResult.1)
---   return ⟨proverResult, stmtOut⟩
+  See `Reduction.runWithLog` for a version that additionally returns the logs of the prover's and
+  the verifier's oracle queries.
+-/
+@[inline, specialize]
+def Reduction.run (stmt : StmtIn) (wit : WitIn)
+    (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) :
+      OptionT (OracleComp (oSpec + (challengeOracleInterface' pSpec).spec))
+        ((FullTranscript pSpec × StmtOut × WitOut) × StmtOut) := do
+  -- `ctxOut` contains both the output statement and witness after running the prover
+  let proverResult ← reduction.prover.run stmt wit
+  let stmtOut := sorry-- (reduction.verifier.run stmt proverResult.1)
+  return ⟨proverResult, stmtOut⟩
 
--- /-- An execution of an interactive reduction on a given initial statement and witness. Consists of
---   first running the prover, and then the verifier. Returns the full transcript, the output statement
---   and witness from the prover, and the output statement from the verifier, along with the logs of
---   the prover's and the verifier's oracle queries.
--- -/
--- @[inline, specialize]
--- def Reduction.runWithLog (stmt : StmtIn) (wit : WitIn)
---     (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ)
---         (((FullTranscript pSpec × StmtOut × WitOut) × StmtOut) ×
---           QueryLog (oSpec + [pSpec.Challenge]ₒ) × QueryLog oSpec) := do
---   -- `ctxOut` contains both the output statement and witness after running the prover
---   let ⟨proverResult, proveQueryLog⟩ ← reduction.prover.runWithLog stmt wit
---   let ⟨stmtOut, verifyQueryLog⟩ ←
---     liftM (simulateQ loggingOracle (reduction.verifier.run stmt proverResult.1)).run
---   return ⟨⟨proverResult, stmtOut⟩, proveQueryLog, verifyQueryLog⟩
+/-- An execution of an interactive reduction on a given initial statement and witness. Consists of
+  first running the prover, and then the verifier. Returns the full transcript, the output statement
+  and witness from the prover, and the output statement from the verifier, along with the logs of
+  the prover's and the verifier's oracle queries.
+-/
+@[inline, specialize]
+def Reduction.runWithLog (stmt : StmtIn) (wit : WitIn)
+    (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) :
+      OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
+        (((FullTranscript pSpec × StmtOut × WitOut) × StmtOut) ×
+          QueryLog (oSpec + (challengeOracleInterface' pSpec).spec) × QueryLog oSpec) := do
+  -- `ctxOut` contains both the output statement and witness after running the prover
+  let ⟨proverResult, proveQueryLog⟩ ← reduction.prover.runWithLog stmt wit
+  let ⟨stmtOut, verifyQueryLog⟩ ←
+    liftM (simulateQ loggingOracle (reduction.verifier.run stmt proverResult.1)).run
+  return sorry
+  -- return ⟨⟨proverResult, stmtOut⟩, proveQueryLog, verifyQueryLog⟩
 
--- /-- TODO: figure out a better name for this -/
--- private lemma Monad.map_of_prod_fst_eq_prod_fst {m : Type u → Type v} [Monad m] [LawfulMonad m]
---     {α β γ : Type u} (ma : m (α × β)) (c : γ) :
---     (fun a => (c, a.1)) <$> ma = Prod.mk c <$> Prod.fst <$> ma := by
---   simp only [Functor.map_map]
+/-- TODO: figure out a better name for this -/
+private lemma Monad.map_of_prod_fst_eq_prod_fst {m : Type u → Type v} [Monad m] [LawfulMonad m]
+    {α β γ : Type u} (ma : m (α × β)) (c : γ) :
+    (fun a => (c, a.1)) <$> ma = Prod.mk c <$> Prod.fst <$> ma := by
+  simp only [Functor.map_map]
 
 -- /-- Logging the queries made by both parties do not change the output of the reduction -/
 -- @[simp]
@@ -245,12 +250,12 @@ namespace Prover
 --     let a ← (simulateQ loggingOracle proverRun).run
 --     (fun aFst : (pSpec.FullTranscript × StmtOut × WitOut) => (fun b => (aFst, Prod.fst b)) <$>
 --         (simulateQ loggingOracle (Verifier.run stmt aFst.1 reduction.verifier)).run.liftComp
---           (oSpec + [pSpec.Challenge]ₒ)) a.1) := rfl
+--           (oSpec + (challengeOracleInterface' pSpec).spec)) a.1) := rfl
 --   _ = _ := by
 --     rw [loggingOracle.simulateQ_bind_fst_comp proverRun
 --       (fun a => (fun b => (a, Prod.fst b)) <$>
 --         (simulateQ loggingOracle (Verifier.run stmt a.1 reduction.verifier)).run.liftComp
---           (oSpec + [pSpec.Challenge]ₒ))]
+--           (oSpec + (challengeOracleInterface' pSpec).spec))]
 --     congr
 --     ext proverResult
 --     rw [← Functor.map_map]
@@ -264,7 +269,7 @@ namespace Prover
 -- def OracleReduction.run [∀ i, OracleInterface (pSpec.Message i)]
 --     (stmt : StmtIn) (oStmt : ∀ i, OStmtIn i) (wit : WitIn)
 --     (reduction : OracleReduction oSpec StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ)
+--       OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
 --         ((FullTranscript pSpec × (StmtOut × ∀ i, OStmtOut i) × WitOut) ×
 --           (StmtOut × ∀ i, OStmtOut i)) := do
 --   let proverResult ← reduction.prover.run ⟨stmt, oStmt⟩ wit
@@ -279,10 +284,10 @@ namespace Prover
 -- def OracleReduction.runWithLog [∀ i, OracleInterface (pSpec.Message i)]
 --     (stmt : StmtIn) (oStmt : ∀ i, OStmtIn i) (wit : WitIn)
 --     (reduction : OracleReduction oSpec StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut pSpec) :
---       OracleComp (oSpec + [pSpec.Challenge]ₒ)
+--       OracleComp (oSpec + (challengeOracleInterface' pSpec).spec)
 --         ((FullTranscript pSpec × (StmtOut × ∀ i, OStmtOut i) × WitOut) ×
 --           (StmtOut × ∀ i, OStmtOut i) ×
---             QueryLog (oSpec + [pSpec.Challenge]ₒ) × QueryLog oSpec) := do
+--             QueryLog (oSpec + (challengeOracleInterface' pSpec).spec) × QueryLog oSpec) := do
 --   let ⟨proverResult, proveQueryLog⟩ ←
 --     (simulateQ loggingOracle (reduction.prover.run ⟨stmt, oStmt⟩ wit)).run
 --   let ⟨stmtOut, verifyQueryLog⟩ ←
@@ -419,50 +424,50 @@ namespace Prover
 
 -- end SingleMessage
 
--- section Classes
+section Classes
 
--- variable {ι : Type} {oSpec : OracleSpec ι}
---     {StmtIn WitIn StmtOut WitOut : Type}
---     {pSpec : ProtocolSpec 2}
+variable {ι : Type} {oSpec : OracleSpec ι}
+    {StmtIn WitIn StmtOut WitOut : Type}
+    {pSpec : ProtocolSpec 2}
 
--- -- /-- Simplification of the prover's execution in a single-round, two-message protocol where the
--- --   prover speaks first -/
--- -- theorem Prover.run_of_isSingleRound [IsSingleRound pSpec] (stmt : StmtIn) (wit : WitIn)
--- --     (prover : Prover pSpec oSpec StmtIn WitIn StmtOut WitOut) :
--- --       prover.run stmt wit = (do
--- --         let state ← liftComp (prover.load stmt wit)
--- --         let ⟨⟨msg, state⟩, queryLog⟩ ← liftComp
--- --           (simulate loggingOracle ∅ (prover.sendMessage default state emptyTranscript))
--- --         let challenge ← query (Sum.inr default) ()
--- --         let state ← liftComp (prover.receiveChallenge default state transcript challenge)
--- --         let transcript := Transcript.mk2 msg challenge
--- --         let witOut := prover.output state
--- --         return (transcript, queryLog, witOut)) := by
--- --   simp [Prover.run, Prover.runToRound, Fin.reduceFinMk, Fin.val_two,
--- --     Fin.val_zero, Fin.coe_castSucc, Fin.val_succ, dir_apply, bind_pure_comp, getType_apply,
--- --     Fin.induction_two, Fin.val_one, pure_bind, map_bind, liftComp]
--- --   split <;> rename_i hDir0
--- --   · exfalso; simp only [prover_first, reduceCtorEq] at hDir0
--- --   split <;> rename_i hDir1
--- --   swap
--- --   · exfalso; simp only [verifier_last_of_two, reduceCtorEq] at hDir1
--- --   simp only [Functor.map_map, bind_map_left, default]
--- --   congr; funext x; congr; funext y;
--- --   simp only [Fin.isValue, map_bind, Functor.map_map, dir_apply, Fin.succ_one_eq_two,
--- --     Fin.succ_zero_eq_one, queryBind_inj', true_and, exists_const]
--- --   funext chal; simp [OracleSpec.append] at chal
--- --   congr; funext state; congr
--- --   rw [← Transcript.mk2_eq_toFull_snoc_snoc _ _]
+-- /-- Simplification of the prover's execution in a single-round, two-message protocol where the
+--   prover speaks first -/
+-- theorem Prover.run_of_isSingleRound [IsSingleRound pSpec] (stmt : StmtIn) (wit : WitIn)
+--     (prover : Prover pSpec oSpec StmtIn WitIn StmtOut WitOut) :
+--       prover.run stmt wit = (do
+--         let state ← liftComp (prover.load stmt wit)
+--         let ⟨⟨msg, state⟩, queryLog⟩ ← liftComp
+--           (simulate loggingOracle ∅ (prover.sendMessage default state emptyTranscript))
+--         let challenge ← query (Sum.inr default) ()
+--         let state ← liftComp (prover.receiveChallenge default state transcript challenge)
+--         let transcript := Transcript.mk2 msg challenge
+--         let witOut := prover.output state
+--         return (transcript, queryLog, witOut)) := by
+--   simp [Prover.run, Prover.runToRound, Fin.reduceFinMk, Fin.val_two,
+--     Fin.val_zero, Fin.coe_castSucc, Fin.val_succ, dir_apply, bind_pure_comp, getType_apply,
+--     Fin.induction_two, Fin.val_one, pure_bind, map_bind, liftComp]
+--   split <;> rename_i hDir0
+--   · exfalso; simp only [prover_first, reduceCtorEq] at hDir0
+--   split <;> rename_i hDir1
+--   swap
+--   · exfalso; simp only [verifier_last_of_two, reduceCtorEq] at hDir1
+--   simp only [Functor.map_map, bind_map_left, default]
+--   congr; funext x; congr; funext y;
+--   simp only [Fin.isValue, map_bind, Functor.map_map, dir_apply, Fin.succ_one_eq_two,
+--     Fin.succ_zero_eq_one, queryBind_inj', true_and, exists_const]
+--   funext chal; simp [OracleSpec.append] at chal
+--   congr; funext state; congr
+--   rw [← Transcript.mk2_eq_toFull_snoc_snoc _ _]
 
--- -- theorem Reduction.run_of_isSingleRound [IsSingleRound pSpec]
--- --     (reduction : Reduction pSpec oSpec StmtIn WitIn StmtOut WitOut PrvState)
--- --     (stmt : StmtIn) (wit : WitIn) :
--- --       reduction.run stmt wit = do
--- --         let state := reduction.prover.load stmt wit
--- --         let ⟨⟨msg, state⟩, queryLog⟩ ← liftComp (simulate loggingOracle ∅
--- --           (reduction.prover.sendMessage default state))
--- --         let challenge := reduction.prover.receiveChallenge default state
--- --         let stmtOut ← reduction.verifier.verify stmt transcript
--- --         return (transcript, queryLog, stmtOut, reduction.prover.output state) := by sorry
+-- theorem Reduction.run_of_isSingleRound [IsSingleRound pSpec]
+--     (reduction : Reduction pSpec oSpec StmtIn WitIn StmtOut WitOut PrvState)
+--     (stmt : StmtIn) (wit : WitIn) :
+--       reduction.run stmt wit = do
+--         let state := reduction.prover.load stmt wit
+--         let ⟨⟨msg, state⟩, queryLog⟩ ← liftComp (simulate loggingOracle ∅
+--           (reduction.prover.sendMessage default state))
+--         let challenge := reduction.prover.receiveChallenge default state
+--         let stmtOut ← reduction.verifier.verify stmt transcript
+--         return (transcript, queryLog, stmtOut, reduction.prover.output state) := by sorry
 
--- end Classes
+end Classes

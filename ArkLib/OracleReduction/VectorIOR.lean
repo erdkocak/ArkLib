@@ -72,12 +72,12 @@ def totalChallengeLength (vPSpec : VectorSpec n) : Nat := ∑ i, vPSpec.challeng
 
 variable {A : Type} {vPSpec : VectorSpec n}
 
-/-- All messages in an V-IOR have the same vector oracle interface. -/
-instance : OracleInterfaces (vPSpec.toProtocolSpec A) where
-  oracleInterfaces := fun _ => some OracleInterface.instVector
+-- /-- All messages in an V-IOR have the same vector oracle interface. -/
+-- instance : OracleInterfaces (vPSpec.toProtocolSpec A) where
+--   oracleInterfaces := fun _ => some OracleInterface.instVector
 
-instance : ∀ i, OracleInterface ((vPSpec.toProtocolSpec A).Message i) :=
-  fun _ => OracleInterface.instVector
+-- instance : ∀ i, OracleInterface ((vPSpec.toProtocolSpec A).Message i) :=
+--   fun _ => OracleInterface.instVector
 
 instance [VCVCompatible A] : ∀ i, VCVCompatible ((vPSpec.toProtocolSpec A).Challenge i) :=
   fun _ => by dsimp; infer_instance
@@ -99,8 +99,7 @@ variable {n : ℕ} {ι : Type}
 def VectorIOR
     (StmtIn : Type) {ιₛᵢ : Type} (OStmtIn : ιₛᵢ → Type) (WitIn : Type)
     (StmtOut : Type) {ιₛₒ : Type} (OStmtOut : ιₛₒ → Type) (WitOut : Type)
-    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type)
-    [∀ i, OracleInterface (OStmtIn i)] :=
+    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type) :=
   OracleReduction []ₒ StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut (vPSpec.toProtocolSpec A)
 
 /-- Vector Interactive Oracle Proofs
@@ -111,8 +110,7 @@ vectors as well, though this can be done if needed. -/
 @[reducible]
 def VectorIOP
     (Statement : Type) {ιₛ : Type} (OStatement : ιₛ → Type) (Witness : Type)
-    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type)
-    [∀ i, OracleInterface (OStatement i)] :=
+    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type) :=
   OracleProof []ₒ Statement OStatement Witness (vPSpec.toProtocolSpec A)
 
 variable {n : ℕ} {vPSpec : ProtocolSpec.VectorSpec n} {A : Type}
@@ -123,7 +121,7 @@ open scoped NNReal
 namespace VectorIOR
 
 variable {StmtIn WitIn StmtOut WitOut : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type}
-  [∀ i, OracleInterface (OStmtIn i)] {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
+  {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
 
 /-- A vector IOR is **secure** with respect to input relation `relIn`, output relation `relOut`, and
     round-by-round knowledge error `ε_rbr` if it satisfies (perfect) completeness and round-by-round
@@ -132,7 +130,7 @@ class IsSecure
     (relIn : Set ((StmtIn × ∀ i, OStmtIn i) × WitIn))
     (relOut : Set ((StmtOut × ∀ i, OStmtOut i) × WitOut))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOR : VectorIOR StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut vPSpec A) where
+    (vectorIOR : VectorIOR StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut vPSpec A sorry sorry) where
 
   /-- The reduction is perfectly complete. -/
   is_complete : vectorIOR.perfectCompleteness (pure ()) ⟨isEmptyElim⟩ relIn relOut
