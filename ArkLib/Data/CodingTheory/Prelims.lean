@@ -256,6 +256,16 @@ instance [Fintype F] [Nonempty F] [Semiring F] [DecidableEq ι] [DecidableEq F] 
   have ⟨r⟩ := ‹Nonempty F›
   use ∑ i : Fin l, r ^ (i : ℕ) • u i, r
 
+open Finset
+
+variable {ι : Type*} [Fintype ι] [Nonempty ι]
+         {F : Type*}
+
+instance [Fintype F] [Nonempty F] [Semiring F] [DecidableEq ι] [DecidableEq F] {l : ℕ}
+  {u : Fin l → ι → F} : Nonempty {x // x ∈ parametrisedCurveFinite u} := by
+  simp [parametrisedCurveFinite]
+  use ∑ i : Fin l, Classical.arbitrary F ^ (i : ℕ) • u i, Classical.arbitrary F
+
 end
 end Curve
 
