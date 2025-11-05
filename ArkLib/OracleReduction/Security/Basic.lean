@@ -61,53 +61,59 @@ TODO: the "right" factoring for the security definitions are the following:
   on the (randomly sampled, at the beginning) values of the shared oracle.
 -/
 
--- namespace Reduction
+namespace Reduction
 
--- section Completeness
+section Completeness
 
--- /-- A reduction satisfies **completeness** with regards to:
---   - an initialization function `init : ProbComp σ` for some ambient state `σ`,
---   - a stateful query implementation `impl` (in terms of `StateT σ ProbComp`)
---   for the shared oracles `oSpec`,
---   - an input relation `relIn` and output relation `relOut` (represented as sets), and
---   - an error `completenessError ≥ 0`,
+example {m} [Monad m]
+    [HasEvalSPMF m] : HasEvalSPMF (OptionT m) := by infer_instance
 
---   if for all valid statement-witness pair `(stmtIn, witIn) ∈ relIn`, the execution between the
---   honest prover and the honest verifier will result in a tuple `((prvStmtOut, witOut), stmtOut)`
---   such that
+/-- A reduction satisfies **completeness** with regards to:
+  - an initialization function `init : ProbComp σ` for some ambient state `σ`,
+  - a stateful query implementation `impl` (in terms of `StateT σ ProbComp`)
+  for the shared oracles `oSpec`,
+  - an input relation `relIn` and output relation `relOut` (represented as sets), and
+  - an error `completenessError ≥ 0`,
 
---   - `(stmtOut, witOut) ∈ relOut`, (the output statement-witness pair is valid) and
---   - `prvStmtOut = stmtOut`, (the output statements are the same from both prover and verifier)
+  if for all valid statement-witness pair `(stmtIn, witIn) ∈ relIn`, the execution between the
+  honest prover and the honest verifier will result in a tuple `((prvStmtOut, witOut), stmtOut)`
+  such that
 
---   except with probability `completenessError`.
--- -/
--- def completeness (relIn : Set (StmtIn × WitIn))
---     (relOut : Set (StmtOut × WitOut))
---     (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec)
---     (completenessError : ℝ≥0) : Prop :=
---   ∀ stmtIn : StmtIn,
---   ∀ witIn : WitIn,
---   (stmtIn, witIn) ∈ relIn →
---     Pr[fun ⟨⟨_, (prvStmtOut, witOut)⟩, stmtOut⟩ => (stmtOut, witOut) ∈ relOut ∧ prvStmtOut = stmtOut
---     | do (simulateQ (impl ++ₛₒ challengeQueryImpl : QueryImpl _ (StateT σ ProbComp))
---           <| reduction.run stmtIn witIn).run' (← init)] ≥ 1 - completenessError
+  - `(stmtOut, witOut) ∈ relOut`, (the output statement-witness pair is valid) and
+  - `prvStmtOut = stmtOut`, (the output statements are the same from both prover and verifier)
 
--- /-- A reduction satisfies **perfect completeness** if it satisfies completeness with error `0`. -/
--- def perfectCompleteness (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
---     (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) : Prop :=
---   completeness init impl relIn relOut reduction 0
+  except with probability `completenessError`.
+-/
+def completeness (relIn : Set (StmtIn × WitIn))
+    (relOut : Set (StmtOut × WitOut))
+    (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec)
+    (completenessError : ℝ≥0) : Prop :=
+  ∀ stmtIn : StmtIn,
+  ∀ witIn : WitIn,
+  (stmtIn, witIn) ∈ relIn →
+    Pr[fun z : (pSpec.FullTranscript × StmtOut × WitOut) × StmtOut => --⟨⟨_, (prvStmtOut, witOut)⟩, stmtOut⟩ =>
+        (z.2, z.1.2.2) ∈ relOut ∧ z.1.2.1 = z.1.2.1 | (do
+      let impl : QueryImpl _ (StateT σ ProbComp) := sorry
+      let r : Option ((pSpec.FullTranscript × StmtOut × WitOut) × StmtOut) ← (simulateQ impl
+        <| reduction.run stmtIn witIn).run' (← init)
+      r.getM : OptionT (ProbComp) _)] ≥ 1 - completenessError
 
--- /-- Type class for completeness for a reduction -/
--- class IsComplete (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
---     (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec)
---     where
---   completenessError : ℝ≥0
---   is_complete : completeness init impl relIn relOut reduction completenessError
+/-- A reduction satisfies **perfect completeness** if it satisfies completeness with error `0`. -/
+def perfectCompleteness (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
+    (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) : Prop :=
+  completeness init impl relIn relOut reduction 0
 
--- /-- Type class for perfect completeness for a reduction -/
--- class IsPerfectComplete (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
---     (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) where
---   is_perfect_complete : perfectCompleteness init impl relIn relOut reduction
+/-- Type class for completeness for a reduction -/
+class IsComplete (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
+    (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec)
+    where
+  completenessError : ℝ≥0
+  is_complete : completeness init impl relIn relOut reduction completenessError
+
+/-- Type class for perfect completeness for a reduction -/
+class IsPerfectComplete (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
+    (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) where
+  is_perfect_complete : perfectCompleteness init impl relIn relOut reduction
 
 -- variable {relIn : Set (StmtIn × WitIn)} {relOut : Set (StmtOut × WitOut)}
 --     {reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec}

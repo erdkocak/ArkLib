@@ -139,7 +139,7 @@ class GenMutualCorrParams (P : Params ι F) (S : ∀ i : Fin (M + 1), Finset (ι
 
 section RBR
 
-open NNRat OracleComp OracleSpec ProtocolSpec VectorIOP
+open NNRat OracleComp OracleSpec ProtocolSpec
 
 /-- `OracleStatement` defines the oracle message type for a multi-indexed setting:
   given base input type `ι`, and field `F`, the output type at each index
@@ -149,11 +149,14 @@ open NNRat OracleComp OracleSpec ProtocolSpec VectorIOP
 def OracleStatement (ι F : Type) : Unit → Type :=
     fun _ => ι → F
 
-/-- Provides a default OracleInterface instance that leverages
-  the oracle statement defined above. The oracle simply applies
-  the function `f : ι → F` to the query input `i : ι`,
-  producing the response. -/
-instance {ι : Type} : OracleInterface (OracleStatement ι F ()) := OracleInterface.instFunction
+-- /-- Provides a default OracleInterface instance that leverages
+--   the oracle statement defined above. The oracle simply applies
+--   the function `f : ι → F` to the query input `i : ι`,
+--   producing the response. -/
+-- instance {ι : Type} : OracleInterface (OracleStatement ι F ()) := OracleInterface.instFunction
+
+def defaultOracleContext {ι : Type} :
+    OracleContext
 
 /-- WHIR relation: the oracle's output is δᵣ-close to a codeword of a smooth ReedSolomon code
 with number of variables at most `varCount` over domain `φ`, within error `err`.
@@ -193,7 +196,7 @@ theorem whir_rbr_soundness
     Fintype.card (vPSpec.ChallengeIdx) = 2 * M + 2 ∧
     -- ∃ a Vector IOPP π with Statement = Unit, Witness = Unit, OracleStatement = (ι₀ F)
       ∃ π :
-        VectorIOP Unit (OracleStatement (ι 0) F) Unit vPSpec F,
+        VectorIOP Unit (OracleStatement (ι 0) F) Unit vPSpec F sorry,
         let max_ε_folds : (i : Fin (M + 1)) → ℝ≥0 :=
           fun i => (univ : Finset (Fin (P.foldingParam i))).sup (ε_fold i)
         let ε_rbr : vPSpec.ChallengeIdx → ℝ≥0 :=

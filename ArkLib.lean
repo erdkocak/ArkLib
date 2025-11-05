@@ -139,7 +139,7 @@ import ArkLib.OracleReduction.Salt
 -- import ArkLib.OracleReduction.Security.RoundByRound
 -- import ArkLib.OracleReduction.Security.SpecialSoundness
 -- import ArkLib.OracleReduction.Security.StateRestoration
--- import ArkLib.OracleReduction.VectorIOR
+import ArkLib.OracleReduction.VectorIOR
 import ArkLib.ProofSystem.BatchedFri.Spec.General
 import ArkLib.ProofSystem.BatchedFri.Spec.SingleRound
 import ArkLib.ProofSystem.Binius.BinaryBasefold.Basic
