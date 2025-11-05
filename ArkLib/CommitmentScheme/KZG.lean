@@ -179,13 +179,6 @@ def verifyOpening (verifySrs : Vector G₂ 2) (commitment : G₁) (opening : G�
   pairing (commitment / g₁ ^ v.val) (verifySrs[0]) =
     pairing opening (verifySrs[1] / g₂ ^ z.val)
 
--- Division algorithm identity specialized to polynomials over `ZMod p`.
-lemma poly_quotient_mul_add_remainder_eq
-  (P d : Polynomial (ZMod p)) :
-  P = (P / d) * d + (P % d) := by
-  simpa [_root_.mul_comm] using
-    ((EuclideanDomain.quotient_mul_add_remainder_eq (R := Polynomial (ZMod p)) P d).symm)
-
 -- p(a) - p(z) = q(a) * (a - z)
 -- e ( C / g₁ ^ v , g₂ ) = e ( O , g₂ ^ a / g₂ ^ z)
 theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
@@ -200,6 +193,9 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
   unfold verifyOpening generateSrs
   simp only [decide_eq_true_eq]
 
+  -- helper facts for the proof
+
+  -- coeffs is the finite coefficients map of poly
   have hcoeffs : coeffs = (coeff poly) ∘ Fin.val := by
     simp_all only [poly]
     ext x : 1
@@ -207,33 +203,33 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
     simp only [Array.getD_eq_getD_getElem?, Array.size_ofFn, Fin.is_lt, getElem?_pos,
     Array.getElem_ofFn, Fin.eta, Option.getD_some]
 
+  -- the (mathematical) degree of poly is less than n+1
   have hpdeg : degree poly ≤ n+1 := by
     simp_rw [←Trim.size_eq_degree]
     apply le_trans (Trim.size_le_size (p := poly))
     simp_rw [poly]
     simp
 
+  -- expansion of (a-z) to Polynomial form
   have haz : (a-z) = UniPoly.eval a (UniPoly.X - UniPoly.C z) := by
     simp_rw [←eval_toPoly_eq_eval, toPoly_sub, eval_sub,
     eval_toPoly_eq_eval]
     simp only [UniPoly.eval_X, UniPoly.eval_C]
 
+  -- the polynomial form of (a-z) is monic
   have hmonic : monic (UniPoly.X - UniPoly.C z) := by
     simp only [UniPoly.monic_X_sub_C]
 
-  have hpoly: mk (Array.ofFn coeffs) = poly := by
-    simp [poly]
+  -- the proof
 
+  -- restate the commitment as the evaluation of poly at a (C => g₁^poly(a))
   simp_rw [hcoeffs, commit_eq_UniPoly hpG1 poly hpdeg]
-  simp_rw [generateOpening, ←hcoeffs]
-  simp_rw [hpoly]
 
+  -- define q(X) := (poly(X) - poly(z)) / (X-z)
+  -- and restate the opening as the evaluation of q at a (opening => g₁^q(a))
+  simp_rw [generateOpening, ←hcoeffs]
   set q := (mk poly - UniPoly.C (UniPoly.eval z (mk poly))).divByMonic (UniPoly.X - UniPoly.C z)
   have hqdeg : degree q ≤ n+1 := by
-    have hCdeg : degree (UniPoly.C (UniPoly.eval z (mk poly))) ≤ 1 := by
-      by_cases h0 : UniPoly.eval z (mk poly) = 0
-      · simp only [h0, degree_C_zero, zero_le]
-      · simp [UniPoly.degree_C (x := UniPoly.eval z (mk poly)) (by simpa using h0)]
     calc
       degree q ≤ degree (mk poly - UniPoly.C (UniPoly.eval z (mk poly))) := by
         simp [q, degree_divByMonic hmonic]
@@ -242,20 +238,31 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
       _ ≤ max (n+1) 1 := by
         apply max_le_max
         · exact hpdeg
-        · exact hCdeg
+        · by_cases h0 : UniPoly.eval z (mk poly) = 0
+          · simp only [h0, degree_C_zero, zero_le]
+          · simp [UniPoly.degree_C (x := UniPoly.eval z (mk poly)) (by simpa using h0)]
       _ = n+1 := by
         simp only [Nat.succ_le_succ (Nat.zero_le n), sup_of_le_left]
   have hfun: (fun i ↦ q.coeff ↑i : Fin (n+1) → ZMod p) = (coeff q) ∘ Fin.val := by rfl
   simp_rw [hfun, commit_eq_UniPoly hpG1 q hqdeg]
+
+  -- evaluate the pairing linearly.
+  -- e (g₁^poly(a) / g₂^poly(z), g₂)= e (g₁^q(a), g₂^a / g₂^(z))
+  -- => (poly(a) - poly(z)) • e (g₁,g₂) = (q(a) * (a-z)) • e (g₁,g₂)
   simp only [towerOfExponents, Nat.reduceAdd, Vector.getElem_ofFn, pow_zero, pow_one]
   simp_rw [←zpow_natCast_sub_natCast, ←zpow_natCast, ←lin_snd, ←lin_fst, smul_smul]
 
+  -- eliminate the pairing and reason only about the exponents: poly(a) - poly(z) = q(a) * (a-z)
   apply modp_eq_additive
   refine (Int.modEq_iff_dvd).2 ?_
   let x : ℤ := (↑(UniPoly.eval a poly).val) - (↑v.val)
   let y : ℤ := (↑(a.val) - ↑(z.val)) * ↑(UniPoly.eval a q).val
   refine (Iff.mp (ZMod.intCast_eq_intCast_iff_dvd_sub (a := x) (b := y) (c := p))) ?_
   subst x y; simp
+
+  -- unfold q to obtainthe self canceling goal:
+  -- poly(a) - poly(z) = (poly(a) - poly(z)) / (a-z) * (a-z)
+  -- prove the goal using the eval isomorphism to mathlib Polynomials
   subst v q
   simp_rw [haz]
   simp_rw [←eval_toPoly_eq_eval, toPoly_divByMonic hmonic,toPoly_sub, ←eval_mul, toPoly_C, toPoly_X]
@@ -315,6 +322,7 @@ def kzg (srs : Vector G₁ (n + 1) × Vector G₂ 2) :
 
 open OracleSpec OracleComp SubSpec ProtocolSpec
 
+/-- the KZG satisfies perfect correctness as defined in `CommitmentScheme` -/
 theorem correctness' (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂} :
     Commitment.perfectCorrectness (pure ()) ⟨isEmptyElim⟩
     (kzg (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)
