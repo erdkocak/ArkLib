@@ -30,7 +30,8 @@ instance instDecidableEqOption {α : Type*} [DecidableEq α] :
     DecidableEq (Option α) := inferInstance
 
 /-- `VCVCompabible` is a type class for types that are finite, inhabited, and have decidable
-  equality. These instances are needed when the type is used as the range of some `OracleSpec`. -/
+  equality. These instances are needed when the type is used as the range of some `OracleSpec`.
+  dtumad: should be able to remove this with the `OracleInterface` changes -/
 class VCVCompatible (α : Type*) extends Fintype α, Inhabited α where
   [type_decidableEq' : DecidableEq α]
 

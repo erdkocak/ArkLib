@@ -283,13 +283,19 @@ instance : ∀ i, VCVCompatible (Challenge !p[] i) :=
 instance : ∀ i, SampleableType (Challenge !p[] i) :=
   fun ⟨i, h⟩ =>
     (Fin.elim0 i : (h' : !p[].dir i = .V_to_P) → SampleableType (!p[].Challenge ⟨i, h'⟩)) h
-instance : ∀ i, OracleInterface (Message !p[] i) :=
-  fun ⟨i, h⟩ =>
-    (Fin.elim0 i : (h' : !p[].dir i = .P_to_V) → OracleInterface (!p[].Message ⟨i, h'⟩)) h
+
+-- def toOracleContext (i) : OracleContext Empty (ReaderM (Message !p[] i)) where
+--   spec := Fin.elim0 i
+
+
+-- instance : ∀ i, OracleInterface (Message !p[] i) :=
+--   fun ⟨i, h⟩ =>
+--     (Fin.elim0 i : (h' : !p[].dir i = .P_to_V) → OracleInterface (!p[].Message ⟨i, h'⟩)) h
 
 instance : ∀ i, VCVCompatible ((default : ProtocolSpec 0).Challenge i) := fun ⟨i, _⟩ => Fin.elim0 i
 instance : ∀ i, SampleableType ((default : ProtocolSpec 0).Challenge i) := fun ⟨i, _⟩ => Fin.elim0 i
-instance : ∀ i, OracleInterface ((default : ProtocolSpec 0).Message i) := fun ⟨i, _⟩ => Fin.elim0 i
+-- instance : ∀ i, OracleInterface ((default : ProtocolSpec 0).Message i) :=
+--  fun ⟨i, _⟩ => Fin.elim0 i
 
 variable {Msg Chal : Type}
 
@@ -298,8 +304,8 @@ instance : IsEmpty (ChallengeIdx ⟨!v[.P_to_V], !v[Msg]⟩) :=
 instance : Unique (MessageIdx ⟨!v[.P_to_V], !v[Msg]⟩) where
   default := ⟨0, by simp⟩
   uniq := fun i => by ext; simp
-instance [inst : OracleInterface Msg] : ∀ i, OracleInterface (Message ⟨!v[.P_to_V], !v[Msg]⟩ i)
-  | ⟨0, _⟩ => inst
+-- instance [inst : OracleInterface Msg] : ∀ i, OracleInterface (Message ⟨!v[.P_to_V], !v[Msg]⟩ i)
+--   | ⟨0, _⟩ => inst
 instance : ∀ i, VCVCompatible (Challenge ⟨!v[.P_to_V], !v[Msg]⟩ i)
   | ⟨0, h⟩ => nomatch h
 instance : ∀ i, SampleableType (Challenge ⟨!v[.P_to_V], !v[Msg]⟩ i)
@@ -310,8 +316,8 @@ instance : IsEmpty (MessageIdx ⟨!v[.V_to_P], !v[Chal]⟩) :=
 instance : Unique (ChallengeIdx ⟨!v[.V_to_P], !v[Chal]⟩) where
   default := ⟨0, by simp⟩
   uniq := fun i => by ext; simp
-instance : ∀ i, OracleInterface (Message ⟨!v[.V_to_P], !v[Chal]⟩ i)
-  | ⟨0, h⟩ => nomatch h
+-- instance : ∀ i, OracleInterface (Message ⟨!v[.V_to_P], !v[Chal]⟩ i)
+--   | ⟨0, h⟩ => nomatch h
 instance [inst : VCVCompatible Chal] : ∀ i, VCVCompatible (Challenge ⟨!v[.V_to_P], !v[Chal]⟩ i)
   | ⟨0, _⟩ => inst
 instance [inst : SampleableType Chal] : ∀ i, SampleableType (Challenge ⟨!v[.V_to_P], !v[Chal]⟩ i)
@@ -603,7 +609,7 @@ end FullTranscript
 
     This is defined as a type class for notational convenience. -/
 class OracleInterfaces (pSpec : ProtocolSpec n) where
-  oracleInterfaces : ∀ i, Option (OracleInterface (pSpec.Message i))
+  oracleInterfaces : ∀ i, Option (OracleContext Unit (ReaderM (pSpec.Message i)))
 
 section OracleInterfaces
 
@@ -614,7 +620,7 @@ variable (pSpec : ProtocolSpec n) [inst : OracleInterfaces pSpec]
 def OracleMessageIdx := {i : pSpec.MessageIdx // (inst.oracleInterfaces i).isSome }
 
 /-- The oracle interface instances for messages that are received as oracles -/
-instance {i : OracleMessageIdx pSpec} : OracleInterface (pSpec.Message i) :=
+instance {i : OracleMessageIdx pSpec} : OracleContext Unit (ReaderM (pSpec.Message i)) :=
   (inst.oracleInterfaces i).get i.2
 
 /-- Subtype of `pSpec.MessageIdx` for messages that are received in full -/
@@ -649,11 +655,10 @@ end OracleInterfaces
   This is the default instance for the challenge oracle interface. It may be overridden by
   `challengeOracleInterface{SR/FS}` for state-restoration and/or Fiat-Shamir. -/
 @[reducible, inline, specialize]
-instance challengeOracleInterface {pSpec : ProtocolSpec n} :
-    ∀ i, OracleInterface (pSpec.Challenge i) := fun i =>
-  { Domain := Unit
-    Range _ := pSpec.Challenge i
-    answer := fun c _ => c }
+instance challengeOracleInterface {pSpec : ProtocolSpec n} (i : pSpec.ChallengeIdx) :
+    OracleContext Unit (ReaderM (pSpec.Challenge i)) where
+  spec := Unit →ₒ pSpec.Challenge i
+  impl _ := do return (← read)
 
 /-- Query a verifier's challenge for a given challenge round `i`, given the default challenge
   oracle interface `challengeOracleInterface`.
@@ -663,17 +668,18 @@ instance challengeOracleInterface {pSpec : ProtocolSpec n} :
   requires an input statement and prior messages up to that round. -/
 @[reducible, inline, specialize]
 def getChallenge (pSpec : ProtocolSpec n) (i : pSpec.ChallengeIdx) :
-    OracleComp ([pSpec.Challenge i]ₒ'(challengeOracleInterface i)) (pSpec.Challenge i) :=
-  (query ()  : OracleQuery ([pSpec.Challenge i]ₒ'(challengeOracleInterface i)) (pSpec.Challenge i))
+    OracleQuery (challengeOracleInterface i).spec (pSpec.Challenge i) :=
+  query ()
+  -- (query ()  : OracleQuery ((challengeOracleInterface i).1) (pSpec.Challenge i))
 
 /-- Define the query implementation for the verifier's challenge in terms of `ProbComp`.
 
 This is a randomness oracle: it simply calls the `selectElem` method inherited from the
   `SampleableType` instance on the challenge types.
 -/
-def challengeQueryImpl {pSpec : ProtocolSpec n} [∀ i, SampleableType (pSpec.Challenge i)] :
-    ∀ i, QueryImpl ([pSpec.Challenge i]ₒ'(challengeOracleInterface i)) ProbComp :=
-  fun i () => uniformOfFintype (pSpec.Challenge i)
+def challengeQueryImpl {pSpec : ProtocolSpec n} [∀ i, SampleableType (pSpec.Challenge i)]
+    (i : pSpec.ChallengeIdx) : QueryImpl (challengeOracleInterface i).spec ProbComp :=
+  fun () => do $ᵗ (pSpec.Challenge i)
 
 /-- The oracle interface for state-restoration and (basic) Fiat-Shamir.
 
@@ -683,11 +689,12 @@ the point of deriving a new challenge. To be precise:
 - The range of the oracle is `pSpec.Challenge i`
 - The oracle just returns the challenge -/
 @[reducible, inline, specialize]
-def challengeOracleInterfaceSR (StmtIn : Type) (pSpec : ProtocolSpec n) :
-    ∀ i, OracleInterface (pSpec.Challenge i) := fun i =>
-  { Domain := StmtIn × pSpec.MessagesUpTo i.1.castSucc
-    Range _ := pSpec.Challenge i
-    answer := fun c _ => c }
+def challengeOracleInterfaceSR (StmtIn : Type) (pSpec : ProtocolSpec n)
+    (i : pSpec.ChallengeIdx) :
+    OracleContext (StmtIn × pSpec.MessagesUpTo i.1.castSucc)
+      (ReaderM (pSpec.Challenge i)) where
+  spec _ := pSpec.Challenge i
+  impl _ := do return (← read)
 
 alias challengeOracleInterfaceFS := challengeOracleInterfaceSR
 
@@ -703,8 +710,8 @@ the input statement (i.e. we can always transform a given reduction into one whe
 random salt). -/
 @[inline, reducible]
 def srChallengeOracle (Statement : Type) {n : ℕ} (pSpec : ProtocolSpec n)
-    (i : pSpec.ChallengeIdx) : OracleSpec :=
-  [pSpec.Challenge i]ₒ'(challengeOracleInterfaceSR Statement pSpec i)
+    (i : pSpec.ChallengeIdx) : OracleSpec (Statement × pSpec.MessagesUpTo i.1.castSucc) :=
+  (challengeOracleInterfaceSR Statement pSpec i).spec
 
 alias fsChallengeOracle := srChallengeOracle
 
@@ -723,18 +730,18 @@ alias fsChallengeOracle := srChallengeOracle
 
 instance {pSpec : ProtocolSpec n} {Statement : Type}
     (i : pSpec.ChallengeIdx) [VCVCompatible (pSpec.Challenge i)] :
-    PFunctor.Fintype (srChallengeOracle Statement pSpec i) where
+    OracleSpec.Fintype (srChallengeOracle Statement pSpec i) where
   fintype_B := fun i => by simp; infer_instance
 
 instance {pSpec : ProtocolSpec n} {Statement : Type}
     (i : pSpec.ChallengeIdx) [VCVCompatible (pSpec.Challenge i)] :
-    PFunctor.Inhabited (srChallengeOracle Statement pSpec i) where
+    OracleSpec.Inhabited (srChallengeOracle Statement pSpec i) where
   inhabited_B := fun i => by simp; infer_instance
 
 instance {pSpec : ProtocolSpec n} {Statement : Type}
     (i : pSpec.ChallengeIdx) [VCVCompatible (pSpec.Challenge i)] :
-    PFunctor.Fintype (fsChallengeOracle Statement pSpec i) :=
-  inferInstanceAs (PFunctor.Fintype (srChallengeOracle Statement pSpec i))
+    OracleSpec.Fintype (fsChallengeOracle Statement pSpec i) :=
+  inferInstanceAs (OracleSpec.Fintype (srChallengeOracle Statement pSpec i))
 
 /-- Define the query implementation for the state-restoration / (slow) Fiat-Shamir oracle (returns a
     challenge given messages up to that point) in terms of `ProbComp`.
@@ -752,7 +759,7 @@ instance {pSpec : ProtocolSpec n} {Statement : Type}
 def srChallengeQueryImpl {Statement : Type} {pSpec : ProtocolSpec n}
     [∀ i, SampleableType (pSpec.Challenge i)] (i : pSpec.ChallengeIdx) :
     QueryImpl (srChallengeOracle Statement pSpec i) ProbComp :=
-  fun _ => uniformOfFintype (pSpec.Challenge i)
+  fun _ => $ᵗ (pSpec.Challenge i)
 
 /-- Alternate version of query implementation that takes in a cached function `f` and returns
   the result and the updated function.
@@ -773,7 +780,7 @@ namespace MessagesUpTo
   querying the state-restoration / Fiat-Shamir oracle for the challenges.
 
   This is used to define `deriveTranscriptFS`. -/
-def deriveTranscriptSRAux {oSpec : OracleSpec} {StmtIn : Type}
+def deriveTranscriptSRAux {ι} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmt : StmtIn) (k : Fin (n + 1)) (messages : pSpec.MessagesUpTo k)
     (j : Fin (k + 1)) (i : pSpec.ChallengeIdx) :
     OracleComp (oSpec + fsChallengeOracle StmtIn pSpec i)
@@ -794,7 +801,7 @@ def deriveTranscriptSRAux {oSpec : OracleSpec} {StmtIn : Type}
 
 /-- Derive the transcript up to round `k` from the (full) messages, via querying the
     state-restoration / Fiat-Shamir oracle for the challenges. -/
-def deriveTranscriptSR {oSpec : OracleSpec} {StmtIn : Type}
+def deriveTranscriptSR {ι} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmt : StmtIn) (k : Fin (n + 1)) (messages : pSpec.MessagesUpTo k)
     (i : pSpec.ChallengeIdx) :
     OracleComp (oSpec + fsChallengeOracle StmtIn pSpec i) (pSpec.Transcript k) := do
@@ -808,7 +815,7 @@ namespace Messages
 
 /-- Derive the transcript up to round `k` from the (full) messages, via querying the
     state-restoration / Fiat-Shamir oracle for the challenges. -/
-def deriveTranscriptSR {oSpec : OracleSpec} {StmtIn : Type}
+def deriveTranscriptSR {ι} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmt : StmtIn) (messages : pSpec.Messages) (i : pSpec.ChallengeIdx) :
     OracleComp (oSpec + fsChallengeOracle StmtIn pSpec i) pSpec.FullTranscript := do
   MessagesUpTo.deriveTranscriptSR stmt (Fin.last n) messages i
