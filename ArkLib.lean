@@ -142,7 +142,13 @@ import ArkLib.OracleReduction.Security.StateRestoration
 import ArkLib.OracleReduction.VectorIOR
 import ArkLib.ProofSystem.BatchedFri.Spec.General
 import ArkLib.ProofSystem.BatchedFri.Spec.SingleRound
-import ArkLib.ProofSystem.Binius.Basic
+import ArkLib.ProofSystem.Binius.BinaryBasefold.Basic
+import ArkLib.ProofSystem.Binius.BinaryBasefold.CoreInteractionPhase
+import ArkLib.ProofSystem.Binius.BinaryBasefold.General
+import ArkLib.ProofSystem.Binius.BinaryBasefold.Prelude
+import ArkLib.ProofSystem.Binius.BinaryBasefold.QueryPhase
+import ArkLib.ProofSystem.Binius.BinaryBasefold.Spec
+import ArkLib.ProofSystem.Binius.BinaryBasefold.Steps
 import ArkLib.ProofSystem.Component.CheckClaim
 import ArkLib.ProofSystem.Component.DoNothing
 import ArkLib.ProofSystem.Component.NoInteraction

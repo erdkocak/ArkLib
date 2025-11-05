@@ -26,7 +26,7 @@ section FieldVanishingPolynomialEquality
 The polynomial `X^q - X` factors into the product of `(X - c)` ∀ `c` ∈ `Fq`,
 i.e. `∏_{c ∈ Fq} (X - c) = X^q - X`.
 -/
-theorem prod_X_sub_C_eq_X_pow_card_sub_X (h_Fq_card_gt_1 : Fintype.card Fq > 1):
+theorem prod_X_sub_C_eq_X_pow_card_sub_X :
   (∏ c ∈ (Finset.univ : Finset Fq), (Polynomial.X - Polynomial.C c)) =
     Polynomial.X^(Fintype.card Fq) - Polynomial.X := by
 
@@ -46,7 +46,7 @@ theorem prod_X_sub_C_eq_X_pow_card_sub_X (h_Fq_card_gt_1 : Fintype.card Fq > 1):
     apply Polynomial.monic_X_pow_sub
     -- The condition is that degree(X) < Fintype.card Fq
     rw [Polynomial.degree_X]
-    exact_mod_cast h_Fq_card_gt_1
+    exact_mod_cast (by exact Fintype.one_lt_card)
 
   have h_roots_P : P.roots = (Finset.univ : Finset Fq).val := by
     apply Polynomial.roots_prod_X_sub_C
@@ -74,7 +74,7 @@ theorem prod_X_sub_C_eq_X_pow_card_sub_X (h_Fq_card_gt_1 : Fintype.card Fq > 1):
     have degLt : (X : Fq[X]).natDegree < ((X : Fq[X]) ^ Fintype.card Fq).natDegree := by
       rw [Polynomial.natDegree_X_pow]
       rw [Polynomial.natDegree_X]
-      exact h_Fq_card_gt_1
+      exact Fintype.one_lt_card
     rw [Polynomial.natDegree_sub_eq_left_of_natDegree_lt degLt]
     rw [Polynomial.natDegree_X_pow]
 
@@ -97,8 +97,7 @@ variable {L : Type*} [CommRing L] [Algebra Fq L]
 The identity `∏_{c ∈ Fq} (X - c) = X^q - X` also holds in the polynomial ring `L[X]`,
 where `L` is any field extension of `Fq`.
 -/
-theorem prod_X_sub_C_eq_X_pow_card_sub_X_in_L
-  (h_Fq_card_gt_1 : Fintype.card Fq > 1):
+theorem prod_X_sub_C_eq_X_pow_card_sub_X_in_L :
   (∏ c ∈ (Finset.univ : Finset Fq), (Polynomial.X - Polynomial.C (algebraMap Fq L c))) =
     Polynomial.X^(Fintype.card Fq) - Polynomial.X := by
 
@@ -128,14 +127,14 @@ theorem prod_X_sub_C_eq_X_pow_card_sub_X_in_L
 
   -- The goal is now `map f (LHS_base) = map f (RHS_base)`.
   -- This is true if `LHS_base = RHS_base`, which is exactly our previous theorem.
-  rw [prod_X_sub_C_eq_X_pow_card_sub_X h_Fq_card_gt_1]
+  rw [prod_X_sub_C_eq_X_pow_card_sub_X]
 
 /--
 The identity `∏_{c ∈ Fq} (X - c) = X^q - X` also holds in the polynomial ring `L[X]`,
 where `L` is any field extension of `Fq`.
 -/
 theorem prod_poly_sub_C_eq_poly_pow_card_sub_poly_in_L
-  (h_Fq_card_gt_1 : Fintype.card Fq > 1) (p : L[X]):
+  (p : L[X]) :
   (∏ c ∈ (Finset.univ : Finset Fq), (p - Polynomial.C (algebraMap Fq L c))) =
     p^(Fintype.card Fq) - p := by
 
@@ -148,7 +147,7 @@ theorem prod_poly_sub_C_eq_poly_pow_card_sub_poly_in_L
 
   -- From the previous theorem, we have the base identity in L[X]:
   -- `(∏ c, (X - C c)) = X^q - X`
-  let base_identity := prod_X_sub_C_eq_X_pow_card_sub_X_in_L (L := L) h_Fq_card_gt_1
+  let base_identity := prod_X_sub_C_eq_X_pow_card_sub_X_in_L (L := L) (Fq:=Fq)
 
   -- `APPROACH : f = g => f.comp(p) = g.comp(p)`
   have h_composed_eq : (∏ c ∈ (Finset.univ : Finset Fq), (X - C (algebraMap Fq L c))).comp p
@@ -186,18 +185,17 @@ The Frobenius identity for polynomials in `Fq[X]`.
 The `q`-th power of a sum of polynomials is the sum of their `q`-th powers.
 -/
 theorem frobenius_identity_in_ground_field
-  {h_Fq_char_prime : Fact (Nat.Prime (ringChar Fq))} (f g : Fq[X]) :
+  [Fact (Nat.Prime (ringChar Fq))] (f g : Fq[X]) :
     (f + g)^(Fintype.card Fq) = f^(Fintype.card Fq) + g^(Fintype.card Fq) := by
   -- The Freshman's Dream `(a+b)^e = a^e + b^e` holds if `e` is a power of the characteristic.
   -- First, we establish that `q = p^n` where `p` is the characteristic of `Fq`.
   let p := ringChar Fq
-  have h_p_prime : Fact p.Prime := h_Fq_char_prime
   obtain ⟨n, hp, hn⟩ := FiniteField.card Fq p
   rw [hn]
   -- The polynomial ring `Fq[X]` also has characteristic `p`.
   haveI : CharP Fq[X] p := Polynomial.charP
   -- Apply the general "Freshman's Dream" theorem for prime powers.
-  exact add_pow_expChar_pow f g p ↑n
+  exact add_pow_expChar_pow f g p ↑n -- this one requires `h_Fq_char_prime`
 
 variable {L : Type*} [CommRing L] [Algebra Fq L] [Nontrivial L]
 
@@ -205,11 +203,10 @@ variable {L : Type*} [CommRing L] [Algebra Fq L] [Nontrivial L]
 The lifted Frobenius identity for polynomials in `L[X]`, where `L` is an `Fq`-algebra.
 The exponent `q` is the cardinality of the base field `Fq`.
 -/
-theorem frobenius_identity_in_algebra {h_Fq_char_prime : Fact (Nat.Prime (ringChar Fq))}
+theorem frobenius_identity_in_algebra [Fact (Nat.Prime (ringChar Fq))]
   (f g : L[X]) : (f + g)^(Fintype.card Fq) = f^(Fintype.card Fq) + g^(Fintype.card Fq) := by
   -- The logic is identical. The key is that `L` inherits the characteristic of `Fq`.
   let p := ringChar Fq
-  haveI : Fact p.Prime := h_Fq_char_prime
   obtain ⟨n, hp, hn⟩ := FiniteField.card Fq p
 
   -- Rewrite the goal using `q = p^n`.
