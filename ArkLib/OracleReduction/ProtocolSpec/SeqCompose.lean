@@ -355,7 +355,7 @@ end FullTranscript
 
 section Append
 
-variable {oSpec : OracleSpec} {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type}
+variable {ι} {oSpec : OracleSpec ι} {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type}
   {m n : ℕ} {pSpec₁ : ProtocolSpec m} {pSpec₂ : ProtocolSpec n}
 
 /-- If two protocols have sampleable challenges, then their concatenation also has sampleable
@@ -369,39 +369,39 @@ instance [h₁ : ∀ i, SampleableType (pSpec₁.Challenge i)]
     (α₁ := pSpec₁.dir) (β₁ := pSpec₂.dir)
     (α₂ := pSpec₁.Type) (β₂ := pSpec₂.Type) (fun i h => h₁ ⟨i, h⟩) (fun i h => h₂ ⟨i, h⟩) i h
 
-/-- If two protocols' messages have oracle representations, then their concatenation's messages also
-    have oracle representations. -/
-instance [O₁ : ∀ i, OracleInterface.{0, u, v} (pSpec₁.Message i)]
-    [O₂ : ∀ i, OracleInterface.{0, u, v} (pSpec₂.Message i)] :
-    ∀ i, OracleInterface.{0, u, v} ((pSpec₁ ++ₚ pSpec₂).Message i) :=
-  fun ⟨i, h⟩ => Fin.fappend₂ (A := Direction) (B := Type)
-    (F := fun dir type => (h : dir = .P_to_V) → OracleInterface type)
-    (α₁ := pSpec₁.dir) (β₁ := pSpec₂.dir)
-    (α₂ := pSpec₁.Type) (β₂ := pSpec₂.Type) (fun i h => O₁ ⟨i, h⟩) (fun i h => O₂ ⟨i, h⟩) i h
+-- /-- If two protocols' messages have oracle representations, then their concatenation's messages also
+--     have oracle representations. -/
+-- instance [O₁ : ∀ i, OracleInterface.{0, u, v} (pSpec₁.Message i)]
+--     [O₂ : ∀ i, OracleInterface.{0, u, v} (pSpec₂.Message i)] :
+--     ∀ i, OracleInterface.{0, u, v} ((pSpec₁ ++ₚ pSpec₂).Message i) :=
+--   fun ⟨i, h⟩ => Fin.fappend₂ (A := Direction) (B := Type)
+--     (F := fun dir type => (h : dir = .P_to_V) → OracleInterface type)
+--     (α₁ := pSpec₁.dir) (β₁ := pSpec₂.dir)
+--     (α₂ := pSpec₁.Type) (β₂ := pSpec₂.Type) (fun i h => O₁ ⟨i, h⟩) (fun i h => O₂ ⟨i, h⟩) i h
 
-instance : ∀ i, OracleInterface ((pSpec₁ ++ₚ pSpec₂).Challenge i) := challengeOracleInterface
+-- instance : ∀ i, OracleInterface ((pSpec₁ ++ₚ pSpec₂).Challenge i) := challengeOracleInterface
 
-@[simp]
-lemma challengeOracleInterface_append_domain_inl (j : pSpec₁.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.Domain = Unit := rfl
+-- @[simp]
+-- lemma challengeOracleInterface_append_domain_inl (j : pSpec₁.ChallengeIdx) :
+--     [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.Domain = Unit := rfl
 
-@[simp]
-lemma challengeOracleInterface_append_range_inl (j : pSpec₁.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.Range () = pSpec₁.Challenge j := by
-  simp only [append, ChallengeIdx.inl, Challenge, instOracleInterfaceChallengeAppend,
-    challengeOracleInterface, OracleInterface.toOracleSpec', OracleInterface.toOracleSpec,
-    Fin.vappend_left]
+-- @[simp]
+-- lemma challengeOracleInterface_append_range_inl (j : pSpec₁.ChallengeIdx) :
+--     [(pSpec₁ ++ₚ pSpec₂).Challenge (.inl j)]ₒ.Range () = pSpec₁.Challenge j := by
+--   simp only [append, ChallengeIdx.inl, Challenge, instOracleInterfaceChallengeAppend,
+--     challengeOracleInterface, OracleInterface.toOracleSpec', OracleInterface.toOracleSpec,
+--     Fin.vappend_left]
 
-@[simp]
-lemma challengeOracleInterface_append_domain_inr (j : pSpec₂.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.Domain = Unit := rfl
+-- @[simp]
+-- lemma challengeOracleInterface_append_domain_inr (j : pSpec₂.ChallengeIdx) :
+--     [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.Domain = Unit := rfl
 
-@[simp]
-lemma challengeOracleInterface_append_range_inr (j : pSpec₂.ChallengeIdx) :
-    [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.Range () = pSpec₂.Challenge j := by
-  simp only [append, ChallengeIdx.inr, Challenge, instOracleInterfaceChallengeAppend,
-    challengeOracleInterface, OracleInterface.toOracleSpec', OracleInterface.toOracleSpec,
-    Fin.vappend_right]
+-- @[simp]
+-- lemma challengeOracleInterface_append_range_inr (j : pSpec₂.ChallengeIdx) :
+--     [(pSpec₁ ++ₚ pSpec₂).Challenge (.inr j)]ₒ.Range () = pSpec₂.Challenge j := by
+--   simp only [append, ChallengeIdx.inr, Challenge, instOracleInterfaceChallengeAppend,
+--     challengeOracleInterface, OracleInterface.toOracleSpec', OracleInterface.toOracleSpec,
+--     Fin.vappend_right]
 
 variable [∀ i, SampleableType (pSpec₁.Challenge i)] [∀ i, SampleableType (pSpec₂.Challenge i)]
 
@@ -484,14 +484,15 @@ instance {m : ℕ} {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
     (A := Direction) (B := Type) (F := fun dir type => (h : dir = .V_to_P) → SampleableType type)
     (fun i' j' h' => inst i' ⟨j', h'⟩) k h
 
-/-- If all protocols' messages have oracle interfaces, then the messages of their sequential
-  composition also have oracle interfaces. -/
-instance {m : ℕ} {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
-    [Oₘ : ∀ i, ∀ j, OracleInterface.{0, u, v} ((pSpec i).Message j)] :
-    ∀ k, OracleInterface.{0, u, v} ((seqCompose pSpec).Message k) :=
-  fun ⟨k, h⟩ => Fin.fflatten₂
-    (A := Direction) (B := Type) (F := fun dir type => (h : dir = .P_to_V) → OracleInterface type)
-    (fun i' j' h' => Oₘ i' ⟨j', h'⟩) k h
+-- /-- If all protocols' messages have oracle interfaces, then the messages of their sequential
+--   composition also have oracle interfaces. -/
+-- instance {m : ℕ} {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
+--     [Oₘ : ∀ i, ∀ j, OracleInterface.{0, u, v} ((pSpec i).Message j)] :
+--     ∀ k, OracleInterface.{0, u, v} ((seqCompose pSpec).Message k) :=
+--   fun ⟨k, h⟩ => Fin.fflatten₂
+--     (A := Direction) (B := Type)
+--     (F := fun dir type => (h : dir = .P_to_V) → OracleInterface type)
+--     (fun i' j' h' => Oₘ i' ⟨j', h'⟩) k h
 
 end SeqCompose
 
