@@ -30,7 +30,7 @@ set_option linter.unusedVariables false
 
 namespace Commitment
 
-open OracleSpec OracleComp SubSpec
+open OracleSpec OracleComp SubSpec ProtocolSpec
 
 variable {ι : Type} (oSpec : OracleSpec ι) (Data Randomness Commitment : Type)
 
@@ -74,12 +74,17 @@ def correctness (scheme : Scheme oSpec Data Randomness Commitment pSpec)
     ∀ data : Data,
     ∀ randomness : Randomness,
     ∀ query : O.Query,
-      let rel : Set ((Commitment × O.Query × O.Response) × (Data × Randomness))
-        := {((cm, query, answer), (data, randomness))|
-          answer = O.answer data query ∧ cm ∈ (scheme.commit data randomness).support}
-      Proof.completeness init impl rel correctnessError scheme.opening
-
-
+    [fun ⟨⟨_, (prvStmtOut, witOut)⟩, stmtOut⟩ =>
+      (stmtOut, witOut) ∈ acceptRejectRel ∧ prvStmtOut = stmtOut
+    | do
+        (do
+          let cm ← simulateQ impl (scheme.commit data randomness)
+          let answer := O.answer data query
+          let stmtIn := (cm, query, answer)
+          let witIn := (data, randomness)
+          let res ← Reduction.completenessGame impl scheme.opening stmtIn witIn
+          return res
+        ).run' (← init)] ≥ 1 - correctnessError
 
 /-- A commitment scheme satisfies **perfect correctness** if it satisfies correctness with no error.
 -/
