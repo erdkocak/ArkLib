@@ -67,7 +67,8 @@ theorem completeness [DecidableEq α] [SelectableType α] {s}
     (((do
       let cache ← buildMerkleTree leaf_data_tree
       let proof := generateProof cache idx
-      let _ ← verifyProof idx (leaf_data_tree.get idx) (cache.getRootValue) proof
+      let verified ← verifyProof idx (leaf_data_tree.get idx) (cache.getRootValue) proof
+      guard verified
       ).simulateQ (randomOracle)).run preexisting_cache).neverFails := by
   -- An OracleComp is never failing on any preexisting cache
   -- if it never fails when run with any oracle function.
@@ -76,11 +77,10 @@ theorem completeness [DecidableEq α] [SelectableType α] {s}
   -- Call this hash function `f`
   intro f
   -- Simplify
-  simp_rw [verifyProof, guard_eq, bind_pure_comp, id_map', runWithOracle_bind,
-    runWithOracle_buildMerkleTree, runWithOracle_getPutativeRoot]
-  simp only [apply_ite, runWithOracle_pure, runWithOracle_failure, Option.bind_eq_bind,
-    Option.bind_some, Option.isSome_some, Option.isSome_none, Bool.if_false_right, Bool.and_true,
-    decide_eq_true_eq]
+  simp only [verifyProof, bind_pure_comp, guard_eq, bind_map_left, beq_iff_eq, runWithOracle_bind,
+    runWithOracle_buildMerkleTree, runWithOracle_getPutativeRoot, apply_ite, runWithOracle_pure,
+    runWithOracle_failure, Option.bind_eq_bind, Option.bind_some, Option.isSome_some,
+    Option.isSome_none, Bool.if_false_right, Bool.and_true, decide_eq_true_eq]
   exact functional_completeness α idx leaf_data_tree fun left right ↦ f () (left, right)
 
 end InductiveMerkleTree

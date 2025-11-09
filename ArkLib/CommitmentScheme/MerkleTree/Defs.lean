@@ -249,12 +249,12 @@ lemma runWithOracle_getPutativeRoot {s} (idx : BinaryTree.SkeletonLeafIndex s)
 Verify a Merkle proof `proof` that a given `leaf` at index `i` is in the Merkle tree with given
 `root`.
 Works by computing the putative root based on the branch, and comparing that to the actual root.
-Outputs `failure` if the proof is invalid.
+Returns a boolean true/false depending on whether the proof is valid or not
 -/
 def verifyProof {α} [DecidableEq α] {s}
     (idx : BinaryTree.SkeletonLeafIndex s) (leafValue : α) (rootValue : α)
-    (proof : List α) : OracleComp (spec α) Unit := do
+    (proof : List α) : OracleComp (spec α) Bool := do
   let putative_root ← getPutativeRoot idx leafValue proof
-  guard (putative_root = rootValue)
+  return (putative_root == rootValue)
 
 end InductiveMerkleTree
