@@ -25,7 +25,7 @@ as defined in `ArkLib.Data.IndexedBinaryTree`.
 * We found that the inductive definition seems likely to be convenient for a few reasons:
   * It allows us to handle non-perfect trees.
   * It can allow us to use trees of arbitrary structure in the extractor.
-* I considered the indexed type useful because the completeness theorem and extractibility theorems
+* I considered the indexed type useful because the completeness theorem and Extractability theorems
   take indices or sets of indices as parameters,
   and because we are working with trees of arbitrary structure,
   this lets us avoid having to check that these indices are valid.
@@ -40,7 +40,7 @@ as defined in `ArkLib.Data.IndexedBinaryTree`.
 - [x] Completeness theorem
 - [ ] Collision Lemma (See SNARGs book 18.3)
   - (this is really not a lemma about oracles, so it could go with the binary tree API)
-- [ ] Extractibility (See SNARGs book 18.5)
+- [ ] Extractability (See SNARGs book 18.5)
 - [ ] Multi-leaf proofs
 - [ ] Arbirary arity trees
 - [ ] Multi-instance

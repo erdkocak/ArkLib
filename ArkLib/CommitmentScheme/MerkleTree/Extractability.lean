@@ -7,7 +7,7 @@ Authors: Quang Dao
 import ArkLib.CommitmentScheme.MerkleTree.Defs
 
 /-!
-# Inductive Merkle Tree Extractibility
+# Inductive Merkle Tree Extractability
 
 -/
 
