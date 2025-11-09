@@ -42,6 +42,7 @@ as defined in `ArkLib.Data.IndexedBinaryTree`.
 - [ ] Collision Lemma (See SNARGs book 18.3)
   - (this is really not a lemma about oracles, so it could go with the binary tree API)
 - [ ] Extractability (See SNARGs book 18.5)
+- [ ] Leaf type distinct from hash type
 - [ ] Multi-leaf proofs
 - [ ] Arbitrary arity trees
 - [ ] Multi-instance

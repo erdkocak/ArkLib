@@ -100,6 +100,24 @@ def SkeletonInternalIndex.toNodeIndex {s : Skeleton} (idx : SkeletonInternalInde
 
 end Skeleton
 
+section Count
+
+def Skeleton.leafCount : Skeleton → Nat
+  | Skeleton.leaf => 1
+  | Skeleton.internal left right =>
+    left.leafCount + right.leafCount
+
+end Count
+
+section Depth
+
+def Skeleton.depth : Skeleton → Nat
+  | Skeleton.leaf => 0
+  | Skeleton.internal left right =>
+    Nat.max left.depth right.depth + 1
+
+end Depth
+
 /-!
 This section contains predicates about indices determined by their neighborhood in the tree.
 -/

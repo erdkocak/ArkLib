@@ -11,6 +11,7 @@ import ArkLib.CommitmentScheme.MerkleTree.Defs
 
 -/
 
+open scoped NNReal
 
 namespace InductiveMerkleTree
 
@@ -48,10 +49,68 @@ TODO, if there is a collision, but it isn't used or is only used in a subtree,
 should the rest of the tree work? Or should it all fail?
 -/
 def extractor {α : Type} (s : Skeleton)
-  (cache : List ((α × α) × α))
+  (cache : (spec α).QueryLog)
   (root : α) :
   FullData (Option α) s := sorry
 
+
+/--
+The extractability theorem for Merkle trees.
+
+Adapting from the SNARGs book Lemma 18.5.1:
+
+For any query bound `qb`,
+and for any adversary `committingAdv` that outputs a root and auxiliary data
+and any `openingAdv` that takes the auxiliary data and outputs a leaf index, leaf value, and proof,
+such that committingAdv and openingAdv together obey the query bound `qb`.
+
+If the `committingAdv` and `openingAdv` are executed, and the `extractor` algorithm is run on the
+resulting cache and root from `committingAdv`,
+then with probability at most κ
+does simultaneously
+
+* the merkle tree verification pass on the proof from `openingAdv`
+* with the extracted leaf value not matching the opened leaf value or the adversary producing a proof different from the extracted proof.
+
+Where κ is ≤ 1/2 * (qb - 1) * qb / (Fintype.card α)
+        + 2 * (s.depth + 1) * s.leafCount / (Fintype.card α)
+(For sufficiently large qb)
+-/
+theorem extractability [DecidableEq α] [SelectableType α] [Fintype α] [(spec α).FiniteRange]
+    {s : Skeleton}
+    (AuxState : Type)
+    (committingAdv : OracleComp (spec α)
+        (α × AuxState))
+    (openingAdv : AuxState →
+        OracleComp (spec α) (SkeletonLeafIndex s × α × List α))
+    (qb : ℕ)
+    (h_IsQueryBound_qb :
+      IsQueryBound
+        (do
+          let (root, aux) ← committingAdv
+          let (idx, leaf, proof) ← openingAdv aux
+          pure ()) qb)
+    (h_le_qb : 4 * s.leafCount + 1 ≤ qb)
+          :
+    [
+      fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified) =>
+        verified ∧
+        (not (leaf == extractedTree.get idx.toNodeIndex)
+        ∨ not (proof.map (Option.some) == extractedProof))
+       |
+      do
+        let ((root, aux), queryLog) ← (simulateQ loggingOracle committingAdv).run
+        let extractedTree := extractor s queryLog root
+        let (idx, leaf, proof) ← openingAdv aux
+        let extractedProof := generateProof extractedTree idx
+        let verified ← verifyProof idx leaf root proof
+        return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified)
+      ] ≤
+        1/2 * (qb - 1) * qb / (Fintype.card α)
+        + 2 * (s.depth + 1) * s.leafCount / (Fintype.card α)
+    := by
+
+  sorry
 
 
 end InductiveMerkleTree
