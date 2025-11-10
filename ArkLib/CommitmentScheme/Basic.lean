@@ -79,11 +79,7 @@ def correctness (scheme : Scheme oSpec Data Randomness Commitment pSpec)
     | do
         (simulateQ (impl ++ₛₒ challengeQueryImpl : QueryImpl _ (StateT σ ProbComp)) (do
           let cm ← scheme.commit data randomness
-          let answer := O.answer data query
-          let stmtIn := (cm, query, answer)
-          let witIn := (data, randomness)
-          let res ← scheme.opening.run stmtIn witIn
-          return res
+          scheme.opening.run ⟨cm, query, O.answer data query⟩ ⟨data, randomness⟩
         )).run' (← init)] ≥ 1 - correctnessError
 
 /-- A commitment scheme satisfies **perfect correctness** if it satisfies correctness with no error.
