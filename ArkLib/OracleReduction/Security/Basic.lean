@@ -63,25 +63,6 @@ namespace Reduction
 
 section Completeness
 
-/-- The completeness game for a reduction.
-
-Given a stateful oracle implementation `impl` and a reduction `reduction`, on input `stmtIn`
-and `witIn` the game runs the reduction under the combined oracle implementation consisting of
-the environment `impl` and the canonical challenge oracle `challengeQueryImpl` (via `simulateQ`).
-It returns, in the `StateT σ ProbComp` monad, the value
-`((transcript, (prvStmtOut, witOut)), stmtOut)`, where:
-
-- `transcript : pSpec.FullTranscript` is the full interaction transcript,
-- `prvStmtOut : StmtOut` is the statement determined by the prover side of the reduction,
-- `witOut : WitOut` is the witness output by the prover, and
-- `stmtOut : StmtOut` is the verifier's output statement.
--/
-def completenessGame (impl : QueryImpl oSpec (StateT σ ProbComp))
-  (reduction : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec)
-  (stmtIn : StmtIn) (witIn : WitIn)
-  : StateT σ ProbComp ((pSpec.FullTranscript × StmtOut × WitOut) × StmtOut)
- := simulateQ (impl ++ₛₒ challengeQueryImpl : QueryImpl _ (StateT σ ProbComp))
-          <| reduction.run stmtIn witIn
 
 /-- A reduction satisfies **completeness** with regards to:
   - an initialization function `init : ProbComp σ` for some ambient state `σ`,
@@ -107,7 +88,8 @@ def completeness (relIn : Set (StmtIn × WitIn))
   ∀ witIn : WitIn,
   (stmtIn, witIn) ∈ relIn →
     [fun ⟨⟨_, (prvStmtOut, witOut)⟩, stmtOut⟩ => (stmtOut, witOut) ∈ relOut ∧ prvStmtOut = stmtOut
-    | do (completenessGame impl reduction stmtIn witIn).run' (← init)] ≥ 1 - completenessError
+    | do (simulateQ (impl ++ₛₒ challengeQueryImpl : QueryImpl _ (StateT σ ProbComp))
+          <| reduction.run stmtIn witIn).run' (← init)] ≥ 1 - completenessError
 
 /-- A reduction satisfies **perfect completeness** if it satisfies completeness with error `0`. -/
 def perfectCompleteness (relIn : Set (StmtIn × WitIn)) (relOut : Set (StmtOut × WitOut))
@@ -180,7 +162,8 @@ theorem perfectCompleteness_eq_prob_one :
       ∀ stmtIn witIn, (stmtIn, witIn) ∈ relIn →
         [fun ⟨⟨_, (prvStmtOut, witOut)⟩, stmtOut⟩ =>
           (stmtOut, witOut) ∈ relOut ∧ prvStmtOut = stmtOut
-        | do (completenessGame impl reduction stmtIn witIn).run' (← init)] = 1 := by
+        | do (simulateQ (impl ++ₛₒ challengeQueryImpl : QueryImpl _ (StateT σ ProbComp))
+          <| reduction.run stmtIn witIn).run' (← init)] = 1 := by
   refine forall_congr' fun stmtIn => forall_congr' fun stmtOut => forall_congr' fun _ => ?_
   rw [ENNReal.coe_zero, tsub_zero, ge_iff_le, OracleComp.one_le_probEvent_iff,
     probEvent_eq_one_iff, Prod.forall]
@@ -500,7 +483,7 @@ section Trivial
 @[simp]
 theorem Reduction.id_perfectCompleteness {rel : Set (StmtIn × WitIn)} (hInit : init.neverFails) :
     (Reduction.id : Reduction oSpec _ _ _ _ _).perfectCompleteness init impl rel rel := by
-  simp [perfectCompleteness, completeness, completenessGame, hInit]
+  simp [perfectCompleteness, completeness, hInit]
   aesop
 
 /-- The identity / trivial verifier is perfectly sound. -/
@@ -538,7 +521,7 @@ theorem OracleReduction.id_perfectCompleteness
     (OracleReduction.id : OracleReduction oSpec _ _ _ _ _ _ _).perfectCompleteness
       init impl rel rel := by
   simp [OracleReduction.perfectCompleteness, Reduction.perfectCompleteness,
-    Reduction.completeness, completenessGame, hInit]
+    Reduction.completeness, hInit]
   aesop
 
 /-- The identity / trivial verifier is perfectly sound. -/

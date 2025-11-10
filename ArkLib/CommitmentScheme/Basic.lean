@@ -77,14 +77,14 @@ def correctness (scheme : Scheme oSpec Data Randomness Commitment pSpec)
     [fun ⟨⟨_, (prvStmtOut, witOut)⟩, stmtOut⟩ =>
       (stmtOut, witOut) ∈ acceptRejectRel ∧ prvStmtOut = stmtOut
     | do
-        (do
-          let cm ← simulateQ impl (scheme.commit data randomness)
+        (simulateQ (impl ++ₛₒ challengeQueryImpl : QueryImpl _ (StateT σ ProbComp)) (do
+          let cm ← scheme.commit data randomness
           let answer := O.answer data query
           let stmtIn := (cm, query, answer)
           let witIn := (data, randomness)
-          let res ← Reduction.completenessGame impl scheme.opening stmtIn witIn
+          let res ← scheme.opening.run stmtIn witIn
           return res
-        ).run' (← init)] ≥ 1 - correctnessError
+        )).run' (← init)] ≥ 1 - correctnessError
 
 /-- A commitment scheme satisfies **perfect correctness** if it satisfies correctness with no error.
 -/
@@ -168,6 +168,29 @@ def extractability (scheme : Scheme oSpec Data Randomness Commitment pSpec)
 -- TODO: version where the query is chosen according to some public coin?
 
 -- TODO: multi-instance versions?
+
+/-- An adversary in the function binding game returns a commitment `cm`, and a vector of length `L`
+  with query `q`, response `r` to the query, and an auxiliary private state (to be passed to the
+  malicious prover in the opening procedure). -/
+def FunctionBindingAdversary {L : ℕ} (oSpec : OracleSpec ι) (Data Commitment AuxState : Type)
+    [O : OracleInterface Data] :=
+  OracleComp oSpec (Commitment × Vector (O.Query × O.Response) L × AuxState)
+
+/-- A commitment scheme satisfies **function binding** with error `functionBindingError` if for all
+adversaries that output a commitment `cm`, and a vector of length `n` with a query `q`, a
+response `r`:
+
+  1. The verifier accepts in the opening procedure given `cm, q, r`
+  2. The extracted data `d` is inconsistent with the claimed response (i.e., `O.answer d q ≠ r`)
+
+  is at most `functionBindingError`.
+
+  Informally, function binding says it's computationally infeasible to convince the
+  verifier to accept an opening, that is not consistent with the evaluation query. -/
+def functionBinding {L : ℕ} (hn : n = 1) (hpSpec : NonInteractive (hn ▸ pSpec))
+    (scheme : Scheme oSpec Data Randomness Commitment (hn ▸ pSpec))
+    (functionBindingError : ℝ≥0) : Prop := sorry
+
 
 /-- A commitment scheme satisfies **hiding** with error `hidingError` if ....
 
