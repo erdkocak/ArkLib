@@ -260,7 +260,7 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
   refine (Iff.mp (ZMod.intCast_eq_intCast_iff_dvd_sub (a := x) (b := y) (c := p))) ?_
   subst x y; simp
 
-  -- unfold q to obtainthe self canceling goal:
+  -- unfold q to obtain the self canceling goal:
   -- poly(a) - poly(z) = (poly(a) - poly(z)) / (a-z) * (a-z)
   -- prove the goal using the eval isomorphism to mathlib Polynomials
   subst v q
@@ -279,6 +279,7 @@ local instance : OracleInterface (Fin (n + 1) → ZMod p) where
     poly.eval z
 
 namespace CommitmentScheme
+
 /-- The KZG instantiated as a **(functional) commitment scheme**.
 
   The scheme takes a pregenerated srtuctured reference string (srs) for the
