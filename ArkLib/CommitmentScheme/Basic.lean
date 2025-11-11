@@ -200,7 +200,7 @@ def functionBinding {L : ℕ} (hn : n = 1) (hpSpec : NonInteractive (hn ▸ pSpe
     ∀ (prover : Prover oSpec (Commitment × O.Query × O.Response) AuxState Bool Unit (hn ▸ pSpec)),
       [fun x =>
         (∀ (i : Fin x.size), x[i].2.2 = true)
-        ∧ (¬ ∃ (d : Data) (i : Fin x.size), O.answer d x[i].1 = x[i].2.1)
+        ∧ (¬ ∃ (d : Data), ∀ (i : Fin x.size), O.answer d x[i].1 = x[i].2.1)
        | do (simulateQ (impl ++ₛₒ (challengeQueryImpl (pSpec := hn ▸ pSpec)) :
           QueryImpl _ (StateT σ ProbComp)) <|
           (do
