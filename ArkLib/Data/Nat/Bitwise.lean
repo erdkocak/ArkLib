@@ -15,9 +15,7 @@ import Mathlib.Algebra.BigOperators.Fin
 
 /-!
 # Bit operations on natural numbers
-
 -/
-
 namespace Nat
 
 -- Note: this is already done with `Nat.sub_add_eq_max`
@@ -25,6 +23,19 @@ theorem max_eq_add_sub {m n : Nat} : Nat.max m n = m + (n - m) := by
   by_cases h : n ≤ m
   · simp [Nat.sub_eq_zero_of_le, h]
   · simp only [Nat.max_eq_right (Nat.le_of_not_le h), Nat.add_sub_of_le (Nat.le_of_not_le h)]
+
+theorem sub_add_eq_sub_sub_rev (a b c : Nat) (h1 : c ≤ b) (h2 : b ≤ a) :
+  a - b + c = a - (b - c) := by
+  conv =>
+    rhs
+    rw [← Nat.sub_add_cancel h2]
+  rw [Nat.add_sub_assoc (Nat.sub_le b c)]
+  rw [Nat.sub_sub_self h1]
+
+@[simp]
+lemma lt_add_of_pos_right_of_le (a b c : ℕ) [NeZero c] (h : a ≤ b) : a < b + c := by
+  apply Nat.lt_of_le_of_lt (n:=a) (m:=b) (k:=b + c) h
+  apply Nat.lt_add_of_pos_right (by exact pos_of_neZero c)
 
 /--
 Returns the `k`-th least significant bit of a natural number `n` as a natural number (in `{0, 1}`).
@@ -135,7 +146,8 @@ lemma eq_iff_eq_all_getBits {n m : ℕ} : n = m ↔ ∀ k, getBit k n = getBit k
     rw [h_all_getBits k]
 
 lemma shiftRight_and_one_distrib {n m k : ℕ} :
-    (n &&& m) >>> k &&& 1 = ((n >>> k) &&& 1) &&& ((m >>> k) &&& 1) := by
+    Nat.getBit k (n &&& m) = Nat.getBit k n &&& Nat.getBit k m := by
+  unfold getBit
   rw [Nat.shiftRight_and_distrib]
   conv =>
     lhs
@@ -145,13 +157,13 @@ lemma shiftRight_and_one_distrib {n m k : ℕ} :
     rw [Nat.and_assoc]
 
 lemma and_eq_zero_iff_and_each_getBit_eq_zero {n m : ℕ} :
-    n &&& m = 0 ↔ ∀ k, ((n >>> k) &&& 1) &&& ((m >>> k) &&& 1) = 0 := by
+    n &&& m = 0 ↔ ∀ k, Nat.getBit k n &&& Nat.getBit k m = 0 := by
   constructor
   · intro h_and_zero
     intro k
     have h_k := shiftRight_and_one_distrib (n := n) (m := m) (k := k)
     rw [←h_k]
-    rw [h_and_zero, Nat.zero_shiftRight, Nat.zero_and]
+    rw [h_and_zero, getBit, Nat.zero_shiftRight, Nat.zero_and]
   · intro h_forall_k -- h_forall_k : ∀ (k : ℕ), n >>> k &&& 1 &&& (m >>> k &&& 1) = 0
     apply eq_iff_eq_all_getBits.mpr
     unfold getBit
@@ -159,12 +171,12 @@ lemma and_eq_zero_iff_and_each_getBit_eq_zero {n m : ℕ} :
     -- ⊢ (n &&& m) >>> k &&& 1 = 0 >>> k &&& 1
     have h_forall_k_eq : ∀ k, ((n &&& m) >>> k) &&& 1 = 0 := by
       intro k
-      rw [shiftRight_and_one_distrib]
+      rw [←getBit, shiftRight_and_one_distrib]
       exact h_forall_k k
     rw [h_forall_k_eq k]
     rw [Nat.zero_shiftRight, Nat.zero_and]
 
-lemma getBit_two_pow {i k: ℕ} : (getBit k (2^i) = if i == k then 1 else 0) := by
+lemma getBit_two_pow {i k : ℕ} : (getBit k (2^i) = if i == k then 1 else 0) := by
   have h_two_pow_i: 2^i = 1 <<< i := by
     simp only [Nat.shiftLeft_eq, one_mul]
   rw [getBit, h_two_pow_i]
@@ -215,19 +227,20 @@ lemma getBit_two_pow {i k: ℕ} : (getBit k (2^i) = if i == k then 1 else 0) := 
         omega
       rw [h_res]
 
-lemma and_two_pow_eq_zero_of_getBit_0 {n i : ℕ} (h_getBit: getBit i n = 0) : n &&& (2 ^ i) = 0 := by
+lemma and_two_pow_eq_zero_of_getBit_0 {n i : ℕ} (h_getBit : getBit i n = 0)
+    : n &&& (2 ^ i) = 0 := by
   apply and_eq_zero_iff_and_each_getBit_eq_zero.mpr
   intro k
   have h_getBit_two_pow := getBit_two_pow (i := i) (k := k)
   if h_k: k = i then
     simp only [h_k, BEq.rfl, ↓reduceIte] at h_getBit_two_pow
     rw [getBit, h_k.symm] at h_getBit
-    rw [h_getBit, Nat.zero_and]
+    rw [getBit, h_getBit, Nat.zero_and]
   else
     push_neg at h_k
     simp only [beq_iff_eq, h_k.symm, ↓reduceIte] at h_getBit_two_pow
     rw [getBit] at h_getBit_two_pow
-    rw [h_getBit_two_pow]
+    rw [getBit, getBit, h_getBit_two_pow]
     rw [Nat.and_zero]
 
 lemma and_two_pow_eq_two_pow_of_getBit_1 {n i : ℕ} (h_getBit: getBit i n = 1) :
@@ -1202,5 +1215,93 @@ lemma getBit_of_binaryFinMapToNat {n : ℕ} (m : Fin n → ℕ) (h_binary: ∀ j
           simp only [beq_iff_eq]
           simp only [ite_eq_right_iff, one_ne_zero, imp_false, ne_eq]
           omega
+
+/-- Middle bits: take `len` bits starting at `offset` from `n`. -/
+def getMiddleBits (offset len n : ℕ) : ℕ :=
+  getLowBits (numLowBits:=len) (n:=n >>> offset)
+
+/-- Bit-level characterization of middle bits. -/
+lemma getBit_of_middleBits {n offset len k : ℕ} :
+  getBit k (getMiddleBits offset len n) =
+    if k < len then getBit (k + offset) n else 0 := by
+  unfold getMiddleBits
+  -- use existing lemmas
+  rw [getBit_of_lowBits, getBit_of_shiftRight]
+
+/-- Middle bits are strictly less than `2^len`. -/
+lemma getMiddleBits_lt_two_pow {n offset len : ℕ} :
+  getMiddleBits offset len n < 2 ^ len := by
+  unfold getMiddleBits
+  exact getLowBits_lt_two_pow (n := n >>> offset) len
+
+/-- Middle bits as a modulus form. -/
+lemma getMiddleBits_eq_mod {n offset len : ℕ} :
+  getMiddleBits offset len n = (n >>> offset) % (2 ^ len) := by
+  unfold getMiddleBits
+  exact getLowBits_eq_mod_two_pow (n := n >>> offset) (numLowBits := len)
+
+lemma and_shl_eq_zero_of_lt_two_pow {a n b : ℕ} (hb : b < 2 ^ n) : (a <<< n) &&& b = 0 := by
+  apply Nat.and_eq_zero_iff_and_each_getBit_eq_zero.mpr
+  intro k
+  rw [getBit_of_shiftLeft]
+  rw [getBit_of_lt_two_pow (a := ⟨b, hb⟩)]
+  split_ifs with h_k_lt_n
+  · simp only [Nat.zero_and]
+  · simp only [Nat.and_zero]
+
+/-- Concatenate high (length m) and low (length n) using shifts. -/
+def joinBits {n m : ℕ} (low : Fin (2 ^ n)) (high : Fin (2 ^ m)) : Fin (2 ^ (m+n)) :=
+  ⟨(high.val <<< n) ||| low.val, by
+    have h_and_zero := and_shl_eq_zero_of_lt_two_pow (a := high.val) (b := low.val) (hb := low.isLt)
+    rw [←Nat.sum_of_and_eq_zero_is_or h_and_zero]
+    rw [Nat.shiftLeft_eq, mul_comm, Nat.pow_add]
+    -- ⊢ 2 ^ n * ↑high + ↑low < 2 ^ m * 2 ^ n
+    calc
+      2 ^ n * high.val + low.val < 2 ^ n * high.val + 2 ^ n := by
+        exact Nat.add_lt_add_left low.isLt _
+      _ = 2 ^ n * (high.val + 1) := by rw [Nat.mul_add, Nat.mul_one]
+      _ ≤ 2 ^ n * (2 ^ m) := by -- `high.val < 2^m` implies `high.val + 1 ≤ 2^m`
+        exact Nat.mul_le_mul_left _ (Nat.succ_le_of_lt high.isLt)
+      _ = 2 ^ m * 2 ^ n := by rw [mul_comm]
+  ⟩
+
+/-- Bit characterization: below cut use low, above cut use high. -/
+lemma getBit_joinBits {n m k : ℕ} (low : Fin (2 ^ n)) (high : Fin (2 ^ m)) :
+  getBit k (joinBits low high).val =
+    if k < n then getBit k low.val else getBit (k - n) high.val := by
+  unfold joinBits
+  dsimp
+  rw [getBit_of_or]
+  rw [getBit_of_shiftLeft]
+  rw [getBit_of_lt_two_pow (a := low)]
+  split_ifs with h_k
+  · simp only [zero_or]
+  · simp only [Nat.or_zero]
+
+/-- Low n bits of joinBits are exactly low. -/
+lemma getLowBits_joinBits {n m : ℕ} (low : Fin (2 ^ n)) (high : Fin (2 ^ m)) :
+  getLowBits n (joinBits low high).val = low.val := by
+  unfold joinBits
+  dsimp
+  rw [getLowBits_eq_mod_two_pow]
+  have h_and_zero := and_shl_eq_zero_of_lt_two_pow (a := high.val) (b := low.val) (hb := low.isLt)
+  rw [←Nat.sum_of_and_eq_zero_is_or h_and_zero]
+  rw [Nat.shiftLeft_eq, mul_comm, add_mod, mul_mod, mod_self, zero_mul, zero_mod, zero_add]
+  rw [Nat.mod_mod]
+  exact Nat.mod_eq_of_lt low.isLt
+
+/-- Dropping low n bits by shifting right recovers high. -/
+lemma getHighBits_no_shl_joinBits {n m : ℕ} (low : Fin (2 ^ n)) (high : Fin (2 ^ m)) :
+  getHighBits_no_shl n (joinBits low high).val = high.val := by
+  unfold joinBits getHighBits_no_shl
+  dsimp
+  have h_and_zero := and_shl_eq_zero_of_lt_two_pow (a := high.val) (b := low.val) (hb := low.isLt)
+  rw [←Nat.sum_of_and_eq_zero_is_or h_and_zero]
+  rw [Nat.add_shiftRight_distrib h_and_zero]
+  rw [Nat.shiftLeft_shiftRight]
+  rw [Nat.shiftRight_eq_div_pow]
+  have h: low.val/2^n = 0 := by
+    apply Nat.div_eq_zero_iff_lt (x:=low) (k:=2^n) (h:=by exact Nat.two_pow_pos n).mpr (by omega)
+  simp only [h, add_zero]
 
 end Nat

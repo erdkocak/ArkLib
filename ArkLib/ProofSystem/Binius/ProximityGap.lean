@@ -64,14 +64,6 @@ open scoped BigOperators LinearCode ProbabilityTheory
 open Real
 
 section SimplePrelims
-theorem Nat.sub_add_eq_sub_sub_rev (a b c : Nat) (h1 : c ≤ b) (h2 : b ≤ a) :
-  a - b + c = a - (b - c) := by
-  conv =>
-    rhs
-    rw [← Nat.sub_add_cancel h2]
-  rw [Nat.add_sub_assoc (Nat.sub_le b c)]
-  rw [Nat.sub_sub_self h1]
-
 lemma Nat.cast_gt_Real_one (a : ℕ) (ha : a > 1) : (a : ℝ) > 1 := by
   rw [gt_iff_lt]
   have h := Nat.cast_lt (α := ℝ) (m := 1) (n := a).mpr

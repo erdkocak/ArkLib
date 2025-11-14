@@ -17,6 +17,13 @@ open NNReal ProximityGap
 
   [BCIKS20] refers to the paper "Proximity Gaps for Reed-Solomon Codes" by Eli Ben-Sasson,
   Dan Carmon, Yuval Ishai, Swastik Kopparty, and Shubhangi Saraf.
+
+  Using {https://eprint.iacr.org/2020/654}, version 20210703:203025.
+
+  ## Main Definitions and Statements
+
+  - divergence of sets
+  - statement of Corollary 1.3 (Concentration bounds) from [BCIKS20].
 -/
 
 namespace DivergenceOfSets
@@ -45,7 +52,10 @@ lemma finite_possibleDeltas : (possibleDeltas U V).Finite :=
   Set.Finite.subset finite_relHammingDistRange possibleDeltas_subset_relHammingDistRange
 
 open Classical in
-/-- Definition of divergence of two sets from `Section 1.2` in [BCIKS20]. -/
+/-- Definition of divergence of two sets from Section 1.2 in [BCIKS20].
+
+For two sets `U` and `V`, the divergence of `U` from `V` is the maximum of the possible
+relative Hamming distances between elements of `U` and the set `V`. -/
 noncomputable def divergence (U V : Set (ι → F)) : ℚ≥0 :=
   haveI : Fintype (possibleDeltas U V) := @Fintype.ofFinite _ finite_possibleDeltas
   if h : (possibleDeltas U V).Nonempty
@@ -56,21 +66,23 @@ end Defs
 
 section Theorems
 
--- For theorems, since we are using the probability notation `Pr_{let x ← $ᵖ S}[...]` which is
--- not universe-polymorphic, we need to put everything in `Type` and not `Type*`.
-
 variable {ι : Type} [Fintype ι] [Nonempty ι]
          {F : Type} [Fintype F] [Field F]
-         {U V C : Set (ι → F)}
+         {U V : Set (ι → F)}
 
 open Classical in
-/-- `Corollary 1.3` (Concentration bounds) from [BCIKS20]. -/
+/-- Corollary 1.3 (Concentration bounds) from [BCIKS20].
+
+Take a Reed-Solomon code of length `ι` and degree `deg`, a proximity-error parameter
+pair `(δ, ε)` and an affine space `U` inside `F^ι`. Let `δ'` denote the divergence of `U` from the
+Reed-Solomon code (`δ^*` in [BCIKS20]). If `δ' ∈ (0, 1 − √ρ)`, then nearly all elements of `U` are
+at distance exactly `δ'` from the Reed-Solomon code. -/
 lemma concentration_bounds {deg : ℕ} {domain : ι ↪ F}
   {U : AffineSubspace F (ι → F)} [Nonempty U]
   (hdiv_pos : 0 < (divergence U (RScodeSet domain deg) : ℝ≥0))
   (hdiv_lt : (divergence U (RScodeSet domain deg) : ℝ≥0) < 1 - ReedSolomonCode.sqrtRate deg domain)
   : let δ' := divergence U (RScodeSet domain deg)
-    Pr_{let y ← $ᵖ U}[Code.relHammingDistToCode y (RScodeSet domain deg) ≠ δ']
+    Pr_{let u ← $ᵖ U}[Code.relHammingDistToCode u (RScodeSet domain deg) ≠ δ']
     ≤ errorBound δ' deg domain := by sorry
 
 end Theorems
