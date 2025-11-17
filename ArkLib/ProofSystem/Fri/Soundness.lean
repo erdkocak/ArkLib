@@ -16,6 +16,7 @@ import ArkLib.ProofSystem.Fri.Spec.SingleRound
 import ArkLib.OracleReduction.Security.Basic
 import ToMathlib.Control.OptionT
 import ArkLib.ToMathlib.List.Basic
+import Mathlib.Algebra.Ring.NonZeroDivisors
 
 namespace Fri
 section Fri
@@ -27,22 +28,24 @@ variable {𝔽 : Type} [NonBinaryField 𝔽] [Finite 𝔽] [DecidableEq 𝔽] [N
 variable (D : Subgroup 𝔽ˣ) {n : ℕ} [DIsCyclicC : IsCyclicWithGen D] [DSmooth : SmoothPowerOfTwo n D]
 variable (g : 𝔽ˣ)
 variable (s : Fin (n + 1) → ℕ+) (d : ℕ+)
-variable (domain_size_cond : (2 ^ (∑ i, (s i).1)) * d ≤ 2 ^ n)
+variable (domain_size_cond : (2 ^ (∑ i, (s i : ℕ))) * d ≤ 2 ^ n)
 
 noncomputable local instance : Fintype 𝔽 := Fintype.ofFinite _
 
-private lemma sum_add_one {i : Fin (n + 1)} :
-  ∑ j' ∈ finRangeTo (i.1 + 1), (s j').1 = (∑ j' ∈ finRangeTo i.1, (s j').1) + (s i).1 := by
+@[simp]
+private lemma sum_add_one {i : Fin (n + 1)} {f : Fin (n + 1) → ℕ} :
+  ∑ j' ∈ finRangeTo (i + 1), f j' = (∑ j' ∈ finRangeTo i, f j') + f i := by
   unfold finRangeTo
-  suffices ∑ x ∈ insert i (List.take i (List.finRange (n + 1))).toFinset, (s x).1 =
-           ∑ x ∈ (List.take i (List.finRange (n + 1))).toFinset, (s x).1 + (s i).1 by
+  suffices ∑ x ∈ insert i (List.take i (List.finRange (n + 1))).toFinset, f x =
+           ∑ x ∈ (List.take i (List.finRange (n + 1))).toFinset, f x + f i by
     simpa [List.take_add]
-  rw [Finset.sum_insert, add_comm]
-  aesop (add simp List.mem_iff_getElem) (add safe (by grind [cases Fin]))
+  have : i ∉ (List.take i (List.finRange (n + 1))).toFinset := by
+    aesop (add simp List.mem_iff_getElem) (add safe (by grind [cases Fin]))
+  simp +arith [Finset.sum_insert this]
 
 private lemma roots_of_unity_lem {s : Fin (n + 1) → ℕ+} {i : Fin (n + 1)}
-    (k_le_n : (∑ j', (s j').1) ≤ n) :
-  (∑ j' ∈ finRangeTo i.1, (s j').1) ≤ n - (s i).1 := by
+  (k_le_n : ∑ j', (s j' : ℕ) ≤ n) :
+  ∑ j' ∈ finRangeTo i, (s j' : ℕ) ≤ n - (s i : ℕ) := by
     apply Nat.le_sub_of_add_le
     rw [←sum_add_one]
     transitivity
@@ -54,32 +57,28 @@ instance {F : Type} [Field F] {a : F} [inst : NeZero a] : Invertible a where
   invOf_mul_self := by field_simp [inst.out]
   mul_invOf_self := by field_simp [inst.out]
 
-def cosetElems {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :
-      List (evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :=
-    if k_le_n : (∑ j', (s j').1) ≤ n
+@[grind]
+def cosetElems {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : List (evalDomainSigma D g s i) :=
+    if k_le_n : ∑ j', (s j').1 ≤ n
     then
-      List.map
-        (fun r =>
-          ⟨
-            _,
-            CosetDomain.mul_root_of_unity D (roots_of_unity_lem k_le_n) s₀.2 r.2
-          ⟩
-        )
-        (Domain.rootsOfUnity D n (s i))
+      (Domain.rootsOfUnity D n (s i)).map fun r =>
+        ⟨
+          _,
+          CosetDomain.mul_root_of_unity D (roots_of_unity_lem k_le_n) s₀.2 r.2
+        ⟩ 
     else []
 
-def cosetG {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :
-      Finset (evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :=
-    List.toFinset (cosetElems D g s s₀)
+def cosetG {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : Finset (evalDomainSigma D g s i) :=
+  (cosetElems D g s s₀).toFinset
 
 def pows (z : 𝔽) (ℓ : ℕ) : Matrix Unit (Fin ℓ) 𝔽 :=
   Matrix.of <| fun _ j => z ^ j.val
 
-def VDM {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :
-    Matrix (Fin (2 ^ (s i).1)) (Fin (2 ^ (s i).1)) 𝔽 :=
+def VDM {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) :
+  Matrix (Fin (2 ^ (s i : ℕ))) (Fin (2 ^ (s i : ℕ))) 𝔽 :=
   if k_le_n : (∑ j', (s j').1) ≤ n
   then
-    have : (cosetElems D g s s₀).length = 2 ^ (s i).1 := by
+    have : (cosetElems D g s s₀).length = 2 ^ (s i : ℕ) := by
       unfold cosetElems Domain.rootsOfUnity
       simp [k_le_n, PNat.val]
     let v : Fin (2 ^ (s i).1) → 𝔽 :=
@@ -87,76 +86,20 @@ def VDM {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, �
     Matrix.vandermonde v
   else 1
 
-
-def fin_equiv_coset {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) : (Fin (2 ^ (s i).1)) ≃ { x // x ∈ cosetG D g s s₀ } where
+def fin_equiv_coset {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : (Fin (2 ^ (s i).1)) ≃ { x // x ∈ cosetG D g s s₀ } where
   toFun := sorry
   invFun := sorry
   left_inv := sorry
   right_inv := sorry
 
-lemma pow_eq {G : Type} [Group G] {a b : ℕ} (g : G) :
-    a < orderOf g → b < orderOf g → g ^ a = g ^ b → a = b := by
-  intros a_lt_ord b_lt_ord H
-  have ga_cast : g ^ a = g ^ (a : ℤ) := by
-    exact Eq.symm (zpow_natCast g a)
-  have gb_cast : g ^ b = g ^ (b : ℤ) := by
-    exact Eq.symm (zpow_natCast g b)
-  rw [ga_cast, gb_cast] at H
-  by_cases h : a < b
-  · exfalso
-    have H' : (g ^ (b : ℤ)) * (g ^ (a : ℤ))⁻¹ = 1 := by
-      exact mul_inv_eq_one.mpr (id (Eq.symm H))
-    rw [←zpow_neg, ←zpow_add] at H'
-    have : ∃ n : ℕ, (n : ℤ) = (b : ℤ) + (-(a : ℤ)) ∧ 0 < n ∧ n < orderOf g := by
-      have h₀ : 0 < (b : ℤ) + (- (a : ℤ)) := by
-        simp
-        exact h
-      have h₁ : (b : ℤ) + (- (a : ℤ)) < orderOf g := by
-        linarith
-      match h : (b : ℤ) + (- (a : ℤ)) with
-      | .ofNat n =>
-        use n
-        rw [h] at h₀ h₁
-        simp only [Int.ofNat_eq_coe, Int.natCast_pos, Nat.cast_lt] at h₀ h₁
-        exact ⟨rfl, h₀, h₁⟩
-      | .negSucc _ =>
-        rw [h] at h₀
-        simp at h₀
-    rcases this with ⟨n, this⟩
-    rw [←this.1, zpow_natCast] at H'
-    apply Nat.not_dvd_of_pos_of_lt this.2.1 this.2.2
-    exact orderOf_dvd_of_pow_eq_one H'
-  · rw [not_lt] at h
-    rcases lt_or_eq_of_le h with h | h
-    · exfalso
-      have H' :  (g ^ (a : ℤ)) * (g ^ (b : ℤ))⁻¹ = 1 := by
-        exact mul_inv_eq_one.mpr H
-      rw [←zpow_neg, ←zpow_add] at H'
-      have : ∃ n : ℕ, (n : ℤ) = (a : ℤ) + (-(b : ℤ)) ∧ 0 < n ∧ n < orderOf g := by
-        have h₀ : 0 < (a : ℤ) + (- (b : ℤ)) := by
-          simp
-          exact h
-        have h₁ : (a : ℤ) + (- (b : ℤ)) < orderOf g := by
-          linarith
-        match h : (a : ℤ) + (- (b : ℤ)) with
-        | .ofNat n =>
-          use n
-          rw [h] at h₀ h₁
-          simp only [Int.ofNat_eq_coe, Int.natCast_pos, Nat.cast_lt] at h₀ h₁
-          exact ⟨rfl, h₀, h₁⟩
-        | .negSucc _ =>
-          rw [h] at h₀
-          simp at h₀
-      rcases this with ⟨n, this⟩
-      rw [←this.1, zpow_natCast] at H'
-      apply Nat.not_dvd_of_pos_of_lt this.2.1 this.2.2
-      exact orderOf_dvd_of_pow_eq_one H'
-    · exact h.symm
+lemma pow_eq {G : Type} [Group G] {a b : ℕ} {g : G} :
+  a < orderOf g → b < orderOf g → g ^ a = g ^ b → a = b := by
+  intros h₁ h₂ h₃
+  rwa [pow_inj_mod, Nat.mod_eq_of_lt h₁, Nat.mod_eq_of_lt h₂] at h₃
 
-instance {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :
-    Invertible (VDM D g s s₀) := by
+instance {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s₀) := by
   haveI : NeZero (VDM D g s s₀).det := by
-    refine { out := ?_ }
+    constructor
     unfold VDM
     split_ifs with cond
     · simp only [finRangeTo.eq_1, evalDomain.eq_1, Domain.evalDomain.eq_1, List.get_eq_getElem,
@@ -195,7 +138,7 @@ instance {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, �
       rw [pow_lift, pow_lift, pow_lift, Units.val_inj] at this
       have this := this.symm
       apply Fin.eq_of_val_eq
-      refine pow_eq _ ?_ ?_ this
+      refine pow_eq ?_ ?_ this
       · convert i'.2
         rw [orderOf_pow, orderOf_submonoid, DSmooth.1]
         have : 2 ^ n = 2 ^ ((n - (s i).1) + (s i).1) := by
@@ -212,6 +155,7 @@ instance {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, �
             exact this
         rw [this, pow_add, mul_comm, Nat.gcd_mul_left_left]
         simp
+        rfl
       · convert j'.2
         rw [orderOf_pow, orderOf_submonoid, DSmooth.1]
         have : 2 ^ n = 2 ^ ((n - (s i).1) + (s i).1) := by
@@ -228,14 +172,15 @@ instance {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, �
             exact this
         rw [this, pow_add, mul_comm, Nat.gcd_mul_left_left]
         simp
+        rfl
     · simp
   apply @Matrix.invertibleOfDetInvertible
 
 
-def VDMInv {i : Fin (n + 1)} (s₀ : evalDomain D g (∑ j' ∈ finRangeTo ↑i, ↑(s j'))) :
+def VDMInv {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) :
     Matrix (Fin (2 ^ (s i).1)) { x // x ∈ cosetG D g s s₀ } 𝔽 :=
   Matrix.reindex (Equiv.refl _) (fin_equiv_coset D g s s₀)
-    (instInvertibleMatrixFinHPowNatOfNatValLtVDM D g s s₀).invOf
+    (instInvertibleMatrixFinHPowNatOfNatValVDM D g s s₀).invOf
 
 lemma g_elem_zpower_iff_exists_nat {G : Type} [Group G] [Finite G] {gen g : G} :
     g ∈ Subgroup.zpowers gen ↔ ∃ n : ℕ, g = gen ^ n ∧ n < orderOf gen := by
@@ -279,8 +224,8 @@ lemma g_elem_zpower_iff_exists_nat {G : Type} [Group G] [Finite G] {gen g : G} :
 
 open Matrix in
 noncomputable def f_succ' {i : Fin (n + 1)}
-  (f : evalDomain D g (∑ j' ∈ finRangeTo i, ↑(s j')) → 𝔽) (z : 𝔽)
-  (s₀' : evalDomain D g (∑ j' ∈ finRangeTo (i.1 + 1), ↑(s j'))) : 𝔽 :=
+  (f : evalDomainSigma D g s i → 𝔽) (z : 𝔽)
+  (s₀' : evalDomainSigma D g s (i.1 + 1)) : 𝔽 :=
   have :
     ∃ s₀ : evalDomain D g (∑ j' ∈ finRangeTo (i.1), ↑(s j')),
       s₀.1 ^ (2 ^ (s i).1) = s₀'.1 := by
@@ -302,20 +247,18 @@ noncomputable def f_succ' {i : Fin (n + 1)}
 
     sorry
   let s₀ := Classical.choose this
-  ((pows z _) *ᵥ (VDMInv D g s s₀) *ᵥ Finset.restrict (cosetG D g s s₀) f) ()
+  (pows z _ *ᵥ VDMInv D g s s₀ *ᵥ Finset.restrict (cosetG D g s s₀) f) ()
 
 lemma claim_8_1
   {i : Fin (n + 1)}
-  (f : ReedSolomon.code
-        (injectF (i := ∑ j' ∈ finRangeTo i, ↑(s j')))
-        -- ((CosetDomain.domainEnum (n := n) D g i.castSucc).trans CosetDomain.injectF)
-        (2 ^ (n - (∑ j' ∈ finRangeTo i, ↑(s j')))))
-  (z : 𝔽)
+  {f : ReedSolomon.code (injectF (i := ∑ j' ∈ finRangeTo i, s j'))
+                        (2 ^ (n - (∑ j' ∈ finRangeTo i, (s j' : ℕ))))}
+  {z : 𝔽}
   :
   f_succ' D g s f.val z ∈
     (ReedSolomon.code
       CosetDomain.injectF
-      (2 ^ (n - (∑ j' ∈ finRangeTo (i.1 + 1), ↑(s j'))))
+      (2 ^ (n - (∑ j' ∈ finRangeTo (i.1 + 1), (s j' : ℕ))))
     ).carrier
   := by sorry
 
@@ -445,9 +388,6 @@ lemma lemma_8_2
       ]
     Pr_{let x ←$ᵖ (Fin t → 𝔽); let z ←$ᵖ (Fin (n + 1) → 𝔽)}[ εQ x z ≤ α0 ] ≤ εC
   := by sorry
-
-
-
 
 end Fri
 end Fri

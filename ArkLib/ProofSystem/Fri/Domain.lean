@@ -4,6 +4,7 @@ import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 import ArkLib.Data.FieldTheory.NonBinaryField.Basic
 import ArkLib.Data.GroupTheory.Smooth
+import ArkLib.ToMathlib.Finset.Basic
 
 variable {F : Type} [NonBinaryField F] [Finite F]
 variable (D : Subgroup Fˣ) {n : ℕ} [DIsCyclicC : IsCyclicWithGen D] [DSmooth : SmoothPowerOfTwo n D]
@@ -417,13 +418,7 @@ namespace CosetDomain
 open Pointwise
 
 omit [Finite F] in
-private lemma op_der_eq : Monoid.toMulAction Fˣ = Units.mulAction' := by
-  unfold Units.mulAction' Monoid.toMulAction
-  congr
-  ext g m
-  simp only [Units.val_mul]
-  unfold_projs
-  rfl
+private lemma op_der_eq : Monoid.toMulAction Fˣ = Units.mulAction' := by ext; rfl
 
 /- Element of `Fˣ` we will use to define our coset -/
 variable (x : Fˣ)
@@ -431,7 +426,10 @@ variable (x : Fˣ)
 /- Cosets that will form domains of evaluation for the FRI codewords. -/
 @[simp]
 def evalDomain (i : ℕ) : Set Fˣ :=
-  (x ^ (2 ^ i)) • (Domain.evalDomain D i)
+  x ^ (2 ^ i) • Domain.evalDomain D i
+
+abbrev evalDomainSigma (s : Fin (n + 1) → ℕ+) (i : ℕ) :=
+  evalDomain D x (∑ j' ∈ finRangeTo i, s j') 
 
 /- Enumeration of the elements of the `i`th coset. -/
 def domain (n : ℕ) (i : ℕ) : Fin (2 ^ (n - i)) → evalDomain D x i :=
