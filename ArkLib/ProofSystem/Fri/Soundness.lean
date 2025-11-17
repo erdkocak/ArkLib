@@ -15,6 +15,7 @@ import ArkLib.ProofSystem.Fri.Spec.General
 import ArkLib.ProofSystem.Fri.Spec.SingleRound
 import ArkLib.OracleReduction.Security.Basic
 import ToMathlib.Control.OptionT
+import ArkLib.ToMathlib.List.Basic
 
 namespace Fri
 section Fri
@@ -32,53 +33,14 @@ noncomputable local instance : Fintype 𝔽 := Fintype.ofFinite _
 
 private lemma sum_add_one {i : Fin (n + 1)} :
   ∑ j' ∈ finRangeTo (i.1 + 1), (s j').1 = (∑ j' ∈ finRangeTo i.1, (s j').1) + (s i).1 := by
-          rw [finRangeTo, List.take_add, List.toFinset_append]
-          rw
-            [
-              Finset.sum_union
-                (by
-                  rw [Finset.disjoint_iff_ne]
-                  intros a h b h'
-                  rw [List.mem_toFinset] at h h'
-                  rw [List.mem_take_iff_getElem] at h h'
-                  rcases h with ⟨ai, ah, ah'⟩
-                  rcases h' with ⟨bi, bh, bh'⟩
-                  have h₁ : ai < i.1 := by omega
-                  have h₂ : bi = 0 := by omega
-                  simp only [h₂, List.getElem_drop, add_zero, List.getElem_finRange, Fin.cast_mk,
-                    Fin.eta] at bh'
-                  simp only [List.getElem_finRange, Fin.cast_mk] at ah'
-                  rw [←bh', ←ah']
-                  rcases i with ⟨i, _⟩
-                  simp only [ne_eq, Fin.mk.injEq]
-                  linarith
-                )
-            ]
-          apply Nat.add_left_cancel_iff.mpr
-          have : (List.take 1 (List.drop (↑i) (List.finRange (n + 1)))).toFinset = {i} := by
-            apply eq_singleton_iff_unique_mem.mpr
-            apply And.intro
-            · rw [List.mem_toFinset]
-              apply List.mem_take_iff_getElem.mpr
-              use 0
-              use
-                (by
-                  rw [Nat.lt_min]
-                  simp
-                )
-              rw [List.getElem_drop]
-              simp
-            · simp only [List.mem_toFinset]
-              intros x h
-              (expose_names; rw [List.mem_take_iff_getElem] at h)
-              rcases h with ⟨j, h, h'⟩
-              have : j = 0 := by
-                omega
-              simp only [this, List.getElem_drop, add_zero, List.getElem_finRange, Fin.cast_mk,
-                Fin.eta] at h'
-              exact h'.symm
-          rw [this]
-          simp
+  unfold finRangeTo
+  rw [List.take_add, List.toFinset_append]
+  simp only [ne_eq, List.drop_eq_nil_iff, List.length_finRange, not_le, Fin.is_lt,
+    List.take_one_eq_head, List.head_drop, List.getElem_finRange, Fin.cast_mk, Fin.eta,
+    List.toFinset_cons, List.toFinset_nil, insert_empty_eq, union_singleton]
+  rw [Finset.sum_insert, add_comm]
+  simp [List.mem_iff_getElem]
+  grind [cases Fin]  
 
 private lemma roots_of_unity_lem {s : Fin (n + 1) → ℕ+} {i : Fin (n + 1)}
     (k_le_n : (∑ j', (s j').1) ≤ n) :
