@@ -34,13 +34,11 @@ noncomputable local instance : Fintype 𝔽 := Fintype.ofFinite _
 private lemma sum_add_one {i : Fin (n + 1)} :
   ∑ j' ∈ finRangeTo (i.1 + 1), (s j').1 = (∑ j' ∈ finRangeTo i.1, (s j').1) + (s i).1 := by
   unfold finRangeTo
-  rw [List.take_add, List.toFinset_append]
-  simp only [ne_eq, List.drop_eq_nil_iff, List.length_finRange, not_le, Fin.is_lt,
-    List.take_one_eq_head, List.head_drop, List.getElem_finRange, Fin.cast_mk, Fin.eta,
-    List.toFinset_cons, List.toFinset_nil, insert_empty_eq, union_singleton]
+  suffices ∑ x ∈ insert i (List.take i (List.finRange (n + 1))).toFinset, (s x).1 =
+           ∑ x ∈ (List.take i (List.finRange (n + 1))).toFinset, (s x).1 + (s i).1 by
+    simpa [List.take_add]
   rw [Finset.sum_insert, add_comm]
-  simp [List.mem_iff_getElem]
-  grind [cases Fin]  
+  aesop (add simp List.mem_iff_getElem) (add safe (by grind [cases Fin]))
 
 private lemma roots_of_unity_lem {s : Fin (n + 1) → ℕ+} {i : Fin (n + 1)}
     (k_le_n : (∑ j', (s j').1) ≤ n) :
