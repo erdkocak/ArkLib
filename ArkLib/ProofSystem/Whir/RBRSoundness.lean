@@ -155,8 +155,8 @@ def OracleStatement (ι F : Type) : Unit → Type :=
 --   producing the response. -/
 -- instance {ι : Type} : OracleInterface (OracleStatement ι F ()) := OracleInterface.instFunction
 
-def defaultOracleContext {ι : Type} :
-    OracleContext
+-- def defaultOracleContext {ι : Type} :
+--     OracleContext
 
 /-- WHIR relation: the oracle's output is δᵣ-close to a codeword of a smooth ReedSolomon code
 with number of variables at most `varCount` over domain `φ`, within error `err`.
@@ -196,13 +196,13 @@ theorem whir_rbr_soundness
     Fintype.card (vPSpec.ChallengeIdx) = 2 * M + 2 ∧
     -- ∃ a Vector IOPP π with Statement = Unit, Witness = Unit, OracleStatement = (ι₀ F)
       ∃ π :
-        VectorIOP Unit (OracleStatement (ι 0) F) Unit vPSpec F sorry,
+        VectorIOP Unit (OracleStatement (ι 0) F) Unit vPSpec F _ _,
         let max_ε_folds : (i : Fin (M + 1)) → ℝ≥0 :=
           fun i => (univ : Finset (Fin (P.foldingParam i))).sup (ε_fold i)
         let ε_rbr : vPSpec.ChallengeIdx → ℝ≥0 :=
           fun _ => (univ.image max_ε_folds ∪ {ε_fin} ∪ univ.image ε_out ∪ univ.image ε_shift).max'
             (by simp)
-        (IsSecureWithGap (whirRelation m_0 (P.φ 0) 0)
+        (VectorIOP.IsSecureWithGap (whirRelation m_0 (P.φ 0) 0)
                          (whirRelation m_0 (P.φ 0) (h.δ 0))
                           ε_rbr π) ∧
 

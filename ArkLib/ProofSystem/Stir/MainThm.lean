@@ -76,11 +76,11 @@ section MainTheorem
 def OracleStatement (ι F : Type) : Unit → Type :=
     fun _ => ι → F
 
-/-- Provides a default OracleInterface instance that leverages
-  the oracle statement defined above. The oracle simply applies
-  the function `f : ι → F` to the query input `i : ι`,
-  producing the response. -/
-instance {ι : Type} : OracleInterface (OracleStatement ι F ()) := OracleInterface.instFunction
+-- /-- Provides a default OracleInterface instance that leverages
+--   the oracle statement defined above. The oracle simply applies
+--   the function `f : ι → F` to the query input `i : ι`,
+--   producing the response. -/
+-- instance {ι : Type} : OracleInterface (OracleStatement ι F ()) := OracleInterface.instFunction
 
 /-- STIR relation: the oracle's output is δᵣ-close to a Reed-Solomon codeword
   of degree at most `degree` over domain `φ`, within error `err`.
@@ -119,7 +119,7 @@ theorem stir_main
   ∃ n : ℕ,
   ∃ vPSpec : ProtocolSpec.VectorSpec n,
   ∃ ε_rbr : vPSpec.ChallengeIdx → ℝ≥0,
-  ∃ π : VectorIOP Unit (OracleStatement ι F) Unit vPSpec F,
+  ∃ π : VectorIOP Unit (OracleStatement ι F) Unit vPSpec F _ _,
   IsSecureWithGap (stirRelation degree φ 0)
                   (stirRelation degree φ δ)
                   ε_rbr π
@@ -180,7 +180,7 @@ theorem stir_rbr_soundness
     Fintype.card (vPSpec.ChallengeIdx) = 2 * M + 2 ∧
     -- ∃ vector IOPP π with the aforementioned `vPSpec`, and for
     -- `Statement = Unit, Witness = Unit, OracleStatement(ι₀, F)` such that
-    ∃ π : VectorIOP Unit (OracleStatement (ι 0) F) Unit vPSpec F,
+    ∃ π : VectorIOP Unit (OracleStatement (ι 0) F) Unit vPSpec F _ _,
     let ε_rbr : vPSpec.ChallengeIdx → ℝ≥0 :=
       fun _ => ({ε_fold} ∪ {ε_fin} ∪ univ.image ε_out ∪ univ.image ε_shift).max' (by simp)
     (IsSecureWithGap (stirRelation (degree ι P 0) (P.φ 0) 0)

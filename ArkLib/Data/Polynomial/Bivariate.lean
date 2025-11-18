@@ -222,6 +222,7 @@ lemma sup_eq_of_le_of_reach {α β : Type} [SemilatticeSup β] [OrderBot β] {s 
     s.sup f = y := by
   grind
 
+set_option maxHeartbeats 1000000 in
 /-- The `X`-degree of the product of two non-zero bivariate polynomials is
 equal to the sum of their degrees. -/
 @[simp, grind _=_]
@@ -286,6 +287,7 @@ lemma degreeX_mul [IsDomain F] (f g : F[X][Y]) (hf : f ≠ 0) (hg : g ≠ 0) :
     rintro ⟨y₁, y₂⟩ h h'
     have : mmfx < y₁ ∨ mmgx < y₂ := by
       have h_anti : y₁ + y₂ = mmfx + mmgx := by simpa using h
+      clear *- h' h_anti
       grind [mul_eq_zero]
     grind [mul_eq_zero]
   apply sup_eq_of_le_of_reach (mmfx + mmgx) _ this
@@ -302,6 +304,7 @@ lemma degreeX_mul [IsDomain F] (f g : F[X][Y]) (hf : f ≠ 0) (hg : g ≠ 0) :
         have h_anti : b₁ + b₂ = mmfx + mmgx := by simpa using h
         have fdegx_eq_0 : degreeX f = 0 := by grind
         have gdegx_eq_0 : degreeX g = 0 := by grind
+        clear *- h' h_anti fdegx_eq_0 gdegx_eq_0
         grind [mul_eq_zero]
       grind [mul_eq_zero]
     grind [zero_eq_mul]

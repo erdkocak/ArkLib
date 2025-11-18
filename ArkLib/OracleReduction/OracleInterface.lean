@@ -26,8 +26,6 @@ import Mathlib.Algebra.Polynomial.Roots
     one can query at a point, and the response is the evaluation of the polynomial on that point.
 
   - Vectors. This instance turns vectors into oracles for which one can query specific positions.
-
-  dt: I've made minimal changes here in the 4.24 update, bigger changes are probably justified
 -/
 
 universe u v w
@@ -219,8 +217,6 @@ open OracleComp OracleSpec OracleQuery
 --   | .inl t => do query t
 --   | .inr (.inl q) => do return (O₁.answer q).run t₁
 --   | .inr (.inr q) => do return (O₂.answer q).run t₂
-
-#check QueryImpl.mapQuery
 
 open Finset in
 /-- A message type together with a `OracleContext` instance is said to have **oracle distance**

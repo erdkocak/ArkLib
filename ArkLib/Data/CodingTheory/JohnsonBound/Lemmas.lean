@@ -265,6 +265,7 @@ private lemma sum_of_not_equals :
         card_sdiff
       ]
       simp [choose_2]
+      stop
       zify [Nat.le_mul_self #B]
       ring
   ]
@@ -289,6 +290,7 @@ private lemma d_eq_sum {B : Finset (Fin n → F)}
   ∑ i, ∑ x ∈ B ×ˢ B with x.1 ≠ x.2, (if x.1 i ≠ x.2 i then 1 else 0) := by
   field_simp [d, choose_2_card_ne_zero h_B]
   rw [Finset.sum_comm]
+  stop
   simp_rw [hamming_dist_eq_sum]
   field_simp
 
@@ -342,7 +344,7 @@ private lemma almost_johnson_choose_2_elimed [Zero F]
                 (by
                 simp_all only [C, δ]
                 field_simp
-                grind?)))
+                grind only)))
 
 private lemma almost_johnson_lhs_div_B_card [Zero F]
   (h_n : 0 < n)

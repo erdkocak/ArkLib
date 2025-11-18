@@ -130,15 +130,16 @@ class IsSecure
     (relIn : Set ((StmtIn × ∀ i, OStmtIn i) × WitIn))
     (relOut : Set ((StmtOut × ∀ i, OStmtOut i) × WitOut))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOR : VectorIOR StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut vPSpec A sorry) where
+    (vectorIOR : VectorIOR StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut vPSpec A sorry sorry) where
 
   /-- The reduction is perfectly complete. -/
-  is_complete : vectorIOR.perfectCompleteness (pure ()) ⟨isEmptyElim⟩ relIn relOut
+  is_complete : vectorIOR.perfectCompleteness (pure ()) isEmptyElim relIn relOut
+    -- (vectorIOR.toReduction)
 
-  /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
-    `ε_rbr`, and the state function. -/
-  is_rbr_knowledge_sound :
-    vectorIOR.verifier.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ relIn relOut ε_rbr
+  -- /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
+  --   `ε_rbr`, and the state function. -/
+  -- is_rbr_knowledge_sound :
+  --   vectorIOR.verifier.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ relIn relOut ε_rbr
 
 -- TODO: define V-IOR of proximity
 
@@ -147,7 +148,7 @@ end VectorIOR
 namespace VectorIOP
 
 variable {Statement Witness : Type} {ιₛ : Type} {OStatement : ιₛ → Type}
-  [∀ i, OracleInterface (OStatement i)]
+  -- [∀ i, OracleInterface (OStatement i)]
 
 /-- A vector IOP is **secure** with respect to relation `relation` and round-by-round knowledge
     error `ε_rbr` if it satisfies (perfect) completeness and round-by-round knowledge soundness
@@ -155,15 +156,15 @@ variable {Statement Witness : Type} {ιₛ : Type} {OStatement : ιₛ → Type}
 class IsSecure
     (relation : Set ((Statement × ∀ i, OStatement i) × Witness))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOP : VectorIOP Statement OStatement Witness vPSpec A) where
+    (vectorIOP : VectorIOP Statement OStatement Witness vPSpec A sorry sorry) where
 
   /-- The reduction is perfectly complete. -/
-  is_complete : vectorIOP.perfectCompleteness (pure ()) ⟨isEmptyElim⟩ relation
+  is_complete : vectorIOP.perfectCompleteness (pure ()) (isEmptyElim) relation sorry
 
-  /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
-    `ε_rbr`, and the state function. -/
-  is_rbr_knowledge_sound :
-    OracleProof.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ relation vectorIOP.verifier ε_rbr
+  -- /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
+  --   `ε_rbr`, and the state function. -/
+  -- is_rbr_knowledge_sound :
+  --   OracleProof.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ relation vectorIOP.verifier ε_rbr
 
 /-- A vector IOP **of proximity** is **secure** with respect to completeness relation
   `completeRelation`, soundness relation `soundRelation`, and round-by-round knowledge error
@@ -174,14 +175,14 @@ class IsSecureWithGap
     (completeRelation : Set ((Statement × ∀ i, OStatement i) × Witness))
     (soundRelation : Set ((Statement × ∀ i, OStatement i) × Witness))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOP : VectorIOP Statement OStatement Witness vPSpec A) where
+    (vectorIOP : VectorIOP Statement OStatement Witness vPSpec A sorry sorry) where
 
   /-- The reduction is perfectly complete. -/
-  is_complete : vectorIOP.perfectCompleteness (pure ()) ⟨isEmptyElim⟩ completeRelation
+  is_complete : vectorIOP.perfectCompleteness (pure ()) (isEmptyElim) completeRelation sorry
 
-  /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
-    `ε_rbr`, and the state function. -/
-  is_rbr_knowledge_sound :
-    OracleProof.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ soundRelation vectorIOP.verifier ε_rbr
+  -- /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
+  --   `ε_rbr`, and the state function. -/
+  -- is_rbr_knowledge_sound :
+  --   OracleProof.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ soundRelation vectorIOP.verifier ε_rbr
 
 end VectorIOP

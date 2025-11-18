@@ -64,7 +64,7 @@ variable [∀ i, VCVCompatible (pSpec.Challenge i)] [DecidableEq ι]
   [∀ i, VCVCompatible (pSpec.Challenge i)]
 
 variable -- dt: temp until better instance exists
-    [HasEvalSPMF (OptionT <| OracleComp (oSpec + pSpec.challengeOracleInterface'.spec))]
+    [HasEvalSPMF (OptionT <| OracleComp (oSpec + pSpec.challengeOracleInterface.spec))]
 
 
 /-- A commitment scheme satisfies **correctness** with error `correctnessError` if for all
@@ -76,9 +76,9 @@ def correctness (scheme : Scheme oSpec Data Randomness Commitment O pSpec)
   ∀ randomness : Randomness,
   ∀ query : O.spec.Domain,
     Pr[ fun x => x.2.1 | ((do
-        let cm ← liftM (liftComp (scheme.commit data randomness) ((oSpec + pSpec.challengeOracleInterface'.spec)))
+        let cm ← liftM (liftComp (scheme.commit data randomness) ((oSpec + pSpec.challengeOracleInterface.spec)))
         let ⟨result, _⟩ ← scheme.opening.run ⟨cm, query, (O.impl query).run data⟩ ⟨data, randomness⟩
-        return result) : OptionT (OracleComp (oSpec + pSpec.challengeOracleInterface'.spec)) _)] ≥ 1 - correctnessError
+        return result) : OptionT (OracleComp (oSpec + pSpec.challengeOracleInterface.spec)) _)] ≥ 1 - correctnessError
 
 /-- A commitment scheme satisfies **perfect correctness** if it satisfies correctness with no error.
 -/

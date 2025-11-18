@@ -20,15 +20,16 @@ of the same type. The relation is `a = b`.
    - We also support a variant where it's `a.query q = r` where `r` is the response, discarding `b`.
 -/
 
-open OracleSpec OracleComp OracleQuery OracleInterface ProtocolSpec
+open OracleSpec OracleComp OracleQuery ProtocolSpec
 
-variable {ι : Type} (oSpec : OracleSpec ι) (OStatement : Type) [OracleInterface OStatement]
-  [inst : SampleableType (Query OStatement)]
+variable {ι : Type} (oSpec : OracleSpec ι) (OStatement : Type) (Q : Type)
+  (Oₛ : OracleContext Q (ReaderM OStatement))
+  [inst : SampleableType Q]
 
 namespace RandomQuery
 
 @[reducible, simp] def StmtIn := Unit
-@[reducible, simp] def StmtOut := Query OStatement
+@[reducible, simp] def StmtOut := Q
 
 @[reducible, simp] def OStmtIn := fun _ : Fin 2 => OStatement
 @[reducible, simp] def OStmtOut := fun _ : Fin 2 => OStatement
@@ -46,11 +47,11 @@ The output relation states that if the verifier's single query was `q`, then
 `a` and `b` agree on that `q`, i.e. `answer a q = answer b q`.
 -/
 @[reducible, simp]
-def relOut : Set ((StmtOut OStatement × ∀ i, OStmtOut OStatement i) × WitOut) :=
-  { ⟨⟨q, oStmt⟩, ()⟩ | answer (oStmt 0) q = answer (oStmt 1) q }
+def relOut : Set ((StmtOut Q × ∀ i, OStmtOut OStatement i) × WitOut) :=
+  { ⟨⟨q, oStmt⟩, ()⟩ | Oₛ.impl q (oStmt 0) = Oₛ.impl q (oStmt 1) }
 
 @[reducible]
-def pSpec : ProtocolSpec 1 := ⟨!v[.V_to_P], !v[Query OStatement]⟩
+def pSpec : ProtocolSpec 1 := ⟨!v[.V_to_P], !v[Q]⟩
 
 /--
 The prover is trivial: it has no messages to send.  It only receives the verifier's challenge `q`,
@@ -61,11 +62,11 @@ We keep track of `(a, b)` in the prover's state, along with the single random qu
 @[inline, specialize]
 def oracleProver : OracleProver oSpec
     Unit (fun _ : Fin 2 => OStatement) Unit
-    (Query OStatement) (fun _ : Fin 2 => OStatement) Unit (pSpec OStatement) where
+    (Q) (fun _ : Fin 2 => OStatement) Unit (pSpec OStatement) where
 
   PrvState
   | 0 => ∀ _ : Fin 2, OStatement
-  | 1 => (∀ _ : Fin 2, OStatement) × (Query OStatement)
+  | 1 => (∀ _ : Fin 2, OStatement) × (Oₛ.spec.Domain)
 
   input := fun x => x.1.2
 
@@ -81,7 +82,7 @@ The oracle verifier simply returns the challenge, and performs no checks.
 @[inline, specialize]
 def oracleVerifier : OracleVerifier oSpec
     Unit (fun _ : Fin 2 => OStatement)
-    (Query OStatement) (fun _ : Fin 2 => OStatement) (pSpec OStatement) where
+    (Q) (fun _ : Fin 2 => OStatement) (pSpec OStatement) where
 
   verify := fun _ chal => do
     let q : Query OStatement := chal ⟨0, rfl⟩

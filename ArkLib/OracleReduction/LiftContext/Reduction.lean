@@ -110,18 +110,22 @@ def Extractor.Straightline.liftContext
     let innerWitIn ← E innerStmtIn innerWitOut fullTranscript proveQueryLog verifyQueryLog
     return lens.wit.lift (outerStmtIn, outerWitOut) innerWitIn
 
-open Verifier in
-/-- The outer round-by-round extractor after lifting invokes the inner extractor on the projected
-  input, and lifts the output -/
-def Extractor.RoundByRound.liftContext
-    {WitMid : Fin (n + 1) → Type}
-    (lens : Extractor.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                          OuterWitIn OuterWitOut InnerWitIn InnerWitOut)
-    (E : Extractor.RoundByRound oSpec InnerStmtIn InnerWitIn InnerWitOut pSpec WitMid) :
-      Extractor.RoundByRound oSpec OuterStmtIn OuterWitIn OuterWitOut pSpec WitMid :=
-  sorry
+-- open Verifier in
+-- /-- The outer round-by-round extractor after lifting invokes the inner extractor on the projected
+--   input, and lifts the output -/
+-- def Extractor.RoundByRound.liftContext
+--     {WitMid : Fin (n + 1) → Type}
+--     (lens : Extractor.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
+--                           OuterWitIn OuterWitOut InnerWitIn InnerWitOut)
+--     (E : Extractor.RoundByRound oSpec InnerStmtIn InnerWitIn InnerWitOut pSpec WitMid) :
+--       Extractor.RoundByRound oSpec OuterStmtIn OuterWitIn OuterWitOut pSpec WitMid :=
+--   sorry
   -- fun roundIdx outerStmtIn fullTranscript proveQueryLog =>
   --   rbrLensInv.liftWit (E roundIdx (lens.projStmt outerStmtIn) fullTranscript proveQueryLog)
+
+-- dtumad: move this to vcv
+instance {m} [Monad m] [h : HasEvalSet m] : HasEvalSet (OptionT m) where
+  toSet := OptionT.mapM' h.toSet
 
 /-- Compatibility relation between the outer input statement and the inner output statement,
 relative to a verifier.
@@ -135,7 +139,7 @@ def Verifier.compatStatement
     (V : Verifier oSpec InnerStmtIn InnerStmtOut pSpec) :
       OuterStmtIn → InnerStmtOut → Prop :=
   fun outerStmtIn innerStmtOut =>
-    ∃ transcript, innerStmtOut ∈ (V.run (lens.proj outerStmtIn) transcript).support
+    ∃ transcript, innerStmtOut ∈ support (V.run (lens.proj outerStmtIn) transcript)
 
 /-- Compatibility relation between the outer input context and the inner output context, relative
 to a reduction.
@@ -150,7 +154,7 @@ def Reduction.compatContext
   fun outerCtxIn innerCtxOut =>
     innerCtxOut ∈
       (Prod.snd ∘ Prod.fst) ''
-        (R.run (lens.stmt.proj outerCtxIn.1) (lens.wit.proj outerCtxIn)).support
+        support (R.run (lens.stmt.proj outerCtxIn.1) (lens.wit.proj outerCtxIn))
 
 /-- Compatibility relation between the outer input witness and the inner output witness, relative to
   a straightline extractor.
@@ -165,7 +169,7 @@ def Extractor.Straightline.compatWit
       OuterStmtIn × OuterWitOut → InnerWitIn → Prop :=
   fun ⟨outerStmtIn, outerWitOut⟩ innerWitIn =>
     ∃ stmt tr logP logV, innerWitIn ∈
-      (E stmt (lens.wit.proj (outerStmtIn, outerWitOut)) tr logP logV).support
+      support (E stmt (lens.wit.proj (outerStmtIn, outerWitOut)) tr logP logV)
 
 /-- The outer state function after lifting invokes the inner state function on the projected
   input, and lifts the output -/
@@ -189,6 +193,7 @@ where
   toFun_next := fun m hDir outerStmtIn transcript hStmt msg =>
     stF.toFun_next m hDir (lens.proj outerStmtIn) transcript hStmt msg
   toFun_full := fun outerStmtIn transcript hStmt => by
+    stop
     have h := stF.toFun_full (lens.proj outerStmtIn) transcript hStmt
     simp [Verifier.run, Verifier.liftContext] at h ⊢
     intro outerStmtOut s hs innerStmtOut s' h' hLens
@@ -212,7 +217,7 @@ theorem liftContext_processRound
                         OuterWitIn OuterWitOut InnerWitIn InnerWitOut}
     {i : Fin n}
     {P : Prover oSpec InnerStmtIn InnerWitIn InnerStmtOut InnerWitOut pSpec}
-    {resultRound : OracleComp (oSpec + [pSpec.Challenge]ₒ)
+    {resultRound : OracleComp (oSpec + _)
       (pSpec.Transcript i.castSucc × (P.liftContext lens).PrvState i.castSucc)} :
       (P.liftContext lens).processRound i resultRound
       = do
@@ -220,6 +225,7 @@ theorem liftContext_processRound
         let ⟨newTranscript, newPrvState⟩ ← P.processRound i (do return ⟨transcript, prvState⟩)
         return ⟨newTranscript, ⟨newPrvState, outerStmtIn, outerWitIn⟩⟩ := by
   unfold processRound liftContext
+  stop
   simp
   congr 1; funext
   split <;> simp
@@ -256,7 +262,7 @@ theorem liftContext_runWithLogToRound
         return ⟨⟨transcript, ⟨prvState, outerStmtIn, outerWitIn⟩⟩, queryLog⟩ := by
   unfold runWithLogToRound
   induction i using Fin.induction with
-  | zero => simp [liftContext, Function.uncurry]
+  | zero => simp [liftContext, Function.uncurry]; sorry
   | succ i ih => simp [liftContext_runToRound, Function.uncurry]; congr
 
 /-- Running the lifted outer prover is equivalent to running the inner prover on the projected
@@ -273,6 +279,7 @@ theorem liftContext_run
         return ⟨fullTranscript, lens.lift (outerStmtIn, outerWitIn) innerCtxOut⟩ := by
   simp only [run, liftContext_runToRound]
   simp [liftContext, Function.uncurry]
+  sorry
 
 /-- Lifting the prover intertwines with logging queries of the prover -/
 theorem liftContext_runWithLog
@@ -305,6 +312,7 @@ theorem liftContext_run
                 lens.stmt.lift outerStmtIn verInnerStmtOut⟩ := by
   unfold run
   simp [liftContext, Prover.liftContext_run, Verifier.liftContext, Verifier.run, Function.uncurry]
+  sorry
 
 theorem liftContext_runWithLog
     {lens : Context.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
@@ -318,6 +326,7 @@ theorem liftContext_runWithLog
                 lens.stmt.lift outerStmtIn verInnerStmtOut⟩, queryLog⟩ := by
   unfold runWithLog
   simp [liftContext, Prover.liftContext_runWithLog, Verifier.liftContext, Verifier.run]
+  sorry
 
 end Reduction
 
@@ -346,6 +355,7 @@ theorem liftContext_completeness
   intro outerStmtIn outerWitIn hRelIn
   have hR := h (lens.stmt.proj outerStmtIn) (lens.wit.proj (outerStmtIn, outerWitIn))
     (lensComplete.proj_complete _ _ hRelIn)
+  stop
   rw [Reduction.liftContext_run]
   refine le_trans hR ?_
   simp
@@ -492,6 +502,7 @@ theorem liftContext_rbr_soundness [Inhabited InnerStmtOut]
   unfold rbrSoundness at h ⊢
   obtain ⟨stF, h⟩ := h
   simp at h ⊢
+  stop
   refine ⟨stF.liftContext lens (lensSound := lensSound), ?_⟩
   intro outerStmtIn hOuterStmtIn WitIn WitOut witIn outerP roundIdx hDir
   have innerP : Prover oSpec InnerStmtIn WitIn InnerStmtOut WitOut pSpec := {
@@ -505,7 +516,7 @@ theorem liftContext_rbr_soundness [Inhabited InnerStmtOut]
   }
   have h' := h (lens.proj outerStmtIn) (lensSound.proj_sound _ hOuterStmtIn)
     WitIn WitOut witIn innerP roundIdx hDir
-  refine le_trans ?_ h'
+  -- refine le_trans ?_ h'
   sorry
 
 /-

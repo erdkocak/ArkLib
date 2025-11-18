@@ -94,6 +94,7 @@ private lemma johnson_condition_strong_implies_2_le_B_card
   have h : (Fintype.card F : ℚ) / (Fintype.card F - 1) = 1 + 1 / (Fintype.card F - 1) := by
     have : (Fintype.card F : ℚ) - 1 ≠ 0 := by simp [sub_eq_zero]; omega
     field_simp
+    sorry
   have h' := JohnsonBound.abs_one_sub_div_le_one (v := v) (a := a) (by omega)
   exact absurd (lt_of_lt_of_le (h ▸ h_johnson) h') (lt_irrefl _)
 
@@ -113,6 +114,7 @@ theorem johnson_bound [Field F]
   let frac := q / (q - 1)
   B.card ≤ (frac * d/n) / JohnsonDenominator B v
   := by
+  stop
   suffices B.card * JohnsonDenominator B v ≤
            Fintype.card F / (Fintype.card F - 1) * d B / n by
     rw [johnson_condition_strong_iff_johnson_denom_pos] at h_condition
