@@ -92,7 +92,7 @@ def Witness (F : Type) [NonBinaryField F] {k : ℕ}
     (s : Fin (k + 1) → ℕ+) (d : ℕ+) (i : Fin (k + 2)) :=
   F⦃< 2^((∑ j', (s j').1) - (∑ j' ∈ finRangeTo i.1, (s j').1)) * d⦄[X]
 
-private lemma sum_add_one {i : Fin (k + 1)} :
+private lemma sum_finRangeTo_add_one {i : Fin (k + 1)} :
   ∑ j' ∈ finRangeTo (i.1 + 1), (s j').1 = (∑ j' ∈ finRangeTo i.1, (s j').1) + (s i).1 := by
           rw [finRangeTo, List.take_add, List.toFinset_append]
           rw
@@ -169,7 +169,7 @@ private lemma witness_lift {F : Type} [NonBinaryField F]
         rw [Nat.sub_sub_right b h', Nat.sub_add_comm h, Nat.add_comm]
       rw [←mul_assoc, ←pow_add, arith]
       · convert deg_bound
-        rw [sum_add_one]
+        rw [sum_finRangeTo_add_one]
         simp
       · simp only [ge_iff_le]
         apply sum_le_univ_sum_of_nonneg
@@ -698,11 +698,11 @@ def getConst (k : ℕ) (s : Fin (k + 1) → ℕ+) : OracleComp [FinalOracleState
             (by simpa using ())
     )
 
-private lemma roots_of_unity_lem {s : Fin (k + 1) → ℕ+} {i : Fin (k + 1)}
+private lemma sum_finRangeTo_le_sub_of_le {s : Fin (k + 1) → ℕ+} {i : Fin (k + 1)}
     (k_le_n : (∑ j', (s j').1) ≤ n) :
   (∑ j' ∈ finRangeTo i.1, (s j').1) ≤ n - (s i).1 := by
     apply Nat.le_sub_of_add_le
-    rw [←sum_add_one]
+    rw [←sum_finRangeTo_add_one]
     transitivity
     · exact sum_le_univ_sum_of_nonneg (by simp)
     · exact k_le_n
@@ -737,7 +737,7 @@ noncomputable def queryVerifier (k_le_n : (∑ j', (s j').1) ≤ n) (l : ℕ) [D
                       (fun r =>
                         ⟨
                           _,
-                          CosetDomain.mul_root_of_unity D (roots_of_unity_lem k_le_n) s₀.2 r.2
+                          CosetDomain.mul_root_of_unity D (sum_finRangeTo_le_sub_of_le k_le_n) s₀.2 r.2
                         ⟩
                       )
                       (Domain.rootsOfUnity D n (s i))
@@ -750,7 +750,7 @@ noncomputable def queryVerifier (k_le_n : (∑ j', (s j').1) ≤ n) (l : ℕ) [D
                     then
                       have := CosetDomain.pow_lift D x (s i).1 s₀.2
                       queryCodeword D x k s (i := ⟨i.1.succ, Order.lt_add_one_iff.mpr h⟩)
-                        ⟨_, by rw [←sum_add_one] at this; exact this⟩
+                        ⟨_, by rw [←sum_finRangeTo_add_one] at this; exact this⟩
                     else
                       pure (p.eval (s₀.1.1 ^ (2 ^ (s (Fin.last k)).1)))
                   guard (RoundConsistency.roundConsistencyCheck x₀ pts β)

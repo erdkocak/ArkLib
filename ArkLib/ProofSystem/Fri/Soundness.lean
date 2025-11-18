@@ -29,28 +29,9 @@ variable (D : Subgroup 𝔽ˣ) {n : ℕ} [DIsCyclicC : IsCyclicWithGen D] [DSmoo
 variable (g : 𝔽ˣ)
 variable (s : Fin (n + 1) → ℕ+) (d : ℕ+)
 variable (domain_size_cond : (2 ^ (∑ i, (s i : ℕ))) * d ≤ 2 ^ n)
+variable {i : Fin (n + 1)}
 
 noncomputable local instance : Fintype 𝔽 := Fintype.ofFinite _
-
-@[simp]
-private lemma sum_add_one {i : Fin (n + 1)} {f : Fin (n + 1) → ℕ} :
-  ∑ j' ∈ finRangeTo (i + 1), f j' = (∑ j' ∈ finRangeTo i, f j') + f i := by
-  unfold finRangeTo
-  suffices ∑ x ∈ insert i (List.take i (List.finRange (n + 1))).toFinset, f x =
-           ∑ x ∈ (List.take i (List.finRange (n + 1))).toFinset, f x + f i by
-    simpa [List.take_add]
-  have : i ∉ (List.take i (List.finRange (n + 1))).toFinset := by
-    aesop (add simp List.mem_iff_getElem) (add safe (by grind [cases Fin]))
-  simp +arith [Finset.sum_insert this]
-
-private lemma roots_of_unity_lem {s : Fin (n + 1) → ℕ+} {i : Fin (n + 1)}
-  (k_le_n : ∑ j', (s j' : ℕ) ≤ n) :
-  ∑ j' ∈ finRangeTo i, (s j' : ℕ) ≤ n - (s i : ℕ) := by
-    apply Nat.le_sub_of_add_le
-    rw [←sum_add_one]
-    transitivity
-    · exact sum_le_univ_sum_of_nonneg (by simp)
-    · exact k_le_n
 
 instance {F : Type} [Field F] {a : F} [inst : NeZero a] : Invertible a where
   invOf := a⁻¹
@@ -58,23 +39,23 @@ instance {F : Type} [Field F] {a : F} [inst : NeZero a] : Invertible a where
   mul_invOf_self := by field_simp [inst.out]
 
 @[grind]
-def cosetElems {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : List (evalDomainSigma D g s i) :=
-    if k_le_n : ∑ j', (s j').1 ≤ n
-    then
-      (Domain.rootsOfUnity D n (s i)).map fun r =>
-        ⟨
-          _,
-          CosetDomain.mul_root_of_unity D (roots_of_unity_lem k_le_n) s₀.2 r.2
-        ⟩ 
-    else []
+def cosetElems (s₀ : evalDomainSigma D g s i) : List (evalDomainSigma D g s i) :=
+  if k_le_n : ∑ j', (s j').1 ≤ n
+  then
+    (Domain.rootsOfUnity D n (s i)).map fun r =>
+      ⟨
+        _,
+        CosetDomain.mul_root_of_unity D (sum_finRangeTo_le_sub_of_le k_le_n) s₀.2 r.2
+      ⟩ 
+  else []
 
-def cosetG {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : Finset (evalDomainSigma D g s i) :=
+def cosetG (s₀ : evalDomainSigma D g s i) : Finset (evalDomainSigma D g s i) :=
   (cosetElems D g s s₀).toFinset
 
 def pows (z : 𝔽) (ℓ : ℕ) : Matrix Unit (Fin ℓ) 𝔽 :=
   Matrix.of <| fun _ j => z ^ j.val
 
-def VDM {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) :
+def VDM (s₀ : evalDomainSigma D g s i) :
   Matrix (Fin (2 ^ (s i : ℕ))) (Fin (2 ^ (s i : ℕ))) 𝔽 :=
   if k_le_n : (∑ j', (s j').1) ≤ n
   then
@@ -86,18 +67,13 @@ def VDM {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) :
     Matrix.vandermonde v
   else 1
 
-def fin_equiv_coset {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : (Fin (2 ^ (s i).1)) ≃ { x // x ∈ cosetG D g s s₀ } where
+def fin_equiv_coset (s₀ : evalDomainSigma D g s i) : (Fin (2 ^ (s i).1)) ≃ { x // x ∈ cosetG D g s s₀ } where
   toFun := sorry
   invFun := sorry
   left_inv := sorry
   right_inv := sorry
 
-lemma pow_eq {G : Type} [Group G] {a b : ℕ} {g : G} :
-  a < orderOf g → b < orderOf g → g ^ a = g ^ b → a = b := by
-  intros h₁ h₂ h₃
-  rwa [pow_inj_mod, Nat.mod_eq_of_lt h₁, Nat.mod_eq_of_lt h₂] at h₃
-
-instance {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s₀) := by
+def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s₀) := by
   haveI : NeZero (VDM D g s s₀).det := by
     constructor
     unfold VDM
@@ -138,6 +114,10 @@ instance {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : Invertible (VDM D 
       rw [pow_lift, pow_lift, pow_lift, Units.val_inj] at this
       have this := this.symm
       apply Fin.eq_of_val_eq
+      have pow_eq {G : Type} [Group G] {a b : ℕ} {g : G} :
+        a < orderOf g → b < orderOf g → g ^ a = g ^ b → a = b := by
+        intros h₁ h₂ h₃
+        rwa [pow_inj_mod, Nat.mod_eq_of_lt h₁, Nat.mod_eq_of_lt h₂] at h₃
       refine pow_eq ?_ ?_ this
       · convert i'.2
         rw [orderOf_pow, orderOf_submonoid, DSmooth.1]
@@ -177,53 +157,27 @@ instance {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) : Invertible (VDM D 
   apply @Matrix.invertibleOfDetInvertible
 
 
-def VDMInv {i : Fin (n + 1)} (s₀ : evalDomainSigma D g s i) :
-    Matrix (Fin (2 ^ (s i).1)) { x // x ∈ cosetG D g s s₀ } 𝔽 :=
+def VDMInv (s₀ : evalDomainSigma D g s i) :
+  Matrix (Fin (2 ^ (s i).1)) (cosetG D g s s₀) 𝔽 :=
   Matrix.reindex (Equiv.refl _) (fin_equiv_coset D g s s₀)
-    (instInvertibleMatrixFinHPowNatOfNatValVDM D g s s₀).invOf
+  (invertibleDomain D g s s₀).invOf
 
 lemma g_elem_zpower_iff_exists_nat {G : Type} [Group G] [Finite G] {gen g : G} :
     g ∈ Subgroup.zpowers gen ↔ ∃ n : ℕ, g = gen ^ n ∧ n < orderOf gen := by
-  apply Iff.intro
-  · intros h
-    rw [Subgroup.mem_zpowers_iff] at h
-    rcases h with ⟨k, h⟩
-    have : gen ^ k = gen ^ (k % orderOf gen) :=
-      Eq.symm (zpow_mod_orderOf gen k)
-    have : ∃ n : ℕ, g = gen ^ n ∧ n < orderOf gen := by
-      have pow_pos : 0 ≤ (k % (orderOf gen)) := by
-        apply Int.emod_nonneg k
-        apply Int.ofNat_ne_zero.mpr
-        intros h
-        have := h ▸ orderOf_pos gen
-        simp at this
-      have h' : ∃ n : ℕ, n = k % (orderOf gen) := by
-        match h' : k % ↑(orderOf gen) with
-        | .ofNat n => use n; rw [h']; rfl
-        | .negSucc _ =>
-          rw [h'] at pow_pos
-          simp at pow_pos
-      rcases h' with ⟨n, h'⟩
-      rw [←h', zpow_natCast] at this
-      use n
-      rw [←this]
-      refine ⟨h.symm, ?_⟩
-      have {a b : ℕ} : (a : ℤ) < (b : ℤ) → a < b := by
-        rw [Int.ofNat_lt]
-        exact id
-      apply this
-      rw [h']
-      apply Int.emod_lt_of_pos k
-      apply Int.natCast_pos.mpr
-      exact orderOf_pos gen
-    rcases this with ⟨n, this⟩
+  have := isOfFinOrder_of_finite gen
+  refine ⟨fun h ↦ ?p₁, ?p₂⟩
+  · obtain ⟨k, h⟩ := Subgroup.mem_zpowers_iff.1 h
+    let k' := k % orderOf gen
+    have pow_pos : 0 ≤ k' := by apply Int.emod_nonneg; simp [*]
+    obtain ⟨n, h'⟩ : ∃ n : ℕ, n = k' := by rcases k' with k' | k' <;> [(use k'; grind); aesop]
     use n
-  · rintro ⟨n, h⟩
-    rw [h.1]
-    exact Subgroup.npow_mem_zpowers _ _
+    have : gen ^ n = gen ^ k := by have := zpow_mod_orderOf gen k; grind [zpow_natCast]
+    have : n < orderOf gen := by zify; rw [h']; apply Int.emod_lt; simp [isOfFinOrder_of_finite gen]
+    grind
+  · grind [Subgroup.npow_mem_zpowers]
 
 open Matrix in
-noncomputable def f_succ' {i : Fin (n + 1)}
+noncomputable def f_succ'
   (f : evalDomainSigma D g s i → 𝔽) (z : 𝔽)
   (s₀' : evalDomainSigma D g s (i.1 + 1)) : 𝔽 :=
   have :
@@ -250,7 +204,6 @@ noncomputable def f_succ' {i : Fin (n + 1)}
   (pows z _ *ᵥ VDMInv D g s s₀ *ᵥ Finset.restrict (cosetG D g s s₀) f) ()
 
 lemma claim_8_1
-  {i : Fin (n + 1)}
   {f : ReedSolomon.code (injectF (i := ∑ j' ∈ finRangeTo i, s j'))
                         (2 ^ (n - (∑ j' ∈ finRangeTo i, (s j' : ℕ))))}
   {z : 𝔽}
