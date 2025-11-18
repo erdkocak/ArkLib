@@ -60,9 +60,6 @@ def subLeftFull (U : Matrix (Fin m) (Fin n) F) (c_reindex : Fin m → Fin n) :
 variable [CommRing F] [Nontrivial F]
          {U : Matrix (Fin m) (Fin n) F}
 
-
-
-
 /-- An m×n matrix has full rank if the submatrix consisting of rows 1 through n has rank n. -/
 lemma rank_eq_if_subUpFull_eq (h : n ≤ m) :
    (subUpFull U (Fin.castLE h)).rank = n  → U.rank = n  := by
@@ -119,8 +116,6 @@ section
 
 variable [Field F]
          {U : Matrix (Fin m) (Fin n) F}
-
-
 
 /-- A square matrix has full rank iff the determinant is nonzero. -/
 lemma rank_eq_iff_det_ne_zero {U : Matrix (Fin n) (Fin n) F} :
@@ -213,7 +208,7 @@ noncomputable def AffSpanFinset [NeZero k] (U : Fin k → ι → F) : Finset (ι
   (AffSpanSet.instFinite U).toFinset
 
 /-- A collection of affine subspaces in `F^ι`. -/
-noncomputable def AffSpanFinsetCol {t : ℕ} [NeZero k] [NeZero t]
+noncomputable def AffSpanFinsetCollection {t : ℕ} [NeZero k] [NeZero t]
   (C : Fin t → (Fin k → (ι → F))) : Set (Finset (ι → F)) :=
   Set.range (fun i => AffSpanFinset (C i))
 

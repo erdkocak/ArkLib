@@ -101,7 +101,7 @@ import ArkLib.Data.Polynomial.RationalFunctions
 import ArkLib.Data.Polynomial.SplitFold
 import ArkLib.Data.Probability.Instances
 import ArkLib.Data.Probability.Notation
-import ArkLib.Data.RingTheory.TowerOfAlgebra
+import ArkLib.Data.RingTheory.AlgebraTower
 import ArkLib.Data.UniPoly.Basic
 import ArkLib.Data.Vector.Basic
 import ArkLib.OracleReduction.BCS.Basic
@@ -124,9 +124,9 @@ import ArkLib.OracleReduction.Execution
 -- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Soundness
 -- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.TraceTransform
 -- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.State
--- import ArkLib.OracleReduction.LiftContext.Lens
--- import ArkLib.OracleReduction.LiftContext.OracleReduction
--- import ArkLib.OracleReduction.LiftContext.Reduction
+import ArkLib.OracleReduction.LiftContext.Lens
+import ArkLib.OracleReduction.LiftContext.OracleReduction
+import ArkLib.OracleReduction.LiftContext.Reduction
 import ArkLib.OracleReduction.OracleInterface
 import ArkLib.OracleReduction.Prelude
 import ArkLib.OracleReduction.ProtocolSpec.Basic
