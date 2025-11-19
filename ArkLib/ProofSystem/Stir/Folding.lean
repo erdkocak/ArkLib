@@ -170,7 +170,7 @@ noncomputable def fold
 noncomputable def foldingDistRange
    (degree : ℕ) [Fintype ι] [Nonempty ι] (φ : ι ↪ F) (f : ι → F) : ℝ :=
     let C : Set (ι → F) := code φ degree
-    min δᵣ(f, C) (1 - Bstar (LinearCode.rate (code φ degree)))
+    min δᵣ'(f, C) (1 - Bstar (LinearCode.rate (code φ degree)))
 
 open ProbabilityTheory
 
@@ -187,7 +187,7 @@ lemma folding
   {degree : ℕ} (δ : ℚ) (hδPos : δ > 0)
   (hδLt : δ < foldingDistRange degree φ f) :
   let C : Set ((indexPow S φ k) → F) := code (pow S φ k) (degree / k)
-  Pr_{ let r ← $ᵖ F }[ δᵣ((fold φ f k r), C) ≤ δ]
+  Pr_{ let r ← $ᵖ F }[ δᵣ'((fold φ f k r), C) ≤ δ]
     ≤ ENNReal.ofReal (proximityError F (degree / k) (LinearCode.rate (code φ degree)) δ k) :=
 by sorry
 

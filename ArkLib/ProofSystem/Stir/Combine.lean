@@ -6,7 +6,7 @@ Authors: Mirco Richter, Poulami Das (Least Authority)
 
 import Mathlib.Tactic.FieldSimp
 
-import ArkLib.Data.CodingTheory.ProximityGap
+import ArkLib.Data.CodingTheory.ProximityGap.Basic
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.Probability.Notation
 import ArkLib.ProofSystem.Stir.ProximityBound
@@ -137,7 +137,7 @@ lemma degreeCor_eq {F : Type u_1} [Field F] [DecidableEq F] {ι : Type u_2} (φ 
 variable {F : Type} [Field F] [Fintype F] [DecidableEq F]
          {ι : Type} [Fintype ι] [Nonempty ι]
 
-open LinearCode ProbabilityTheory ReedSolomon STIR in
+open LinearCode Classical ProbabilityTheory ReedSolomon STIR in
 /-- Lemma 4.13
   Let `dstar` be the target degree, `f₁,...,f_{m-1} : ι → F`,
   `0 < degs₁,...,degs_{m-1} < dstar` be degrees and
@@ -150,9 +150,10 @@ lemma combine_theorem
   (δ : ℝ) (hδPos : δ > 0)
   (hδLt : δ < (min (1 - Bstar (rate (code φ degree)))
                    (1 - (rate (code φ degree)) - 1 / Fintype.card ι)))
-  (hProb : Pr_{ let r ← $ᵖ F}[δᵣ((combine φ dstar r fs degs), (code φ dstar)) ≤ δ] >
+  (hProb : Pr_{ let r ← $ᵖ F}[δᵣ'((combine φ dstar r fs degs), (code φ dstar)) ≤ δ] >
     ENNReal.ofReal (proximityError F dstar (rate (code φ degree)) δ (m * (dstar + 1) - ∑ i, degs i))) :
-      ProximityGap.correlatedAgreement (code φ degree) ⟨δ, by linarith⟩ fs
+      ProximityGap.jointAgreement (F := F) (κ := Fin m) (ι := ι) (C := code φ degree)
+        (W := fs) (δ := ⟨δ, by linarith⟩)
       := by sorry
 
 end Combine

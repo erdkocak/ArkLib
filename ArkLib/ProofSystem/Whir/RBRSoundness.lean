@@ -163,7 +163,7 @@ def whirRelation
     {ι : Type} [Fintype ι] [Nonempty ι]
     (varCount : ℕ) (φ : ι ↪ F) [Smooth φ] (err : ℝ)
     : Set ((Unit × ∀ i, (OracleStatement ι F i)) × Unit) :=
-  { ⟨⟨_, oracle⟩, _⟩ | δᵣ(oracle (), smoothCode φ varCount) ≤ err }
+  { ⟨⟨_, oracle⟩, _⟩ | δᵣ'(oracle (), smoothCode φ varCount) ≤ err }
 
 /-- Theorem 5.2: **Round-by-round soundness of the WHIR Vector IOPP** -/
 theorem whir_rbr_soundness
@@ -183,7 +183,7 @@ theorem whir_rbr_soundness
   -- ∀ f₀ : ι₀ → F, δ₀ < δᵣ(f₀, CRS[F,ι₀,m₀,wPoly₀,σ₀]),
   -- where δᵣ denotes the relative Hamming distance
     (hδ₀Lt : ∀ f_0 : (ι 0) → F,
-      (h.δ 0) < (δᵣ(f_0, (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀)) : ℝ))
+      (h.δ 0) < (δᵣ'(f_0, (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀)) : ℝ))
     (ε_fold : (i : Fin (M + 1)) → Fin (P.foldingParam i) → ℝ≥0) (ε_out : Fin (M + 1) → ℝ≥0)
     (ε_shift : Fin M → ℝ≥0) (ε_fin : ℝ≥0) :
     ∃ n : ℕ,

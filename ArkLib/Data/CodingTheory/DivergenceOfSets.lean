@@ -5,7 +5,8 @@ Authors: Katerina Hristova, František Silváši, Julian Sutherland
 -/
 
 import ArkLib.Data.CodingTheory.Basic
-import ArkLib.Data.CodingTheory.ProximityGap
+import ArkLib.Data.CodingTheory.ProximityGap.Basic
+import ArkLib.Data.CodingTheory.ProximityGap.BCIKS20
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.Probability.Notation
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
@@ -38,7 +39,7 @@ variable {ι : Type*} [Fintype ι] [Nonempty ι]
 
 /-- The set of possible relative Hamming distances between two sets. -/
 def possibleDeltas (U V : Set (ι → F)) : Set ℚ≥0 :=
-  {d : ℚ≥0 | ∃ u ∈ U, δᵣ(u,V) = d}
+  {d : ℚ≥0 | ∃ u ∈ U, δᵣ'(u,V) = d}
 
 /-- The set of possible relative Hamming distances between two sets is well-defined. -/
 @[simp]

@@ -63,7 +63,7 @@ lemma quotienting [DecidableEq F] {degree : ℕ} {domain : ι ↪ F} [Nonempty �
   (f : ι → F) (Ans Fill : S → F) (δ : ℝ) (hδPos : δ > 0) (hδLt : δ < 1)
   (h : ∀ u : code domain degree, u.val ∈ (relHammingBall ↑(code domain degree) f δ) →
     ∃ (x : S) (hx : x.val ∈ S), ((decodeLT u) : F[X]).eval x.val ≠ Ans ⟨x.val, hx⟩) :
-    δᵣ((funcQuotient f S Ans Fill), (code domain (degree - S.card))) +
+    δᵣ'((funcQuotient f S Ans Fill), (code domain (degree - S.card))) +
       ((disagreementSet f S Ans).card : ℝ) / (ι.card : ℝ) > δ := by
   sorry
 

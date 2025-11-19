@@ -2,13 +2,15 @@
 Copyright (c) 2024 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Quang Dao, Katerina Hristova, František Silváši, Julian Sutherland, Ilia Vlasov,
-Mirco Richter
+Mirco Richter, Chung Thai Nguyen
 -/
 
 import ArkLib.Data.MvPolynomial.LinearMvExtension
 import ArkLib.Data.Polynomial.Interface
 import Mathlib.LinearAlgebra.Lagrange
 import Mathlib.RingTheory.Henselian
+import Mathlib.Data.NNReal.Defs
+import Mathlib.Data.NNReal.Basic -- for instFloorSemiring of ℝ≥0
 
 /-!
   # Reed-Solomon Codes
@@ -264,6 +266,13 @@ lemma dist_le_length [DecidableEq F] (inj : Function.Injective α) :
 abbrev sqrtRate [Fintype ι] (deg : ℕ) (domain : ι ↪ F) : ℝ≥0 :=
   (LinearCode.rate (ReedSolomon.code domain deg) : ℝ≥0).sqrt
 
+/-- The Johnson bound radius for Reed-Solomon codes: `1 - √ρ`.
+  This is the maximum relative distance up to which list decoding is guaranteed
+  by the Johnson bound.
+  For any code with rate ρ and minimum relative distance δ = (1-ρ), the Johnson radius is 1 - √ρ. -/
+noncomputable def johnsonRadius [Fintype ι] (deg : ℕ) (domain : ι ↪ F) : ℝ≥0 :=
+  1 - sqrtRate deg domain
+
 end
 
 lemma card_le_card_of_count_inj {α β : Type*} [DecidableEq α] [DecidableEq β]
@@ -343,6 +352,50 @@ theorem minDist [Field F] [DecidableEq F] (inj : Function.Injective α) [NeZero 
       rw [wt, filter_card_add_filter_neg_card_eq_card]
       simp
     omega
+
+theorem dist_eq {F : Type*} {m n : ℕ} {α : Fin m → F} [Field F] [DecidableEq F]
+  (inj : Function.Injective α) [NeZero n] (h : n ≤ m) :
+    Code.dist (R := F) ((ReedSolomon.code ⟨α, inj⟩ n) : Set (Fin m → F)) = m - n + 1 := by
+  simp_rw [dist_eq_minDist]
+  rw [ReedSolomonCode.minDist inj h]
+
+/-- The exact unique decoding radius for Reed-Solomon codes via MDS property: `d = n - k + 1`.
+The unique decoding radius is ⌊(d-1)/2⌋ = ⌊(n-k)/2⌋. -/
+theorem uniqueDecodingRadius_RS_eq {F : Type*} {m n : ℕ} {α : Fin m → F} [Field F] [DecidableEq F]
+  (inj : Function.Injective α) [NeZero n] (h : n ≤ m) :
+    Code.uniqueDecodingRadius (ι := Fin m) (F := F) (C := ReedSolomon.code ⟨α, inj⟩ n) =
+    -- Note: This is Nat.div (floor)
+    ((Fintype.card (Fin m)) - (LinearCode.dim (ReedSolomon.code ⟨α, inj⟩ n))) / 2 := by
+  -- 1. Unfold the definition of the radius
+  simp only [uniqueDecodingRadius] -- Goal: (‖C‖₀ - 1) / 2 = (n - k) / 2
+  rw [dist_eq_minDist]
+  rw [ReedSolomonCode.minDist inj h]
+  simp only [add_tsub_cancel_right, Fintype.card_fin]
+  rw [dim_eq_deg_of_le (inj := inj) (h := by exact h)]
+
+open NNReal in
+/-- The relative unique decoding radius for Reed-Solomon codes: `(1 - ρ)/2`. -/
+theorem relativeUniqueDecodingRadius_RS_eq
+    {F : Type*} {m n : ℕ} {α : Fin m → F} [Field F] [DecidableEq F]
+  (inj : Function.Injective α) [NeZero n] (h : n ≤ m) :
+    Code.relativeUniqueDecodingRadius (ι := Fin m) (F := F) (C := ReedSolomon.code ⟨α, inj⟩ n) =
+    ((1 : ℝ≥0) - LinearCode.rate (ReedSolomon.code ⟨α, inj⟩ n)) / 2 := by
+  have h_m_ne_zero: m ≠ 0 := by
+    by_contra h_m_eq_zero
+    have h_n_eq_0 : n = 0 := by omega
+    have h_n_ne_0 : n ≠ 0 := by exact Ne.symm (NeZero.ne' n)
+    exact h_n_ne_0 h_n_eq_0
+  -- 1. Get the code C for brevity
+  set C := ReedSolomon.code ⟨α, inj⟩ n
+  rw [Code.relativeUniqueDecodingRadius, ReedSolomonCode.dist_eq (h := h),
+    ReedSolomonCode.rateOfLinearCode_eq_div (h := h)]
+  simp only [Nat.cast_add, Nat.cast_tsub, Nat.cast_one, add_tsub_cancel_right, Fintype.card_fin,
+    NNRat.cast_div, NNRat.cast_natCast]
+  -- ⊢ (↑m - ↑n) / 2 / ↑m = (1 - ↑n / ↑m) / 2
+  conv_lhs =>
+    rw [NNReal.sub_div, NNReal.sub_div, div_div, mul_comm, ←div_div]
+    rw [div_self (Nat.cast_ne_zero.mpr h_m_ne_zero)]
+  conv_rhs => rw [NNReal.sub_div, div_div, mul_comm, ←div_div]
 
 end
 

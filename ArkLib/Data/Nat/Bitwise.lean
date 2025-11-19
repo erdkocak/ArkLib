@@ -12,11 +12,18 @@ import Mathlib.Data.Nat.Digits.Defs
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.NNReal.Defs
+import Mathlib.Data.NNReal.Basic -- for instFloorSemiring of ℝ≥0
+import Mathlib.Algebra.CharP.Defs
+import Mathlib.Data.Nat.Cast.Order.Field
+import Mathlib.Data.ENat.Defs
+import Mathlib.Data.ENat.Basic
 
 /-!
 # Bit operations on natural numbers
 -/
 namespace Nat
+open NNReal ENat
 
 -- Note: this is already done with `Nat.sub_add_eq_max`
 theorem max_eq_add_sub {m n : Nat} : Nat.max m n = m + (n - m) := by
@@ -36,6 +43,25 @@ theorem sub_add_eq_sub_sub_rev (a b c : Nat) (h1 : c ≤ b) (h2 : b ≤ a) :
 lemma lt_add_of_pos_right_of_le (a b c : ℕ) [NeZero c] (h : a ≤ b) : a < b + c := by
   apply Nat.lt_of_le_of_lt (n:=a) (m:=b) (k:=b + c) h
   apply Nat.lt_add_of_pos_right (by exact pos_of_neZero c)
+
+@[simp]
+lemma cast_div_le_div_cast_NNReal (x y : ℕ) :
+    ((x / y : ℕ) : ℝ≥0) ≤ (x : ℝ≥0) / (y : ℝ≥0) := by
+  by_cases hy : y = 0
+  · -- If y = 0, both sides are 0 by definition
+    -- Nat.div_zero is 0, and NNReal.div_zero is 0
+    simp only [hy, Nat.div_zero, CharP.cast_eq_zero, div_zero, le_refl]
+  · -- Now, we know y ≠ 0. We can use the iff lemma for division `a ≤ b / c ↔ a * c ≤ b`
+    have hy_nnreal_ne_zero : (y : ℝ≥0) ≠ 0 := by
+      simp only [ne_eq, Nat.cast_eq_zero, hy, not_false_eq_true] -- `hy` is `y ≠ 0`
+    exact Nat.cast_div_le
+
+@[simp]
+lemma ENat.le_floor_NNReal_iff (x : ENat) (y : ℝ≥0) (hx_ne_top : x ≠ ⊤) :
+  (x : ENat) ≤ ((Nat.floor y) : ENat) ↔ x.toNat ≤ Nat.floor y := by
+  lift x to ℕ using hx_ne_top
+  -- y : ℝ≥0, x : ℕ, ⊢ ↑x ≤ ↑⌊y⌋₊ ↔ (↑x).toNat ≤ ⌊y⌋₊
+  simp only [Nat.cast_le, toNat_coe]
 
 /--
 Returns the `k`-th least significant bit of a natural number `n` as a natural number (in `{0, 1}`).
