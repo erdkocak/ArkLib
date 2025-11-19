@@ -124,26 +124,13 @@ def domainEmb {i : ℕ} : evalDomain D i ↪ F :=
 omit [Finite F] in
 lemma D_def : D = evalDomain D 0 := by
   unfold evalDomain
-  simp only [pow_zero, pow_one]
-  have := DIsCyclicC.zpow_surjective
-  unfold Function.Surjective at this
   ext x
-  apply Iff.intro
-  · intros h
-    rcases this ⟨x, h⟩ with ⟨a, h⟩
-    simp only at h
-    refine Subgroup.mem_zpowers_iff.mpr ?_
-    exists a
-    have : x = (DIsCyclicC.gen ^ a) := by
-      norm_cast
-      rw [h]
-    rw [this]
-  · intros h
-    rw [Subgroup.mem_zpowers_iff] at h
-    rcases h with ⟨k, h⟩
-    norm_cast at h
-    rw [←h]
-    exact (DIsCyclicC.gen ^ k).2
+  rw [Subgroup.mem_zpowers_iff]
+  simp only [pow_zero, pow_one]
+  norm_cast
+  refine ⟨fun h ↦ ?p₁, fun h ↦ h.choose_spec ▸ (DIsCyclicC.gen ^ h.choose).2⟩
+  have := DIsCyclicC.zpow_surjective ⟨x, h⟩
+  grind
 
 /- Proof each on of these groups is cyclic (with a computable generator) -/
 instance {i : ℕ} : IsCyclicWithGen (evalDomain D i) := by
