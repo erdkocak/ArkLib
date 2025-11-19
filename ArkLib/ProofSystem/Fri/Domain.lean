@@ -28,7 +28,7 @@ def domain (n : ℕ) (i : ℕ) : Fin (2 ^ (n - i)) → evalDomain D i :=
   fun j => ⟨(DIsCyclicC.gen ^ (2 ^ i)) ^ j.1, by simp⟩
 
 omit [Finite F] in
-lemma domain_surjective (i : ℕ) : i ≤ n → Function.Surjective (domain D n i) := by
+lemma domain_surjective {i : ℕ} : i ≤ n → Function.Surjective (domain D n i) := by
   intros h
   unfold Function.Surjective
   intros b
@@ -87,110 +87,16 @@ lemma domain_surjective (i : ℕ) : i ≤ n → Function.Surjective (domain D n 
 
 lemma pow_inj {i : ℕ} {a b : Fin (2 ^ (n - i))} :
     i ≤ n → (DIsCyclicC.gen.1 ^ 2 ^ i) ^ a.1 = (DIsCyclicC.gen.1 ^ 2 ^ i) ^ b.1 → a = b := by
-  intros h h'
-  have ha := a.2
-  have hb := b.2
-  by_contra a_neq_b
-  rcases Fin.lt_or_lt_of_ne a_neq_b with a_le_b | a_gt_b
-  · have h' := h'.symm
-    rw [←mul_inv_eq_one] at h'
-    have cast_eq {a : Fˣ} (n : ℕ) : a ^ n = a ^ (Int.ofNat n) := by
-      exact rfl
-    rw [cast_eq a.1, cast_eq b.1, ←zpow_neg, ←zpow_add] at h'
-    have h₁ : 0 < (Int.ofNat b.1 + -Int.ofNat a.1) := by
-      apply Int.lt_add_of_neg_add_lt
-      rw [add_zero]
-      simp only [Int.ofNat_eq_coe, neg_lt_neg_iff, Nat.cast_lt, Fin.val_fin_lt]
-      exact a_le_b
-    have h₂ : (Int.ofNat b.1 + -Int.ofNat a.1) < 2 ^ (n - i) := by
-      simp only [Int.ofNat_eq_coe, add_neg_lt_iff_lt_add]
-      apply lt_add_of_lt_of_nonneg
-      · norm_cast
-      · simp
-    have : Int.ofNat b.1 + -Int.ofNat a.1 = Int.ofNat (b.1 - a.1) := by
-      simp
-      have : Int.ofNat b.1 + - Int.ofNat a.1 = Int.ofNat b.1 - Int.ofNat a.1 := by
-        ring
-      rw [Int.ofNat_eq_coe, Int.ofNat_eq_coe] at this
-      rw [this, Int.sub_eq_iff_eq_add']
-      norm_cast
-      refine Eq.symm (Nat.add_sub_of_le ?_)
-      exact Nat.le_of_succ_le a_le_b
-    rw [this] at h' h₁ h₂
-    rw [Int.ofNat_eq_coe, zpow_natCast] at h'
-    have h' := orderOf_dvd_of_pow_eq_one h'
-    have : orderOf (DIsCyclicC.gen.1 ^ 2 ^ i)  = 2 ^ (n - i) := by
-      rw [orderOf_pow]
-      norm_cast
-      rw [DSmooth.smooth]
-      have : n = (n - i) + i := by
-        exact (Nat.sub_eq_iff_eq_add h).mp rfl
-      rw (occs := .pos [2]) [this]
-      rw [pow_add, Nat.gcd_mul_left_left]
-      exact Nat.pow_div h (by decide)
-    rw [this] at h'
-    have : 2 ^ (n - i) ≤ b.1 - a.1 := by
-      rcases h' with ⟨m, h'⟩
-      rw [Int.ofNat_eq_coe, Int.natCast_pos] at h₁
-      have : m > 0 := by
-        by_contra h
-        simp at h
-        rw [h, mul_zero] at h'
-        rw [h', lt_self_iff_false] at h₁
-        exact h₁
-      nlinarith
-    have :  b.1 - a.1 < 2 ^ (n - i) := by
-      exact Nat.sub_lt_of_lt hb
-    linarith
-  · rw [←mul_inv_eq_one] at h'
-    have cast_eq {a : Fˣ} (n : ℕ) : a ^ n = a ^ (Int.ofNat n) := by
-      exact rfl
-    rw [cast_eq a.1, cast_eq b.1, ←zpow_neg, ←zpow_add] at h'
-    have h₁ : 0 < (Int.ofNat a.1 + -Int.ofNat b.1) := by
-      apply Int.lt_add_of_neg_add_lt
-      rw [add_zero]
-      simp only [Int.ofNat_eq_coe, neg_lt_neg_iff, Nat.cast_lt, Fin.val_fin_lt]
-      exact a_gt_b
-    have h₂ : (Int.ofNat a.1 + -Int.ofNat b.1) < 2 ^ (n - i) := by
-      simp only [Int.ofNat_eq_coe, add_neg_lt_iff_lt_add]
-      apply lt_add_of_lt_of_nonneg
-      · norm_cast
-      · simp
-    have : Int.ofNat a.1 + -Int.ofNat b.1 = Int.ofNat (a.1 - b.1) := by
-      simp
-      have : Int.ofNat a.1 + - Int.ofNat b.1 = Int.ofNat a.1 - Int.ofNat b.1 := by
-        ring
-      rw [Int.ofNat_eq_coe, Int.ofNat_eq_coe] at this
-      rw [this, Int.sub_eq_iff_eq_add']
-      norm_cast
-      refine Eq.symm (Nat.add_sub_of_le ?_)
-      exact Nat.le_of_succ_le a_gt_b
-    rw [this] at h' h₁ h₂
-    rw [Int.ofNat_eq_coe, zpow_natCast] at h'
-    have h' := orderOf_dvd_of_pow_eq_one h'
-    have : orderOf (DIsCyclicC.gen.1 ^ 2 ^ i)  = 2 ^ (n - i) := by
-      rw [orderOf_pow]
-      norm_cast
-      rw [DSmooth.smooth]
-      have : n = (n - i) + i := by
-        exact (Nat.sub_eq_iff_eq_add h).mp rfl
-      rw (occs := .pos [2]) [this]
-      rw [pow_add, Nat.gcd_mul_left_left]
-      exact Nat.pow_div h (by decide)
-    rw [this] at h'
-    have : 2 ^ (n - i) ≤ a.1 - b.1 := by
-      rcases h' with ⟨m, h'⟩
-      rw [Int.ofNat_eq_coe, Int.natCast_pos] at h₁
-      have : m > 0 := by
-        by_contra h
-        simp at h
-        rw [h, mul_zero] at h'
-        rw [h', lt_self_iff_false] at h₁
-        exact h₁
-      nlinarith
-    have :  a.1 - b.1 < 2 ^ (n - i) := by
-      exact Nat.sub_lt_of_lt ha
-    linarith
+  intros h₁ h₂
+  rw [pow_inj_mod] at h₂
+  have : orderOf (DIsCyclicC.gen.1 ^ 2 ^ i)  = 2 ^ (n - i) := by
+    calc orderOf (DIsCyclicC.gen.1 ^ 2 ^ i)
+      _ = 2 ^ n / (2 ^ n).gcd (2 ^ i)               := by simp [orderOf_pow, DSmooth.smooth]
+      _ = 2 ^ n / (2 ^ (n - i + i)).gcd (2 ^ i)     := by aesop
+      _ = 2 ^ n / (2 ^ (n - i) * 2 ^ i).gcd (2 ^ i) := by grind
+      _ = 2 ^ n / 2 ^ i                             := by rw [Nat.gcd_mul_left_left _ _]
+      _ = 2 ^ (n - i)                               := Nat.pow_div h₁ (by decide)
+  grind [Fin.val_inj, Nat.mod_eq_of_lt, cases Fin]
 
 lemma domain_injective (i : ℕ) : i ≤ n → Function.Injective (domain D n i) := by
   intros h a b h'
