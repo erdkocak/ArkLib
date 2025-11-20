@@ -11,6 +11,28 @@ variable (D : Subgroup Fˣ) {n : ℕ} [DIsCyclicC : IsCyclicWithGen D] [DSmooth 
 
 namespace Fri
 
+section
+
+/-
+For `[CommMonoid K], (Monoid.toMulAction _ : MulAction Kˣ Kˣ) = Units.mulAction'` is not defeq.
+This leads to some typeclass friction that is ameliorated, albeit not resolved, by some automation.
+
+Viz. the discussion here:
+https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X.3F/topic/class.2Flemmas.20for.20smul.20distributing.20over.20smul
+-/
+
+omit [Finite F] in
+@[simp, grind _=_]
+private lemma op_der_eq : Monoid.toMulAction Fˣ = Units.mulAction' := by ext; rfl
+
+omit [Finite F] in
+@[grind, aesop safe apply]
+private lemma mem_smul_of_congr_aux {a b : Fˣ} {s : Set Fˣ}
+  (h₅ : a ∈ (@Set.smulSet Fˣ _ (Monoid.toMulAction Fˣ).toSMul).smul b s) :
+  a ∈ (@Set.smulSet Fˣ _ (Units.mulAction').toSMul).smul b s := by
+  convert h₅
+  simp
+
 namespace Domain
 
 /-- Constructs the subgroups of `Fˣ` which we will use to construct
@@ -133,25 +155,17 @@ lemma D_def : D = evalDomain D 0 := by
   grind
 
 /- Proof each on of these groups is cyclic (with a computable generator) -/
-instance {i : ℕ} : IsCyclicWithGen (evalDomain D i) := by
-  unfold evalDomain
-  constructor
-  swap
-  · refine ⟨DIsCyclicC.gen.1 ^ 2 ^ i, ?_⟩
-    simp
-  · unfold Function.Surjective
-    rintro ⟨b, h⟩
-    have : ∃ n : ℤ, b = (DIsCyclicC.gen.1 ^ 2 ^ i) ^ n := by
-      refine Subgroup.exists_mem_zpowers.mp ?_
-      exists b
-    rcases this with ⟨a, h'⟩
-    exists a
-    simp only [h']
-    rfl
+instance {i : ℕ} : IsCyclicWithGen (evalDomain D i) :=
+  ⟨
+    ⟨DIsCyclicC.gen.1 ^ 2 ^ i, by simp⟩,
+    by rintro ⟨b, h⟩
+       have := Subgroup.exists_mem_zpowers.1 ⟨b, ⟨h, rfl⟩⟩
+       aesop
+  ⟩
 
 omit [Finite F] in
 lemma pow_2_pow_i_mem_Di_of_mem_D :
-  ∀ {x : Fˣ} (i : ℕ),
+  ∀ {x : Fˣ} {i : ℕ},
     x ∈ D → x ^ (2 ^ i) ∈ evalDomain D i := by
   intros x i h
   simp only [evalDomain]
@@ -236,44 +250,30 @@ lemma minus_one_in_doms {i : ℕ} (h : i < n) :
   exists ((2 ^ (n - (i + 1))))
   norm_cast
   rw [←pow_mul, ←pow_add]
-  have : (i + (n - (i + 1))) = n - 1 := by
-    refine Eq.symm ((fun {b a c} h ↦ (Nat.sub_eq_iff_eq_add' h).mp) (Nat.le_sub_one_of_lt h) ?_)
-    exact Eq.symm (Nat.Simproc.sub_add_eq_comm n i 1)
-  rw [this]
-  have : ((DIsCyclicC.gen.1 ^ 2 ^ (n - 1)) ^ 2) = 1 := by
-    rw [←pow_mul]
-    have : 2 ^ (n - 1) * 2 = 2 ^ n := by
-      apply Nat.two_pow_pred_mul_two
-      linarith
-    rw [this, ←DSmooth.smooth]
+  rw [show i + (n - (i + 1)) = n - 1 by omega]
+  have : (DIsCyclicC.gen.1 ^ 2 ^ (n - 1)) ^ 2 = 1 := by
+    rw [
+      ←pow_mul,
+      show 2 ^ (n - 1) * 2 = 2 ^ n by grind [Nat.two_pow_pred_mul_two],
+      ←DSmooth.smooth
+    ]
     norm_cast
     rw [pow_orderOf_eq_one]
   have alg {x : Fˣ} : x^2 = 1 → x = 1 ∨ x = -1 := by
-    intros h
-    refine (Units.inv_eq_self_iff x).mp ?_
-    have {a b : Fˣ} (c : Fˣ) : c * a = c * b → a = b := by
-      intros h
-      have : c⁻¹ * (c * a) = c⁻¹ * (c * a) := by rfl
-      rw (occs := .pos [2]) [h] at this
-      rw [←mul_assoc, ←mul_assoc, inv_mul_cancel, one_mul, one_mul] at this
-      exact this
-    apply this x
-    simp only [mul_inv_cancel, h.symm, pow_two]
-  have cast : (DIsCyclicC.gen ^ 2 ^ (n - 1)).1 = (DIsCyclicC.gen.1 ^ 2 ^ (n - 1)) := by rfl
-  rw [cast]
+    intros h₁
+    have := sq_eq_one_iff (a := (x : F))
+    norm_cast at this
+    aesop
   specialize alg this
-  rcases alg with alg | alg
-  · have gen_ord := DSmooth.smooth
-    rw [orderOf_eq_iff (by simp)] at gen_ord
-    have gen_ord :=
-      gen_ord.2
-        (2 ^ (n - 1))
-        (by apply Nat.two_pow_pred_lt_two_pow; linarith)
-        (by simp)
-    exfalso
-    apply gen_ord
-    norm_cast at alg
-  · assumption
+  have gen_ord := DSmooth.smooth
+  rw [orderOf_eq_iff (by simp)] at gen_ord
+  norm_cast at alg
+  have gen_ord :=
+    gen_ord.2
+      (2 ^ (n - 1))
+      (by apply Nat.two_pow_pred_lt_two_pow; linarith)
+      (by simp)
+  tauto
 
 omit [Finite F] in
 lemma dom_n_eq_triv : evalDomain D n = ⊥ := by
@@ -310,9 +310,8 @@ namespace CosetDomain
 
 open Pointwise
 
-omit [Finite F] in
-private lemma op_der_eq : Monoid.toMulAction Fˣ = Units.mulAction' := by ext; rfl
 
+  
 /- Element of `Fˣ` we will use to define our coset -/
 variable (x : Fˣ)
 
@@ -324,6 +323,7 @@ def evalDomain (i : ℕ) : Set Fˣ :=
 abbrev evalDomainSigma (s : Fin (n + 1) → ℕ+) (i : ℕ) :=
   evalDomain D x (∑ j' ∈ finRangeTo i, s j') 
 
+-- set_option pp.all true in
 /- Enumeration of the elements of the `i`th coset. -/
 def domain (n : ℕ) (i : ℕ) : Fin (2 ^ (n - i)) → evalDomain D x i :=
   fun j =>
@@ -337,9 +337,7 @@ def domain (n : ℕ) (i : ℕ) : Fin (2 ^ (n - i)) → evalDomain D x i :=
               Domain.evalDomain D i := by
           rw [←mul_assoc]
           simp
-        convert (mem_leftCoset_iff _).mpr h
-        expose_names
-        exact (@op_der_eq F inst).symm
+        exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 h)
     ⟩
 
 lemma domain_injective {i : ℕ} : i ≤ n → Function.Injective (domain D x n i) := by
@@ -376,8 +374,7 @@ noncomputable def domainToFin {i : Fin (n + 1)} : evalDomain D x i → Fin (2 ^ 
       unfold evalDomain at h
       have h' : (x ^ 2 ^ i.1)⁻¹ * ↑g ∈ ↑(Domain.evalDomain D ↑i) := by
         apply (@mem_leftCoset_iff Fˣ _ (Domain.evalDomain D ↑i) g.1 (x ^ (2 ^ i.1))).mp
-        convert h
-        exact op_der_eq
+        aesop
       unfold Domain.evalDomain at h'
       rw [Subgroup.mem_zpowers_iff] at h'
       rcases h' with ⟨ind, h'⟩
@@ -437,21 +434,19 @@ lemma D_def : evalDomain D x 0 = x • D := by simp [Domain.D_def D]
 
 lemma pow_2_pow_i_mem_Di_of_mem_D {F : Type} [NonBinaryField F] [Finite F] {D : Subgroup Fˣ}
   [DIsCyclicC : IsCyclicWithGen ↥D] {x : Fˣ} :
-  ∀ {a : Fˣ} (i : ℕ),
+  ∀ {a : Fˣ} {i : ℕ},
     a ∈ evalDomain D x 0 → a ^ (2 ^ i) ∈ evalDomain D x i := by
   unfold evalDomain
   intros a i h
   have h : x⁻¹ * a ∈ Domain.evalDomain D 0 := by
     simp only [pow_zero, pow_one] at h
     apply (mem_leftCoset_iff _).mp
-    convert h
-    exact op_der_eq
+    aesop
   rw [←Domain.D_def] at h
-  have h := Domain.pow_2_pow_i_mem_Di_of_mem_D D i h
+  have h := Domain.pow_2_pow_i_mem_Di_of_mem_D D (i := i) h
   have : (x⁻¹ * a) ^ 2 ^ i = (x ^ (2 ^ i))⁻¹ * (a ^ (2 ^ i)) := by field_simp
   rw [this] at h
-  convert (mem_leftCoset_iff _).mpr h
-  exact op_der_eq.symm
+  exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 h)
 
 omit [Finite F] in
 lemma sqr_mem_D_succ_i_of_mem_D_i : ∀ {a : Fˣ} {i : ℕ},
@@ -460,8 +455,7 @@ lemma sqr_mem_D_succ_i_of_mem_D_i : ∀ {a : Fˣ} {i : ℕ},
   intros a i h
   have h : (x ^ 2 ^ i)⁻¹ * a ∈ Domain.evalDomain D i := by
     apply (mem_leftCoset_iff _).mp
-    convert h
-    exact op_der_eq
+    aesop
   have h := Domain.sqr_mem_D_succ_i_of_mem_D_i D h
   have : ((x ^ 2 ^ i)⁻¹ * a) ^ 2 = (x ^ 2 ^ (i + 1))⁻¹ * (a ^ 2) := by
     have : ((x ^ 2 ^ i)⁻¹ * a) ^ 2 = ((x ^ 2 ^ i) ^ 2)⁻¹ * (a ^ 2) := by field_simp
@@ -472,8 +466,7 @@ lemma sqr_mem_D_succ_i_of_mem_D_i : ∀ {a : Fˣ} {i : ℕ},
       grind
     rw [this]
   rw [this] at h
-  convert (mem_leftCoset_iff _).mpr h
-  exact op_der_eq.symm
+  exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 h)
 
 omit [Finite F] in
 lemma pow_lift : ∀ {a : Fˣ} {i : ℕ} (s : ℕ),
@@ -496,8 +489,7 @@ lemma neg_mem_dom_of_mem_dom : ∀ {a : Fˣ} (i : Fin n),
   rintro a ⟨i, i_prop⟩ h
   have mem : (x ^ 2 ^ i)⁻¹ * a ∈ Domain.evalDomain D i := by
     apply (mem_leftCoset_iff _).mp
-    convert h
-    exact op_der_eq
+    aesop
 
   have : (x ^ 2 ^ i)⁻¹ * -a ∈ ↑(Domain.evalDomain D i) := by
     have : (x ^ 2 ^ i)⁻¹ * -a = ((x ^ 2 ^ i)⁻¹ * a) * (- 1) := by field_simp
@@ -533,9 +525,7 @@ lemma mul_root_of_unity {x : Fˣ} :
       Eq.symm (pow_mul_pow_sub 2 i_le_j), pow_mul, zpow_mul
     ]
     norm_cast
-  have := (mem_leftCoset_iff (x ^ 2 ^ i)).mpr this
-  convert this
-  exact op_der_eq.symm
+  exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 this)
 
 omit [Finite F] in
 lemma dom_n_eq_triv : evalDomain D x n = {x ^ (2 ^ n)} := by
@@ -552,8 +542,7 @@ noncomputable instance : Nonempty ↑(CosetDomain.evalDomain D x 0) := by
     by
       simp
       have := (@mem_leftCoset_iff Fˣ _ (Subgroup.zpowers DIsCyclicC.gen.1) x x).mpr (by simp)
-      convert this
-      exact op_der_eq.symm
+      aesop
     ⟩
 
 noncomputable instance : Fintype ↑(CosetDomain.evalDomain D x 0) := inferInstance
@@ -564,5 +553,7 @@ instance domain_neg_inst {F : Type} [NonBinaryField F] [Finite F] {D : Subgroup 
   neg := fun a => ⟨_, neg_mem_dom_of_mem_dom D x i a.2⟩
 
 end CosetDomain
+
+end
 
 end Fri

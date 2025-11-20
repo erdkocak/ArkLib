@@ -727,7 +727,7 @@ noncomputable def queryVerifier (k_le_n : (∑ j', (s j').1) ≤ n) (l : ℕ) [D
                   let s₀ :
                     evalDomain D x
                       (∑ j' ∈ finRangeTo i.1, (s j').1) :=
-                    ⟨_, pow_2_pow_i_mem_Di_of_mem_D _ s₀.2⟩
+                    ⟨_, pow_2_pow_i_mem_Di_of_mem_D s₀.2⟩
                   let queries :
                     List (
                       evalDomain D x
