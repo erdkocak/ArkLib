@@ -1,6 +1,7 @@
 import Mathlib.GroupTheory.Coset.Basic
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.MeasureTheory.MeasurableSpace.Defs
 
 import ArkLib.Data.FieldTheory.NonBinaryField.Basic
 import ArkLib.Data.GroupTheory.Smooth
@@ -25,13 +26,62 @@ omit [Finite F] in
 @[simp, grind _=_]
 private lemma op_der_eq : Monoid.toMulAction Fˣ = Units.mulAction' := by ext; rfl
 
-omit [Finite F] in
-@[grind, aesop safe apply]
-private lemma mem_smul_of_congr_aux {a b : Fˣ} {s : Set Fˣ}
-  (h₅ : a ∈ (@Set.smulSet Fˣ _ (Monoid.toMulAction Fˣ).toSMul).smul b s) :
-  a ∈ (@Set.smulSet Fˣ _ (Units.mulAction').toSMul).smul b s := by
-  convert h₅
-  simp
+open Lean Elab in
+private def reconcile (goal : MVarId) : MetaM (Option MVarId) := goal.withContext do
+  let mut goal ← go goal
+  for const in ←getLCtx do
+    if const.isImplementationDetail then continue
+    goal ← go goal (mkIdent const.userName)
+  pure (.some goal)
+  where go (goal : MVarId) (loc : Option Ident := .none) : MetaM MVarId := do
+    let tac : MetaM _ :=
+      match loc with
+      | .none => `(tactic|try rewrite [op_der_eq])
+      | .some loc => `(tactic|try rewrite [op_der_eq] at $loc:ident)
+    let ([goal'], _) ← runTactic goal (←tac)
+      | throwError "Failed to reconcile `Monoid.toMulAction` and `Units.mulAction`."
+    return goal'
+
+open Lean Elab Tactic in
+private def reconcile_tac : TacticM Unit := liftMetaTactic1 reconcile
+
+/--
+`reconcile`-aware `aesop` that deals with coset membership.
+
+- Optionally takes either side of `mem_leftCoset_iff` as a hint.
+-/
+scoped syntax (name := reconcileStx) withPosition("aesop_reconcile" (colGt ident)?) : tactic
+
+open Lean Elab Tactic in
+@[tactic reconcileStx, inherit_doc reconcileStx]
+private def elabReconcileStx : Tactic := fun stx => do
+  match stx with
+  | `(tactic|aesop_reconcile $[$h]?) =>
+    let tac : TacticM _ :=
+      match h with
+      | .none => `(tactic|(try apply (mem_leftCoset_iff _).1
+                           aesop (add safe tactic reconcile_tac)))
+      | .some h => `(tactic| (try have := (mem_leftCoset_iff _).2 $h
+                              try apply (mem_leftCoset_iff _).1
+                              aesop (add safe tactic reconcile_tac)))
+    evalTactic (←tac)
+  | _ => throwError "Unsupported syntax."
+
+/--
+Reconciles `Monoid.toMulAction Fˣ = Units.mulAction'` across the goal.
+-/
+scoped elab "reconcile" : tactic => reconcile_tac
+
+-- open Lean Elab Tactic in
+-- scoped elab "reconcile" h:(ident)? : tactic => do
+--   let tac : TacticM _ :=
+--     match h with
+--     | .none => `(tactic|(try apply (mem_leftCoset_iff _).1
+--                          aesop (add safe tactic (reconcile_tac))))
+--     | .some h => `(tactic| (try have := (mem_leftCoset_iff _).2 $h
+--                             try apply (mem_leftCoset_iff _).1
+--                             aesop (add safe tactic (reconcile_tac))))
+--   evalTactic (←tac)
 
 namespace Domain
 
@@ -337,7 +387,7 @@ def domain (n : ℕ) (i : ℕ) : Fin (2 ^ (n - i)) → evalDomain D x i :=
               Domain.evalDomain D i := by
           rw [←mul_assoc]
           simp
-        exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 h)
+        aesop_reconcile h
     ⟩
 
 lemma domain_injective {i : ℕ} : i ≤ n → Function.Injective (domain D x n i) := by
@@ -374,7 +424,7 @@ noncomputable def domainToFin {i : Fin (n + 1)} : evalDomain D x i → Fin (2 ^ 
       unfold evalDomain at h
       have h' : (x ^ 2 ^ i.1)⁻¹ * ↑g ∈ ↑(Domain.evalDomain D ↑i) := by
         apply (@mem_leftCoset_iff Fˣ _ (Domain.evalDomain D ↑i) g.1 (x ^ (2 ^ i.1))).mp
-        aesop
+        aesop_reconcile
       unfold Domain.evalDomain at h'
       rw [Subgroup.mem_zpowers_iff] at h'
       rcases h' with ⟨ind, h'⟩
@@ -413,7 +463,7 @@ noncomputable def domainToFin {i : Fin (n + 1)} : evalDomain D x i → Fin (2 ^ 
         rw [h']
         simp
       rw [h']
-      norm_cast
+      rfl
     Classical.choose this
 
 def injectF {F : Type} [NonBinaryField F] {D : Subgroup Fˣ} [DIsCyclicC : IsCyclicWithGen ↥D]
@@ -438,15 +488,11 @@ lemma pow_2_pow_i_mem_Di_of_mem_D {F : Type} [NonBinaryField F] [Finite F] {D : 
     a ∈ evalDomain D x 0 → a ^ (2 ^ i) ∈ evalDomain D x i := by
   unfold evalDomain
   intros a i h
-  have h : x⁻¹ * a ∈ Domain.evalDomain D 0 := by
-    simp only [pow_zero, pow_one] at h
-    apply (mem_leftCoset_iff _).mp
-    aesop
+  have h : x⁻¹ * a ∈ Domain.evalDomain D 0 := by aesop_reconcile
   rw [←Domain.D_def] at h
-  have h := Domain.pow_2_pow_i_mem_Di_of_mem_D D (i := i) h
   have : (x⁻¹ * a) ^ 2 ^ i = (x ^ (2 ^ i))⁻¹ * (a ^ (2 ^ i)) := by field_simp
-  rw [this] at h
-  exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 h)
+  have h := this ▸ Domain.pow_2_pow_i_mem_Di_of_mem_D D (i := i) h
+  aesop_reconcile h
 
 omit [Finite F] in
 lemma sqr_mem_D_succ_i_of_mem_D_i : ∀ {a : Fˣ} {i : ℕ},
@@ -456,7 +502,6 @@ lemma sqr_mem_D_succ_i_of_mem_D_i : ∀ {a : Fˣ} {i : ℕ},
   have h : (x ^ 2 ^ i)⁻¹ * a ∈ Domain.evalDomain D i := by
     apply (mem_leftCoset_iff _).mp
     aesop
-  have h := Domain.sqr_mem_D_succ_i_of_mem_D_i D h
   have : ((x ^ 2 ^ i)⁻¹ * a) ^ 2 = (x ^ 2 ^ (i + 1))⁻¹ * (a ^ 2) := by
     have : ((x ^ 2 ^ i)⁻¹ * a) ^ 2 = ((x ^ 2 ^ i) ^ 2)⁻¹ * (a ^ 2) := by field_simp
     rw [this]
@@ -465,8 +510,8 @@ lemma sqr_mem_D_succ_i_of_mem_D_i : ∀ {a : Fˣ} {i : ℕ},
       congr 1
       grind
     rw [this]
-  rw [this] at h
-  exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 h)
+  have h := this ▸ Domain.sqr_mem_D_succ_i_of_mem_D_i D h
+  aesop_reconcile h
 
 omit [Finite F] in
 lemma pow_lift : ∀ {a : Fˣ} {i : ℕ} (s : ℕ),
@@ -488,9 +533,7 @@ lemma neg_mem_dom_of_mem_dom : ∀ {a : Fˣ} (i : Fin n),
   unfold evalDomain
   rintro a ⟨i, i_prop⟩ h
   have mem : (x ^ 2 ^ i)⁻¹ * a ∈ Domain.evalDomain D i := by
-    apply (mem_leftCoset_iff _).mp
-    aesop
-
+    aesop_reconcile h
   have : (x ^ 2 ^ i)⁻¹ * -a ∈ ↑(Domain.evalDomain D i) := by
     have : (x ^ 2 ^ i)⁻¹ * -a = ((x ^ 2 ^ i)⁻¹ * a) * (- 1) := by field_simp
     rw [this]
@@ -500,8 +543,7 @@ lemma neg_mem_dom_of_mem_dom : ∀ {a : Fˣ} (i : Fin n),
           (Domain.evalDomain D i)
           (Domain.minus_one_in_doms D i_prop)
       ).mpr mem
-  convert (mem_leftCoset_iff _).mpr this
-  exact op_der_eq.symm
+  aesop_reconcile this
 
 omit [Finite F] in
 lemma mul_root_of_unity {x : Fˣ} :
@@ -525,7 +567,7 @@ lemma mul_root_of_unity {x : Fˣ} :
       Eq.symm (pow_mul_pow_sub 2 i_le_j), pow_mul, zpow_mul
     ]
     norm_cast
-  exact mem_smul_of_congr_aux ((mem_leftCoset_iff _).2 this)
+  aesop_reconcile this
 
 omit [Finite F] in
 lemma dom_n_eq_triv : evalDomain D x n = {x ^ (2 ^ n)} := by
