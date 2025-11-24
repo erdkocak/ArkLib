@@ -67,8 +67,9 @@ private def elabReconcileStx : Tactic := fun stx => withMainContext do
   match stx with
   | `(tactic|aesop_reconcile) =>
     evalTactic (←
-      `(tactic|(have := fun X₁ X₂ X₃ ↦ @mem_leftCoset_iff Fˣ _ X₁ X₂ X₃
+      `(tactic|(have := fun A A₁ X₁ X₂ X₃ ↦ @mem_leftCoset_iff.{0} A A₁ X₁ X₂ X₃
                 reconcile
+                specialize this (Units ‹_›) inferInstance
                 aesop)))
   | _ => throwError "Unsupported syntax."
 
