@@ -12,11 +12,11 @@ open ConcreteBinaryTower
 
 section HelperFunctions
 /-- Converts an Array to a Fin function of a specific size `n`. -/
-def arrayToFinMap {α : Type _} (n : ℕ) (arr : Array α) (h : arr.size = n) : Fin n → α :=
+def Array.toFinVec {α : Type _} (n : ℕ) (arr : Array α) (h : arr.size = n) : Fin n → α :=
   fun i => arr[i]
 
 /- The product of a function mapped over the list `0..n-1`. -/
-lemma list_prod_finRange_eq_finset_prod {M : Type*} [CommMonoid M] {n : ℕ} (f : Fin n → M) :
+lemma List.prod_finRange_eq_finset_prod {M : Type*} [CommMonoid M] {n : ℕ} (f : Fin n → M) :
     ((List.finRange n).map f).prod = ∏ i : Fin n, f i := rfl
 end HelperFunctions
 
@@ -154,7 +154,7 @@ theorem evalWAt_eq_W (i : Fin r) (x : L) :
   -- 1. Convert implementation to mathematical product over Fin(2^i)
   unfold evalWAt getUElements
   rw [List.map_map]
-  rw [list_prod_finRange_eq_finset_prod] -- Now the pattern matches!
+  rw [List.prod_finRange_eq_finset_prod] -- Now the pattern matches!
   -- 2. Prepare RHS
   rw [AdditiveNTT.W, Polynomial.eval_prod]
   simp only [Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C]
@@ -404,7 +404,7 @@ instance : Fintype BTF₃ := (inferInstance : Fintype (ConcreteBTField 3))
 in the evaluation domain `S₀` defined by the spanning basis elements `{β₀, ..., β_{ℓ + 𝓡 - 1}}`
 of `BTF₃` over `GF(2)`. -/
 def testNTTBTF₃ : Fin (2 ^ (2 + 2)) → BTF₃ := by
-  let a : Fin 4 → BTF₃ := arrayToFinMap 4 #[7, 1, 0, 0] rfl
+  let a : Fin 4 → BTF₃ := Array.toFinVec 4 #[7, 1, 0, 0] rfl
   letI : Algebra (ConcreteBTField 0) BTF₃ := ConcreteBTFieldAlgebra (l := 0) (r := 3)
     (h_le := by omega)
   haveI : Fact (LinearIndependent (ConcreteBTField 0) (computableBasisExplicit 3)) :=
