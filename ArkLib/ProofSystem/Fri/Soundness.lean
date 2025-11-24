@@ -176,8 +176,9 @@ lemma g_elem_zpower_iff_exists_nat {G : Type} [Group G] [Finite G] {gen g : G} :
     grind
   · grind [Subgroup.npow_mem_zpowers]
 
-example (a b c : 𝔽ˣ) : a⁻¹ * b = c → b = a * c := by
-  exact fun a_1 ↦ eq_mul_of_inv_mul_eq a_1
+example (g : 𝔽ˣ) : g⁻¹ * g = 1 := by
+  exact inv_mul_cancel g
+
 
 open Matrix in
 noncomputable def f_succ'
@@ -198,9 +199,24 @@ noncomputable def f_succ'
     rcases this with ⟨m, this⟩
     have m_lt := this.2
     have := eq_mul_of_inv_mul_eq this.1
-    iterate 2 rw [sum_finRangeTo_add_one] at this
-
-    sorry
+    iterate 2 rw [sum_finRangeTo_add_one, Nat.pow_add, pow_mul] at this
+    rw [pow_right_comm _ _ m] at this
+    use
+      ⟨
+        (g ^ 2 ^ ∑ j' ∈ finRangeTo ↑i, (s j').1) *
+        ((DIsCyclicC.gen ^ 2 ^ ∑ j' ∈ finRangeTo ↑i, (s j').1) ^ m),
+        by
+          have := fun X₁ X₂ X₃ ↦ @mem_leftCoset_iff.{0} 𝔽ˣ _ X₁ X₂ X₃
+          reconcile
+          erw
+            [
+              evalDomain, this, ←mul_assoc, inv_mul_cancel,
+              one_mul, Domain.evalDomain, SetLike.mem_coe
+            ]
+          exact Subgroup.npow_mem_zpowers _ _
+      ⟩
+    simp only [this, mul_pow]
+    rfl
   let s₀ := Classical.choose this
   (pows z _ *ᵥ VDMInv D g s s₀ *ᵥ Finset.restrict (cosetG D g s s₀) f) ()
 
