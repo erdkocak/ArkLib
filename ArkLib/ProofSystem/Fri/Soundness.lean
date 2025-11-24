@@ -193,7 +193,7 @@ noncomputable def f_succ'
       ((g ^ 2 ^ ∑ j' ∈ finRangeTo (↑i + 1), (s j').1))⁻¹ * s₀'.1 ∈
         Domain.evalDomain D (∑ j' ∈ finRangeTo (↑i + 1), ↑(s j'))
         := by
-        sorry
+        aesop_reconcile
     simp only [Domain.evalDomain] at this
     rw [g_elem_zpower_iff_exists_nat] at this
     rcases this with ⟨m, this⟩
