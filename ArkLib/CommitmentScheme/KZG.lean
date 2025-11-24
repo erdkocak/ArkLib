@@ -271,6 +271,9 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
 
 open Commitment
 
+-- TODO this should be a fact in VCV-io I think..
+variable [OracleComp.SelectableType (ZMod p)]
+
 local instance : OracleInterface (Fin (n + 1) → ZMod p) where
   Query := ZMod p
   Response := ZMod p
@@ -291,10 +294,15 @@ namespace CommitmentScheme
   message) to prove the evaluation of the commited polynomial at a point `z`. The
   message from the prover is the witness for the evaluation.
 -/
-def KZG (srs : Vector G₁ (n + 1) × Vector G₂ 2) :
-    Commitment.Scheme ([]ₒ) (Fin (n + 1) → ZMod p) Unit G₁ ⟨!v[.P_to_V], !v[G₁]⟩ where
-  commit := fun coeffs _ => return commit srs.1 coeffs
-  opening := {
+def KZG :
+    Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁ (Vector G₁ (n + 1)) (Vector G₂ 2)
+    ⟨!v[.P_to_V], !v[G₁]⟩ where
+  keygen := do
+    let a ←$ᵗ (ZMod p)
+    let srs := generateSrs (g₁:=g₁) (g₂:=g₂) n a
+    return srs
+  commit := fun ck coeffs _ => return commit ck coeffs
+  opening := fun (ck,vk) => {
     prover := {
       PrvState := fun
         | 0 => (Fin (n + 1) → ZMod p) × ZMod p
@@ -304,7 +312,7 @@ def KZG (srs : Vector G₁ (n + 1) × Vector G₂ 2) :
         (coefficients, z)
 
       sendMessage := fun ⟨0, _⟩ => fun (coefficients, z) => do
-        let opening := generateOpening srs.1 coefficients z
+        let opening := generateOpening ck coefficients z
         return (opening, ())
 
       receiveChallenge := fun ⟨i, h⟩ => by
@@ -318,7 +326,7 @@ def KZG (srs : Vector G₁ (n + 1) × Vector G₂ 2) :
     verifier := {
       verify := fun ⟨commitment, z, v⟩ transcript => do
         let opening : G₁ := transcript ⟨0, by decide⟩
-        return verifyOpening (g₁:=g₁) (g₂:=g₂) pairing srs.2 commitment opening z v
+        return verifyOpening (g₁:=g₁) (g₂:=g₂) pairing vk commitment opening z v
     }
   }
 
