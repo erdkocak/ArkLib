@@ -58,14 +58,14 @@ scoped elab "reconcile" : tactic => liftMetaTactic1 reconcile
 
 Can be trivially extended to recognise more than just `mem_leftCoset_iff`.
 -/
-scoped syntax (name := reconcileStx) "aesop_reconcile" : tactic
+syntax (name := reconcileStx) "aesop_reconcile" : tactic
 
 set_option hygiene false in
 open Lean Elab Tactic PrettyPrinter Delaborator in
 @[tactic reconcileStx, inherit_doc reconcileStx]
 private def elabReconcileStx : Tactic := fun stx => withMainContext do
   match stx with
-  | `(tactic|aesop_reconcile) =>  
+  | `(tactic|aesop_reconcile) =>
     evalTactic (←
       `(tactic|(have := fun X₁ X₂ X₃ ↦ @mem_leftCoset_iff Fˣ _ X₁ X₂ X₃
                 reconcile
@@ -330,17 +330,19 @@ instance {i : Fin (n + 1)} : OfNat (evalDomain D i) 1 where
 instance domain_neg_inst {i : Fin n} : Neg (evalDomain D i.1) where
   neg := fun x => ⟨_, minus_one_in_doms D i.2⟩ * x
 
+#check domainEnum
+
 /- Enumerates the `2^s` roots of unity of `Fˣ`, which corresponds to the
    elemens of the `(n - s)`th subgroup (for `s ≤ n`). -/
 def rootsOfUnity (n s : ℕ) : List (Domain.evalDomain D (n - s)) :=
   List.map
-    (fun i =>
+    (fun ind =>
       ⟨
-        (DIsCyclicC.gen.1 ^ (2 ^ (n - s))) ^ i,
+        (DIsCyclicC.gen.1 ^ (2 ^ (n - s))) ^ ind,
         by
           unfold evalDomain
           apply Subgroup.mem_zpowers_iff.mpr
-          exists i
+          exists ind
       ⟩
     )
     (List.range (2 ^ s))
@@ -360,7 +362,7 @@ def evalDomain (i : ℕ) : Set Fˣ :=
   x ^ (2 ^ i) • Domain.evalDomain D i
 
 abbrev evalDomainSigma (s : Fin (n + 1) → ℕ+) (i : ℕ) :=
-  evalDomain D x (∑ j' ∈ finRangeTo i, s j') 
+  evalDomain D x (∑ j' ∈ finRangeTo i, s j')
 
 /- Enumeration of the elements of the `i`th coset. -/
 def domain (n : ℕ) (i : ℕ) : Fin (2 ^ (n - i)) → evalDomain D x i :=
@@ -555,7 +557,7 @@ lemma dom_n_eq_triv : evalDomain D x n = {x ^ (2 ^ n)} := by
 
 noncomputable local instance : Fintype F := Fintype.ofFinite _
 
-noncomputable instance : Nonempty ↑(CosetDomain.evalDomain D x 0) := 
+noncomputable instance : Nonempty ↑(CosetDomain.evalDomain D x 0) :=
   ⟨x, by aesop_reconcile⟩
 
 noncomputable instance : Fintype ↑(CosetDomain.evalDomain D x 0) := inferInstance

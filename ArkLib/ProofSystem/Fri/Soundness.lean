@@ -46,7 +46,7 @@ def cosetElems (s₀ : evalDomainSigma D g s i) : List (evalDomainSigma D g s i)
       ⟨
         _,
         CosetDomain.mul_root_of_unity D (sum_finRangeTo_le_sub_of_le k_le_n) s₀.2 r.2
-      ⟩ 
+      ⟩
   else []
 
 def cosetG (s₀ : evalDomainSigma D g s i) : Finset (evalDomainSigma D g s i) :=
@@ -176,6 +176,9 @@ lemma g_elem_zpower_iff_exists_nat {G : Type} [Group G] [Finite G] {gen g : G} :
     grind
   · grind [Subgroup.npow_mem_zpowers]
 
+example (a b c : 𝔽ˣ) : a⁻¹ * b = c → b = a * c := by
+  exact fun a_1 ↦ eq_mul_of_inv_mul_eq a_1
+
 open Matrix in
 noncomputable def f_succ'
   (f : evalDomainSigma D g s i → 𝔽) (z : 𝔽)
@@ -184,20 +187,18 @@ noncomputable def f_succ'
     ∃ s₀ : evalDomain D g (∑ j' ∈ finRangeTo (i.1), ↑(s j')),
       s₀.1 ^ (2 ^ (s i).1) = s₀'.1 := by
     have h := s₀'.2
-    simp only [evalDomain, finRangeTo] at h
+    simp only [evalDomain] at h
     have :
-      ((g ^ 2 ^ ∑ j' ∈ (List.take (i.1 + 1) (List.finRange (n + 1))).toFinset, (s j').1))⁻¹ * s₀'.1 ∈
-        Domain.evalDomain D (∑ j' ∈ (List.take (↑i + 1) (List.finRange (n + 1))).toFinset, ↑(s j'))
-        := by sorry
+      ((g ^ 2 ^ ∑ j' ∈ finRangeTo (↑i + 1), (s j').1))⁻¹ * s₀'.1 ∈
+        Domain.evalDomain D (∑ j' ∈ finRangeTo (↑i + 1), ↑(s j'))
+        := by
+        sorry
     simp only [Domain.evalDomain] at this
     rw [g_elem_zpower_iff_exists_nat] at this
     rcases this with ⟨m, this⟩
-
-
-
-
-
-
+    have m_lt := this.2
+    have := eq_mul_of_inv_mul_eq this.1
+    iterate 2 rw [sum_finRangeTo_add_one] at this
 
     sorry
   let s₀ := Classical.choose this

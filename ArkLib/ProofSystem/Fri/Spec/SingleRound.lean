@@ -707,6 +707,18 @@ private lemma sum_finRangeTo_le_sub_of_le {s : Fin (k + 1) → ℕ+} {i : Fin (k
     · exact sum_le_univ_sum_of_nonneg (by simp)
     · exact k_le_n
 
+@[simp]
+lemma min_lem {a b : ℕ} : 2 ^ (min a b) = min (2 ^ a) (2 ^ b) := by
+  by_cases h : a < b
+  · have : 2 ^ a < 2 ^ b := (Nat.pow_lt_pow_iff_right (by decide)).mpr h
+    rw [min_eq_left (Nat.le_of_succ_le h)]
+    rw [min_eq_left (Nat.le_of_succ_le this)]
+  · rw [not_lt] at h
+    have : 2 ^ b ≤ 2 ^ a :=
+      Nat.pow_le_pow_right (by decide) h
+    rw [min_eq_right h]
+    rw [min_eq_right this]
+
 /- Verifier for query round of the FRI protocol. Runs `l` checks on uniformly
    sampled points in the first evaluation domain against the oracles sent during
    every folding round. -/
@@ -734,13 +746,33 @@ noncomputable def queryVerifier (k_le_n : (∑ j', (s j').1) ≤ n) (l : ℕ) [D
                         (∑ j' ∈ finRangeTo i.1, (s j').1)
                     ) :=
                     List.map
-                      (fun r =>
+                      (fun ind =>
+                        let r :=
+                          Domain.domainEnum D (⟨n - (s i).1, by grind⟩ : Fin (n + 1))
+                            ⟨
+                              ind.1,
+                              by
+                                have : 2 ^ (s i).1 ≤ 2 ^ n := by
+                                  apply Nat.pow_le_pow_right (by decide)
+                                  transitivity
+                                  swap
+                                  exact k_le_n
+                                  have h := Finset.single_le_sum
+                                    (f := fun j => (s j).1) (s := Finset.univ)
+                                  apply h
+                                  exact fun i _ ↦ Nat.zero_le ↑(s i)
+                                  exact mem_univ _
+                                simp
+                                rw [Nat.sub_sub_eq_min]
+                                aesop
+                            ⟩
                         ⟨
                           _,
-                          CosetDomain.mul_root_of_unity D (sum_finRangeTo_le_sub_of_le k_le_n) s₀.2 r.2
+                          CosetDomain.mul_root_of_unity D
+                            (sum_finRangeTo_le_sub_of_le k_le_n) s₀.2 r.2
                         ⟩
                       )
-                      (Domain.rootsOfUnity D n (s i))
+                      (List.finRange (2 ^ (s i).1))
                   let (pts : List (F × F)) ←
                     List.mapM
                       (fun q => queryCodeword D x k s q >>= fun v => pure (q.1.1, v))
