@@ -15,8 +15,7 @@ section HelperFunctions
 def arrayToFinMap {α : Type _} (n : ℕ) (arr : Array α) (h : arr.size = n) : Fin n → α :=
   fun i => arr[i]
 
-/-- The product of a function mapped over the list `0..n-1`
--/
+/- The product of a function mapped over the list `0..n-1`. -/
 lemma list_prod_finRange_eq_finset_prod {M : Type*} [CommMonoid M] {n : ℕ} (f : Fin n → M) :
     ((List.finRange n).map f).prod = ∏ i : Fin n, f i := rfl
 end HelperFunctions
@@ -136,7 +135,7 @@ theorem bitsToU_bijective (i : Fin r) :
     rw [hFq_card.out]
 
 /-- Computes the elements of the subspace: `U_i = span({β_0, ..., β_{i-1}})`. -/
-def get_U_elements (i : Fin r) : List L :=
+def getUElements (i : Fin r) : List L :=
   (List.finRange (2^i.val)).map fun k =>
     (Finset.univ : Finset (Fin i)).sum fun j =>
       if Nat.getBit (n := k.val) (k := j.val) == 1 then
@@ -144,16 +143,16 @@ def get_U_elements (i : Fin r) : List L :=
       else 0
 
 /-- Evaluates the subspace vanishing polynomial `W_i(x) = ∏_{u ∈ U_i} (x - u).` -/
-def eval_W_at (i : Fin r) (x : L) : L :=
-  ((get_U_elements (β := β) (ℓ := ℓ) (R_rate := R_rate) i).map (fun u => x - u)).prod
+def evalWAt (i : Fin r) (x : L) : L :=
+  ((getUElements (β := β) (ℓ := ℓ) (R_rate := R_rate) i).map (fun u => x - u)).prod
 
 omit [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
-/-- Prove that `eval_W_at` equals the standard definition of `W_i(x)`. -/
-theorem eval_W_at_eq_standard_W_at (i : Fin r) (x : L) :
-  eval_W_at (β := β) (ℓ := ℓ) (R_rate := R_rate) (i := i) x =
+/-- Prove that `evalWAt` equals the standard definition of `W_i(x)`. -/
+theorem evalWAt_eq_W (i : Fin r) (x : L) :
+  evalWAt (β := β) (ℓ := ℓ) (R_rate := R_rate) (i := i) x =
     (W (𝔽q := 𝔽q) (β := β) (i := i)).eval x := by
   -- 1. Convert implementation to mathematical product over Fin(2^i)
-  unfold eval_W_at get_U_elements
+  unfold evalWAt getUElements
   rw [List.map_map]
   rw [list_prod_finRange_eq_finset_prod] -- Now the pattern matches!
   -- 2. Prepare RHS
@@ -163,9 +162,8 @@ theorem eval_W_at_eq_standard_W_at (i : Fin r) (x : L) :
   -- LHS: ∏ k : Fin(2^i), (x - bitsToU k), RHS: ∏ u : U i,      (x - u)
   apply Finset.prod_bij (s := ((Finset.univ (α := (Fin (2^(i.val)))))))
     (t := (Finset.univ : Finset (U 𝔽q β i)))
-    (i := fun k _ => by
-      exact bitsToU (𝔽q := 𝔽q) (β := β) (ℓ := ℓ) (r := r) (R_rate := R_rate) (L := L) (i := i) k
-    )
+    (i := fun k _ =>
+      bitsToU (𝔽q := 𝔽q) (β := β) (ℓ := ℓ) (r := r) (R_rate := R_rate) (L := L) (i := i) k)
     (hi := by
       -- Proof that the map lands in the target set (Finset.univ)
       intro a _
@@ -192,23 +190,23 @@ theorem eval_W_at_eq_standard_W_at (i : Fin r) (x : L) :
     )
 
 /-- Evaluates the normalized subspace vanishing polynomial `Ŵ_i(x) = W_i(x) / W_i(β_i)`. -/
-def eval_normalizedW_at (i : Fin r) (x : L) : L :=
-  let W_x := eval_W_at (r := r) (L := L) (ℓ := ℓ) (β := β) (R_rate := R_rate) (i := i) x
+def evalNormalizedWAt (i : Fin r) (x : L) : L :=
+  let W_x := evalWAt (r := r) (L := L) (ℓ := ℓ) (β := β) (R_rate := R_rate) (i := i) x
   let beta_i := β i
-  let W_beta := eval_W_at (β := β) (ℓ := ℓ) (R_rate := R_rate) (i := i) beta_i
+  let W_beta := evalWAt (β := β) (ℓ := ℓ) (R_rate := R_rate) (i := i) beta_i
   W_x * W_beta⁻¹
 
 omit [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
-/-- Prove that `eval_normalizedW_at` equals the standard definition of `Ŵ_i(x)`. -/
-theorem eval_normalizedW_at_eq_standard_normalizedW_at (i : Fin r) (x : L) :
-  eval_normalizedW_at (β := β) (ℓ := ℓ) (R_rate := R_rate) (i := i) x
+/-- Prove that `evalNormalizedWAt` equals the standard definition of `Ŵ_i(x)`. -/
+theorem evalNormalizedWAt_eq_normalizedW (i : Fin r) (x : L) :
+  evalNormalizedWAt (β := β) (ℓ := ℓ) (R_rate := R_rate) (i := i) x
     = (normalizedW (𝔽q := 𝔽q) (β := β) (i := i)).eval x := by
-  unfold eval_normalizedW_at
-  -- 3. Apply the correctness theorem we just proved (eval_W_at_eq_standard_W_at)
+  unfold evalNormalizedWAt
+  -- 3. Apply the correctness theorem we just proved (evalWAt_eq_standardWAt)
   -- We apply it twice: once for 'x' and once for 'β i'
-  rw [eval_W_at_eq_standard_W_at (r := r) (L := L) (𝔽q := 𝔽q) (β := β) i x]
+  rw [evalWAt_eq_W (r := r) (L := L) (𝔽q := 𝔽q) (β := β) i x]
   simp only
-  rw [eval_W_at_eq_standard_W_at (r := r) (L := L) (𝔽q := 𝔽q) (β := β) i (β i)]
+  rw [evalWAt_eq_W (r := r) (L := L) (𝔽q := 𝔽q) (β := β) i (β i)]
   -- normalizedW is defined as: C (eval (W i) (β i))⁻¹ * W i
   rw [AdditiveNTT.normalizedW]
   -- Property: (Constant * Poly).eval x = Constant * (Poly.eval x)
@@ -221,12 +219,12 @@ theorem eval_normalizedW_at_eq_standard_normalizedW_at (i : Fin r) (x : L) :
 Corresponds to `AdditiveNTT.twiddleFactor`.
 -/
 def computableTwiddleFactor (i : Fin ℓ) (u : Fin (2 ^ (ℓ + R_rate - i - 1))) : L :=
-  -- eval_normalizedW_at L i u
+  -- evalNormalizedWAt L i u
   ∑ (⟨k, hk⟩: Fin (ℓ + R_rate - i - 1)),
   if Nat.getBit k u.val = 1 then
     -- this branch maps to the above Nat.getBit = 1 branch
       -- (of evaluationPointω (i+1)) under (qMap i)(X)
-    (eval_normalizedW_at (β := β) (ℓ := ℓ) (R_rate := R_rate)
+    (evalNormalizedWAt (β := β) (ℓ := ℓ) (R_rate := R_rate)
       (i := ⟨i, by omega⟩) (x := β ⟨i + 1 + k, by omega⟩))
   else 0
 
@@ -238,7 +236,7 @@ theorem computableTwiddleFactor_eq_twiddleFactor (i : Fin ℓ) :
   twiddleFactor (𝔽q := 𝔽q) (L := L) (β := β) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
     (i := ⟨i, by omega⟩) := by
   unfold computableTwiddleFactor twiddleFactor
-  simp_rw [eval_normalizedW_at_eq_standard_normalizedW_at (𝔽q := 𝔽q) (β := β) (ℓ := ℓ)
+  simp_rw [evalNormalizedWAt_eq_normalizedW (𝔽q := 𝔽q) (β := β) (ℓ := ℓ)
     (R_rate := R_rate) (i := ⟨i, by omega⟩)]
 
 /-- Performs one stage of the Additive NTT. This corresponds to `NTTStage` in the abstract
@@ -361,7 +359,7 @@ instance (k : ℕ) : NeZero (2^k) := by
 
 /-- Computable basis for ConcreteBTField k over ConcreteBTField 0.
 This is the explicit product of Z's. -/
-def computable_basis_explicit (k : ℕ) (i : Fin (2 ^ k)) : ConcreteBTField k :=
+def computableBasisExplicit (k : ℕ) (i : Fin (2 ^ k)) : ConcreteBTField k :=
   (Finset.univ : Finset (Fin k)).prod fun j =>
     if Nat.getBit (n := i.val) (k := j.val) == 1 then
       concreteTowerAlgebraMap (j.val + 1) k (by omega) (Z (j.val + 1))
@@ -372,11 +370,11 @@ omit [NeZero r] in
 theorem hβ_lin_indep_concrete (k : ℕ) :
     letI := ConcreteBTFieldAlgebra (l:=0) (r:=k) (h_le:=by omega)
     LinearIndependent (R := ConcreteBTField 0)
-      (v := computable_basis_explicit k) := by
+      (v := computableBasisExplicit k) := by
   letI := ConcreteBTFieldAlgebra (l:=0) (r:=k) (h_le:=by omega)
-  have h_eq : computable_basis_explicit k = fun i => multilinearBasis 0 k (by omega) i := by
+  have h_eq : computableBasisExplicit k = fun i => multilinearBasis 0 k (by omega) i := by
     funext i
-    unfold computable_basis_explicit
+    unfold computableBasisExplicit
     rw [multilinearBasis_apply k 0 (by omega) i]
     simp only [beq_iff_eq, Nat.sub_zero, 𝕏, map_pow]
     congr 1
@@ -405,17 +403,17 @@ instance : Fintype BTF₃ := (inferInstance : Fintype (ConcreteBTField 3))
 **Output:** A function `Fin 16 → BTF₃` giving the evaluations of `p(x) = x` at 16 points
 in the evaluation domain `S₀` defined by the spanning basis elements `{β₀, ..., β_{ℓ + 𝓡 - 1}}`
 of `BTF₃` over `GF(2)`. -/
-def test_ntt_BTF₃ : Fin (2 ^ (2 + 2)) → BTF₃ := by
+def testNTTBTF₃ : Fin (2 ^ (2 + 2)) → BTF₃ := by
   let a : Fin 4 → BTF₃ := arrayToFinMap 4 #[7, 1, 0, 0] rfl
   letI : Algebra (ConcreteBTField 0) BTF₃ := ConcreteBTFieldAlgebra (l := 0) (r := 3)
     (h_le := by omega)
-  haveI : Fact (LinearIndependent (ConcreteBTField 0) (computable_basis_explicit 3)) :=
+  haveI : Fact (LinearIndependent (ConcreteBTField 0) (computableBasisExplicit 3)) :=
     { out := hβ_lin_indep_concrete 3 }
   -- r is the size of the basis
   exact computableAdditiveNTT (𝔽q := ConcreteBTField 0) (L := BTF₃) (r := 2^3) (ℓ := 2)
-    (R_rate := 2) (h_ℓ_add_R_rate := by omega) (β := computable_basis_explicit (k := 3)) (a := a)
+    (R_rate := 2) (h_ℓ_add_R_rate := by omega) (β := computableBasisExplicit (k := 3)) (a := a)
 
--- #eval test_ntt_BTF₃
+-- #eval testNTTBTF₃
 -- ![1#8, 0#8, 3#8, 2#8, 5#8, 4#8, 7#8, 6#8, 9#8, 8#8, 11#8, 10#8, 13#8, 12#8, 15#8, 14#8]
 
 end ConcreteBTFieldInstances

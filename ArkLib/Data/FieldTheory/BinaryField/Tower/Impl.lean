@@ -2315,8 +2315,7 @@ instance instFieldConcrete {k : ℕ} : Field (ConcreteBTField k) :=
   mkFieldInstance (getBTFResult k).toConcreteBTFieldProps
 
 instance instCharP2 {k : ℕ} : CharP (ConcreteBTField k) 2 :=
-  charP_eq_2_of_add_self_eq_zero (F:=(ConcreteBTField k)) (sumZeroIffEq:=by
-    exact fun x y ↦ add_eq_zero_iff_eq x y)
+  charP_eq_2_of_add_self_eq_zero (F:=(ConcreteBTField k)) (sumZeroIffEq:=add_eq_zero_iff_eq)
 
 instance (k : ℕ) : Fintype (ConcreteBTField k) := (getBTFResult k).instFintype
 
