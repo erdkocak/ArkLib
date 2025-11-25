@@ -11,6 +11,7 @@ import ArkLib.Data.UniPoly.Basic
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Order.Star.Basic
 import Mathlib.Algebra.Polynomial.FieldDivision
+import VCVio.OracleComp.SimSemantics.Constructions
 
 /-! ## The KZG Polynomial Commitment Scheme
 
@@ -332,28 +333,49 @@ def KZG :
 
 open OracleSpec OracleComp SubSpec ProtocolSpec
 
-/- the KZG satisfies perfect correctness as defined in `CommitmentScheme`
+#check neverFails_uniformOfFintype
+#check neverFails_writerT_run_simulateQ_iff
+#check neverFails_lift_comp_iff
+
+
+
+lemma neverFails_simulateQ_unifOracle {ι : Type} {spec : OracleSpec ι} {α : Type}
+    [∀ i, SelectableType (spec.range i)]
+    (oa : OracleComp spec α) :
+    neverFails (simulateQ unifOracle oa).run ↔ neverFails oa := by
+  sorry
+
+/-- Lift a QueryImpl from ProbComp to StateT σ ProbComp using StateT.lift -/
+def liftQueryImpl {ι : Type} {spec : OracleSpec ι} {σ : Type} [Monad ProbComp]
+    (qi : QueryImpl spec ProbComp) : QueryImpl spec (StateT σ ProbComp) where
+  impl | query i t => StateT.lift (qi.impl (query i t))
+
+/- the KZG satisfies perfect correctness as defined in `CommitmentScheme` -/
 theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂} :
-    Commitment.perfectCorrectness (pure ()) ⟨isEmptyElim⟩
-    (KZG (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)
-    (generateSrs (g₁:=g₁) (g₂:=g₂) n a)) := by
+    Commitment.perfectCorrectness (pure ()) (liftQueryImpl unifOracle)
+    (KZG (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)) := by
     intro data randomness query
-    unfold Proof.completeness Reduction.completeness
     have hpSpec : ProverOnly ⟨!v[.P_to_V], !v[G₁]⟩ := by
       refine { prover_first' := ?_ }; simp
     simp only [Reduction.run_of_prover_first]
     simp [KZG]
-    intro a_1 a_2 b a_3 a_4 a_5
-    change ZMod p at a_2
-    change ZMod p at b
-    simp [acceptRejectRel]
-    set coeffs := a_3
-    set z := a_2
-    set v := b
-    simp only [OracleInterface.answer] at *
-    subst a_4 a_5 v
-    simpa using KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a coeffs z
--/
+    constructor
+    · -- Goal: neverFails ((simulateQ (liftQueryImpl unifOracle ++ₛₒ challengeQueryImpl)
+      --   (liftComp ($ᵗZMod p) _)).run ())
+      -- This states that simulating a uniform sample from ZMod p never fails.
+      -- The proof requires:
+      -- (1) $ᵗZMod p never fails (neverFails_uniformOfFintype)
+      -- (2) liftComp preserves neverFails (neverFails_lift_comp_iff)
+      -- (3) simulateQ with StateT-based query impl preserves neverFails
+      --     (no direct lemma in VCVio; neverFails_writerT_run_simulateQ_iff is related but not
+      --      directly applicable)
+      sorry
+    · intro a_sample _ _
+      constructor
+      · simp [acceptRejectRel]
+        exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
+      · exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
+
 
 end CommitmentScheme
 
