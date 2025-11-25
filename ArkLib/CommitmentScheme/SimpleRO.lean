@@ -55,8 +55,9 @@ local instance : OracleInterface α where
   Response := α
   answer := fun x _ => x
 
-def commitmentScheme : Commitment.Scheme (oSpec α β γ) α β γ !p[] where
-  commit := fun v r => commit v
-  opening := .mk (sorry) (.mk (sorry))
+def commitmentScheme : Commitment.Scheme (oSpec α β γ) α β γ Unit Unit !p[] where
+  keygen := pure ((), ())
+  commit := fun _ v _ => commit v
+  opening := fun _ => { prover := sorry, verifier := sorry }
 
 end SimpleRO
