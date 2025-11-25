@@ -2466,7 +2466,10 @@ theorem ReedSolomon_ProximityGapAffineLines_UniqueDecoding [Nontrivial (ReedSolo
     unfold errorBound
     have h_δ_mem : δ ∈ Set.Icc 0 (((1 : ℝ≥0) - (rate (ReedSolomon.code domain k))) / 2) := by
       simp only [Set.mem_Icc, zero_le, true_and]
-      rw [←ReedSolomonCode.relativeUniqueDecodingRadius_RS_eq (h := by exact hk)]
+      rw [rateOfLinearCode_eq_div (h := hk)]
+      simp only [NNRat.cast_div, NNRat.cast_natCast]
+      rw [←ReedSolomonCode.relativeUniqueDecodingRadius_RS_eq (F := A)
+        (m := n) (n := k) (h := by exact hk)]
       rw [dist_le_UDR_iff_relDist_le_relUDR] at he_unique_decoding_radius
       exact he_unique_decoding_radius
     simp only [h_δ_mem, ↓reduceIte]
