@@ -337,22 +337,9 @@ open OracleSpec OracleComp SubSpec ProtocolSpec
 #check neverFails_writerT_run_simulateQ_iff
 #check neverFails_lift_comp_iff
 
-
-
-lemma neverFails_simulateQ_unifOracle {ι : Type} {spec : OracleSpec ι} {α : Type}
-    [∀ i, SelectableType (spec.range i)]
-    (oa : OracleComp spec α) :
-    neverFails (simulateQ unifOracle oa).run ↔ neverFails oa := by
-  sorry
-
-/-- Lift a QueryImpl from ProbComp to StateT σ ProbComp using StateT.lift -/
-def liftQueryImpl {ι : Type} {spec : OracleSpec ι} {σ : Type} [Monad ProbComp]
-    (qi : QueryImpl spec ProbComp) : QueryImpl spec (StateT σ ProbComp) where
-  impl | query i t => StateT.lift (qi.impl (query i t))
-
 /- the KZG satisfies perfect correctness as defined in `CommitmentScheme` -/
 theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂} :
-    Commitment.perfectCorrectness (pure ()) (liftQueryImpl unifOracle)
+    Commitment.perfectCorrectness (pure ∅) (randomOracle)
     (KZG (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)) := by
     intro data randomness query
     have hpSpec : ProverOnly ⟨!v[.P_to_V], !v[G₁]⟩ := by
@@ -360,22 +347,12 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ 
     simp only [Reduction.run_of_prover_first]
     simp [KZG]
     constructor
-    · -- Goal: neverFails ((simulateQ (liftQueryImpl unifOracle ++ₛₒ challengeQueryImpl)
-      --   (liftComp ($ᵗZMod p) _)).run ())
-      -- This states that simulating a uniform sample from ZMod p never fails.
-      -- The proof requires:
-      -- (1) $ᵗZMod p never fails (neverFails_uniformOfFintype)
-      -- (2) liftComp preserves neverFails (neverFails_lift_comp_iff)
-      -- (3) simulateQ with StateT-based query impl preserves neverFails
-      --     (no direct lemma in VCVio; neverFails_writerT_run_simulateQ_iff is related but not
-      --      directly applicable)
-      sorry
+    · sorry
     · intro a_sample _ _
       constructor
       · simp [acceptRejectRel]
         exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
       · exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
-
 
 end CommitmentScheme
 
