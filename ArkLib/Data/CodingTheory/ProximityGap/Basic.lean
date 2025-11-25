@@ -83,13 +83,13 @@ variable {κ : Type k} {ι : Type l} [Fintype κ] [Fintype ι] [Nonempty ι]
 variable {F : Type v} [Ring F] [Fintype F] [DecidableEq F]
 -- variable {M : Type} [Fintype M] -- Message space type
 variable {A : Type w} [Fintype A] [DecidableEq A] [AddCommMonoid A] [Module F A] -- Alphabet type
-variable (C : Set (ι → A)) [Fintype C]
+variable (C : Set (ι → A))
 
 /-- The proximity measure of two vectors `u` and `v` from a code `C` at distance `d` is the number
   of vectors at distance at most `d` from the linear combination of `u` and `v` with coefficients
   `r` in `F`. -/
-def proximityMeasure (u v : Word A ι) (d : ℕ) : ℕ :=
-  Fintype.card {r : F | Δ₀'(r • u + (1 - r) • v, C) ≤ d}
+noncomputable def proximityMeasure (u v : Word A ι) (d : ℕ) : ℕ :=
+  Fintype.card {r : F | Δ₀(r • u + (1 - r) • v, C) ≤ d}
 
 /-- A code `C` exhibits proximity gap at distance `d` and cardinality bound `bound` if for every
       pair of vectors `u` and `v`, whenever the proximity measure for `C u v d` is greater than
@@ -98,7 +98,7 @@ def proximityGap (d : ℕ) (bound : ℕ) : Prop :=
   ∀ u v : Word (A := A) (ι := ι), (proximityMeasure (F := F) C u v d > bound)
     →
     letI : Fintype (C ^⋈ (Fin 2)) := interleavedCodeSet_fintype (C := C)
-    (Δ₀'(u ⋈₂ v, C ^⋈ (Fin 2)) ≤ d)
+    (Δ₀(u ⋈₂ v, C ^⋈ (Fin 2)) ≤ d)
 
 /-- The consequent of correlated agreement: Words collectively agree on the same set of coordinates
 `S` with the base code `C`.

@@ -749,13 +749,65 @@ lemma distToCode_of_nonempty {α : Type*} [LinearOrder α] [Zero α]
   simp [distToCode, Finset.min'_eq_inf', Finset.min_eq_inf_withTop]
   rfl
 
-/-- Computable version of the distance from a vector `u` to a code `C`, assuming `C` is a `Fintype`.
-TODO: prove Δ₀' = Δ₀
--/
+/-- Computable version of the distance from a vector `u` to a finite code `C`. -/
 def distFromCode' (C : Set (n → R)) [Fintype C] (u : n → R) : ℕ∞ :=
   Finset.min <| (@Finset.univ C _).image (fun v => hammingDist u v.1)
 
 notation "Δ₀'(" u ", " C ")" => distFromCode' C u
+
+/-- For finite nonempty codes, the computable distance equals the noncomputable distance. -/
+lemma distFromCode'_eq_distFromCode (C : Set (n → R)) [Fintype C] (u : n → R) :
+    Δ₀'(u, C) = Δ₀(u, C) := by
+  by_cases hC_empty: C = ∅
+  · subst hC_empty
+    simp only [distFromCode', Finset.univ_eq_empty, Finset.image_empty, Finset.min_empty,
+      distFromCode, Set.mem_empty_iff_false, false_and, exists_false, Set.setOf_false,
+      _root_.sInf_empty]
+  · have hC_nonempty : Nonempty C := Set.nonempty_iff_ne_empty'.mpr hC_empty
+    unfold distFromCode distFromCode'
+    -- The minimum equals the infimum for finite sets
+    have h_nonempty : (@Finset.univ C _).image (fun v => hammingDist u v.1) |>.Nonempty := by
+      apply Finset.Nonempty.image
+      exact Finset.univ_nonempty
+    apply le_antisymm
+    · -- Show min ≤ inf
+      apply le_csInf
+      · -- The inf set is nonempty
+        obtain ⟨c, hc⟩ := (inferInstance : Nonempty C)
+        use (hammingDist u c : ℕ∞)
+        simp only [Set.mem_setOf_eq]
+        exact ⟨c, hc, le_refl _⟩
+      · -- min is a lower bound
+        intro d hd
+        simp only [Set.mem_setOf_eq] at hd
+        obtain ⟨v, hv, hdist⟩ := hd
+        calc Finset.min ((@Finset.univ C _).image (fun v => hammingDist u v.1))
+          _ ≤ hammingDist u v := by
+            apply Finset.min_le
+            apply Finset.mem_image.mpr
+            refine ⟨⟨v, hv⟩, Finset.mem_univ _, rfl⟩
+          _ ≤ d := hdist
+    · -- Show inf ≤ min
+      apply csInf_le
+      · -- The set is bounded below
+        use 0
+        intro d _
+        exact bot_le
+      · -- min is in the set of upper bounds
+        simp only [Set.mem_setOf_eq]
+        obtain ⟨min_val, hmin⟩ := Finset.min_of_nonempty h_nonempty
+        -- 1. The minimum value must belong to the set
+        have h_in_set : min_val ∈ (@Finset.univ C _).image (fun v => hammingDist u v.1) :=
+          Finset.mem_of_min hmin
+        -- 2. Unwrap the image definition to find the specific codeword `c`
+        -- "There exists a c in C such that hammingDist(u, c) = min_val"
+        rw [Finset.mem_image] at h_in_set
+        obtain ⟨⟨c, hc_mem⟩, -, h_dist_eq⟩ := h_in_set
+        -- 3. Provide `c` as the witness for the existential goal
+        refine ⟨c, hc_mem, ?_⟩
+        -- 4. Prove the inequality: we know `dist(u, c) = min_val`, and `result = min_val`
+        rw [h_dist_eq, hmin]
+        exact le_refl _
 
 end Computable
 

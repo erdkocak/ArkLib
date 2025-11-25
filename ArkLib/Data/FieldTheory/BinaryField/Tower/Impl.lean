@@ -2319,6 +2319,8 @@ instance instCharP2 {k : ℕ} : CharP (ConcreteBTField k) 2 :=
 
 instance (k : ℕ) : Fintype (ConcreteBTField k) := (getBTFResult k).instFintype
 
+instance instFintype {k : ℕ} : Fintype (ConcreteBTField k) := (getBTFResult k).instFintype
+
 /-- adjoined root of poly k, generator of successor field BTField (k + 1) -/
 @[simp]
 def 𝕏 (k : ℕ) : ConcreteBTField (k + 1) := Z (k + 1)
