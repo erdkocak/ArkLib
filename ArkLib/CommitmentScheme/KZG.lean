@@ -347,7 +347,10 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ 
     simp only [Reduction.run_of_prover_first]
     simp [KZG]
     constructor
-    · sorry
+    · /- goal:
+      neverFails ((simulateQ (randomOracle ++ₛₒ challengeQueryImpl)
+        (liftComp ($ᵗZMod p) (unifSpec ++ₒ _))).run ∅)-/
+      sorry
     · intro a_sample _ _
       constructor
       · simp [acceptRejectRel]
