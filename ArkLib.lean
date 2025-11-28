@@ -1,6 +1,7 @@
 import ArkLib.AGM.Basic
 import ArkLib.CommitmentScheme.Basic
 import ArkLib.CommitmentScheme.Fold
+import ArkLib.CommitmentScheme.HardnessAssumptions
 import ArkLib.CommitmentScheme.InductiveMerkleTree
 import ArkLib.CommitmentScheme.KZG
 import ArkLib.CommitmentScheme.MerkleTree

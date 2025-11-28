@@ -53,6 +53,8 @@ def towerOfExponents (g : G) (a : ZMod p) (n : ℕ) : Vector G (n + 1) :=
 def generateSrs (n : ℕ) (a : ZMod p) : Vector G₁ (n + 1) × Vector G₂ 2 :=
   (towerOfExponents g₁ a n, towerOfExponents g₂ a 1)
 
+/-- The ARSDH adversary returns a set of size D+1 and two group elements h₁ and h₂.
+-/
 def ARSDHAdversary (D : ℕ):=
   Vector G₁ (D + 1) × Vector G₂ 2 → OracleComp oSpec (Finset (ZMod p) × G₁ × G₁)
 
