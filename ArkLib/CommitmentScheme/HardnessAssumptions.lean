@@ -53,11 +53,15 @@ def towerOfExponents (g : G) (a : ZMod p) (n : ℕ) : Vector G (n + 1) :=
 def generateSrs (n : ℕ) (a : ZMod p) : Vector G₁ (n + 1) × Vector G₂ 2 :=
   (towerOfExponents g₁ a n, towerOfExponents g₂ a 1)
 
-/-- The ARSDH adversary returns a set of size D+1 and two group elements h₁ and h₂.
--/
+/-- The ARSDH adversary returns a set of size D+1 and two group elements h₁ and h₂ upon receiving
+the srs. -/
 def ARSDHAdversary (D : ℕ):=
   Vector G₁ (D + 1) × Vector G₂ 2 → OracleComp oSpec (Finset (ZMod p) × G₁ × G₁)
 
+/-- The adaptive rational strong Diffie–Hellman (ARSDH) assumption.
+Taken from Def. 9.6 in "On the Fiat–Shamir Security of "Succinct Arguments from Functional
+Commitments" (see https://eprint.iacr.org/2025/902.pdf)
+-/
 def ARSDH [(unifSpec ++ₒ oSpec).FiniteRange]
     (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p)) (error : ℝ≥0)
     : Prop :=
