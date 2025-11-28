@@ -331,11 +331,12 @@ def KZG :
     }
   }
 
-open OracleSpec OracleComp SubSpec ProtocolSpec
+open OracleSpec OracleComp SubSpec ProtocolSpec SimOracle
 
 #check neverFails_uniformOfFintype
 #check neverFails_writerT_run_simulateQ_iff
 #check neverFails_lift_comp_iff
+#check SimOracle.simulate_coe_append_left
 
 /- the KZG satisfies perfect correctness as defined in `CommitmentScheme` -/
 theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂} :
