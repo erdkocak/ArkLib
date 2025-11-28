@@ -59,7 +59,7 @@ def ARSDHAdversary (D : ℕ):=
   Vector G₁ (D + 1) × Vector G₂ 2 → OracleComp oSpec (Finset (ZMod p) × G₁ × G₁)
 
 /-- The adaptive rational strong Diffie–Hellman (ARSDH) assumption.
-Taken from Def. 9.6 in "On the Fiat–Shamir Security of "Succinct Arguments from Functional
+Taken from Def. 9.6 in "On the Fiat–Shamir Security of Succinct Arguments from Functional
 Commitments" (see https://eprint.iacr.org/2025/902.pdf)
 -/
 def ARSDH [(unifSpec ++ₒ oSpec).FiniteRange]
