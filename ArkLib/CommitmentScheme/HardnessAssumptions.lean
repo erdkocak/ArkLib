@@ -55,8 +55,15 @@ def generateSrs (n : ℕ) (a : ZMod p) : Vector G₁ (n + 1) × Vector G₂ 2 :=
 
 /-- The ARSDH adversary returns a set of size D+1 and two group elements h₁ and h₂ upon receiving
 the srs. -/
-def ARSDHAdversary (D : ℕ):=
+def ARSDHAdversary (D : ℕ) :=
   Vector G₁ (D + 1) × Vector G₂ 2 → OracleComp oSpec (Finset (ZMod p) × G₁ × G₁)
+
+def ARSDHGame (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p)) :
+    OracleComp (unifSpec ++ₒ oSpec) (ZMod p × Finset (ZMod p) × G₁ × G₁) := do
+  let τ ← liftComp ($ᵗ (ZMod p)) (unifSpec ++ₒ oSpec)
+  let srs := generateSrs (g₁ := g₁) (g₂ := g₂) D τ
+  let (S, h₁, h₂) ← liftComp (adversary srs) _
+  return (τ, S, h₁, h₂)
 
 /-- The adaptive rational strong Diffie–Hellman (ARSDH) assumption.
 Taken from Def. 9.6 in "On the Fiat–Shamir Security of Succinct Arguments from Functional
@@ -68,11 +75,7 @@ def ARSDH [(unifSpec ++ₒ oSpec).FiniteRange]
   [fun (τ,S,h₁,h₂) =>
     letI Zₛ := ∏ s ∈ S, (Polynomial.X - Polynomial.C s)
     S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val
-  | do
-      let τ ← liftComp ($ᵗ (ZMod p)) (unifSpec ++ₒ oSpec)
-      let srs := generateSrs (g₁:=g₁) (g₂:=g₂) D τ
-      let (S, h₁, h₂) ← liftComp (adversary srs) _
-      return (τ, S, h₁, h₂)
+  | ARSDHGame (oSpec := oSpec) (g₁ := g₁) (g₂ := g₂) D adversary
   ] ≤ error
 
 

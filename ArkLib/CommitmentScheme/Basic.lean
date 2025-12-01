@@ -176,14 +176,15 @@ def extractability (scheme : Scheme oSpec Data Randomness Commitment ComKey Veri
 /-- An adversary in the function binding game returns a commitment `cm`, and a vector of length `L`
   of queries, claimed responses to the queries, and auxiliary private states (to be passed to the
   malicious prover in the opening procedure). -/
-def FunctionBindingAdversary (oSpec : OracleSpec ι) (Data Commitment AuxState : Type)
-  [O : OracleInterface Data] (L : ℕ) :=
-  OracleComp oSpec (Commitment × Vector (O.Query × O.Response × AuxState) L)
-  -- TODO add COmKey -> Prover toi adversary type
+structure FunctionBindingAdversary (oSpec : OracleSpec ι) (Data Commitment AuxState : Type)
+  [O : OracleInterface Data] (L : ℕ) {n : ℕ} (pSpec : ProtocolSpec n) (ComKey : Type)
+where
+  claim : (OracleComp oSpec (Commitment × Vector (O.Query × O.Response × AuxState) L))
+  prover : (ComKey → Prover oSpec (Commitment × O.Query × O.Response) AuxState Bool Unit pSpec)
 
 /-- A commitment scheme satisfies **function binding** with error `functionBindingError` if for all
 adversaries that output a commitment `cm`, and a vector of length `L` of queries `q_i`, claimed
-responses `r_i` to the queries, and auxiliary private states `st_i` (to be passed to the malicious
+responses `r_i` to the queries, and auxiliary private states `st_i` (to be passed to the adversary
 prover in the opening procedure), and for all malicious provers in the opening procedure taking in
 `st_i`, the probability that:
 
@@ -202,9 +203,7 @@ def functionBinding {L : ℕ} (hn : n = 1) (hpSpec : NonInteractive (hn ▸ pSpe
     [∀ i, SelectableType ((hn ▸ pSpec).Challenge i)]
     (scheme : Scheme oSpec Data Randomness Commitment ComKey VerifKey (hn ▸ pSpec))
     (functionBindingError : ℝ≥0) : Prop :=
-    ∀ adversary : FunctionBindingAdversary oSpec Data Commitment AuxState L,
-    ∀ (prover :
-        ComKey → Prover oSpec (Commitment × O.Query × O.Response) AuxState Bool Unit (hn ▸ pSpec)),
+    ∀ adversary : FunctionBindingAdversary oSpec Data Commitment AuxState L (hn ▸ pSpec) ComKey,
       [fun x =>
         (∀ (i : Fin x.size), x[i].2.2 = true)
         ∧ (¬ ∃ (d : Data), ∀ (i : Fin x.size), O.answer d x[i].1 = x[i].2.1)
@@ -212,8 +211,8 @@ def functionBinding {L : ℕ} (hn : n = 1) (hpSpec : NonInteractive (hn ▸ pSpe
           QueryImpl _ (StateT σ ProbComp)) <|
           (do
             let (ck,vk) ← liftComp scheme.keygen _
-            let (cm, claims) ← liftComp adversary _
-            let reduction := Reduction.mk (prover ck) (scheme.opening (ck,vk)).verifier
+            let (cm, claims) ← liftComp adversary.claim _
+            let reduction := Reduction.mk (adversary.prover ck) (scheme.opening (ck,vk)).verifier
             claims.toArray.mapM (fun ⟨q, r, st⟩ =>
               do
                 let ⟨_, verifier_accept⟩ ← reduction.run (cm, q, r) st

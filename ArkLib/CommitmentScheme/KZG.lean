@@ -6,6 +6,7 @@ Authors: Quang Dao
 
 
 import ArkLib.CommitmentScheme.Basic
+import ArkLib.CommitmentScheme.HardnessAssumptions
 import ArkLib.AGM.Basic
 import ArkLib.Data.UniPoly.Basic
 import Mathlib.Algebra.Field.ZMod
@@ -282,6 +283,8 @@ local instance : OracleInterface (Fin (n + 1) → ZMod p) where
     let poly : UniPoly (ZMod p) := UniPoly.mk (Array.ofFn coeffs)
     poly.eval z
 
+open scoped NNReal
+
 namespace CommitmentScheme
 
 /-- The KZG instantiated as a **(functional) commitment scheme**.
@@ -296,13 +299,13 @@ namespace CommitmentScheme
   message from the prover is the witness for the evaluation.
 -/
 def KZG :
-    Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁ (Vector G₁ (n + 1)) (Vector G₂ 2)
-    ⟨!v[.P_to_V], !v[G₁]⟩ where
+    Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁ (Vector G₁ (n + 1) × Vector G₂ 2)
+    (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩ where
   keygen := do
     let a ←$ᵗ (ZMod p)
     let srs := generateSrs (g₁:=g₁) (g₂:=g₂) n a
-    return srs
-  commit := fun ck coeffs _ => return commit ck coeffs
+    return (srs,srs)
+  commit := fun ck coeffs _ => return commit ck.1 coeffs
   opening := fun (ck,vk) => {
     prover := {
       PrvState := fun
@@ -313,7 +316,7 @@ def KZG :
         (coefficients, z)
 
       sendMessage := fun ⟨0, _⟩ => fun (coefficients, z) => do
-        let opening := generateOpening ck coefficients z
+        let opening := generateOpening ck.1 coefficients z
         return (opening, ())
 
       receiveChallenge := fun ⟨i, h⟩ => by
@@ -327,19 +330,55 @@ def KZG :
     verifier := {
       verify := fun ⟨commitment, z, v⟩ transcript => do
         let opening : G₁ := transcript ⟨0, by decide⟩
-        return verifyOpening (g₁:=g₁) (g₂:=g₂) pairing vk commitment opening z v
+        return verifyOpening (g₁:=g₁) (g₂:=g₂) pairing vk.2 commitment opening z v
     }
   }
 
 open OracleSpec OracleComp SubSpec ProtocolSpec SimOracle
 
-#check neverFails_uniformOfFintype
-#check neverFails_writerT_run_simulateQ_iff
-#check neverFails_lift_comp_iff
-#check SimOracle.simulate_coe_append_left
+/-- randomOracle never fails on any query.
+    The proof follows from the fact that randomOracle either returns a cached value (pure)
+    or samples uniformly (which never fails). -/
+lemma neverFails_randomOracle_impl {ι : Type} [DecidableEq ι] {spec : OracleSpec ι}
+    [spec.DecidableEq] [∀ i, SelectableType (spec.range i)]
+    (β : Type) (q : OracleQuery spec β) (s : spec.QueryCache) :
+    ((randomOracle.impl q).run s).neverFails := by
+  cases q with
+  | query i t =>
+    simp only [randOracle.apply_eq, StateT.run_bind, StateT.run_get, pure_bind]
+    cases h : s i t with -- case split on whether the query is cached
+    | some u =>
+      simp only [StateT.run_pure]
+      exact neverFails_pure _
+    | none =>
+      simp only [StateT.run_bind, StateT.run_monadLift, StateT.run_modifyGet]
+      rw [neverFails_bind_iff]
+      constructor
+      · rw [neverFails_bind_iff]
+        refine ⟨neverFails_uniformOfFintype _, ?_⟩
+        intro u _
+        exact neverFails_pure _
+      · intro ⟨u, s'⟩ _
+        exact neverFails_pure _
+
+lemma neverFails_stateT_run_simulateQ {ι ι' : Type} {spec : OracleSpec ι} {spec' : OracleSpec ι'}
+    {α σ : Type}
+    (so : QueryImpl spec (StateT σ (OracleComp spec'))) (oa : OracleComp spec α) (s : σ)
+    (hso : ∀ (β : Type) (q : OracleQuery spec β) (s' : σ), ((so.impl q).run s').neverFails)
+    (h : oa.neverFails) : ((simulateQ so oa).run s).neverFails := by
+  induction oa using OracleComp.inductionOn generalizing s with
+  | pure x => simp [simulateQ_pure, StateT.run_pure, neverFails_pure]
+  | query_bind i t oa ih =>
+    simp only [neverFails_query_bind_iff] at h
+    simp only [simulateQ_bind, simulateQ_query, StateT.run_bind, neverFails_bind_iff]
+    refine ⟨hso _ (query i t) s, ?_⟩
+    intro ⟨r, s'⟩ _
+    exact ih r s' (h r)
+  | failure => simp [neverFails] at h
 
 /- the KZG satisfies perfect correctness as defined in `CommitmentScheme` -/
-theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂} :
+theorem correctness (hpG1 : Nat.card G₁ = p) (_a : ZMod p) {g₁ : G₁} {g₂ : G₂}
+    [SelectableType G₁] :
     Commitment.perfectCorrectness (pure ∅) (randomOracle)
     (KZG (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)) := by
     intro data randomness query
@@ -348,15 +387,35 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ 
     simp only [Reduction.run_of_prover_first]
     simp [KZG]
     constructor
-    · /- goal:
-      neverFails ((simulateQ (randomOracle ++ₛₒ challengeQueryImpl)
-        (liftComp ($ᵗZMod p) (unifSpec ++ₒ _))).run ∅)-/
-      sorry
+    · apply neverFails_stateT_run_simulateQ
+      · -- The oracle implementation (randomOracle ++ₛₒ challengeQueryImpl) never fails
+        intro β q s'
+        cases q with
+        | query i t =>
+          cases i with
+          | inl i₁ => exact neverFails_randomOracle_impl _ (OracleQuery.query i₁ t) s'
+          | inr i₂ => fin_cases i₂
+      · -- liftComp of uniform sampling never fails
+        simp only [neverFails_lift_comp_iff, neverFails_uniformOfFintype]
     · intro a_sample _ _
       constructor
       · simp [acceptRejectRel]
         exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
       · exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
+
+def reduction {ι : Type} (oSpec : OracleSpec ι) (D : ℕ) :
+    Groups.ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p) := sorry
+
+/- the KZG satisfies function binding as defined in `CommitmentScheme` with the ARSDH error -/
+theorem functionBinding (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂}
+    {L : ℕ} (AuxState : Type) (functionBindingError : ℝ≥0) :
+    Commitment.functionBinding (init := pure ∅) (impl := randomOracle) (L := L)
+    (hn := rfl) (hpSpec := { prover_first' := by simp }) (AuxState := AuxState)
+    (KZG (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)) functionBindingError
+    → Groups.ARSDH (oSpec := unifSpec) (g₁ := g₁) (g₂ := g₂) n
+        (reduction unifSpec n) functionBindingError := by
+    unfold Commitment.functionBinding
+    sorry
 
 end CommitmentScheme
 
