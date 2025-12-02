@@ -18,6 +18,7 @@ import Mathlib.Algebra.CharP.Defs
 import Mathlib.Data.Nat.Cast.Order.Field
 import Mathlib.Data.ENat.Defs
 import Mathlib.Data.ENat.Basic
+import Mathlib.Data.ENNReal.Inv
 
 /-!
 # Bit operations on natural numbers
@@ -26,8 +27,72 @@ Naming convention:
 - ..._getBit_1 or _eq_one : the value of getBit is 1 at the specified bit(s)
 - getBit_of_... : the value of getBit is the value of the specified bit(s), under some preconditions
 -/
-namespace Nat
+
 open NNReal ENat
+
+@[simp]
+lemma ENat.le_floor_NNReal_iff (x : ENat) (y : ℝ≥0) (hx_ne_top : x ≠ ⊤) :
+  (x : ENat) ≤ ((Nat.floor y) : ENat) ↔ x.toNat ≤ Nat.floor y := by
+  lift x to ℕ using hx_ne_top
+  -- y : ℝ≥0, x : ℕ, ⊢ ↑x ≤ ↑⌊y⌋₊ ↔ (↑x).toNat ≤ ⌊y⌋₊
+  simp only [Nat.cast_le, toNat_coe]
+
+section ENNReal
+open ENNReal
+variable {a b c d : ℝ≥0∞} {r p q : ℝ≥0}
+-- Reference: `FormulaRabbit81`'s PR: https://github.com/leanprover-community/mathlib4/commit/2452ad7288de553bc1201969ed13782affaf3459
+
+lemma ENNReal.div_lt_div_iff_left (hc₀ : c ≠ 0) (hc : c ≠ ∞) : a / c < b / c ↔ a < b :=
+  ENNReal.mul_lt_mul_right (by simpa) (by simpa)
+
+@[gcongr]
+lemma ENNReal.div_lt_div_right (hc₀ : c ≠ 0) (hc : c ≠ ∞) (hab : a < b) : a / c < b / c :=
+  (ENNReal.div_lt_div_iff_left hc₀ hc).2 hab
+
+theorem ENNReal.mul_inv_rev_ENNReal {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0) :
+    ((a : ENNReal)⁻¹ * (b : ENNReal)⁻¹) = ((a : ENNReal) * (b : ENNReal))⁻¹ := by
+-- Let x = ↑a and y = ↑b for readability
+  let x : ENNReal := a
+  let y : ENNReal := b
+  -- Prove x and y are non-zero and finite (needed for inv_cancel)
+  have hx_ne_zero : x ≠ 0 := by exact Nat.cast_ne_zero.mpr ha
+  have hy_ne_zero : y ≠ 0 := by exact Nat.cast_ne_zero.mpr hb
+  have hx_ne_top : x ≠ ∞ := by exact ENNReal.natCast_ne_top a
+  have hy_ne_top : y ≠ ∞ := by exact ENNReal.natCast_ne_top b
+  have ha_NNReal_ne0 : (a : ℝ≥0) ≠ 0 := by exact Nat.cast_ne_zero.mpr ha
+  have hb_NNReal_ne0 : (b : ℝ≥0) ≠ 0 := by exact Nat.cast_ne_zero.mpr hb
+  -- (a * b)⁻¹ = b⁻¹ * a⁻¹
+  have hlhs : ((a : ENNReal)⁻¹ * (b : ENNReal)⁻¹) = ((a : ℝ≥0)⁻¹ * (b : ℝ≥0)⁻¹) := by
+    rw [coe_inv (hr := by exact ha_NNReal_ne0)]
+    rw [coe_inv (hr := by exact hb_NNReal_ne0)]
+    rw [ENNReal.coe_natCast, ENNReal.coe_natCast]
+  have hrhs : ((a : ENNReal) * (b : ENNReal))⁻¹ = ((a : ℝ≥0) * (b : ℝ≥0))⁻¹ := by
+    rw [coe_inv (hr := (mul_ne_zero_iff_right hb_NNReal_ne0).mpr (ha_NNReal_ne0))]
+    simp only [coe_mul, coe_natCast]
+  rw [hlhs, hrhs]
+  rw [mul_inv_rev (a := (a : ℝ≥0)) (b := (b : ℝ≥0))]
+  rw [coe_mul, mul_comm]
+
+lemma ENNReal.coe_le_of_NNRat {a b : ℚ≥0} : ((a : ENNReal)) ≤ (b) ↔ a ≤ b := by
+  exact ENNReal.coe_le_coe.trans (by norm_cast)
+
+lemma ENNReal.coe_NNRat_coe_NNReal (x : ℚ≥0) : (x : ENNReal) = ((x : ℝ≥0) : ENNReal) := by rfl
+-- We can use `NNRat.cast_div` or so after `ENNReal.coe_NNRat_coe_NNReal`
+
+lemma ENNReal.coe_div_of_NNRat {a b : ℚ≥0} (hb : b ≠ 0) :
+  ((a : ENNReal) / (b : ENNReal)) = (((a / b) : ℚ≥0) : ENNReal) := by
+  rw [ENNReal.coe_NNRat_coe_NNReal, ENNReal.coe_NNRat_coe_NNReal]
+  rw [←ENNReal.coe_div (hr := by
+    simp only [ne_eq, NNRat.cast_eq_zero, hb, not_false_eq_true])] -- back to NNReal
+  congr 1
+  rw [NNRat.cast_div]
+
+lemma ENNReal.coe_Nat_coe_NNRat (x : ℕ) : (x : ENNReal) = ((x : ℚ≥0) : ENNReal) := by rfl
+-- We can use `NNRat.cast_div` or so after `ENNReal.coe_NNRat_coe_NNReal`
+
+end ENNReal
+
+namespace Nat
 
 -- Note: this is already done with `Nat.sub_add_eq_max`
 theorem max_eq_add_sub {m n : Nat} : Nat.max m n = m + (n - m) := by
@@ -77,13 +142,6 @@ lemma cast_div_le_div_cast_NNReal (x y : ℕ) :
     have hy_nnreal_ne_zero : (y : ℝ≥0) ≠ 0 := by
       simp only [ne_eq, Nat.cast_eq_zero, hy, not_false_eq_true] -- `hy` is `y ≠ 0`
     exact Nat.cast_div_le
-
-@[simp]
-lemma ENat.le_floor_NNReal_iff (x : ENat) (y : ℝ≥0) (hx_ne_top : x ≠ ⊤) :
-  (x : ENat) ≤ ((Nat.floor y) : ENat) ↔ x.toNat ≤ Nat.floor y := by
-  lift x to ℕ using hx_ne_top
-  -- y : ℝ≥0, x : ℕ, ⊢ ↑x ≤ ↑⌊y⌋₊ ↔ (↑x).toNat ≤ ⌊y⌋₊
-  simp only [Nat.cast_le, toNat_coe]
 
 theorem two_mul_lt_iff_le_half_of_sub_one (a b : ℕ) (h_b_pos : b > 0) :
     2 * a < b ↔ a ≤ (b - 1) / 2 := by

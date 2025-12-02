@@ -952,8 +952,6 @@ lemma exists_relClosest_codeword_of_Nonempty_Code {ι : Type*} [Fintype ι] {F :
   -- This is exactly `h_sInf_mem`.
   exact h_sInf_mem
 
-lemma ENNReal.coe_NNRat (x : ℚ≥0) : (x : ENNReal) = ((x : ℝ≥0) : ENNReal) := by rfl
-
 theorem relDistFromCode_eq_distFromCode_div (u : ι → F) (C : Set (ι → F)) [Nonempty C] :
     δᵣ(u, C) = (Δ₀(u, C) : ENNReal) / (Fintype.card ι : ENNReal) := by
   -- 1. Unfold definitions
@@ -999,7 +997,7 @@ theorem relDistFromCode_eq_distFromCode_div (u : ι → F) (C : Set (ι → F)) 
       -- By definition of `M'`, `δᵣ(u, C) = relHammingDist u M'`.
       rw [←hM'_is_min_rel, relHammingDist]
       conv_rhs =>
-        rw [ENNReal.coe_NNRat]; rw [NNRat.cast_div];
+        rw [ENNReal.coe_NNRat_coe_NNReal]; rw [NNRat.cast_div];
         simp only [NNRat.cast_natCast, ne_eq, Nat.cast_eq_zero, Fintype.card_ne_zero,
           not_false_eq_true, ENNReal.coe_div, ENNReal.coe_natCast]
       gcongr
@@ -1016,14 +1014,14 @@ theorem pairDist_eq_distToCode_iff_eq_relDistToCode_div
   constructor
   · intro h_dist_eq
     dsimp only [relHammingDist]
-    conv_lhs => rw [ENNReal.coe_NNRat, NNRat.cast_div]; simp only [NNRat.cast_natCast, ne_eq,
+    conv_lhs => rw [ENNReal.coe_NNRat_coe_NNReal, NNRat.cast_div]; simp only [NNRat.cast_natCast, ne_eq,
       Nat.cast_eq_zero, Fintype.card_ne_zero, not_false_eq_true, ENNReal.coe_div,
       ENNReal.coe_natCast]
     rw [←h_dist_eq]; rfl
   · intro h_rel_dist_eq
     dsimp only [relHammingDist] at h_rel_dist_eq
     conv_lhs at h_rel_dist_eq =>
-      rw [ENNReal.coe_NNRat, NNRat.cast_div]; simp only [NNRat.cast_natCast,
+      rw [ENNReal.coe_NNRat_coe_NNReal, NNRat.cast_div]; simp only [NNRat.cast_natCast,
       ne_eq, Nat.cast_eq_zero, Fintype.card_ne_zero, not_false_eq_true, ENNReal.coe_div,
       ENNReal.coe_natCast];
     conv at h_rel_dist_eq =>
