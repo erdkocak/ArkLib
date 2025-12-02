@@ -90,6 +90,18 @@ lemma distFromCode_le_dist_to_mem (u : n → R) {C : Set (n → R)} (v : n → R
     simp only [Set.mem_setOf_eq]
     exact ⟨v, hv, le_refl _⟩
 
+/-- If `u` and `v` are distinct members of a code `C`, their distance is at least `‖C‖₀`. -/
+lemma pairDist_ge_code_mindist_of_ne {C : Set (n → R)} {u v : n → R}
+    (hu : u ∈ C) (hv : v ∈ C) (h_ne : u ≠ v) :
+    Δ₀(u, v) ≥ ‖C‖₀:= by
+  unfold Code.dist -- We use the property of sInf: if `k` is in the set `S`, then `sInf S ≤ k`.
+  apply Nat.sInf_le
+  simp only [Set.mem_setOf_eq]
+  exists u
+  constructor
+  · exact hu
+  · exists v
+
 noncomputable def minDist (C : Set (n → R)) : ℕ :=
   sInf {d | ∃ u ∈ C, ∃ v ∈ C, u ≠ v ∧ hammingDist u v = d}
 
@@ -1446,19 +1458,41 @@ lemma uniqueDecodingRadius_eq_floor_div_2 {ι : Type*} [Fintype ι] {F : Type*} 
 /-- Given an error/proximity parameter `e` within the unique decoding radius of a code `C` where
 `‖C‖₀ > 0`, this lemma proves the standard bound `2 * e < d`
 (i.e. condition of `Code.eq_of_lt_dist`). -/
-lemma two_mul_proximity_lt_d_UDR {ι : Type*} [Fintype ι] {F : Type*} [DecidableEq F]
+lemma UDRClose_iff_two_mul_proximity_lt_d_UDR {ι : Type*} [Fintype ι] {F : Type*} [DecidableEq F]
     (C : Set (ι → F)) [NeZero (‖C‖₀)]
-    {e : ℕ} (he : e ≤ Code.uniqueDecodingRadius (C := C)) : 2 * e < ‖C‖₀ := by
-  unfold Code.uniqueDecodingRadius at he
-  have h_2e_le := Nat.mul_le_mul_left 2 he
-  have h_div_prop : 2 * ((‖C‖₀ - 1) / 2) ≤ ‖C‖₀ - 1 := by
-    rw [Nat.mul_comm]
-    exact Nat.div_mul_le_self (‖C‖₀ - 1) 2
-  have h_2e_le_d_minus_1 : 2 * e ≤ ‖C‖₀ - 1 :=
-    le_trans h_2e_le h_div_prop
-  rw [Nat.le_sub_one_iff_lt] at h_2e_le_d_minus_1
-  · exact h_2e_le_d_minus_1
-  · exact Nat.pos_of_neZero ‖C‖₀
+    {e : ℕ} : e ≤ Code.uniqueDecodingRadius (C := C) ↔ 2 * e < ‖C‖₀ :=
+  (Nat.two_mul_lt_iff_le_half_of_sub_one (a := e) (b := ‖C‖₀)
+    (h_b_pos := by exact Nat.pos_of_neZero ‖C‖₀)).symm
+
+/-- A stronger version of `distFromCode_eq_of_lt_half_dist`:
+If two codewords `v` and `w` are both within the `uniqueDecodingRadius` of
+`u` (i.e. `2 * Δ₀(u, v) < ‖C‖₀ and 2 * Δ₀(u, w) < ‖C‖₀`), then they must be equal. -/
+theorem eq_of_le_uniqueDecodingRadius {ι : Type*} [Fintype ι] {F : Type*}
+    [DecidableEq F] (C : Set (ι → F)) (u : ι → F) {v w : ι → F}
+    (hv : v ∈ C) (hw : w ∈ C)
+    (huv : Δ₀(u, v) ≤ Code.uniqueDecodingRadius C)
+    (huw : Δ₀(u, w) ≤ Code.uniqueDecodingRadius C) : v = w := by
+  -- Handle the edge case where distance is 0 (trivial code)
+  by_cases hd : ‖C‖₀ = 0
+  · simp only [uniqueDecodingRadius] at huv huw
+    simp only [hd, zero_tsub, Nat.zero_div, nonpos_iff_eq_zero, hammingDist_eq_zero] at huv huw
+    rw [←huv, ←huw]
+  · -- Main Case: d > 0
+    apply eq_of_lt_dist hv hw
+    calc
+      Δ₀(v, w) ≤ Δ₀(v, u) + Δ₀(u, w) := by exact hammingDist_triangle v u w
+      _ = Δ₀(u, v) + Δ₀(u, w)        := by simp only [hammingDist_comm]
+      _ ≤ Code.uniqueDecodingRadius C + Code.uniqueDecodingRadius C := by gcongr
+      _ < ‖C‖₀                          := by
+        -- Proof that 2 * ⌊(d-1)/2⌋ < d
+        simp only [uniqueDecodingRadius]
+        -- 2 * ((d - 1) / 2) ≤ d - 1
+        have h_div : 2 * ((‖C‖₀ - 1) / 2) ≤ ‖C‖₀ - 1 := by
+          rw [mul_comm]
+          apply Nat.div_mul_le_self (m := ‖C‖₀ - 1) (n := 2)
+        -- Since d ≠ 0, d - 1 < d
+        have h_sub : ‖C‖₀ - 1 < ‖C‖₀ := Nat.pred_lt hd
+        omega
 
 /--
 A word `u` is within the `uniqueDecodingRadius` of a code `C` if and only if

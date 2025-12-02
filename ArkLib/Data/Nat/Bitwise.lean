@@ -21,6 +21,10 @@ import Mathlib.Data.ENat.Basic
 
 /-!
 # Bit operations on natural numbers
+
+Naming convention:
+- ..._getBit_1 or _eq_one : the value of getBit is 1 at the specified bit(s)
+- getBit_of_... : the value of getBit is the value of the specified bit(s), under some preconditions
 -/
 namespace Nat
 open NNReal ENat
@@ -38,6 +42,24 @@ theorem sub_add_eq_sub_sub_rev (a b c : Nat) (h1 : c ≤ b) (h2 : b ≤ a) :
     rw [← Nat.sub_add_cancel h2]
   rw [Nat.add_sub_assoc (Nat.sub_le b c)]
   rw [Nat.sub_sub_self h1]
+
+lemma cast_gt_Real_one (a : ℕ) (ha : a > 1) : (a : ℝ) > 1 := by
+  rw [gt_iff_lt]
+  have h := Nat.cast_lt (α := ℝ) (m := 1) (n := a).mpr
+  rw [cast_one] at h
+  exact h ha
+
+lemma sub_div_two_add_one_le (n k : ℕ) [NeZero n] [NeZero k] (hkn : k ≤ n) :
+    (n - k) / 2 + 1 ≤ n := by
+  have h_div_le_self : (n - k) / 2 ≤ n - k := Nat.div_le_self (n - k) 2
+  have h_le_sub_add_one : (n - k) / 2 + 1 ≤ n - k + 1 := by
+    apply Nat.add_le_add_right h_div_le_self 1
+  have h_sub_lt_n : n - k < n := by
+    apply Nat.sub_lt_self
+    · exact NeZero.pos k
+    · exact hkn
+  have h_sub_add_one_le_n : n - k + 1 ≤ n := Nat.succ_le_of_lt h_sub_lt_n
+  exact le_trans h_le_sub_add_one h_sub_add_one_le_n
 
 @[simp]
 lemma lt_add_of_pos_right_of_le (a b c : ℕ) [NeZero c] (h : a ≤ b) : a < b + c := by
@@ -63,6 +85,21 @@ lemma ENat.le_floor_NNReal_iff (x : ENat) (y : ℝ≥0) (hx_ne_top : x ≠ ⊤) 
   -- y : ℝ≥0, x : ℕ, ⊢ ↑x ≤ ↑⌊y⌋₊ ↔ (↑x).toNat ≤ ⌊y⌋₊
   simp only [Nat.cast_le, toNat_coe]
 
+theorem two_mul_lt_iff_le_half_of_sub_one (a b : ℕ) (h_b_pos : b > 0) :
+    2 * a < b ↔ a ≤ (b - 1) / 2 := by
+  constructor
+  · intro h
+    by_cases hb : b = 0
+    · omega
+    · have hb_pos : 0 < b := Nat.pos_of_ne_zero hb
+      have : 2 * a + 1 ≤ b := by omega
+      omega
+  · intro h
+    by_cases hb : b = 0
+    · omega
+    · have hb_pos : 0 < b := Nat.pos_of_ne_zero hb
+      omega
+
 /--
 Returns the `k`-th least significant bit of a natural number `n` as a natural number (in `{0, 1}`).
 
@@ -74,6 +111,9 @@ lemma testBit_true_eq_getBit_eq_1 (k n : Nat) : n.testBit k = ((Nat.getBit k n) 
   unfold getBit
   rw [Nat.testBit]
   simp only [one_and_eq_mod_two, mod_two_bne_zero, beq_iff_eq, and_one_is_mod]
+
+lemma testBit_eq_getBit (k n : Nat) : (n.testBit k : Bool) = ((Nat.getBit k n) = 1) := by
+  simp only [testBit, one_and_eq_mod_two, mod_two_bne_zero, beq_iff_eq, getBit, and_one_is_mod]
 
 lemma testBit_false_eq_getBit_eq_0 (k n : Nat) :
   (n.testBit k = false) = ((Nat.getBit k n) = 0) := by
@@ -201,6 +241,35 @@ lemma and_eq_zero_iff_and_each_getBit_eq_zero {n m : ℕ} :
       exact h_forall_k k
     rw [h_forall_k_eq k]
     rw [Nat.zero_shiftRight, Nat.zero_and]
+
+lemma ge_two_pow_of_getBit_1 {n i : ℕ} (h_getBit : Nat.getBit i n = 1) : n ≥ 2^i := by
+  rw [Nat.getBit_eq_testBit] at h_getBit
+  simp only [ite_eq_left_iff, Bool.not_eq_true, zero_ne_one, imp_false,
+    Bool.not_eq_false] at h_getBit
+  let res := Nat.ge_two_pow_of_testBit (x := n) (i := i) (p := h_getBit)
+  exact res
+
+lemma exists_ge_and_getBit_1_of_ge_two_pow {n x : Nat} (p : x ≥ 2 ^ n) :
+  ∃ (i : Nat), i ≥ n ∧ Nat.getBit i x = 1 := by
+  let res := Nat.exists_ge_and_testBit_of_ge_two_pow (x := x) (n := n) (p := p)
+  simp only [Nat.testBit_true_eq_getBit_eq_1] at res
+  exact res
+
+lemma getBit_1_of_ge_two_pow_and_lt_two_pow_succ {x i : ℕ}
+    (h_ge_two_pow : x ≥ 2 ^ i) (h_lt_two_pow_succ : x < 2 ^ (i + 1)) : Nat.getBit i x = 1 := by
+  let res := Nat.exists_ge_and_getBit_1_of_ge_two_pow (n := i) (x := x) (p := h_ge_two_pow)
+  rcases res with ⟨j, h_j_ge_i, h_getBit_eq_1⟩
+  by_cases h_j_gt_i : j > i
+  · have h_x_ge_2_pow_j : x ≥ 2 ^ j := by
+      apply Nat.ge_two_pow_of_getBit_1 (h_getBit := h_getBit_eq_1)
+    have h_x_gt_2_pow_i_succ : x ≥ 2 ^ (i + 1) := by
+      calc
+        x ≥ 2 ^ j := by exact h_x_ge_2_pow_j;
+        _ ≥ 2 ^ (i + 1) := by apply Nat.pow_le_pow_right; omega; omega;
+    omega -- h_x_gt_2_pow_i_succ contradicts h_lt_two_pow_succ
+  · have h_j_eq_i : j = i := by omega
+    rw [h_j_eq_i] at h_getBit_eq_1
+    exact h_getBit_eq_1
 
 lemma getBit_two_pow {i k : ℕ} : (getBit k (2^i) = if i == k then 1 else 0) := by
   have h_two_pow_i: 2^i = 1 <<< i := by
