@@ -116,7 +116,7 @@ def proximityChecksSpec (γ_challenges :
       -- Compute the next value using localized fold matrix form
       let cur_challenge_batch : Fin ϑ → L := fun j => fold_challenges ⟨i + j.val, by omega⟩
 
-      let c_next := localized_fold_matrix_form 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+      let c_next := single_point_localized_fold_matrix_form 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
         (i:=⟨i, by omega⟩) (steps:=ϑ) (h_i_add_steps:=by simp only; omega)
         (r_challenges:=cur_challenge_batch) (y:=next_suffix_of_v) (fiber_eval_mapping:=f_i_on_fiber)
 
@@ -295,7 +295,7 @@ noncomputable def queryOracleVerifier :
         let cur_challenge_batch : Fin ϑ → L := fun j => stmt.challenges ⟨i +
         j.val, by rw [Fin.val_last]; omega⟩
 
-        let c_next := localized_fold_matrix_form 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        let c_next := single_point_localized_fold_matrix_form 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
           (i:=⟨i, by omega⟩) (steps:=ϑ) (h_i_add_steps:=by simp only; omega)
           (r_challenges:=cur_challenge_batch) (y:=next_suffix_of_v)
           (fiber_eval_mapping:=fun idx => f_i_on_fiber.get ⟨idx, by

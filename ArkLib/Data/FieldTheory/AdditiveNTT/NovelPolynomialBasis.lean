@@ -1343,7 +1343,6 @@ lemma degree_Xⱼ (ℓ : ℕ) (h_ℓ : ℓ ≤ r) (j : Fin (2 ^ ℓ)) :
           exact Nat.mod_two_ne_one.mp h
         rw [h_0]
         exact mul_eq_zero_comm.mp rfl
-    -- We use the `Nat.digits` API for this.
     rw [Finset.sum_congr rfl deg_each] -- .degree introduces (WithBot ℕ)
     -- ⊢ ⊢ ∑ x, ↑(if bit ↑x ↑j = 1 then 2 ^ ↑x else 0) = ↑↑j
     set f:= fun x: ℕ => if Nat.getBit x j = 1 then (2: ℕ) ^ (x: ℕ) else 0

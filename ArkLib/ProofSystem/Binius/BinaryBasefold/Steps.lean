@@ -83,8 +83,7 @@ noncomputable def getFoldProverFinalOutput (i : Fin ℓ)
     (i := ⟨i, by omega⟩) := witIn.f
   let challenges : Fin (1) → L := fun cId => r_i'
   let fᵢ_succ := iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-    (steps := ⟨1, by apply Nat.lt_add_of_pos_right_of_le; exact NeZero.one_le⟩)
-    (i := ⟨i, by omega⟩)
+    (steps := 1) (i := ⟨i, by omega⟩)
     (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega)
     f_i challenges
   simp only at fᵢ_succ
@@ -228,6 +227,10 @@ theorem foldOracleReduction_perfectCompleteness (hInit : init.neverFails) (i : F
   unfold OracleReduction.perfectCompleteness
   intro stmtIn witIn h_relIn
   simp only
+  -- Honest prover computes sumcheck polynomial correctly from witness
+  -- and preserves all consistency properties through the fold step
+  -- Key: roundRelationProp at i.castSucc implies foldStepRelOutProp at i.succ
+  -- by preservation of masterKStateProp components
   sorry
 
 open scoped NNReal

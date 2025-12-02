@@ -120,6 +120,49 @@ noncomputable def qMap (i : Fin r) : L[X] :=
     / ((W 𝔽q β (i + 1)).eval (β (i + 1)))
   C constMultiplier * ∏ c: 𝔽q, (X - C (algebraMap 𝔽q L c))
 
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+/-- Helper: The natDegree of qMap is |𝔽q| = 2. -/
+lemma natDegree_qMap (i : Fin r) : (qMap 𝔽q β i).natDegree = 2 := by
+  let q := Fintype.card 𝔽q
+  let constMultiplier := ((W 𝔽q β i).eval (β i))^q / ((W 𝔽q β (i + 1)).eval (β (i + 1)))
+  -- 1. Establish the polynomial form: C * (X^q - X)
+  have h_q_poly_form : qMap 𝔽q β i = C constMultiplier * (X ^ q - X) := by
+    rw [qMap, prod_poly_sub_C_eq_poly_pow_card_sub_poly_in_L (p:=X)]
+  rw [h_q_poly_form]
+  -- 2. Use natDegree rules
+  -- natDegree (C * P) = natDegree P (if C ≠ 0)
+  rw [Polynomial.natDegree_C_mul]
+  · -- natDegree (X^q - X) = q
+    rw [Polynomial.natDegree_sub_eq_left_of_natDegree_lt]
+    · rw [Polynomial.natDegree_X_pow]; unfold q; rw [hF₂.out];
+    · -- Proof that natDegree X < natDegree X^q
+      rw [Polynomial.natDegree_X_pow, Polynomial.natDegree_X]
+      have hq_ge_2 : Fintype.card 𝔽q ≥ 2 := by rw [hF₂.out]
+      exact hq_ge_2
+  · -- Proof that constMultiplier ≠ 0 (Standard non-zero evaluation argument)
+    intro h_zero
+    have h_num_ne_zero : ((W 𝔽q β i).eval (β i)) ^ q ≠ 0 := by
+      exact pow_ne_zero q (AdditiveNTT.Wᵢ_eval_βᵢ_neq_zero 𝔽q β i)
+    rw [div_eq_zero_iff] at h_zero
+    cases h_zero with
+    | inl h => contradiction
+    | inr h =>
+       have h_den_ne_zero : ((W 𝔽q β (i + 1)).eval (β (i + 1))) ≠ 0 :=
+         AdditiveNTT.Wᵢ_eval_βᵢ_neq_zero 𝔽q β (i + 1)
+       contradiction
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+lemma qMap_ne_zero (i : Fin r) : (qMap 𝔽q β i) ≠ 0 := by
+  apply Polynomial.ne_zero_of_natDegree_gt (n := 0)
+  rw [natDegree_qMap 𝔽q β i]; exact Nat.zero_lt_two
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+/-- The degree of the quotient map is |𝔽q| (which is 2). -/
+lemma degree_qMap (i : Fin r) : (qMap 𝔽q β i).degree = 2 := by
+  conv_rhs => change ((2 : ℕ) : WithBot ℕ)
+  rw [←natDegree_qMap 𝔽q β i]
+  rw [Polynomial.degree_eq_natDegree (hp := qMap_ne_zero 𝔽q β i)]
+
 omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime hF₂ hβ_lin_indep h_β₀_eq_1 in
 theorem qMap_eval_𝔽q_eq_0 (i : Fin r) :
   ∀ c: 𝔽q, (qMap 𝔽q β i).eval (algebraMap 𝔽q L c) = 0 := by
@@ -895,21 +938,6 @@ lemma intermediateNormVpoly_eval_is_linear_map (i : Fin (ℓ + 1)) (k : Fin (ℓ
         rw [isLinearMap_innerFold.map_smul, isLinearMap_qmap_eval.map_smul]
     }
 
--- /--
--- **Corollary 4.4.** For each `i ∈ {0, ..., r-1}`, we have `Ŵᵢ = q⁽ⁱ⁻¹⁾ ∘ ... ∘ q⁽⁰⁾`
--- (with the convention that for `i = 0`, this is just `X`).
--- -/
--- lemma normalizedW_eq_qMap_composition
---
---   -- We also need the hypotheses for qMap_comp_normalizedW
---   (h_Fq_card_gt_1: Fintype.card 𝔽q > 1)
---   (h_Fq_char_prime: Fact (Nat.Prime (ringChar 𝔽q)))
---   (hβ_lin_indep : LinearIndependent 𝔽q β)
---   (ℓ R_rate : ℕ)
---   (i : Fin r) :
---   normalizedW 𝔽q β i = qCompositionChain 𝔽q β (ℓ:=ℓ) (R_rate:=R_rate) i :=
--- by
-
 omit [DecidableEq 𝔽q] hF₂ in
 -- Ŵₖ⁽⁰⁾(X) = Ŵ(X)
 theorem base_intermediateNormVpoly
@@ -924,6 +952,46 @@ theorem base_intermediateNormVpoly
   simp only [Fin.mk_zero', Fin.coe_ofNat_eq_mod, zero_add]
   rw [normalizedW_eq_qMap_composition 𝔽q β ℓ R_rate ⟨k, by omega⟩]
   rw [qCompositionChain_eq_foldl 𝔽q β]
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+/-- The natDegree of `Ŵₖ⁽ⁱ⁾(X)` is `2^k`. -/
+lemma natDegree_intermediateNormVpoly (i : Fin (ℓ + 1)) (k : Fin (ℓ - i + 1)) :
+  (intermediateNormVpoly 𝔽q β h_ℓ_add_R_rate i k).natDegree = 2 ^ k.val := by
+  induction k using Fin.induction with
+  | zero =>
+    -- Base Case: X
+    unfold intermediateNormVpoly
+    simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, Fin.foldl_zero, natDegree_X, pow_zero]
+  | succ k' ih =>
+    -- Inductive Step
+    unfold intermediateNormVpoly
+    simp only [Fin.val_succ]
+    rw [Fin.foldl_succ_last]
+    simp only [Fin.val_last, Fin.coe_castSucc]
+    -- 1. Apply natDegree_comp
+    rw [Polynomial.natDegree_comp]
+    -- 2. Handle qMap part
+    rw [natDegree_qMap]
+    -- 3. Handle Accumulator part (use IH)
+    -- We match the accumulator definition to the IH term
+    have h_acc_eq_prev :
+      Fin.foldl (↑k') (fun acc j ↦ (qMap 𝔽q β ⟨↑i + ↑j, by omega⟩).comp acc) X
+      = intermediateNormVpoly 𝔽q β h_ℓ_add_R_rate i ⟨k', by omega⟩ := rfl
+    unfold intermediateNormVpoly at ih
+    simp only [Fin.coe_castSucc] at ih
+    rw [h_acc_eq_prev] at ih ⊢
+    rw [ih]
+    -- 4. Arithmetic: 2 * 2^k' = 2^(k'+1)
+    rw [pow_succ']
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+/-- The degree of `Ŵₖ⁽ⁱ⁾(X)` is `2^k`. -/
+lemma degree_intermediateNormVpoly (i : Fin (ℓ + 1)) (k : Fin (ℓ - i + 1)) :
+  (intermediateNormVpoly 𝔽q β h_ℓ_add_R_rate i k).degree = 2 ^ k.val := by
+  rw [Polynomial.degree_eq_natDegree]
+  · rw [natDegree_intermediateNormVpoly]; norm_cast
+  · apply Polynomial.ne_zero_of_natDegree_gt (n := 0);
+    rw [natDegree_intermediateNormVpoly]; simp only [Nat.ofNat_pos, pow_pos]
 
 -- i = 0->l: Ŵᵢ = q(i-1) ∘ ⋯ ∘ q(0)
 -- Ŵᵢ is actually Ŵᵢ⁽⁰⁾ => deg(Ŵᵢ) = 2^i = |Uᵢ|, and it vanishes on Uᵢ = Uᵢ⁽⁰⁾ = ⟨β₀, ..., β_{i-1}⟩
@@ -1404,6 +1472,52 @@ lemma intermediateNovelBasisX_zero_eq_one (i : Fin (ℓ + 1)) :
   simp only [Nat.getBit_zero_eq_zero, pow_zero]
   exact Finset.prod_const_one
 
+omit h_Fq_char_prime [DecidableEq L] [DecidableEq 𝔽q] h_β₀_eq_1 in
+/-- The degree of an `i`-th order novel polynomial basis element `Xⱼ⁽ⁱ⁾(X)` is exactly `j`.
+Somewhat similar to proof of `degree_Xⱼ`. -/
+lemma degree_intermediateNovelBasisX (i : Fin (ℓ + 1)) (j : Fin (2 ^ (ℓ - i))) :
+  (intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate (i := i) (j := j)).degree = j := by
+  rw [intermediateNovelBasisX, degree_prod]
+  set rangeL := Fin ℓ
+  -- ⊢ ∑ i ∈ rangeL, (normalizedW 𝔽q β i ^ bit (↑i) j).degree = ↑j
+  by_cases h_ℓ_0: ℓ = 0
+  · have h_ℓ_sub_i : ℓ - i = 0 := by omega
+    rw! (castMode:=.all) [h_ℓ_sub_i]
+    rw! (castMode:=.all) [h_ℓ_0]
+    simp only [Finset.univ_eq_empty, Nat.reduceAdd, Nat.pow_zero, Fin.val_eq_zero, degree_pow,
+      nsmul_eq_mul, Finset.sum_empty, WithBot.coe_zero]
+  · push_neg at h_ℓ_0
+    have deg_each: ∀ (k : Fin (ℓ - i)), ((intermediateNormVpoly 𝔽q β h_ℓ_add_R_rate (i := i)
+        (k:=⟨k, by omega⟩))^(Nat.getBit k j)).degree
+      = if Nat.getBit (k := k.val) (n := j.val) = 1 then (2:ℕ)^k.val else 0 := by
+      intro (k : Fin (ℓ - i))
+      rw [degree_pow]
+      have h_deg_norm_vpoly: (intermediateNormVpoly 𝔽q β h_ℓ_add_R_rate (i := i)
+        (k:=⟨k, by omega⟩)).degree = 2 ^ k.val := by rw [degree_intermediateNormVpoly]
+      rw [h_deg_norm_vpoly]
+      simp only [nsmul_eq_mul, Nat.cast_ite, Nat.cast_pow,
+        Nat.cast_ofNat, CharP.cast_eq_zero]
+      have h_get_bit_lt_2 := Nat.getBit_lt_2 (k:=k.val) (n:=j.val)
+      by_cases h: Nat.getBit (k := k.val) (n := j.val) = 1
+      · simp only [h, Nat.cast_one, one_mul, ↓reduceIte];
+      · simp only [h, ↓reduceIte, mul_eq_zero, Nat.cast_eq_zero, pow_eq_zero_iff',
+        OfNat.ofNat_ne_zero, ne_eq, false_and, or_false]
+        omega
+    simp_rw [deg_each]
+    -- ⊢ ∑ x, ↑(if (↑x).getBit ↑j = 1 then 2 ^ ↑i else 0) = ↑↑j
+    set f:= fun x: ℕ => if Nat.getBit x j = 1 then (2: ℕ) ^ (x: ℕ) else 0
+    simp only [Nat.cast_ite, Nat.cast_pow, Nat.cast_ofNat, CharP.cast_eq_zero]
+    conv_rhs =>
+      rw [Nat.getBit_repr_univ (ℓ := ℓ - i) (j := j.val) (by omega)]
+    simp only [WithBot.coe_sum, WithBot.coe_mul, WithBot.coe_pow, WithBot.coe_ofNat]
+    congr 1
+    funext (x : Fin (ℓ - i))
+    have h_getBit_lt_2 := Nat.getBit_lt_2 (k:=x) (n:=j.val)
+    by_cases h: Nat.getBit (k := x) (n := j.val) = 1
+    · simp only [h, ↓reduceIte, WithBot.coe_one, one_mul];
+    · simp only [h, ↓reduceIte, zero_eq_mul, WithBot.coe_eq_zero, pow_eq_zero_iff',
+      OfNat.ofNat_ne_zero, ne_eq, false_and, or_false]; omega
+
 omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime hF₂ hβ_lin_indep h_β₀_eq_1 in
 /-- `X₂ⱼ⁽ⁱ⁾ = Xⱼ⁽ⁱ⁺¹⁾(q⁽ⁱ⁾(X)) ∀ j ∈ {0, ..., 2^(ℓ-i)-1}, ∀ i ∈ {0, ..., ℓ-1}` -/
 lemma even_index_intermediate_novel_basis_decomposition (i : Fin ℓ) (j : Fin (2 ^ (ℓ - i - 1))) :
@@ -1537,6 +1651,208 @@ noncomputable def intermediateEvaluationPoly (i : Fin (ℓ + 1))
     (coeffs : Fin (2 ^ (ℓ - i)) → L) : L[X] :=
   ∑ (⟨j, hj⟩: Fin (2^(ℓ-i))), C (coeffs ⟨j, by omega⟩) *
     (intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i ⟨j, by omega⟩)
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+lemma degree_intermediateEvaluationPoly_lt (i : Fin (ℓ + 1))
+    (coeffs : Fin (2 ^ (ℓ - i)) → L) :
+  (intermediateEvaluationPoly 𝔽q β h_ℓ_add_R_rate i coeffs).degree < 2 ^ (ℓ - i) := by
+  rw [intermediateEvaluationPoly]
+  simp only
+  apply (Polynomial.degree_sum_le Finset.univ (fun (j : Fin (2^(ℓ-i))) => C (coeffs ⟨j, by omega⟩)
+    * intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i ⟨j, by omega⟩)).trans_lt
+  apply (Finset.sup_lt_iff ?_).mpr ?_
+  · -- ⊢ ⊥ < 2 ^ ℓ
+    exact compareOfLessAndEq_eq_lt.mp rfl
+  · -- ∀ b ∈ univ, (C (a b) * Xⱼ 𝔽q β ℓ h_ℓ b).degree < 2 ^ ℓ
+    intro (j : Fin (2 ^ (ℓ - ↑i))) _
+    -- ⊢ (C (a j) * Xⱼ 𝔽q β ℓ h_ℓ j).degree < 2 ^ ℓ
+    calc (C (coeffs ⟨j, by omega⟩) * intermediateNovelBasisX 𝔽q β
+      h_ℓ_add_R_rate i ⟨j, by omega⟩).degree
+      _ ≤ (C (coeffs ⟨j, by omega⟩)).degree + (intermediateNovelBasisX 𝔽q β
+        h_ℓ_add_R_rate i ⟨j, by omega⟩).degree := by apply Polynomial.degree_mul_le
+      _ ≤ 0 + (intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i ⟨j, by omega⟩).degree := by
+        gcongr; exact Polynomial.degree_C_le
+      _ = ↑j.val := by
+        rw [degree_intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i ⟨j, by omega⟩];
+        simp only [zero_add]; rfl
+      _ < ↑(2^(ℓ-i)) := by norm_cast; exact j.isLt
+
+section IntermediateNovelPolynomialBasis
+
+/-- The basis vectors for the intermediate level `i`. -/
+noncomputable def intermediateBasisVectors (i : Fin (ℓ + 1)) :
+  Fin (2 ^ (ℓ - i.val)) → L⦃<2^(ℓ - i.val)⦄[X] :=
+  fun j => ⟨intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i j, by
+    apply Polynomial.mem_degreeLT.mpr
+    rw [degree_intermediateNovelBasisX]
+    -- Proof that j < 2^(ℓ-i)
+    change (j.val: WithBot ℕ) < ((2: WithBot ℕ) ^ (ℓ - i.val))
+    norm_cast
+    exact j.isLt
+  ⟩
+
+/-- The vector space of coefficients for polynomials of degree < 2^(ℓ-i). -/
+abbrev IntermediateCoeffVecSpace (i : Fin (ℓ + 1)) := Fin (2^(ℓ - i.val)) → L
+
+/-- The linear map from polynomials (in the subtype) to their coefficient vectors at level `i`. -/
+def intermediateToCoeffsVec (i : Fin (ℓ + 1)) :
+    L⦃<2^(ℓ - i.val)⦄[X] →ₗ[L] IntermediateCoeffVecSpace (L := L) i where
+  toFun := fun p => fun k => p.val.coeff k.val
+  map_add' := fun p q => by ext k; simp [coeff_add]
+  map_smul' := fun c p => by ext k; simp [coeff_smul, smul_eq_mul]
+
+/-- The Change-of-Basis Matrix from the Intermediate Novel Basis to the Monomial Basis.
+    A_jk = coeff of X^k in intermediate basis vector X_j. -/
+noncomputable def intermediateChangeOfBasisMatrix (i : Fin (ℓ + 1)) :
+    Matrix (Fin (2 ^ (ℓ - i.val))) (Fin (2 ^ (ℓ - i.val))) L :=
+  fun j k => (intermediateToCoeffsVec (L := L) i
+    (intermediateBasisVectors 𝔽q β h_ℓ_add_R_rate i j)) k
+
+omit h_Fq_char_prime [DecidableEq L] [DecidableEq 𝔽q] h_β₀_eq_1 in
+theorem intermediateChangeOfBasisMatrix_lower_triangular (i : Fin (ℓ + 1)) :
+    (intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i).BlockTriangular ⇑OrderDual.toDual := by
+  intro j k h_jk
+  simp only [OrderDual.toDual_lt_toDual] at h_jk
+  dsimp [intermediateChangeOfBasisMatrix, intermediateToCoeffsVec, intermediateBasisVectors]
+  -- We need coeff(X_j, k) = 0 when j < k
+  -- This holds because deg(X_j) = j < k
+  apply Polynomial.coeff_eq_zero_of_natDegree_lt
+  rw [Polynomial.natDegree_eq_of_degree_eq_some
+    (degree_intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i j)]
+  exact h_jk
+
+omit h_Fq_char_prime [DecidableEq L] [DecidableEq 𝔽q] h_β₀_eq_1 in
+theorem intermediateChangeOfBasisMatrix_diag_ne_zero (i : Fin (ℓ + 1)) :
+    (∀ j, (intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i) j j ≠ 0) := by
+  intro j
+  dsimp [intermediateChangeOfBasisMatrix, intermediateToCoeffsVec, intermediateBasisVectors]
+  -- The diagonal entry is the leading coefficient
+  apply Polynomial.coeff_ne_zero_of_eq_degree
+  exact degree_intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i j
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+theorem intermediateChangeOfBasisMatrix_det_ne_zero (i : Fin (ℓ + 1)) :
+    (intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i).det ≠ 0 := by
+  rw [Matrix.det_of_lowerTriangular]
+  · apply Finset.prod_ne_zero_iff.mpr
+    intro j hj_mem_univ
+    let res := intermediateChangeOfBasisMatrix_diag_ne_zero 𝔽q β h_ℓ_add_R_rate i j
+    exact res
+  · exact intermediateChangeOfBasisMatrix_lower_triangular 𝔽q β h_ℓ_add_R_rate i
+
+/-- The intermediate change-of-basis matrix is invertible. -/
+noncomputable instance intermediateChangeOfBasisMatrix_invertible (i : Fin (ℓ + 1)) :
+    Invertible (intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i) := by
+  refine Matrix.invertibleOfIsUnitDet _ ?_
+  exact Ne.isUnit (intermediateChangeOfBasisMatrix_det_ne_zero 𝔽q β h_ℓ_add_R_rate i)
+
+/-- Convert monomial coefficients to novel coefficients at level `i`.
+    n = m * A⁻¹ -/
+noncomputable def monomialToINovelCoeffs (i : Fin (ℓ + 1))
+    (monomial_coeffs : Fin (2 ^ (ℓ - i.val)) → L) : Fin (2 ^ (ℓ - i.val)) → L :=
+  let A := intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i
+  Matrix.vecMul monomial_coeffs (⅟A)
+
+/-- Convert novel coefficients to monomial coefficients at level `i`.
+    m = n * A -/
+noncomputable def iNovelToMonomialCoeffs (i : Fin (ℓ + 1))
+    (novel_coeffs : Fin (2 ^ (ℓ - i.val)) → L) : Fin (2 ^ (ℓ - i.val)) → L :=
+  let A := intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i
+  Matrix.vecMul novel_coeffs A
+
+noncomputable def getINovelCoeffs (i : Fin (ℓ + 1)) (P : L[X]) : Fin (2 ^ (ℓ - i.val)) → L :=
+  let mono_coefs : Fin (2 ^ (ℓ - i.val)) → L := fun k => P.coeff k.val
+  monomialToINovelCoeffs 𝔽q β h_ℓ_add_R_rate i mono_coefs
+
+omit h_Fq_char_prime [DecidableEq L] [DecidableEq 𝔽q] h_β₀_eq_1 in
+/-- Round trip inverse property: Monomial -> Novel -> Monomial -/
+theorem monomialToINovel_iNovelToMonomial_inverse (i : Fin (ℓ + 1))
+  (coeffs : Fin (2 ^ (ℓ - i.val)) → L) :
+    iNovelToMonomialCoeffs 𝔽q β h_ℓ_add_R_rate i
+      (monomialToINovelCoeffs 𝔽q β h_ℓ_add_R_rate i coeffs) = coeffs := by
+  unfold monomialToINovelCoeffs iNovelToMonomialCoeffs
+  dsimp
+  let A := intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i
+  rw [Matrix.vecMul_vecMul]
+  simp only [Matrix.invOf_eq_nonsing_inv, Matrix.inv_mul_of_invertible, Matrix.vecMul_one]
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+theorem iNovelToMonomial_monomialToINovel_inverse (i : Fin (ℓ + 1))
+  (coeffs : Fin (2 ^ (ℓ - i.val)) → L) :
+    monomialToINovelCoeffs 𝔽q β h_ℓ_add_R_rate i
+      (iNovelToMonomialCoeffs 𝔽q β h_ℓ_add_R_rate i coeffs) = coeffs := by
+  unfold monomialToINovelCoeffs iNovelToMonomialCoeffs
+  dsimp
+  let A := intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i
+  rw [Matrix.vecMul_vecMul]
+  simp only [Matrix.invOf_eq_nonsing_inv, Matrix.mul_inv_of_invertible, Matrix.vecMul_one]
+
+-- TODO: intermediate counterpart of `novelPolynomialBasis` for arbitrary subspace level `i`
+
+omit [DecidableEq L] [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
+/-- **Reconstruction Lemma**:
+    If `P` has degree < 2^(ℓ-i), and we convert its coefficients to the intermediate novel basis,
+    the resulting `intermediateEvaluationPoly` is exactly `P`.
+-/
+lemma intermediateEvaluationPoly_from_inovel_coeffs_eq_self
+    (i : Fin (ℓ + 1)) (P : L[X])
+    (hP_deg : P.degree < 2 ^ (ℓ - i.val)) :
+    intermediateEvaluationPoly 𝔽q β h_ℓ_add_R_rate (i := i)
+      (coeffs := getINovelCoeffs 𝔽q β h_ℓ_add_R_rate i P) = P := by
+  -- 1. Apply extensionality (two polys are equal if all coeffs are equal)
+  apply Polynomial.ext
+  intro k
+  let N := 2 ^ (ℓ - i.val)
+  set novel_coeffs := getINovelCoeffs 𝔽q β h_ℓ_add_R_rate i P
+  -- 2. Case Analysis on k
+  by_cases hk : k < N
+  · let k_fin : Fin N := ⟨k, hk⟩
+    -- LHS expansion
+    conv_lhs => rw [intermediateEvaluationPoly]
+    -- coeff (∑ C * X_basis) = ∑ coeff (C * X_basis) = ∑ C * coeff (X_basis)
+    simp only [Fin.eta, finset_sum_coeff, coeff_C_mul]
+    -- Crucial Step: Recognize this sum as Matrix Multiplication
+    -- ∑_j (novel_j * coeff(Basis_j, k)) is exactly the k-th component of (novel * A)
+    -- where A is the intermediateChangeOfBasisMatrix.
+    let A := intermediateChangeOfBasisMatrix 𝔽q β h_ℓ_add_R_rate i
+    -- By definition of A, A_jk = coeff(Basis_j, k)
+    have h_matrix_def : ∀ j, (intermediateNovelBasisX 𝔽q β h_ℓ_add_R_rate i j).coeff k
+      = A j k_fin := fun j => by
+      dsimp only [intermediateChangeOfBasisMatrix, intermediateToCoeffsVec,
+        intermediateBasisVectors, LinearMap.coe_mk, AddHom.coe_mk, A]
+    simp_rw [h_matrix_def]
+    -- `⊢ ∑ x, novel_coeffs x * A x k_fin = P.coeff k`, which is (vecMul novel_coeffs A) k_fin
+    have h_left_eq : ∑ x, novel_coeffs x * A x k_fin = Matrix.vecMul novel_coeffs A k_fin := by
+      dsimp only [Matrix.vecMul, dotProduct]
+    conv_lhs => rw [h_left_eq] -- change to vecMul notation
+    -- Apply the Inversion Logic
+    -- novel_coeffs was defined as (monomial * A⁻¹)
+    -- So we have (monomial * A⁻¹) * A
+    unfold novel_coeffs getINovelCoeffs monomialToINovelCoeffs
+    -- We need to unfold the let binding inside the goal
+    -- It is easier to rewrite the vector multiplication: (v * A⁻¹) * A = v * (A⁻¹ * A) = v * I = v
+    rw [Matrix.vecMul_vecMul]
+    rw [invOf_mul_self]
+    rw [Matrix.vecMul_one]
+  · -- Case k >= N (Out of bounds)
+    push_neg at hk
+    -- RHS is 0 because P has degree < N
+    rw [Polynomial.coeff_eq_zero_of_degree_lt (n := k) (p := intermediateEvaluationPoly 𝔽q β
+      h_ℓ_add_R_rate i novel_coeffs) (h := by
+      let res := degree_intermediateEvaluationPoly_lt 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (i := i) (coeffs := novel_coeffs)
+      calc
+        _ < (2 : WithBot ℕ) ^ (ℓ - i.val) := by omega
+        _ ≤ k := by norm_cast
+    )]
+    rw [Polynomial.coeff_eq_zero_of_degree_lt (n := k) (p := P) (h := by
+      calc
+        _ < (2 : WithBot ℕ) ^ (ℓ - i.val) := by omega
+        _ ≤ k := by norm_cast
+    )]
+
+end IntermediateNovelPolynomialBasis
+
 
 /-- The even and odd refinements of `P⁽ⁱ⁾(X)` which are polynomials in the `(i+1)`-th basis.
 `P₀⁽ⁱ⁺¹⁾(Y) = ∑_{j=0}^{2^{ℓ-i-1}-1} a_{2j} ⋅ Xⱼ⁽ⁱ⁺¹⁾(Y)`

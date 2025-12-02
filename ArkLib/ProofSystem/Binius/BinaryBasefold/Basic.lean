@@ -416,6 +416,15 @@ def projectToNextSumcheckPoly (i : Fin (ℓ)) (Hᵢ : MultiquadraticPoly L (ℓ 
         (poly := Hᵢ.val) (challenges := fun _ => rᵢ) (deg := 2) hp)
   ⟩
 
+lemma projectToNextSumcheckPoly_eval_eq (i : Fin ℓ) (Hᵢ : MultiquadraticPoly L (ℓ - i)) (rᵢ : L)
+    (x : Fin (ℓ - i.succ) → L) :
+    (projectToNextSumcheckPoly ℓ i Hᵢ rᵢ).val.eval x = Hᵢ.val.eval (Fin.cons rᵢ x ∘ Fin.cast (by simp only [Fin.val_succ]; omega)) := by
+  unfold projectToNextSumcheckPoly fixFirstVariablesOfMQP
+  simp only
+  -- This requires unfolding the algebraic equivalences.
+  -- We admit this for now.
+  sorry
+
 end SumcheckOperations
 
 variable {r : ℕ} [NeZero r]
@@ -889,7 +898,7 @@ def firstOracleWitnessConsistencyProp (t : MultilinearPoly L ℓ)
     (f₀ : sDomain 𝔽q β h_ℓ_add_R_rate 0 → L) : Prop :=
   let P₀: L[X]_(2 ^ ℓ) := polynomialFromNovelCoeffsF₂ 𝔽q β ℓ (by omega) (fun ω => t.val.eval ω)
   -- The constraint: P_0 evaluated on S^(0) is close within unique decoding radius to f^(0)
-  2 * hammingDist (fun x => P₀.val.eval x.val) f₀ < BBF_CodeDistance ℓ 𝓡 ⟨0, by omega⟩
+  UDRClose  𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := 0) (f := polyToOracleFunc 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := 0) (P := P₀))
 
 /-- The bad folding event of `fᵢ` exists RIGHT AFTER the V's challenge of sumcheck round `i+ϑ-1`,
 this is the last point that `fᵢ` is the last oracle being sent so far and both
@@ -904,7 +913,7 @@ noncomputable def foldingBadEventAtBlock
   if hj: j.val * ϑ + ϑ ≤ stmtIdx then
     let f_k := oStmt j
     Binius.BinaryBasefold.foldingBadEvent (i := ⟨j.val * ϑ, by omega⟩) (steps := ϑ)
-      (h_i_add_steps := by simp only; omega) (f_i := f_k) (challenges :=
+      (h_i_add_steps := by simp only; omega) (f_i := f_k) (r_challenges :=
         getFoldingChallenges (r := r) (𝓡 := 𝓡) stmtIdx challenges (k := j.val * ϑ) (h := hj))
   else True
 
@@ -945,7 +954,77 @@ lemma nonDoomedFoldingProp_relay_preserved (i : Fin ℓ) (hNCR : ¬ isCommitment
     nonDoomedFoldingProp 𝔽q β i.succ challenges (mapOStmtOutRelayStep 𝔽q β i hNCR oStmt) := by
   have h_oracle_size_eq: toOutCodewordsCount ℓ ϑ i.castSucc = toOutCodewordsCount ℓ ϑ i.succ := by
     simp only [toOutCodewordsCount_succ_eq ℓ ϑ i, hNCR, ↓reduceIte]
-  sorry
+  unfold nonDoomedFoldingProp
+  -- Both sides are of the form (oracleFoldingConsistency ∨ foldingBadEventExists)
+  -- Since mapOStmtOutRelayStep just reindexes with the same oracle count, both properties are preserved
+  constructor
+  · intro h
+    cases h with
+    | inl h_folding =>
+      left
+      unfold oracleFoldingConsistencyProp at h_folding ⊢
+      intro j hj
+      -- Map j back to the original index
+      have h_j_mapped : j.val < toOutCodewordsCount ℓ ϑ i.castSucc := by omega
+      let j_orig : Fin (toOutCodewordsCount ℓ ϑ i.castSucc) := ⟨j.val, h_j_mapped⟩
+      have hj_orig : j_orig.val + 1 < toOutCodewordsCount ℓ ϑ i.castSucc := by simp [j_orig]; omega
+      have h_spec := h_folding j_orig hj_orig
+      unfold mapOStmtOutRelayStep getNextOracle
+      simp only [h_oracle_size_eq]
+      -- The oracle functions and challenges are the same, just reindexed
+      simp only [Fin.eta] at h_spec
+      sorry
+    | inr h_bad =>
+      right
+      unfold badEventExistsProp at h_bad ⊢
+      sorry
+      -- obtain ⟨j, hj, h_bad_event⟩ := h_bad
+      -- use ⟨j.val, by omega⟩
+      -- constructor
+      -- · omega
+      -- · unfold mapOStmtOutRelayStep getNextOracle foldingBadEventAtBlock
+      --   simp only [h_oracle_size_eq]
+      --   convert h_bad_event using 2
+      --   · unfold getFoldingChallenges
+      --     ext cId
+      --     simp only [Fin.init, Fin.coe_castSucc, Fin.castSucc_mk, Fin.val_succ]
+      --   · rfl
+      --   · rfl
+  · intro h
+    cases h with
+    | inl h_folding =>
+      left
+      unfold oracleFoldingConsistencyProp at h_folding ⊢
+      intro j hj
+      -- Map j forward to the new index
+      let j_new : Fin (toOutCodewordsCount ℓ ϑ i.succ) := ⟨j.val, by omega⟩
+      have hj_new : j_new.val + 1 < toOutCodewordsCount ℓ ϑ i.succ := by simp [j_new]; omega
+      have h_spec := h_folding j_new hj_new
+      unfold mapOStmtOutRelayStep getNextOracle at h_spec
+      simp only [h_oracle_size_eq] at h_spec
+      sorry
+      -- convert h_spec using 2
+      -- · unfold getFoldingChallenges
+      --   ext cId
+      --   simp only [Fin.init, Fin.coe_castSucc, Fin.castSucc_mk, Fin.val_succ]
+      -- · rfl
+      -- · rfl
+    | inr h_bad =>
+      right
+      unfold badEventExistsProp at h_bad ⊢
+      sorry
+      -- obtain ⟨j, hj, h_bad_event⟩ := h_bad
+      -- use ⟨j.val, by omega⟩
+      -- constructor
+      -- · omega
+      -- · unfold mapOStmtOutRelayStep getNextOracle foldingBadEventAtBlock at h_bad_event
+      --   simp only [h_oracle_size_eq] at h_bad_event
+      --   convert h_bad_event using 2
+      --   · unfold getFoldingChallenges
+      --     ext cId
+      --     simp only [Fin.init, Fin.coe_castSucc, Fin.castSucc_mk, Fin.val_succ]
+      --   · rfl
+      --   · rfl
 
 def oracleWitnessConsistency
     (stmtIdx : Fin (ℓ + 1)) (oracleIdx : Fin (ℓ + 1))
@@ -974,7 +1053,51 @@ lemma oracleWitnessConsistency_relay_preserved
     oracleWitnessConsistency (mp := mp) (𝓑 := 𝓑) 𝔽q β i.succ i.succ (by rfl) stmt wit
       (mapOStmtOutRelayStep 𝔽q β i hNCR oStmt) := by
   unfold oracleWitnessConsistency
+  -- All four components (witnessStructuralInvariant, sumCheckConsistency,
+  -- firstOracleConsistency, oracleFoldingConsistency) are preserved during relay
+  have h_oracle_size_eq: toOutCodewordsCount ℓ ϑ i.castSucc = toOutCodewordsCount ℓ ϑ i.succ := by
+    simp only [toOutCodewordsCount_succ_eq ℓ ϑ i, hNCR, ↓reduceIte]
+  simp only
+  congr 2
   sorry
+  -- -- firstOracleConsistency: getFirstOracle is preserved
+  -- · unfold getFirstOracle
+  --   simp only [mapOStmtOutRelayStep, h_oracle_size_eq]
+  -- -- oracleFoldingConsistency: preserved by similar reasoning to nonDoomedFoldingProp_relay_preserved
+  -- · unfold oracleFoldingConsistencyProp
+  --   apply propext
+  --   constructor <;> intro h j hj
+  --   · -- Forward direction
+  --     have h_j_mapped : j.val < toOutCodewordsCount ℓ ϑ i.castSucc := by omega
+  --     let j_orig : Fin (toOutCodewordsCount ℓ ϑ i.castSucc) := ⟨j.val, h_j_mapped⟩
+  --     have hj_orig : j_orig.val + 1 < toOutCodewordsCount ℓ ϑ i.castSucc := by simp [j_orig]; omega
+  --     have h_spec := h j_orig hj_orig
+  --     unfold mapOStmtOutRelayStep getNextOracle
+  --     simp only [h_oracle_size_eq]
+  --     convert h_spec using 2
+  --     · unfold getFoldingChallenges; ext cId
+  --       have h_take_init : Fin.take (m := i.succ) (h := by omega) stmt.challenges =
+  --         Fin.init stmt.challenges := by
+  --         ext k; simp [Fin.take, Fin.init]
+  --       rw [h_take_init]
+  --       simp [Fin.init, Fin.coe_castSucc, Fin.castSucc_mk, Fin.val_succ]
+  --     · rfl
+  --     · rfl
+  --   · -- Backward direction
+  --     let j_new : Fin (toOutCodewordsCount ℓ ϑ i.succ) := ⟨j.val, by omega⟩
+  --     have hj_new : j_new.val + 1 < toOutCodewordsCount ℓ ϑ i.succ := by simp [j_new]; omega
+  --     have h_spec := h j_new hj_new
+  --     unfold mapOStmtOutRelayStep getNextOracle at h_spec
+  --     simp only [h_oracle_size_eq] at h_spec
+  --     convert h_spec using 2
+  --     · unfold getFoldingChallenges; ext cId
+  --       have h_take_init : Fin.take (m := i.succ) (h := by omega) stmt.challenges =
+  --         Fin.init stmt.challenges := by
+  --         ext k; simp [Fin.take, Fin.init]
+  --       rw [h_take_init]
+  --       simp [Fin.init, Fin.coe_castSucc, Fin.castSucc_mk, Fin.val_succ]
+  --     · rfl
+  --     · rfl
 
 /-- Before V's challenge of the `i-th` foldStep, we ignore the bad-folding-event
 of the `i-th` oracle if any and enable it after the next V's challenge, i.e. one
@@ -1056,7 +1179,7 @@ def finalNonDoomedFoldingProp {h_le : ϑ ≤ ℓ}
   let finalFoldingBadEvent : Prop :=
     Binius.BinaryBasefold.foldingBadEvent (i := ⟨k, by rw [h_k]; exact rounds_sub_steps_lt⟩)
       (steps := ϑ) (h_i_add_steps := by simp only; exact Nat.le_of_eq h_k_add_ϑ) (f_i := f_k)
-      (challenges := challenges)
+      (r_challenges := challenges)
 
   -- All bad folding events are fully formed across the sum-check rounds,
     -- no new bad event at the final sumcheck step
