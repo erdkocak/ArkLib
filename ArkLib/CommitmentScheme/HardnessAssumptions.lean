@@ -65,6 +65,10 @@ def ARSDHGame (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂
   let (S, h₁, h₂) ← liftComp (adversary srs) _
   return (τ, S, h₁, h₂)
 
+def ARSDHCond (D : ℕ) (τ : ZMod p) (S : Finset (ZMod p)) (h₁ h₂ : G₁) : Prop
+  := letI Zₛ := ∏ s ∈ S, (Polynomial.X - Polynomial.C s)
+    S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val
+
 /-- The adaptive rational strong Diffie–Hellman (ARSDH) assumption.
 Taken from Def. 9.6 in "On the Fiat–Shamir Security of Succinct Arguments from Functional
 Commitments" (see https://eprint.iacr.org/2025/902.pdf)
@@ -72,12 +76,9 @@ Commitments" (see https://eprint.iacr.org/2025/902.pdf)
 def ARSDH [(unifSpec ++ₒ oSpec).FiniteRange]
     (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p)) (error : ℝ≥0)
     : Prop :=
-  [fun (τ,S,h₁,h₂) =>
-    letI Zₛ := ∏ s ∈ S, (Polynomial.X - Polynomial.C s)
-    S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val
+  [fun (τ,S,h₁,h₂) => ARSDHCond D τ S h₁ h₂
   | ARSDHGame (oSpec := oSpec) (g₁ := g₁) (g₂ := g₂) D adversary
   ] ≤ error
-
 
 end Pairings
 

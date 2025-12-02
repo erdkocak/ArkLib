@@ -403,18 +403,22 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (_a : ZMod p) {g₁ : G₁} {g₂
         exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
       · exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
 
+#check probEvent_bind_eq_tsum
+#check probEvent_map
+
 def reduction {ι : Type} (oSpec : OracleSpec ι) (D : ℕ) :
     Groups.ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p) := sorry
 
-/- the KZG satisfies function binding as defined in `CommitmentScheme` with the ARSDH error -/
-theorem functionBinding (hpG1 : Nat.card G₁ = p) (a : ZMod p) {g₁ : G₁} {g₂ : G₂}
-    {L : ℕ} (AuxState : Type) (functionBindingError : ℝ≥0) :
-    Commitment.functionBinding (init := pure ∅) (impl := randomOracle) (L := L)
-    (hn := rfl) (hpSpec := { prover_first' := by simp }) (AuxState := AuxState)
-    (KZG (n:=n) (g₁:=g₁) (g₂:=g₂) (pairing:=pairing)) functionBindingError
-    → Groups.ARSDH (oSpec := unifSpec) (g₁ := g₁) (g₂ := g₂) n
-        (reduction unifSpec n) functionBindingError := by
-    unfold Commitment.functionBinding
+/- the KZG satisfies function binding as defined in `CommitmentScheme` provided ARSDH holds. -/
+theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂} {D : ℕ}
+    (L : ℕ) (AuxState : Type) [SelectableType G₁] (ARSDHerror : ℝ≥0)
+    (hARSDH : ∀ (adversary : Groups.ARSDHAdversary unifSpec D
+        (G₁ := G₁) (G₂ := G₂) (p := p)),
+      Groups.ARSDH (oSpec := unifSpec) (g₁ := g₁) (g₂ := g₂) D adversary ARSDHerror) :
+    Commitment.functionBinding (L := L) (init := pure ∅) (impl := randomOracle)
+      (hn := rfl) (hpSpec := { prover_first' := by simp }) AuxState
+      (KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)) ARSDHerror := by
+    -- bind functionBinding via a reduction to ARSDH(-error)
     sorry
 
 end CommitmentScheme

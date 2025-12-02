@@ -179,7 +179,7 @@ def extractability (scheme : Scheme oSpec Data Randomness Commitment ComKey Veri
 structure FunctionBindingAdversary (oSpec : OracleSpec ι) (Data Commitment AuxState : Type)
   [O : OracleInterface Data] (L : ℕ) {n : ℕ} (pSpec : ProtocolSpec n) (ComKey : Type)
 where
-  claim : (OracleComp oSpec (Commitment × Vector (O.Query × O.Response × AuxState) L))
+  claim : (ComKey → OracleComp oSpec (Commitment × Vector (O.Query × O.Response × AuxState) L))
   prover : (ComKey → Prover oSpec (Commitment × O.Query × O.Response) AuxState Bool Unit pSpec)
 
 /-- A commitment scheme satisfies **function binding** with error `functionBindingError` if for all
@@ -211,7 +211,7 @@ def functionBinding {L : ℕ} (hn : n = 1) (hpSpec : NonInteractive (hn ▸ pSpe
           QueryImpl _ (StateT σ ProbComp)) <|
           (do
             let (ck,vk) ← liftComp scheme.keygen _
-            let (cm, claims) ← liftComp adversary.claim _
+            let (cm, claims) ← liftComp (adversary.claim ck) _
             let reduction := Reduction.mk (adversary.prover ck) (scheme.opening (ck,vk)).verifier
             claims.toArray.mapM (fun ⟨q, r, st⟩ =>
               do
