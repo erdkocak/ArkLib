@@ -22,7 +22,7 @@ import Mathlib.Algebra.Polynomial.FieldDivision
 variable {ι : Type} (oSpec : OracleSpec ι)
 
 open OracleComp OracleSpec
-open scoped NNReal
+open scoped NNReal ENNReal
 
 namespace Groups
 
@@ -58,13 +58,10 @@ the srs. -/
 def ARSDHAdversary (D : ℕ) :=
   Vector G₁ (D + 1) × Vector G₂ 2 → OracleComp oSpec (Finset (ZMod p) × G₁ × G₁)
 
-/-- The adaptive rational strong Diffie–Hellman (ARSDH) assumption.
-Taken from Def. 9.6 in "On the Fiat–Shamir Security of Succinct Arguments from Functional
-Commitments" (see https://eprint.iacr.org/2025/902.pdf)
--/
-def ARSDH [(unifSpec ++ₒ oSpec).FiniteRange]
-    (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p)) (error : ℝ≥0)
-    : Prop :=
+/-- The probabillity of breaking ARSDH for a specific adversary. -/
+noncomputable def ARSDH_Experiment [(unifSpec ++ₒ oSpec).FiniteRange]
+    (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p))
+    : ℝ≥0∞ :=
   [fun (τ,S,h₁,h₂) =>
     letI Zₛ := ∏ s ∈ S, (Polynomial.X - Polynomial.C s)
     S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val
@@ -73,7 +70,18 @@ def ARSDH [(unifSpec ++ₒ oSpec).FiniteRange]
     let srs := generateSrs (g₁ := g₁) (g₂ := g₂) D τ
     let (S, h₁, h₂) ← liftComp (adversary srs) _
     return (τ, S, h₁, h₂)
-  ] ≤ error
+  ]
+
+/-- The adaptive rational strong Diffie–Hellman (ARSDH) assumption.
+Taken from Def. 9.6 in "On the Fiat–Shamir Security of Succinct Arguments from Functional
+Commitments" (see https://eprint.iacr.org/2025/902.pdf)
+-/
+def ARSDHAssumption [(unifSpec ++ₒ oSpec).FiniteRange]
+    (D : ℕ) (error : ℝ≥0)
+    : Prop :=
+     ∀ (adversary : ARSDHAdversary unifSpec D
+        (G₁ := G₁) (G₂ := G₂) (p := p)),
+      ARSDH_Experiment (oSpec := unifSpec) (g₁ := g₁) (g₂ := g₂) D adversary ≤ (error : ℝ≥0∞)
 
 end Pairings
 

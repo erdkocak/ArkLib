@@ -412,9 +412,8 @@ def reduction {ι : Type} (oSpec : OracleSpec ι) (D : ℕ) :
 /- the KZG satisfies function binding as defined in `CommitmentScheme` provided ARSDH holds. -/
 theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂} {D : ℕ}
     (L : ℕ) (AuxState : Type) [SelectableType G₁] (ARSDHerror : ℝ≥0)
-    (hARSDH : ∀ (adversary : Groups.ARSDHAdversary unifSpec D
-        (G₁ := G₁) (G₂ := G₂) (p := p)),
-      Groups.ARSDH (oSpec := unifSpec) (g₁ := g₁) (g₂ := g₂) D adversary ARSDHerror) :
+    (hARSDH : Groups.ARSDHAssumption (G₁ := G₁) (G₂ := G₂) (g₁ := g₁) (g₂ := g₂)
+      unifSpec D ARSDHerror) :
     Commitment.functionBinding (L := L) (init := pure ∅) (impl := randomOracle)
       (hn := rfl) (hpSpec := { prover_first' := by simp }) AuxState
       (KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)) ARSDHerror := by
