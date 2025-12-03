@@ -25,7 +25,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "2038752c748c39b41249ccf45aa86a8737b8109c",
+   "rev": "e3d5a7b917d3c70950a8ca16d635faf8795a7821",
    "name": "VCVio",
    "manifestFile": "lake-manifest.json",
    "inputRev": "upstream-pfun",

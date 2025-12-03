@@ -65,11 +65,12 @@ universe u v
 
 -- section Execution
 
-variable {ι : Type} {oSpec : OracleSpec ι}
-  {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type}
-  {Oₛᵢ : ∀ i, OracleContext Unit (ReaderM (OStmtIn i))}
- {WitIn : Type}
-  {StmtOut : Type} {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type} {WitOut : Type}
+variable
+  {ι} {oSpec : OracleSpec ι} {StmtIn StmtOut WitIn WitOut OStmtIn OStmtOut Qₛᵢ Qₘ Qₛₒ : Type}
+  {n : ℕ} {pSpec : ProtocolSpec n}
+  {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
+  {Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages)}
+  {Oₛₒ : OracleSpec Qₛₒ}
   {n : ℕ} {pSpec : ProtocolSpec n}
 
 namespace Prover
@@ -173,8 +174,8 @@ def Verifier.run (stmt : StmtIn) (transcript : FullTranscript pSpec)
     both the output statement and oracle statements, and the log of queries made by the verifier.
 -/
 @[inline, specialize]
-def OracleVerifier.run (Oₘ : ∀ i, OracleContext Unit (ReaderM (pSpec.Message i)))
-    (stmt : StmtIn) (oStmtIn : ∀ i, OStmtIn i) (transcript : FullTranscript pSpec)
+def OracleVerifier.run (Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages))
+    (stmt : StmtIn) (oStmtIn : OStmtIn) (transcript : FullTranscript pSpec)
     (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ) :
       OracleComp oSpec (StmtOut × (∀ i, OStmtOut i)) := do
   sorry
