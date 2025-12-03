@@ -27,5 +27,11 @@ name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 rev = "lean4.18.0"
 
+[[require]]
+name = "CompPoly"
+git = "https://github.com/NethermindEth/CompPoly"
+rev = "init"
+
+
 [[lean_lib]]
 name = "ArkLib"
