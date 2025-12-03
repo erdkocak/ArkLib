@@ -13,6 +13,43 @@ import ArkLib.CommitmentScheme.MerkleTree.Defs
 
 open scoped NNReal
 
+/--
+Convert a computation to one that also returns its query log
+
+TODO
+- generalize Type universe?
+- generalize spec
+- move to vcv?
+- already in vcv?
+-/
+def OracleComp.withLogging {T : Type} (spec : OracleSpec Unit) (oa : OracleComp (spec) T) :
+    OracleComp (spec) (T × (spec).QueryLog) :=
+  (simulateQ loggingOracle oa).run
+
+/--
+prove that logging of a bind is bind of loggings.
+-/
+lemma OracleComp.pure_withLogging (A B) (spec : OracleSpec Unit)
+    (oa : OracleComp (spec) A) (ob : A → OracleComp (spec) B) :
+    (oa >>= ob).withLogging =
+    do
+      let (a, a_log) ← oa.withLogging
+      let (b, b_log) ← (ob a).withLogging
+      return (b, a_log ++ b_log) := by
+  sorry
+
+/--
+prove that logging of a bind is bind of loggings.
+-/
+lemma OracleComp.bind_withLogging (A B) (spec : OracleSpec Unit)
+    (oa : OracleComp (spec) A) (ob : A → OracleComp (spec) B) :
+    (oa >>= ob).withLogging =
+    do
+      let (a, a_log) ← oa.withLogging
+      let (b, b_log) ← (ob a).withLogging
+      return (b, a_log ++ b_log) := by
+  sorry
+
 namespace InductiveMerkleTree
 
 open List OracleSpec OracleComp BinaryTree
@@ -53,6 +90,68 @@ def extractor {α : Type} (s : Skeleton)
   (root : α) :
   FullData (Option α) s := sorry
 
+/--
+The game for extractability.
+-/
+def extractability_game
+    [DecidableEq α] [SelectableType α] [Fintype α] [(spec α).FiniteRange]
+    {s : Skeleton}
+    {AuxState : Type}
+    (committingAdv : OracleComp (spec α)
+        (α × AuxState))
+    (openingAdv : AuxState →
+        OracleComp (spec α) (SkeletonLeafIndex s × α × List α)) :
+    OracleComp (spec α)
+      (α × AuxState × SkeletonLeafIndex s × α × List α ×
+       FullData (Option α) s × List (Option α) × Bool) :=
+  do
+    let ((root, aux), queryLog) ← committingAdv.withLogging
+    let extractedTree := extractor s queryLog root
+    let (idx, leaf, proof) ← openingAdv aux
+    let extractedProof := generateProof extractedTree idx
+    let verified ← verifyProof idx leaf root proof
+    return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified)
+
+
+
+/--
+The game for extractability, augmented to return the query logs
+of the committing adversary, opening adversary, and verification.
+-/
+def extractability_game_with_logging
+    [DecidableEq α] [SelectableType α] [Fintype α] [(spec α).FiniteRange]
+    {s : Skeleton}
+    {AuxState : Type}
+    (committingAdv : OracleComp (spec α)
+        (α × AuxState))
+    (openingAdv : AuxState →
+        OracleComp (spec α) (SkeletonLeafIndex s × α × List α)) :
+    OracleComp (spec α)
+      (α × AuxState × SkeletonLeafIndex s × α × List α ×
+       FullData (Option α) s × List (Option α) × Bool ×
+       (spec α).QueryLog × (spec α).QueryLog × (spec α).QueryLog)
+         :=
+  do
+    let ((root, aux), committingLog) ← (committingAdv).withLogging
+    let extractedTree := extractor s committingLog root
+    let ((idx, leaf, proof), openingLog) ← ((openingAdv aux)).withLogging
+    let extractedProof := generateProof extractedTree idx
+    let (verified, verificationLog) ←
+      ((verifyProof idx leaf root proof)).withLogging
+    return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+            committingLog, openingLog, verificationLog)
+
+
+
+
+-- Does this exists in vcvio somewhere?
+def collisionIn {α : Type} [DecidableEq α]
+    (log : (spec α).QueryLog) : Prop :=
+  ∃ q1 q2, (q1 ≠ q2) ∧
+    q1 ∈ log.getQ () ∧ q2 ∈ log.getQ () ∧
+    q1.2 == q2.2
+
+
 
 /--
 The extractability theorem for Merkle trees.
@@ -75,10 +174,13 @@ does simultaneously
 Where κ is ≤ 1/2 * (qb - 1) * qb / (Fintype.card α)
         + 2 * (s.depth + 1) * s.leafCount / (Fintype.card α)
 (For sufficiently large qb)
+
+Here, we loosen this a bit to attempt a proof by considering all collisions
+in the combined query logs of the committing and opening adversaries and the verification.
 -/
 theorem extractability [DecidableEq α] [SelectableType α] [Fintype α] [(spec α).FiniteRange]
     {s : Skeleton}
-    (AuxState : Type)
+    {AuxState : Type}
     (committingAdv : OracleComp (spec α)
         (α × AuxState))
     (openingAdv : AuxState →
@@ -92,25 +194,137 @@ theorem extractability [DecidableEq α] [SelectableType α] [Fintype α] [(spec 
           pure ()) qb)
     (h_le_qb : 4 * s.leafCount + 1 ≤ qb)
           :
-    [
-      fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified) =>
+    [fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified) =>
         verified ∧
         (not (leaf == extractedTree.get idx.toNodeIndex)
-        ∨ not (proof.map (Option.some) == extractedProof))
-       |
+        ∨ not (proof.map (Option.some) == extractedProof)) |
       do
-        let ((root, aux), queryLog) ← (simulateQ loggingOracle committingAdv).run
-        let extractedTree := extractor s queryLog root
-        let (idx, leaf, proof) ← openingAdv aux
-        let extractedProof := generateProof extractedTree idx
-        let verified ← verifyProof idx leaf root proof
+        let (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified) ←
+          extractability_game committingAdv openingAdv
         return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified)
       ] ≤
-        1/2 * (qb - 1) * qb / (Fintype.card α)
+        1/2 * ((qb + s.depth) - 1) * (qb + s.depth) / (Fintype.card α)
         + 2 * (s.depth + 1) * s.leafCount / (Fintype.card α)
     := by
 
-  sorry
+  calc
+    -- We first rewrite the game to include the query logs
+    _ = [fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+              committingLog, openingLog, verificationLog) =>
+            verified ∧
+            (not (leaf == extractedTree.get idx.toNodeIndex)
+            ∨ not (proof.map (Option.some) == extractedProof)) |
+          do
+            let (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                committingLog, openingLog, verificationLog) ←
+              extractability_game_with_logging committingAdv openingAdv
+            return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                    committingLog, openingLog, verificationLog)] := by
+      -- This follows from marginalization
+      sorry
+    -- The bad event happens only when there is a collision event
+    -- or the bad event happens with no collision
+    _ ≤ [fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+            committingLog, openingLog, verificationLog)
+            =>
+            (collisionIn (committingLog ++ openingLog ++ verificationLog)) ∨
+            (¬ (collisionIn (committingLog ++ openingLog ++ verificationLog)) ∧
+            (verified ∧
+            (not (leaf == extractedTree.get idx.toNodeIndex)
+            ∨ not (proof.map (Option.some) == extractedProof)))) |
+          do
+            let (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                committingLog, openingLog, verificationLog) ←
+              extractability_game_with_logging committingAdv openingAdv
+            return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                    committingLog, openingLog, verificationLog)] := by
+      apply probEvent_mono
+      tauto
+    -- We apply the union bound
+    _ ≤ [fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+            committingLog, openingLog, verificationLog)
+            =>
+            (collisionIn (committingLog ++ openingLog ++ verificationLog)) |
+          do
+            let (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                committingLog, openingLog, verificationLog) ←
+              extractability_game_with_logging committingAdv openingAdv
+            return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                    committingLog, openingLog, verificationLog)] +
+        [fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+            committingLog, openingLog, verificationLog)
+            =>
+            (¬ (collisionIn (committingLog ++ openingLog ++ verificationLog)) ∧
+            (verified ∧
+            (not (leaf == extractedTree.get idx.toNodeIndex)
+            ∨ not (proof.map (Option.some) == extractedProof)))) |
+          do
+            let (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                committingLog, openingLog, verificationLog) ←
+              extractability_game_with_logging committingAdv openingAdv
+            return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                    committingLog, openingLog, verificationLog)] := by
+        -- TODO is this in vcvio somewhere?
+        sorry
+    -- We bound the collision event probability with a collision bound
+    _ ≤ 1/2 * ((qb + s.depth) - 1) * (qb + s.depth) / (Fintype.card α) +
+        [fun (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+            committingLog, openingLog, verificationLog)
+            =>
+            (¬ (collisionIn (committingLog ++ openingLog ++ verificationLog)) ∧
+            (verified ∧
+            (not (leaf == extractedTree.get idx.toNodeIndex)
+            ∨ not (proof.map (Option.some) == extractedProof)))) |
+          do
+            let (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                committingLog, openingLog, verificationLog) ←
+              extractability_game_with_logging committingAdv openingAdv
+            return (root, aux, idx, leaf, proof, extractedTree, extractedProof, verified,
+                    committingLog, openingLog, verificationLog)] := by
+        gcongr
+        -- TODO: Prove a general collision bound lemma
+        sorry
+    -- We bound the no-collision bad event probability
+    _ ≤ 1/2 * ((qb + s.depth) - 1) * (qb + s.depth) / (Fintype.card α) +
+        2 * (s.depth + 1) * s.leafCount / (Fintype.card α):= by
+        sorry
+
+
+  /-
+  Now we can break down the bad event into smaller events
+  In the SNARGS book, they define
+  E_col = the event that there is a collision in committingLog
+  E_tree = the event that the tree extraction with committingLog
+           is different from the tree extraction
+           with the combined committingLog and openingLog
+  E_sub = the event that The verificationLog contains a query to a node not in the committingLog
+          and verification succeeds
+
+  The SNARGs book makes the observation that
+
+  Pr[Adversary wins] ≤ Pr[E_col]
+                       + Pr[E_tree | not E_col]
+                       + Pr[E_sub | not E_col and not E_tree]
+                       + Pr[Adversary wins | not E_col and not E_tree and not E_sub]
+
+  But I think this really stands in for the tighter version, which might be easier to reason about.
+
+  Pr[Adversary wins] ≤ Pr[E_col]
+                       + Pr[E_tree and not E_col]
+                       + Pr[E_sub and not E_col and not E_tree]
+                       + Pr[Adversary wins and not E_col and not E_tree and not E_sub]
+
+  TODO: does the proof really have to be this complicated?
+  Can't we simply look at the event of any collision at all happening?
+
+  * Does a collision happen in the adversary's queries and verification combined?
+    * Probability of YES is small by query bound
+    * If not, then consider whether the index opened exists in the extracted tree.
+      * If yes, then if the proof differs at all, we must leave the extracted tree
+        * After which, we can't return without a collision, so we don't verify.
+      * If no, then the only way to verify is to have a collision.
+
+  -/
 
 
 end InductiveMerkleTree
