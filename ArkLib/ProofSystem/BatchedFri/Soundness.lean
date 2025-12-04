@@ -10,6 +10,7 @@ import ArkLib.Data.CodingTheory.Basic
 import ArkLib.Data.CodingTheory.Prelims
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.Probability.Notation
+import ArkLib.ProofSystem.BatchedFri.Spec.General
 import ArkLib.ProofSystem.Fri.Domain
 import ArkLib.ProofSystem.Fri.Spec.General
 import ArkLib.ProofSystem.Fri.Spec.SingleRound
@@ -25,11 +26,11 @@ open OracleComp OracleSpec ProtocolSpec CosetDomain
 open NNReal Finset Function ProbabilityTheory
 
 variable {𝔽 : Type} [NonBinaryField 𝔽] [Finite 𝔽] [DecidableEq 𝔽] [Nontrivial 𝔽]
-variable (D : Subgroup 𝔽ˣ) {n : ℕ} [DIsCyclicC : IsCyclicWithGen D] [DSmooth : SmoothPowerOfTwo n D]
-variable (g : 𝔽ˣ)
-variable (s : Fin (n + 1) → ℕ+) (d : ℕ+)
+variable (D : Subgroup 𝔽ˣ) (n : ℕ) [DIsCyclicC : IsCyclicWithGen D] [DSmooth : SmoothPowerOfTwo n D]
+variable (g : 𝔽ˣ) {k : ℕ}
+variable (s : Fin (k + 1) → ℕ+) (d : ℕ+)
 variable (domain_size_cond : (2 ^ (∑ i, (s i : ℕ))) * d ≤ 2 ^ n)
-variable {i : Fin (n + 1)}
+variable {i : Fin (k + 1)}
 
 noncomputable local instance : Fintype 𝔽 := Fintype.ofFinite _
 
@@ -37,6 +38,9 @@ instance {F : Type} [Field F] {a : F} [inst : NeZero a] : Invertible a where
   invOf := a⁻¹
   invOf_mul_self := by field_simp [inst.out]
   mul_invOf_self := by field_simp [inst.out]
+
+#check Domain.domainEnum
+#check Domain.rootsOfUnity
 
 @[grind]
 def cosetElems (s₀ : evalDomainSigma D g s i) : List (evalDomainSigma D g s i) :=
@@ -50,7 +54,7 @@ def cosetElems (s₀ : evalDomainSigma D g s i) : List (evalDomainSigma D g s i)
   else []
 
 def cosetG (s₀ : evalDomainSigma D g s i) : Finset (evalDomainSigma D g s i) :=
-  (cosetElems D g s s₀).toFinset
+  (cosetElems D n g s s₀).toFinset
 
 def pows (z : 𝔽) (ℓ : ℕ) : Matrix Unit (Fin ℓ) 𝔽 :=
   Matrix.of <| fun _ j => z ^ j.val
@@ -59,22 +63,23 @@ def VDM (s₀ : evalDomainSigma D g s i) :
   Matrix (Fin (2 ^ (s i : ℕ))) (Fin (2 ^ (s i : ℕ))) 𝔽 :=
   if k_le_n : (∑ j', (s j').1) ≤ n
   then
-    have : (cosetElems D g s s₀).length = 2 ^ (s i : ℕ) := by
+    have : (cosetElems D n g s s₀).length = 2 ^ (s i : ℕ) := by
       unfold cosetElems Domain.rootsOfUnity
       simp [k_le_n, PNat.val]
     let v : Fin (2 ^ (s i).1) → 𝔽 :=
-      fun x => ((cosetElems D g s s₀).get ⟨x.1, by rw [this]; exact x.2⟩).1.1
+      fun x => ((cosetElems D n g s s₀).get ⟨x.1, by rw [this]; exact x.2⟩).1.1
     Matrix.vandermonde v
   else 1
 
-def fin_equiv_coset (s₀ : evalDomainSigma D g s i) : (Fin (2 ^ (s i).1)) ≃ { x // x ∈ cosetG D g s s₀ } where
-  toFun := sorry
-  invFun := sorry
-  left_inv := sorry
-  right_inv := sorry
+noncomputable def fin_equiv_coset (s₀ : evalDomainSigma D g s i) :
+    (Fin (2 ^ (s i).1)) ≃ { x // x ∈ cosetG D n g s s₀ } := by
+  apply Equiv.ofBijective
+  swap
+  sorry
+  sorry
 
-def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s₀) := by
-  haveI : NeZero (VDM D g s s₀).det := by
+def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D n g s s₀) := by
+  haveI : NeZero (VDM D n g s s₀).det := by
     constructor
     unfold VDM
     split_ifs with cond
@@ -128,7 +133,7 @@ def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s�
           swap
           · exact cond
           · have :=
-              @Finset.single_le_sum (Fin (n + 1)) ℕ _ _ _
+              @Finset.single_le_sum (Fin (k + 1)) ℕ _ _ _
                 (fun i => (s i).1) Finset.univ (by intros i _; simp)
                 i (by simp)
             simp only at this
@@ -145,7 +150,7 @@ def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s�
           swap
           · exact cond
           · have :=
-              @Finset.single_le_sum (Fin (n + 1)) ℕ _ _ _
+              @Finset.single_le_sum (Fin (k + 1)) ℕ _ _ _
                 (fun i => (s i).1) Finset.univ (by intros i _; simp)
                 i (by simp)
             simp only at this
@@ -157,10 +162,10 @@ def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D g s s�
   apply @Matrix.invertibleOfDetInvertible
 
 
-def VDMInv (s₀ : evalDomainSigma D g s i) :
-  Matrix (Fin (2 ^ (s i).1)) (cosetG D g s s₀) 𝔽 :=
-  Matrix.reindex (Equiv.refl _) (fin_equiv_coset D g s s₀)
-  (invertibleDomain D g s s₀).invOf
+noncomputable def VDMInv (s₀ : evalDomainSigma D g s i) :
+  Matrix (Fin (2 ^ (s i).1)) (cosetG D n g s s₀) 𝔽 :=
+  Matrix.reindex (Equiv.refl _) (fin_equiv_coset D n g s s₀)
+  (invertibleDomain D n g s s₀).invOf
 
 lemma g_elem_zpower_iff_exists_nat {G : Type} [Group G] [Finite G] {gen g : G} :
     g ∈ Subgroup.zpowers gen ↔ ∃ n : ℕ, g = gen ^ n ∧ n < orderOf gen := by
@@ -218,14 +223,14 @@ noncomputable def f_succ'
     simp only [this, mul_pow]
     rfl
   let s₀ := Classical.choose this
-  (pows z _ *ᵥ VDMInv D g s s₀ *ᵥ Finset.restrict (cosetG D g s s₀) f) ()
+  (pows z _ *ᵥ VDMInv D n g s s₀ *ᵥ Finset.restrict (cosetG D n g s s₀) f) ()
 
 lemma claim_8_1
   {f : ReedSolomon.code (injectF (i := ∑ j' ∈ finRangeTo i, s j'))
                         (2 ^ (n - (∑ j' ∈ finRangeTo i, (s j' : ℕ))))}
   {z : 𝔽}
   :
-  f_succ' D g s f.val z ∈
+  f_succ' D n g s f.val z ∈
     (ReedSolomon.code
       CosetDomain.injectF
       (2 ^ (n - (∑ j' ∈ finRangeTo (i.1 + 1), (s j' : ℕ))))
@@ -245,7 +250,7 @@ noncomputable def correlated_agreement_density {ι : Type} [Fintype ι]
 
 open Polynomial
 
-noncomputable def oracle (l : ℕ) (z : Fin (n + 1) → 𝔽) (f : (CosetDomain.evalDomain D g 0) → 𝔽) :
+noncomputable def oracleImpl (l : ℕ) (z : Fin (k + 1) → 𝔽) (f : (CosetDomain.evalDomain D g 0) → 𝔽) :
   QueryImpl
     ([]ₒ ++ₒ ([Spec.FinalOracleStatement D g s]ₒ ++ₒ [(Spec.QueryRound.pSpec D g l).Message]ₒ))
     (OracleComp [(Spec.QueryRound.pSpec D g l).Message]ₒ) where
@@ -255,10 +260,10 @@ noncomputable def oracle (l : ℕ) (z : Fin (n + 1) → 𝔽) (f : (CosetDomain.
           | query (.inl i) _ => PEmpty.elim i
           | query (.inr (.inl i)) dom =>
             let f0 := Lagrange.interpolate Finset.univ (fun v => v.1.1) f
-            let chals : List (Fin (n + 1) × 𝔽) :=
-              ((List.finRange (n + 1)).map (fun i => (i, z i))).take i.1
+            let chals : List (Fin (k + 1) × 𝔽) :=
+              ((List.finRange (k + 1)).map (fun i => (i, z i))).take i.1
             let fi : 𝔽[X] := List.foldl (fun f (i, α) => Polynomial.foldNth (s i) f α) f0 chals
-            if h : i.1 = n + 1
+            if h : i.1 = k + 1
             then pure <| by
               simp only
                 [
@@ -300,6 +305,9 @@ instance {g : 𝔽ˣ} {l : ℕ} : [(Spec.QueryRound.pSpec D g l).Message]ₒ.Fin
     have h := this ▸ i.2
     simp at h
 
+-- #check  BatchedFri.Spec.BatchingRound.instOracleInterfaceMessageBatchSpec
+-- #check Spec.QueryRound.instOracleInterfaceMessagePSpec
+-- omit [BatchedFri.Spec.BatchingRound.instOracleInterfaceMessageBatchSpec 1] in
 open ENNReal in
 lemma lemma_8_2
   {t : ℕ}
@@ -323,17 +331,18 @@ lemma lemma_8_2
         / (2 * ρ_sqrt ^ 3) * (Fintype.card 𝔽)
       + (∑ i, (s i).1) * (2 * m + 1) * (2 ^ n + 1) / (Fintype.card 𝔽 * ρ_sqrt)
     let εQ  (x : Fin t → 𝔽)
-            (z : Fin (n + 1) → 𝔽) :=
+            (z : Fin (k + 1) → 𝔽) :=
       Pr_{let samp ←$ᵖ (CosetDomain.evalDomain D g 0)}[
         [
           fun _ => True |
           (
             (do
-              simulateQ (oracle D g s 1 z (fun v ↦ f 0 v + ∑ i, x i * f i.succ v))
+              simulateQ
+                (oracleImpl D g s 1 z (fun v ↦ f 0 v + ∑ i, x i * f i.succ v))
                 (
                   (
                     Fri.Spec.QueryRound.queryVerifier D g
-                      (n := n + 1) (k := n) (s := s) (l := 1)
+                      (n := n) (k := k) (s := s) (l := 1)
                         (by
                           apply Spec.round_bound (d := d)
                           transitivity
@@ -343,21 +352,96 @@ lemma lemma_8_2
                         )
                   ).verify
                   z
-                  (fun i => by
-                    simpa only
-                      [
-                        Spec.QueryRound.pSpec, Challenge,
-                        show i.1 = 0 by omega, Fin.isValue,
-                        Fin.vcons_zero
-                      ] using fun _ => samp
+                  (fun i =>
+                    by
+                      simpa only
+                        [
+                          Spec.QueryRound.pSpec, Challenge,
+                          show i.1 = 0 by omega, Fin.isValue,
+                          Fin.vcons_zero
+                        ] using fun _ => samp
                   )
                 )
             )
           )
         ] = 1
       ]
-    Pr_{let x ←$ᵖ (Fin t → 𝔽); let z ←$ᵖ (Fin (n + 1) → 𝔽)}[ εQ x z ≤ α0 ] ≤ εC
+    Pr_{let x ←$ᵖ (Fin t → 𝔽); let z ←$ᵖ (Fin (k + 1) → 𝔽)}[ εQ x z ≤ α0 ] ≤ εC
   := by sorry
+
+#check (BatchedFri.Spec.BatchingRound.batchOracleReduction D g s 1 0).verifier
+
+@[reducible]
+def MaliciousWitness (F : Type) [Semiring F] (m : ℕ) :=
+  Fin (m + 1) → (CosetDomain.evalDomain D g 0 → 𝔽)
+
+#check OracleReduction.run
+#check BatchedFri.Spec.BatchingRound.batchSpec
+#check ProtocolSpec.Challenge
+#check OracleReduction.verifier
+#check BatchedFri.Spec.batchedFRIreduction
+
+#check [_]ₒ
+
+set_option diagnostics true
+instance {t l : ℕ} : ([]ₒ ++ₒ
+      [(BatchedFri.Spec.BatchingRound.batchSpec 𝔽 t ++ₚ
+            (Spec.pSpecFold D g k s ++ₚ Spec.FinalFoldPhase.pSpec 𝔽 ++ₚ
+              Spec.QueryRound.pSpec D g l)).Challenge]ₒ).FiniteRange := sorry
+
+#check ProtocolSpec.instOracleInterfaceMessageAppend
+
+#check BatchedFri.Spec.BatchingRound.batchSpec
+variable {l : ℕ}
+#check (Spec.pSpecFold D g k s ++ₚ Spec.FinalFoldPhase.pSpec 𝔽 ++ₚ Spec.QueryRound.pSpec D g l)
+#check OracleVerifier
+
+open ENNReal in
+lemma lemma_8_3
+  {t l : ℕ}
+  (f : Fin t.succ → (CosetDomain.evalDomain D g 0 → 𝔽))
+  {m r : ℕ}
+  (m_ge_3 : m ≥ 3)
+  :
+    let ρ_sqrt :=
+      ReedSolomonCode.sqrtRate
+        (2 ^ n)
+        (Embedding.trans (CosetDomain.domainEnum (n := n) D g 0) (CosetDomain.domainEmb D g))
+    let α : ℝ≥0∞ := ENNReal.ofReal (ρ_sqrt * (1 + 1 / 2 * m))
+    letI bl :=
+      @ProtocolSpec.instOracleInterfaceMessageAppend 1 ((Fin.vsum fun (x : Fin k) ↦ 2) + 2 + 1)
+        (BatchedFri.Spec.BatchingRound.batchSpec 𝔽 t) (Spec.pSpecFold D g k s ++ₚ Spec.FinalFoldPhase.pSpec 𝔽 ++ₚ Spec.QueryRound.pSpec D g l)
+        inferInstance inferInstance
+    -- have :
+    let verif : OracleVerifier []ₒ Unit (BatchedFri.Spec.OracleStatement D g t) (Spec.FinalStatement 𝔽 k) (Spec.FinalOracleStatement D g s) (BatchedFri.Spec.BatchingRound.batchSpec 𝔽 t ++ₚ
+      (Spec.pSpecFold D g k s ++ₚ Spec.FinalFoldPhase.pSpec 𝔽 ++ₚ Spec.QueryRound.pSpec D g l)) := by
+      have blo := BatchedFri.Spec.batchedFRIreduction (n := n) D g k s (2 ^ (n - ∑ j, (s j).1)) sorry l t
+      have : bl = fun i ↦ ProtocolSpec.instOracleInterfaceMessageAppend i := by
+        dsimp [bl]
+        funext
+        rfl
+      rw [←this] at blo
+      exact blo.verifier
+    let bla :=
+      ∃ prov,
+      [
+          fun _ => True |
+            OracleReduction.run () f ()
+              ⟨
+                prov,
+                verif
+              ⟩
+      ] > 0
+    True := sorry
+
+-- failed to synthesize
+--   (i :
+--       (BatchedFri.Spec.BatchingRound.batchSpec 𝔽 t ++ₚ
+--           (Spec.pSpecFold D g k s ++ₚ Spec.FinalFoldPhase.pSpec 𝔽 ++ₚ Spec.QueryRound.pSpec D g l)).MessageIdx) →
+--     OracleInterface
+--       ((BatchedFri.Spec.BatchingRound.batchSpec 𝔽 t ++ₚ
+--             (Spec.pSpecFold D g k s ++ₚ Spec.FinalFoldPhase.pSpec 𝔽 ++ₚ Spec.QueryRound.pSpec D g l)).Message
+--         i)
 
 end Fri
 end Fri

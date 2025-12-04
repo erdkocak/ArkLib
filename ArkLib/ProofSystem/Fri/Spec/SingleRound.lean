@@ -324,7 +324,7 @@ def pSpec : ProtocolSpec 2 :=
   ⟨
     !v[.V_to_P, .P_to_V],
     !v[
-        F,
+        Unit → F,
         (evalDomain D x (∑ j' ∈ (List.take (i.1 + 1) (List.finRange (k + 1))).toFinset, s j')) → F
       ]
   ⟩
@@ -336,6 +336,18 @@ instance {i : Fin k} : ∀ j, OracleInterface ((pSpec D x s i).Message j)
       unfold pSpec Message
       simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
       infer_instance
+
+instance {i : Fin k} : ∀ j, OracleInterface ((pSpec D x s i).Challenge j)
+  | ⟨0, h⟩ => by
+    unfold pSpec Challenge
+    simp only [evalDomain, Domain.evalDomain, Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue,
+      Fin.vcons_zero]
+    infer_instance
+  | ⟨1, h⟩ => nomatch h
+    -- by
+    --   unfold pSpec Message
+    --   simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
+    --   infer_instance
 
 /-- The prover for the `i`-th round of the FRI protocol. It first receives the challenge,
     then does an `s` degree split of this polynomial. Finally, it returns the evaluation of
@@ -362,10 +374,10 @@ noncomputable def foldProver :
 
   receiveChallenge
   | ⟨0, _⟩ => fun ⟨⟨chals, o⟩, p⟩ => pure <|
-    fun (α : F) =>
+    fun (α : Unit → F) =>
       ⟨
-        ⟨Fin.append chals (fun (_ : Fin 1) => α), o⟩,
-        ⟨p.1.foldNth (2 ^ (s i.castSucc).1) α, witness_lift p.2⟩
+        ⟨Fin.append chals (fun (_ : Fin 1) => α ()), o⟩,
+        ⟨p.1.foldNth (2 ^ (s i.castSucc).1) (α ()), witness_lift p.2⟩
       ⟩
   | ⟨1, h⟩ => nomatch h
 
@@ -641,7 +653,7 @@ def pSpec : ProtocolSpec 1 :=
   ⟨!v[.V_to_P], !v[Fin l → evalDomain D x 0]⟩
 
 /- `OracleInterface` instances for the query round `pSpec`. -/
-instance : ∀ j, OracleInterface ((pSpec D x l).Message j) := fun j =>
+instance (priority := high) : ∀ j, OracleInterface ((pSpec D x l).Message j) := fun j =>
   match j with
   | ⟨0, h⟩ => nomatch h
 
@@ -707,17 +719,6 @@ private lemma sum_finRangeTo_le_sub_of_le {s : Fin (k + 1) → ℕ+} {i : Fin (k
     · exact sum_le_univ_sum_of_nonneg (by simp)
     · exact k_le_n
 
-@[simp]
-lemma min_lem {a b : ℕ} : 2 ^ (min a b) = min (2 ^ a) (2 ^ b) := by
-  by_cases h : a < b
-  · have : 2 ^ a < 2 ^ b := (Nat.pow_lt_pow_iff_right (by decide)).mpr h
-    rw [min_eq_left (Nat.le_of_succ_le h)]
-    rw [min_eq_left (Nat.le_of_succ_le this)]
-  · rw [not_lt] at h
-    have : 2 ^ b ≤ 2 ^ a :=
-      Nat.pow_le_pow_right (by decide) h
-    rw [min_eq_right h]
-    rw [min_eq_right this]
 
 /- Verifier for query round of the FRI protocol. Runs `l` checks on uniformly
    sampled points in the first evaluation domain against the oracles sent during
@@ -752,19 +753,11 @@ noncomputable def queryVerifier (k_le_n : (∑ j', (s j').1) ≤ n) (l : ℕ) [D
                             ⟨
                               ind.1,
                               by
-                                have : 2 ^ (s i).1 ≤ 2 ^ n := by
-                                  apply Nat.pow_le_pow_right (by decide)
-                                  transitivity
-                                  swap
-                                  exact k_le_n
-                                  have h := Finset.single_le_sum
-                                    (f := fun j => (s j).1) (s := Finset.univ)
-                                  apply h
-                                  exact fun i _ ↦ Nat.zero_le ↑(s i)
-                                  exact mem_univ _
-                                simp
-                                rw [Nat.sub_sub_eq_min]
-                                aesop
+                                have : (s i).1 ≤ n := by
+                                  refine le_trans ?_ k_le_n
+                                  apply Finset.single_le_sum
+                                    (f := fun j => (s j).1) (by aesop) (mem_univ _)
+                                simp_all only [Nat.sub_sub_eq_min, inf_of_le_right, Fin.is_lt]
                             ⟩
                         ⟨
                           _,

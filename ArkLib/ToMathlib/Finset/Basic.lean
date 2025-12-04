@@ -125,7 +125,7 @@ lemma sum_finRangeTo_add_one {n} {i : Fin (n + 1)} {f : Fin (n + 1) → ℕ} :
     aesop (add simp List.mem_iff_getElem) (add safe (by grind [cases Fin]))
   simp +arith [Finset.sum_insert this]
 
-lemma sum_finRangeTo_le_sub_of_le {n} {s : Fin (n + 1) → ℕ+} {i : Fin (n + 1)}
+lemma sum_finRangeTo_le_sub_of_le {n k : ℕ} {s : Fin (k + 1) → ℕ+} {i : Fin (k + 1)}
   (k_le_n : ∑ j', (s j' : ℕ) ≤ n) :
   ∑ j' ∈ finRangeTo i, (s j' : ℕ) ≤ n - (s i : ℕ) := by
     apply Nat.le_sub_of_add_le

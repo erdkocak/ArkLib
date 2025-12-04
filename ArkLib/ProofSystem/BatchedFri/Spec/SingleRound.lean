@@ -98,8 +98,7 @@ noncomputable def batchProver :
           ps 0 + ∑ i, Polynomial.C (cs i) * (ps i.succ).1,
           by
             unfold Fri.Spec.Witness
-            simp only [List.toFinset_finRange, Fin.coe_ofNat_eq_mod, Nat.zero_mod, List.take_zero,
-              List.toFinset_nil, sum_empty, tsub_zero]
+            simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod]
             apply mem_degreeLT.mpr
             by_cases h : ↑(ps 0) + ∑ i, Polynomial.C (cs i) * ↑(ps i.succ) = 0
             · rw [h]
