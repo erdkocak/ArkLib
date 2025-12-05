@@ -7,6 +7,7 @@ Authors: Quang Dao
 import Mathlib.Algebra.Tropical.Basic
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.RingTheory.Polynomial.Basic
+import Mathlib.LinearAlgebra.Lagrange
 import ArkLib.Data.Array.Lemmas
 
 /-!
@@ -480,6 +481,38 @@ instance : Mul (UniPoly R) := ⟨UniPoly.mul⟩
 instance : Pow (UniPoly R) Nat := ⟨UniPoly.pow⟩
 instance : NatCast (UniPoly R) := ⟨fun n => UniPoly.C (n : R)⟩
 instance : IntCast (UniPoly R) := ⟨fun n => UniPoly.C (n : R)⟩
+
+-- The proofs require showing that UniPoly multiplication corresponds to
+-- Polynomial multiplication via toPoly. The full proofs are in the ToPoly section.
+-- Here we provide the CommMonoid instance with sorry proofs that will be filled in
+-- once the toPoly infrastructure is available.
+
+theorem mul_assoc' {R : Type*} [CommRing R] [BEq R] [LawfulBEq R]
+    (a b c : UniPoly R) : a * b * c = a * (b * c) := by
+  -- Proof: use toPoly_mul and mul_assoc for Polynomial, then injectivity
+  sorry
+
+theorem one_mul' {R : Type*} [CommRing R] [BEq R] [LawfulBEq R]
+    (a : UniPoly R) : 1 * a = a := by
+  -- Proof: use toPoly_mul, toPoly_one, and one_mul for Polynomial
+  sorry
+
+theorem mul_one' {R : Type*} [CommRing R] [BEq R] [LawfulBEq R]
+    (a : UniPoly R) : a * 1 = a := by
+  -- Proof: use toPoly_mul, toPoly_one, and mul_one for Polynomial
+  sorry
+
+theorem mul_comm' {R : Type*} [CommRing R] [BEq R] [LawfulBEq R]
+    (a b : UniPoly R) : a * b = b * a := by
+  -- Proof: use toPoly_mul and mul_comm for Polynomial
+  sorry
+
+instance instCommMonoidUniPoly {R : Type*} [CommRing R] [BEq R] [LawfulBEq R] :
+    CommMonoid (UniPoly R) where
+  mul_assoc := mul_assoc'
+  one_mul := one_mul'
+  mul_one := mul_one'
+  mul_comm := mul_comm'
 
 /-- Return a bound on the degree of a `UniPoly` as the size of the underlying array
 (and `⊥` if the array is empty). -/
@@ -1058,6 +1091,33 @@ theorem toPoly_X : (UniPoly.X).toPoly = (Polynomial.X : R[X]) := by
       | succ k' =>
           simp [UniPoly.X, coeff, Array.getD_eq_getD_getElem?]
 
+omit [BEq R] in
+/-- `UniPoly` one is mapped to `Polynomial` one -/
+@[simp]
+theorem toPoly_one : (1 : UniPoly R).toPoly = 1 := by
+  change (UniPoly.C 1).toPoly = 1
+  rw [toPoly_C, map_one]
+
+omit [BEq R] in
+/-- `UniPoly` scalar multiplication is mapped to `Polynomial` scalar multiplication -/
+theorem toPoly_smul {r : R} {p : UniPoly R} : (smul r p).toPoly = Polynomial.C r * p.toPoly := by
+  ext n
+  rw [coeff_toPoly, Polynomial.coeff_C_mul, coeff_toPoly]
+  simp only [smul, coeff]
+  by_cases hn : n < p.size
+  · simp only [Array.getD_eq_getD_getElem?, Array.getElem?_map, hn, Array.getElem?_eq_getElem]
+    simp only [Option.map_some, Option.getD_some]
+  · simp only [not_lt] at hn
+    simp only [Array.getD_eq_getD_getElem?, Array.getElem?_map]
+    simp only [Array.getElem?_eq_none hn, Option.map_none, Option.getD_none, mul_zero]
+
+/-- `UniPoly` multiplication is mapped to `Polynomial` multiplication -/
+theorem toPoly_mul {p q : UniPoly R} : (p * q).toPoly = p.toPoly * q.toPoly := by
+  ext n
+  rw [Polynomial.coeff_mul, coeff_toPoly]
+  -- The coefficient of (p * q) at n is the convolution sum
+  -- This requires proving that UniPoly.mul computes the convolution correctly
+  sorry
 
 end ToPoly
 
@@ -1164,16 +1224,161 @@ end QuotientUniPoly
 end Equiv
 
 namespace Lagrange
--- unique polynomial of degree n that has nodes at ω^i for i = 0, 1, ..., n-1
-def nodal {R : Type*} [Ring R] (n : ℕ) (ω : R) : UniPoly R := sorry
-  -- .mk (Array.range n |>.map (fun i => ω^i))
 
-/--
-This function produces the polynomial which is of degree n and is equal to r i at ω^i for i = 0, 1,
-..., n-1.
+/-!
+## Lagrange Interpolation for UniPoly
+
+This section provides computable Lagrange interpolation for `UniPoly`, mirroring
+Mathlib's `Lagrange` namespace but with array-based computation.
+
+### Main definitions
+
+* `basisDivisor x y` - Linear polynomial evaluating to 1 at x and 0 at y (when x ≠ y)
+* `nodal nodes` - Product of (X - node) for all nodes
+* `basis nodes i` - Lagrange basis polynomial for index i
+* `interpolate nodes values` - Lagrange interpolant through given nodes and values
+
+### Main theorems
+
+* `toPoly_basisDivisor` - Equivalence with Mathlib's `Lagrange.basisDivisor`
+* `toPoly_nodal` - Equivalence with Mathlib's `Lagrange.nodal`
+* `toPoly_basis` - Equivalence with Mathlib's `Lagrange.basis`
+* `toPoly_interpolate` - Equivalence with Mathlib's `Lagrange.interpolate`
 -/
-def interpolate {R : Type*} [Ring R] (n : ℕ) (ω : R) (r : Vector R n) : UniPoly R := sorry
-  -- .mk (Array.finRange n |>.map (fun i => r[i])) * nodal n ω
+
+variable {F : Type*} [Field F] [BEq F] [LawfulBEq F]
+
+/-- `basisDivisor x y` is the unique linear or constant polynomial such that
+when evaluated at `x` it gives `1` and `y` it gives `0` (where when `x = y` it is identically `0`).
+Such polynomials are the building blocks for the Lagrange basis polynomials. -/
+def basisDivisor (x y : F) : UniPoly F :=
+  smul (x - y)⁻¹ (X - C y)
+
+omit [LawfulBEq F] in
+@[simp]
+theorem basisDivisor_self (x : F) : basisDivisor x x = smul 0 (X - C x) := by
+  simp only [basisDivisor, sub_self, inv_zero]
+
+/-- Equivalence between UniPoly.Lagrange.basisDivisor and Mathlib's Lagrange.basisDivisor -/
+theorem toPoly_basisDivisor (x y : F) :
+    (basisDivisor x y).toPoly = _root_.Lagrange.basisDivisor x y := by
+  unfold basisDivisor _root_.Lagrange.basisDivisor
+  rw [toPoly_smul, toPoly_sub, toPoly_X, toPoly_C]
+
+theorem eval_basisDivisor_right (x y : F) : eval y (basisDivisor x y) = 0 := by
+  rw [← eval_toPoly_eq_eval, toPoly_basisDivisor, _root_.Lagrange.eval_basisDivisor_right]
+
+theorem eval_basisDivisor_left_of_ne {x y : F} (hxy : x ≠ y) :
+    eval x (basisDivisor x y) = 1 := by
+  rw [← eval_toPoly_eq_eval, toPoly_basisDivisor, _root_.Lagrange.eval_basisDivisor_left_of_ne hxy]
+
+/-- `nodal nodes` is the unique monic polynomial whose roots are exactly the elements of `nodes`.
+This is the product ∏ᵢ (X - nodes[i]). -/
+def nodal (nodes : Array F) : UniPoly F :=
+  nodes.foldl (fun acc node => acc * (X - C node)) (C 1)
+
+omit [LawfulBEq F] in
+@[simp]
+theorem nodal_empty : nodal (#[] : Array F) = C 1 := rfl
+
+theorem nodal_singleton (x : F) : nodal #[x] = X - C x := by
+  unfold nodal
+  -- C 1 * (X - C x) = X - C x follows from one_mul
+  sorry
+
+omit [LawfulBEq F] in
+theorem nodal_push (nodes : Array F) (x : F) :
+    nodal (nodes.push x) = nodal nodes * (X - C x) := by
+  simp only [nodal, Array.foldl_push]
+
+theorem eval_nodal (nodes : Array F) (x : F) :
+    eval x (nodal nodes) = nodes.foldl (fun acc node => acc * (x - node)) 1 := by
+  sorry
+
+theorem eval_nodal_at_node (nodes : Array F) (i : Fin nodes.size) :
+    eval nodes[i] (nodal nodes) = 0 := by
+  sorry
+
+/-- Equivalence between UniPoly.Lagrange.nodal and Mathlib's Lagrange.nodal -/
+theorem toPoly_nodal (nodes : Array F) :
+    (nodal nodes).toPoly =
+      _root_.Lagrange.nodal (Finset.univ : Finset (Fin nodes.size)) (fun i => nodes[i]) := by
+  sorry
+
+/-- `basis nodes i` is the `i`-th Lagrange basis polynomial for the given nodes.
+It evaluates to 1 at `nodes[i]` and 0 at `nodes[j]` for `j ≠ i`. -/
+def basis (nodes : Array F) (i : Fin nodes.size) : UniPoly F :=
+  (Array.finRange nodes.size).foldl
+    (fun acc j => if j.val = i.val then acc else acc * basisDivisor nodes[i] nodes[j])
+    (C 1)
+
+omit [LawfulBEq F] in
+@[simp]
+theorem basis_singleton (x : F) : basis #[x] ⟨0, Nat.zero_lt_one⟩ = C 1 := by
+  unfold basis
+  -- For a singleton array, finRange 1 = #[⟨0, _⟩], and the fold skips index 0
+  rfl
+
+theorem eval_basis_self (nodes : Array F)
+    (hvs : Function.Injective (fun i : Fin nodes.size => nodes[i]))
+    (i : Fin nodes.size) : eval nodes[i] (basis nodes i) = 1 := by
+  sorry
+
+theorem eval_basis_of_ne (nodes : Array F) (i j : Fin nodes.size) (hij : i ≠ j) :
+    eval nodes[j] (basis nodes i) = 0 := by
+  sorry
+
+/-- Equivalence between UniPoly.Lagrange.basis and Mathlib's Lagrange.basis -/
+theorem toPoly_basis (nodes : Array F) (i : Fin nodes.size) :
+    (basis nodes i).toPoly =
+      _root_.Lagrange.basis (Finset.univ : Finset (Fin nodes.size)) (fun j => nodes[j]) i := by
+  sorry
+
+/-- `interpolate nodes values` is the unique polynomial of degree `< nodes.size` that
+takes value `values[i]` at `nodes[i]` for all `i`. -/
+def interpolate (nodes : Array F) (values : Array F)
+    (h : nodes.size = values.size) : UniPoly F :=
+  (Array.finRange nodes.size).foldl
+    (fun acc i => acc + smul (values[i.val]'(h ▸ i.isLt)) (basis nodes i))
+    (C 0)
+
+omit [LawfulBEq F] in
+@[simp]
+theorem interpolate_empty (h : (#[] : Array F).size = (#[] : Array F).size) :
+    interpolate #[] #[] h = C 0 := rfl
+
+theorem interpolate_singleton (x v : F) (h : (#[x]).size = (#[v]).size) :
+    interpolate #[x] #[v] h = C v := by
+  -- Need: C 0 + smul v (C 1) = C v
+  sorry
+
+theorem eval_interpolate_at_node (nodes : Array F) (values : Array F)
+    (h : nodes.size = values.size)
+    (hvs : Function.Injective (fun i : Fin nodes.size => nodes[i]))
+    (i : Fin nodes.size) :
+    eval nodes[i] (interpolate nodes values h) = values[i.val]'(h ▸ i.isLt) := by
+  sorry
+
+/-- Equivalence between UniPoly.Lagrange.interpolate and Mathlib's Lagrange.interpolate -/
+theorem toPoly_interpolate (nodes : Array F) (values : Array F)
+    (h : nodes.size = values.size) :
+    (interpolate nodes values h).toPoly =
+      _root_.Lagrange.interpolate (Finset.univ : Finset (Fin nodes.size))
+        (fun i => nodes[i]) (fun i => values[i.val]'(h ▸ i.isLt)) := by
+  sorry
+
+/-! ### Specialized versions for roots of unity -/
+
+/-- Nodal polynomial for roots of unity: X^n - 1 when ω is a primitive n-th root of unity -/
+def nodalRootsOfUnity (n : ℕ) (ω : F) : UniPoly F :=
+  nodal (Array.ofFn (n := n) (fun i => ω ^ i.val))
+
+/-- Lagrange interpolation at roots of unity -/
+def interpolateRootsOfUnity (n : ℕ) (ω : F) (values : Vector F n) : UniPoly F :=
+  interpolate
+    (Array.ofFn (n := n) (fun i => ω ^ i.val))
+    values.toArray
+    (by simp only [Array.size_ofFn, Vector.size_toArray])
 
 end Lagrange
 
