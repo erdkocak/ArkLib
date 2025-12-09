@@ -140,6 +140,7 @@ import ArkLib.OracleReduction.Security.RoundByRound
 import ArkLib.OracleReduction.Security.SpecialSoundness
 import ArkLib.OracleReduction.Security.StateRestoration
 import ArkLib.OracleReduction.VectorIOR
+import ArkLib.ProofSystem.BatchedFri.Soundness
 import ArkLib.ProofSystem.BatchedFri.Spec.General
 import ArkLib.ProofSystem.BatchedFri.Spec.SingleRound
 import ArkLib.ProofSystem.Binius.BinaryBasefold.Basic
@@ -163,7 +164,6 @@ import ArkLib.ProofSystem.ConstraintSystem.R1CS
 import ArkLib.ProofSystem.DSL
 import ArkLib.ProofSystem.Fri.Domain
 import ArkLib.ProofSystem.Fri.RoundConsistency
-import ArkLib.ProofSystem.Fri.Soundness
 import ArkLib.ProofSystem.Fri.Spec.General
 import ArkLib.ProofSystem.Fri.Spec.SingleRound
 import ArkLib.ProofSystem.Plonk.Basic

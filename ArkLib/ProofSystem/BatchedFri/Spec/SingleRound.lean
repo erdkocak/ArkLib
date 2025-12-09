@@ -74,6 +74,9 @@ def batchSpec (F : Type) (m : ℕ) : ProtocolSpec 1 := ⟨!v[.V_to_P], !v[Fin m 
 instance : ∀ j, OracleInterface ((batchSpec F m).Message j)
   | ⟨0, h⟩ => nomatch h
 
+instance : ∀ j, OracleInterface ((batchSpec F m).Challenge j) :=
+  ProtocolSpec.challengeOracleInterface
+
 /-- The batching round oracle prover. -/
 noncomputable def batchProver :
   OracleProver []ₒ

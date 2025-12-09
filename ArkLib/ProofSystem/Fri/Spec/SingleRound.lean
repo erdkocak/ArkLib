@@ -82,7 +82,7 @@ def OracleStatement (i : Fin (k + 1)) : Fin (i.val + 1) → Type :=
 def FinalOracleStatement : Fin (k + 2) → Type :=
   fun j =>
     if j.1 = k + 1
-    then (Unit → F[X])
+    then F[X]
     else (evalDomain D x (∑ j' ∈ finRangeTo j.1, s j') → F)
 
 /-- The FRI protocol has as witness the polynomial that is supposed to correspond to the codeword in
@@ -200,12 +200,7 @@ instance {i : Fin (k + 1)} : ∀ j, OracleInterface (OracleStatement D x s i j) 
 instance : ∀ j, OracleInterface (FinalOracleStatement D x s j) :=
   fun j =>
     if h : j = k + 1
-    then {
-           Query := Unit
-           Response := F[X]
-           answer := cast (by simp [h, FinalOracleStatement])
-                          (id (α := Unit → F[X]))
-         }
+    then OracleInterface.instDefault
     else {
            Query :=
             ↑(
@@ -242,7 +237,7 @@ lemma range_lem₂ : [FinalOracleStatement D x s]ₒ.range (Fin.last (k + 1)) = 
   unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
   unfold OracleInterface.Query
   unfold instOracleInterfaceFinalOracleStatement
-  simp
+  aesop (add simp OracleInterface.instDefault)
 
 omit [Finite F] in
 @[simp]
@@ -251,7 +246,7 @@ lemma domain_lem₂ :
   unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
   unfold OracleInterface.Query
   unfold instOracleInterfaceFinalOracleStatement
-  simp
+  aesop (add simp OracleInterface.instDefault)
 
 namespace FoldPhase
 
@@ -324,7 +319,7 @@ def pSpec : ProtocolSpec 2 :=
   ⟨
     !v[.V_to_P, .P_to_V],
     !v[
-        Unit → F,
+        F,
         (evalDomain D x (∑ j' ∈ (List.take (i.1 + 1) (List.finRange (k + 1))).toFinset, s j')) → F
       ]
   ⟩
@@ -337,17 +332,8 @@ instance {i : Fin k} : ∀ j, OracleInterface ((pSpec D x s i).Message j)
       simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
       infer_instance
 
-instance {i : Fin k} : ∀ j, OracleInterface ((pSpec D x s i).Challenge j)
-  | ⟨0, h⟩ => by
-    unfold pSpec Challenge
-    simp only [evalDomain, Domain.evalDomain, Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue,
-      Fin.vcons_zero]
-    infer_instance
-  | ⟨1, h⟩ => nomatch h
-    -- by
-    --   unfold pSpec Message
-    --   simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
-    --   infer_instance
+instance {i : Fin k} : ∀ j, OracleInterface ((pSpec D x s i).Challenge j) :=
+  ProtocolSpec.challengeOracleInterface
 
 /-- The prover for the `i`-th round of the FRI protocol. It first receives the challenge,
     then does an `s` degree split of this polynomial. Finally, it returns the evaluation of
@@ -374,10 +360,10 @@ noncomputable def foldProver :
 
   receiveChallenge
   | ⟨0, _⟩ => fun ⟨⟨chals, o⟩, p⟩ => pure <|
-    fun (α : Unit → F) =>
+    fun (α : F) =>
       ⟨
-        ⟨Fin.append chals (fun (_ : Fin 1) => α ()), o⟩,
-        ⟨p.1.foldNth (2 ^ (s i.castSucc).1) (α ()), witness_lift p.2⟩
+        ⟨Fin.append chals (fun (_ : Fin 1) => α), o⟩,
+        ⟨p.1.foldNth (2 ^ (s i.castSucc).1) α, witness_lift p.2⟩
       ⟩
   | ⟨1, h⟩ => nomatch h
 
@@ -503,15 +489,16 @@ def outputRelation (cond : ∑ i, (s i).1 ≤ n) [DecidableEq F] (δ : ℝ≥0) 
   element as the challenge to the prover, then in contrast to the previous folding rounds simply
   sends the folded polynomial to the verifier. -/
 @[reducible]
-def pSpec (F : Type) [Semiring F] : ProtocolSpec 2 := ⟨!v[.V_to_P, .P_to_V], !v[F, Unit → F[X]]⟩
+def pSpec (F : Type) [Semiring F] : ProtocolSpec 2 :=
+  ⟨!v[.V_to_P, .P_to_V], !v[F, F[X]]⟩
 
 /- `OracleInterface` instance for the `pSpec` of the final folding round of the FRI protocol. -/
 instance : ∀ j, OracleInterface ((pSpec F).Message j)
   | ⟨0, h⟩ => nomatch h
-  | ⟨1, _⟩ => by
-      unfold pSpec Message
-      simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
-      exact OracleInterface.instFunction
+  | ⟨1, _⟩ => OracleInterface.instDefault
+
+/- `OracleInterface` instance for the `pSpec` of the final folding round of the FRI protocol. -/
+instance : ∀ j, OracleInterface ((pSpec F).Challenge j) := ProtocolSpec.challengeOracleInterface
 
 /- Prover for the final folding round of the FRI protocol. -/
 noncomputable def finalFoldProver :
@@ -534,7 +521,7 @@ noncomputable def finalFoldProver :
   sendMessage
   | ⟨0, h⟩ => nomatch h
   | ⟨1, _⟩ => fun ⟨⟨chals, o⟩, p⟩ =>
-    pure ⟨fun x => p.1, ⟨⟨chals, o⟩, p⟩⟩
+    pure ⟨p.1, ⟨⟨chals, o⟩, p⟩⟩
 
   receiveChallenge
   | ⟨0, _⟩ => fun ⟨⟨chals, o⟩, p⟩ => pure <|
@@ -558,7 +545,7 @@ noncomputable def finalFoldProver :
           unfold FinalOracleStatement
           if h : j.1 = k + 1
           then
-            simpa [h] using fun x => p.1
+            simpa [h] using p.1
           else
           simpa [h, ↓reduceIte, OracleStatement, evalDomain] using
             o ⟨j.1, Nat.lt_of_le_of_ne (Fin.is_le j) h⟩
@@ -656,6 +643,9 @@ def pSpec : ProtocolSpec 1 :=
 instance (priority := high) : ∀ j, OracleInterface ((pSpec D x l).Message j) := fun j =>
   match j with
   | ⟨0, h⟩ => nomatch h
+
+instance (priority := high) : ∀ j, OracleInterface ((pSpec D x l).Challenge j) :=
+  ProtocolSpec.challengeOracleInterface
 
 instance : ∀ j, OracleInterface ((pSpec D x l).Challenge j) := fun j =>
   by

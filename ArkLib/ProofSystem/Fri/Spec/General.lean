@@ -62,13 +62,22 @@ def pSpecFold : ProtocolSpec (Fin.vsum fun (_ : Fin k) ↦ 2) :=
 instance : ∀ j, OracleInterface ((pSpecFold D x k s).Message j) :=
   instOracleInterfaceMessageSeqCompose
 
+instance : ∀ j, OracleInterface ((pSpecFold D x k s).Challenge j) :=
+  ProtocolSpec.challengeOracleInterface
+
 instance : ∀ j, OracleInterface (((pSpecFold D x k s ++ₚ FinalFoldPhase.pSpec F)).Message j) :=
   instOracleInterfaceMessageAppend
+
+instance : ∀ j, OracleInterface (((pSpecFold D x k s ++ₚ FinalFoldPhase.pSpec F)).Challenge j) :=
+  ProtocolSpec.challengeOracleInterface
 
 instance :
     ∀ i, OracleInterface
           ((pSpecFold D x k s ++ₚ FinalFoldPhase.pSpec F ++ₚ QueryRound.pSpec D x l).Message i) :=
   instOracleInterfaceMessageAppend
+
+instance : ∀ j, OracleInterface (((pSpecFold D x k s ++ₚ FinalFoldPhase.pSpec F ++ₚ QueryRound.pSpec D x l)).Challenge j) :=
+  ProtocolSpec.challengeOracleInterface
 
 /- Oracle reduction for all folding rounds of the FRI protocol -/
 @[reducible]
