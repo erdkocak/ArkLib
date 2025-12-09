@@ -92,21 +92,10 @@ noncomputable def fin_equiv_coset (s₀ : evalDomainSigma D g s i) (k_le_n : ∑
   · intros a b
     aesop
   · rintro ⟨⟨y, h'⟩, h⟩
-    simp
-    unfold evalDomainSigma at h'
-    -- unfold evalDomain Domain.evalDomain at h'
-    -- have : ∃ a : Fin (2 ^ (s i).1),
-    --    y =
-    --     (g ^ 2 ^ ∑ j' ∈ finRangeTo ↑i, (s j').1) *
-    --       (DIsCyclicC.gen.1 ^ 2 ^ ∑ j' ∈ finRangeTo ↑i, (s j').1) ^ a.1 := by sorry
-    -- rcases this with ⟨a, h⟩
-    -- use a
-
-
-
-
-    -- simp only [evalDomain.eq_1, finRangeTo.eq_1, Domain.evalDomain.eq_1]
-    sorry
+    simp only [evalDomain.eq_1, finRangeTo.eq_1, Domain.evalDomain.eq_1, Subtype.mk.injEq]
+    simp only [evalDomain.eq_1, finRangeTo.eq_1, Domain.evalDomain.eq_1, cosetG, k_le_n,
+      ↓reduceDIte, mem_image, mem_univ, cosetEnum, Subtype.mk.injEq, true_and] at h
+    exact h
 
 def invertibleDomain (s₀ : evalDomainSigma D g s i) : Invertible (VDM D n g s s₀) := by
   haveI : NeZero (VDM D n g s s₀).det := by
