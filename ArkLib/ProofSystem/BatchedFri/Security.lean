@@ -1,7 +1,12 @@
 /-
-Copyright (c) 2024-2025 ArkLib Contributors. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
-Authors: František Silváši, Julian Sutherland, Ilia Vlasov
+  Copyright (c) 2024-2025 ArkLib Contributors. All rights reserved.
+  Released under Apache 2.0 license as described in the file LICENSE.
+  Authors: František Silváši, Julian Sutherland, Ilia Vlasov
+
+  [BCIKS20] refers to the paper "Proximity Gaps for Reed-Solomon Codes" by Eli Ben-Sasson,
+  Dan Carmon, Yuval Ishai, Swastik Kopparty, and Shubhangi Saraf.
+
+  Using {https://eprint.iacr.org/2020/654}, version 20210703:203025.
 -/
 
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
@@ -30,7 +35,6 @@ variable {𝔽 : Type} [NonBinaryField 𝔽] [Finite 𝔽] [DecidableEq 𝔽] [N
 variable (D : Subgroup 𝔽ˣ) (n : ℕ) [DIsCyclicC : IsCyclicWithGen D] [DSmooth : SmoothPowerOfTwo n D]
 variable (g : 𝔽ˣ) {k : ℕ}
 variable (s : Fin (k + 1) → ℕ+) (d : ℕ+)
-variable (domain_size_cond : (2 ^ (∑ i, (s i : ℕ))) * d ≤ 2 ^ n)
 variable {i : Fin (k + 1)}
 
 noncomputable local instance : Fintype 𝔽 := Fintype.ofFinite _
@@ -39,6 +43,8 @@ instance {F : Type} [Field F] {a : F} [inst : NeZero a] : Invertible a where
   invOf := a⁻¹
   invOf_mul_self := by field_simp [inst.out]
   mul_invOf_self := by field_simp [inst.out]
+
+section Completeness
 
 def cosetEnum (s₀ : evalDomainSigma D g s i) (k_le_n : ∑ j', (s j').1 ≤ n)
       (j : Fin (2 ^ (s i).1)) : { x // x ∈ evalDomainSigma D g s ↑i } :=
@@ -187,7 +193,12 @@ noncomputable def f_succ'
   let s₀ := Classical.choose this
   (pows z _ *ᵥ VDMInv D n g s s₀ k_le_n *ᵥ Finset.restrict (cosetG D n g s s₀) f) ()
 
-lemma claim_8_1
+/-- This theorem asserts that given an appropriate codeword,
+  `f` of an appropriate Reed-Solomon code, the result of honestly folding the corresponding
+  polynomial is then itself a member of the next Reed-Solomon code.
+
+  Corresponds to Claim 8.1 of [BCIKS20] -/
+lemma fri_round_consistency_completeness
   {f : ReedSolomon.code (domainEmb D g (i := ∑ j' ∈ finRangeTo i, s j'))
                         (2 ^ (n - (∑ j' ∈ finRangeTo i, (s j' : ℕ))))}
   {z : 𝔽}
@@ -199,6 +210,10 @@ lemma claim_8_1
       (2 ^ (n - (∑ j' ∈ finRangeTo (i.1 + 1), (s j' : ℕ))))
     ).carrier
   := by sorry
+
+end Completeness
+
+section Soundness
 
 /-- Affine space: {g | ∃ x : Fin t.succ → 𝔽, x 0 = 1 ∧ g = ∑ i, x i • f i  }
 -/
@@ -271,6 +286,8 @@ instance {g : 𝔽ˣ} {l : ℕ} : [(Spec.QueryRound.pSpec D g l).Message]ₒ.Fin
     have : i.1 = 0 := by omega
     have h := this ▸ i.2
     simp at h
+
+variable (domain_size_cond : (2 ^ (∑ i, (s i : ℕ))) * d ≤ 2 ^ n)
 
 open ENNReal in
 lemma lemma_8_2
@@ -434,6 +451,8 @@ lemma lemma_8_3
         (ReedSolomon.code (CosetDomain.domainEmb (i := 0) D g) (2 ^ n)).carrier
         α f := by
   sorry
+
+end Soundness
 
 end Fri
 end Fri
