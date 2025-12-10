@@ -27,14 +27,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -r ./scripts/requirements.txt
-
       - name: Extract arguments from comment
         id: get_args
         run: |
@@ -75,36 +67,12 @@ jobs:
 
           echo "$PARSED_ARGS" >> $GITHUB_OUTPUT
 
-      - name: Run AI Review Script
-        id: ai_review
-        env:
-          # The GitHub token is automatically available to the runner
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          # Run the script and capture its output to post as a comment later
-          # We use a special "end of file" marker to handle multiline output
-          EOF_MARKER=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 16)
-          echo "review_text<<$EOF_MARKER" >> $GITHUB_OUTPUT
-          python ./scripts/review.py \
-            --pr-number ${{ github.event.issue.number }} \
-            --external-refs "${{ steps.get_args.outputs.external_refs }}" \
-            --arklib-refs "${{ steps.get_args.outputs.arklib_refs }}" \
-            --additional-comments "${{ steps.get_args.outputs.additional_comments }}" >> $GITHUB_OUTPUT
-          echo "$EOF_MARKER" >> $GITHUB_OUTPUT
-
-      - name: Post Review Comment
-        uses: actions/github-script@v8
-        env:
-          REVIEW_TEXT: ${{ steps.ai_review.outputs.review_text }}
+      - name: Run AI Review Action
+        uses: ./ai-workflows-export/review
         with:
-          script: |
-            const header = '### 🤖 AI Review (with external context)\\n\\n';
-            const reviewBody = process.env.REVIEW_TEXT;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: header + reviewBody
-            });
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-number: ${{ github.event.issue.number }}
+          external-refs: ${{ steps.get_args.outputs.external_refs }}
+          repo-refs: ${{ steps.get_args.outputs.arklib_refs }}
+          additional-comments: ${{ steps.get_args.outputs.additional_comments }}

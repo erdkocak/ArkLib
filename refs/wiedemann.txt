@@ -1,0 +1,1092 @@
+AN ITERATED QUADRATIC EXTENSION OF GF(2)
+DOUG WIEDEMANN
+
+University
+
+of Waterloo,
+
+Waterloo, Ontario, Canada
+
+(Submitted November 1986)
+1.
+
+I t is well known
+2 3
+
+x'°
+
++x
+
+3J
+
+A CONSTRUCTION
+
+(see, for example, Ex. 3.96 of
+
+[1]) that the polynomials
+
++ 1 are irreducible in GF(2)[x] for J = 0, 1, 2, . . . .
+
+(x2'3'
+
++ x3J
+
++ l)(x3J
+
++ 1 ) = x3J+±+
+
+Since
+
+1
+
+is a square-free polynomial, it follows that the period of each root of a;2*3
+x
+
++
+
++ 1 is precisely 3J 1 , only one and a half times the degree of the polyno-
+
+mial .
+
+The field
+Cj ~ GF(2)[x]/(x2'3J'
+
++ x3'
+
++ 1) ~
+
+may be obtained by iterated cubic
+where x0 £ 1 is a cube
+solution to x1 = xQ,
+
+GF(22'3J)
+
+extensions beginning with CQ ~
+
+root of unity.
+
+We have
+
+GF(2)(xQ)9
+
+C1 ~ CQCX-L), where x x is any
+
+Iterating, C--+1« CAxj + 1) 9 where x- + 1 = x-.
+
+This paper deals with an iterated quadratic extension of GF(2),
+
+whose gen-
+
+erators are described by
+x
+
+j + i + xj+i
+
+= x
+
+j
+
+for
+
+J ^ ° 3 where arQ + x~l
+
+= 1.
+
+(1)
+
+Let
+
+Z?0 - GF(2)(* 0 ), ^ - ff0(*i>* .-•- V i S V * j + i>Note that ic2 + ^ Q + 1 = 0 has no root in GF(2) so the first extension is quadratic.
+
+To show that
+
+each subsequent extension is quadratic, it need only be
+
+shown that the equation for x.,1 , which may be rewritten x.
+has no root in E -, for all j > 0.
+
+Although this
+
++x•
+
+x. + I = 0,
+
+follows almost
+
+immediately
+
+from theorems about finite fields, for example. Theorem 6.69 of Berlekamp [2],
+a more elementary proof will be given here. Let
+
+Tr(n\x)
+
+= £
+
+x2\
+
+i =l
+
+Also, let \E\ denote the order or number of elements of a finite field E.
+Theorem 1: For j > 0, xj+1
+
+i E^
+
+\Ej + 1\
+
+= 22° + 2 and
+
+Tru + Z\x. + 1 ) = 57r(j'+ 2)(a;:_J1) = 1 .
+
+290
+
+[Nov.
+
+AN ITERATED QUADRATIC EXTENSION OF GF(2)
+
+Proof (mathematical
+
+induction):
+
+Note xQ £ GF(2)
+
+and Tr(1)(xQ)
+
+= T P ( 1 ) ( ^ Q 1 ) = 1.
+
+The statement of the theorem is therefore true for j = -1 if E_
+be GF(2).
+
+In a field of characteristic 2, assume x
+x 4 = x 2 s 2 + 1 = xz3
+
++ s 2 + 1, x8
+
+= xz7
+
++ z6
+
+2
+
+= xz
+
++ 1.
+
++ zh
+
++ 1,
+
+is defined tc
+Then,
+
+and, in general,
+2K
+
+2K - 1
+
+,
+
+= XZ
+
+X
+
++
+
+k
+x~^
+
+2^ z
+i =l
+
+?K - ?v
+
+•
+
+Hence,
+^r 2 +1
+
+(Tp(J+ 1 ) (xT 1 )) 2 e
+
++ *?
+
+= xd + 1x*
+
+(2)
+
+Now assume that the statement of the theorem holds for j - 1.
+der 2
+
+Then #. has or-
+
+so, if x. x1 were in E J , by the Fermat theorem and (2), #•_,, = #..., +
+
+# (^p (J+D (^T1))2.
+
+But Tv^
+
++ 1)
+
+= 1 by
+
+{x~^)
+
+hypothesis, so, by
+
+#. . -, is not in E- itself but in a quadratic extension of E •.
+2
+
+is, therefore, |/77'| = 2
+
+2
+
+order 2 so, if O denotes the nontrivial
+Finally, Tr '
+
++ 2)
+
+is the trace map of
+
+Tr(j' + 2 ) 0 r T M
+by the last part
+
+The order of 27-,.
+
+, using the second statement of the hypothesis.
+
+Note that the other root to (1) for x.,1
+(j
+
+contradiction,
+
+£,J. + 1
+
+is tf7?\. Also, Gal(E -^JE.)
+Galois automorphism, 0(x.
+
+has
+1
+
+) = x"
+
+.
+
+to GF(2) , so
+
+= T P ( J > 2 ) ( X .+ 1 ) = TP (J ' + 1 ) (X.+ 1 + a U > + . ) ) = Tr(j" + 1)(x.) = 1
+
+of the hypothesis, completing
+
+the statement of the theorem
+
+for j .
+9n
+
+F
+
+Corollary:
+Proof:
+
+xnn
+
+= 1, when n ^ 0 and Fn = 2
+
+Define E_1
+
+to be GF(2) .
+
++ 1 is the Fermat number.
+
+Since |27n| = 2
+92
+
+, the nontrivial member of
+
+n
+
+Gal(En/En_1)
+i s g i v e n by On(y) = 2/ . S i n c e t h e c o n j u g a t e of x n o v e r t h e
+2? n _ 1 i s x ™ , x ^ = # „ . T h u s , ^ n n = 1. •
+The order
+
+of a field element
+
+power which equals 1.
+that xn
+
+is defined to be the smallest
+
+In the case where Fn
+
+field
+
+nonnegative
+
+is prime, the above result implies
+
+has order Fn . In any case, the order of xn
+
+divides Fn ,
+
+Since the Fer-
+
+mat numbers are known to be mutually relatively prime, for example, see Theorem
+16 of [3], the order
+i < n*
+
+We say
+
+of xnxn_1
+
+••• xQ
+
+i < n, then x„x„
+F
+
+n?n-i
+
+x^9
+
+an element of a field is primitive if its order is the same as
+
+the number of nonzero field elements.
+ft
+
+is the product of the orders of the
+
+Yl
+
+•••
+
+1
+
+If the order of xi
+
+is, in fact, F^ for
+
+••• x„ is a primitive element of E , because
+U
+
+A.
+
+F
+
+o
+
+= 22"+1 -
+
+fL
+
+1 = \En\
+
+-
+
+We h a v e n o t b e e n a b l e t o d e t e r m i n e i f x x
+
+1.
+. •
+
+w n- 1
+
+1988]
+
+291
+
+AN ITERATED QUADRATIC EXTENSION OF GF(2)
+
+2.
+
+BASIS SETS
+
+There are several natural ways to construct a basis of En as a vector space
+over GF(2).
+
+0 < i < 2 n+ 1 , because
+
+One such is of course the set of powers x£,
+is a degree 2 n + 1 extension of GF(2).
+
+#„ = GF(2)(xn)
+
+lection of elements of the form xn
+
+n
+
+• •• xQ°9
+
+Another basis is the col-
+
+where each 6^ £ {0, l}. This can be
+
+= 1 and x1
+
+shown by induction on n.
+
+Clearly, x
+
+ratic extension of En_19
+
+every member of Z?n is uniquely expressible as axn + b ,
+
+Since Z?n is a quad-
+
+Assuming a and 2? can be expressed as sums of the ^ " l ^ , , #
+
+where a9 b £ E _1.
+xQ° ,
+
+span E .
+
+it follows easily that En
+
+is spanned by
+
+the xnn
+
+••• ;r00. It immediately
+
+follows that these elements form a basis because the number of them is the same
+as the dimension of the space spanned.
+Another basis consists of elements of the f orm xnn - • • x^
+
+where e . e {±1}.
+
+This is shown by a similar argument which
+
+uses the fact that each element of
+
+En equals axn
+
++ cx^1
+
+Theorem 2:
+
++ b = axn
+
+= (a + c)xn
+
+x6n«.--x6Qo
+x 2n l
+
+iii)
+
+6^(0,1}
+
+b9
+
+c e
+
+En_1.
+
+ii)
+
+£ { e {-1,1}
+
+x^-'-xl*
+
+0 < i < 2n + 1
+
+It has already been shown that i) and ii) each form a basis.
+
+ments iii) are the conjugates of xn
+are linearly
+XQ = x
+
+for some a,
+
+The following are bases of En:
+i)
+
+Proof:
+
++ cxn_1
+
+independent.
+
+The ele-
+
+over GF(2), and it will be shown that they
+
+This will be done by induction.
+
+Certainly, xQ
+
+and
+
++ 1 are linearly independent over GF(2) . Assume that the conjugates of
+22?1
+
+x n_ 1
+
+in En_1
+
+linearly independent.
+
+are
+
+each conjugate
+
+of xn
+
+to its
+
+The transformation On(y)
+
+reciprocal.
+
+If a combination
+
+= y
+
+takes
+
+of the conjugates
+
+vanishes, then grouping by reciprocal pairs gives
+
+2
+
+r W f + s.*-21) = o,
+
+o)
+
+i =0
+
+where ai,
+
+g^ e GF(2).
+
+Applying On to both sides interchanges ou and 3^.
+
+Add-
+
+ing this to the original equation gives
+
+<<** + MOrf +x'n2i) = t\^i
+
+0= t
+
+By the inductive hypothesis, ai
+2n- 1
+
++
+
+Wn-i-
+
+£=0
+
+i=0
+
+2
+Z a--^
+£"~n - 1
+
++ 3^ E 0.
+
+Thus, the sum (3) can be rewritten:
+
+1
+
+:
+
+i=0
+
+this time the hypothesis implies a292
+
+E @- E 0.
+
+Thus, iii) forms a basis.
+[N ov.
+
+AN ITERATED QUADRATIC EXTENSION OF GF(2)
+
+In some sense the most interesting is the basis i) because the set for E
+is contained in the set for En.
+
+Therefore, the union of all bases given by i)
+
+is a basis for the infinite field which
+interesting property
+
+is the union of all the En.
+
+of the basis i) is
+
+Another
+
+that every boolean polynomial in n
+
+variables corresponds to an
+
+element of En.
+
+These boolean polynomials can be
+
+multiplied as elements of En
+
+in a straightforward if tedious manner. To multi-
+
+ply two such elements, collect all terms containing xn
+
+(ax„ + b)(cx„
+
++ d) = (aox^
+
+n
+
+to one side.
+
+Then using
+
++ be + ad)x„ + (ac + bd)
+
+the product is computable in terms of a few products in E
+
+,.
+
+Using this for-
+
+mula, it can be seen, though the proof is omitted, that the "degree" of
+product of the two elements does not exceed
+
+the sum of their degrees.
+
+the
+
+By the
+
+degree of a field element, we mean the degree of the associated boolean polynomial.
+Each basis element of i) can be identified with the 0-1 vector, or bit vector, (6 n , ..., 6 0 ) which, in turn, can be identified with the integer
+6n2n
+Let bi
+
++ -.. + 6 0 2° .
+
+be the basis element associated with the integer i. We now prove a fact
+
+regarding the expansion of a product of two basis elements as the sum of basis
+elements.
+Theorem 3-
+
+For any
+
+i, j , and k the expansion of b^bj
+
+if the expansion of b^b^
+Lemma:
+
+contains bk
+
+if and only
+
+contains bj .
+
+For all i and j , b^b-
+
+contains the basis element bQ = 1 if and only if
+
+i = J.
+Proof of the Lemma:
+
+Once again, we use induction on n.
+
+Obviously, the Lemma
+
+holds whenever the two basis elements are in E_ . Assume it holds whenever the
+two basis elements are in E
+statement of the Lemma is
+the product is in x E
+r
+
+n
+
+bA
+
+= x d,
+
+J
+
+Yl
+
+x En_1
+
+where
+
+. Now, in En, if both bi
+true.
+
+are in En_1,
+
+cannot occur in the expansion. If b-
+
+0
+
+L
+
+n,
+
+then b-b-
+
+Yl — x
+
+= xx„
+
+<s d
+
+and does not contain bQ«
+
+the
+
+is a factor of one but not the other,
+
+and bn
+n -1
+
+c, d e E
+
+and only if o = ds
+
+If xn
+
+and bj
+
+ilYl
+
+^od + cd.
+
+= x a and
+n
+
+The first term is in
+
+—L
+
+By hypothesis, the second term contains b0
+
+meaning i. = j .
+
+if
+
+This establishes the statement of the Lemma
+
+for En in all cases, m
+Proof of Theorem 3: Consider the coefficient of ^
+it is the coefficient of bk
+
+1988]
+
+in b^bj.
+
+in (bibj)bk.
+
+By the Lemma,
+
+Since
+
+293
+
+AN ITERATED QUADRATIC EXTENSION OF GF(2)
+
+=
+
+(bibj)bk
+
+(bib^bj
+
+it is also the coefficient of hi
+Corollary 1:
+
+in b^b^*
+
+m
+
+Let i 0 j be the mod 2 sum of i and j as bit vectors.
+
+The coef-
+
+ficient of b• ~ • infc.-&iis one.
+Proof:
+
+Let iDj9
+
+i U j be the bitwise AND, bitwise OR of i and j , respectively.
+
+It will be shown that the coefficient of bQ in
+
+is one which, together
+
+fy^jb^b-
+
+with the Lemma proves the Corollary.
+
+Now, by rearranging terms,
+
+and by the Lemma, this contains a b0
+
+in its expansion, m
+
+The following corollary is an immediate consequence of the Lemma.
+Corollary 2:
+
+For any a e E
+
+a2
+
+9
+
+contains bQ in its expansion if and only if a
+
+is the sum of an odd number of basis elements.
+3.
+The minimal
+
+polynomials over
+
+Starting with p Q(y)
+V (y)
+
+=
+
+2
+
+y
+
+V (y
+
+MINIMAL POLYNOMIALS
+
++
+
+= y
+1
+
+y' )-
+
+2
+
++ y + 1,
+It i
+
+s
+
+GF(2)
+
+of the xn
+
+are quite
+
+2
+
+let p (y)
+
+= y p>Q(y
+
+1
+
++ y' )
+
+easy to compute.
+and, in general,
+
+clear that p (x ) = 0 for all n because
+
+p fe+1 (^ +1 ) =^TX (x !<> = °Since p
+
+has degree
+
+2 n + 1 , it is the minimal
+
+result gives a method for computing the p
+
+polynomial of xn.
+
+The following
+
+which is probably better suited to
+
+calculation.
+Theorem k: Let sequences of polynomials an(y)
+a 0 = 1 + y29
+Then an + bn
+Proof: Let x
+
+bQ = y and an + 1 = a2n + b2,
+is the minimal polynomial of
+
+and bn(y)
+
+bn + 1 = anbn,
+
+be defined as follows:
+f o r n = 1, 2 , 3 , . . . .
+
+xn.
+
+= 1 and observe that, for n > 0, y = xn+1
+
+is a root of a Q +
+
+xnbQ
+
+After repeating this n + 1 times, we see that y = xn + 1 is a root of an + 1+bn
+
++ 1.
+
+and, therefore, a root of
+(a0
+
++ a;„fc0)(a0 + x^b
+
+0)
+
+= a± +
+
+xn_1b1.
+
+If ?i ) 1, dw = i n+1 is a root of
+(ax + ^ n . A ) K + <-A>
+
+= a
+
+2 + ^n-2^2*
+
+It follows from the definition that an has degree
+294
+
+n+1
+
+2
+
+and that Z?n has degree
+[Nov.
+
+AN ITERATED QUADRATIC EXTENSION OF GF(2)
+2n + 1 - 1. Thus, an + 2?n has degree
+
+2n + 1 with x n as a root, so it must be the
+
+minimal polynomial of x . m
+k.
+
+EXPERIMENT
+
+The numbers FQ, F± , F2, F 3 , F^ are prime so, by the Corollary to Theorem 1,
+xn
+
+has order Fn for n < 4.
+
+In addition, using the complete factorizations [4,
+
+5] of F n for 5 < n < 8, it has been checked on a computer that xn
+
+£ 1 for any
+
+proper divisor & of Fn for n < 8. It would be desirable to know whether xn always has order Fn .
+
+If this is true, then y
+
+= oon_1 . . . xQ is primitive. It
+
+would be useful to have a good way to compute the minimal polynomials of the
+y •
+
+5.
+
+A FIELD USED BY CONWAY
+
+J. H. Conway has given an iterated quadratic extension [6, 7] of GF(2) that
+comes from the theory of Nim-like games.
+
+In our terminology,
+
+this extension
+
+would be defined by
+
+c2n + cn = cn_± ...
+
+c0 for n > 1 and c\ + oQ = 1.
+
+It is well known that any two finite fields of the same order are isomorphic.
+However, we do not yet know of an explicit isomorphism between GF(2) (xn) and
+
+GF(2)(an).
+ACKNOWLEDGMENT
+The author would like to thank Norman Herzberg and Neal Zierler for their
+assistance.
+REFERENCES
+1.
+
+R. Lidl & H. Niederreiter. Introduction
+to Finite Fields
+cations.
+Cambridge:; Cambridge University Press, 1986.
+
+2.
+
+E. R. Berlekamp.
+
+3.
+
+G. H. Hardy & E. M. Wright. The Theory
+sity Press, 1971. Fourth Edition.
+
+4.
+
+R. P. Brent & J. M. Pollard. "Factorization of the Eighth Fermat Number."
+Math. Comp. 36 (1981):627-630.
+
+5.
+
+J. C. Hallyburton, Jr., & J. Brillhart. "Two New Factors of Fermat Numbers." Math. Comp. 29 (1975):109-112; see also Corrigenda, Math. Comp. 30
+(1976):198.
+
+6.
+
+J. H. Conway.
+
+7.
+
+Algebraic
+
+On Numbers
+
+Coding
+
+Theory.
+
+and Games.
+
+J. H. Conway & N. J. A. Sloane.
+
+and Their
+
+Appli-
+
+New York: McGraw-Hill, 1968.
+
+of Numbers.
+
+Oxford: Oxford Univer-
+
+New York: Academic Press, 1976.
+
+"Lexicographic
+
+Codes from Game Theory." IEEE Transactions
+
+Codes:
+
+on Information
+
+Error-Correcting
+
+Theory
+
+32 (May
+
+1986).
+
+1988]
+
+oqr
+
+

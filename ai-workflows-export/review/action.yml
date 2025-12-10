@@ -1,0 +1,57 @@
+name: 'Gemini Code Review'
+description: 'Review PR code with context using Gemini and post a comment.'
+inputs:
+  gemini-api-key:
+    description: 'Google Gemini API Key'
+    required: true
+  github-token:
+    description: 'GitHub Token'
+    required: true
+  pr-number:
+    description: 'Pull Request Number'
+    required: true
+  external-refs:
+    description: 'Comma-separated URLs of external references'
+    required: false
+  repo-refs:
+    description: 'Comma-separated paths of local repository files'
+    required: false
+  additional-comments:
+    description: 'Additional context or instructions for the reviewer'
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r ${{ github.action_path }}/requirements.txt
+
+    - name: Run Review Script
+      shell: bash
+      id: ai_review
+      env:
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        python ${{ github.action_path }}/main.py \
+          --pr-number ${{ inputs.pr-number }} \
+          --external-refs "${{ inputs.external-refs }}" \
+          --repo-refs "${{ inputs.repo-refs }}" \
+          --additional-comments "${{ inputs.additional-comments }}" > review_output.md
+
+    - name: Post Review Comment
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+      run: |
+        # Prepend header
+        echo -e "### 🤖 AI Review (with external context)\n\n$(cat review_output.md)" > final_review.md
+        
+        # Post comment
+        gh issue comment $PR_NUMBER --body-file final_review.md

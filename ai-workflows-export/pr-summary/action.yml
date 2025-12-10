@@ -1,0 +1,38 @@
+name: 'Gemini PR Summary'
+description: 'Generates a PR summary using Gemini AI and posts it as a comment.'
+inputs:
+  gemini-api-key:
+    description: 'Google Gemini API Key'
+    required: true
+  github-token:
+    description: 'GitHub Token'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r ${{ github.action_path }}/requirements.txt
+
+    - name: Generate diff
+      shell: bash
+      run: |
+        if [ ! -f pr.diff ]; then
+           # Ensure we have enough history or fetch it
+           # Assuming checkout was done with fetch-depth: 0
+           git diff ${{ github.event.pull_request.base.sha }} HEAD > pr.diff
+        fi
+
+    - name: Run Summary Script
+      shell: bash
+      env:
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: python ${{ github.action_path }}/main.py
