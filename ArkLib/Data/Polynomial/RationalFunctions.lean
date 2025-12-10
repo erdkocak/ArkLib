@@ -22,6 +22,10 @@ import Mathlib.RingTheory.PowerSeries.Substitution
 
   We define the notions of Appendix A of [BCIKS20].
 
+  ## References
+
+  - [BCIKS20] Proximity Gaps for Reed-Solomon Codes
+
   ## Main Definitions
 
 -/
