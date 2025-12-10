@@ -11,17 +11,11 @@ import ArkLib.Data.Probability.Notation
 # Proximity Generators
 
 This file formalizes the notion of proximity generators,
-introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
+introduced in Section 4 of [WHIR2024].
 
 ## Implementation notes
 
 Todo?
-
-## References
-
-* G Arnon, A Chies, G Fenzi, and E Yogev,
-  [*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?

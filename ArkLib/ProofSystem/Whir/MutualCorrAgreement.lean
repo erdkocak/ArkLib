@@ -15,18 +15,12 @@ import ArkLib.ProofSystem.Whir.ProximityGen
 # Mutual Correlated Agreement for Proximity Generators
 
 This file formalizes the notion of mutual correlated agreement for proximity generators,
-introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
+introduced in Section 4 of [WHIR2024].
 
 ## Implementation notes
 
 The reference paper is phrased in terms of a minimum distance,
 which should be understood as being the minimum relative hamming distance, which is used here.
-
-## References
-
-* G Arnon, A Chiesa, G Fenzi, and E Yogev,
-[*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?
