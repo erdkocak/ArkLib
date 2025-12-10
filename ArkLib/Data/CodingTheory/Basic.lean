@@ -25,17 +25,69 @@ import ArkLib.Data.Nat.Bitwise
   code to be a linear subspace of `n → R`. We also define the notion of generator matrix and
   (parity) check matrix.
 
+  ## Naming conventions
+  1. suffix `'`: **computable/instantiation** of the corresponding
+  mathematical generic definitions without such suffix (e.g. `Δ₀'(u, C)` vs `Δ₀(u, C)`,
+  `δᵣ'(u, C)` vs `δᵣ(u, C)`, ...)
+    - **NOTE**: The generic (non-suffixed) definitions (`Δ₀`, `δᵣ`, ...) are recommended
+      to be used in generic security statements, and the suffixed definitions
+      (`Δ₀'`, `δᵣ'`, ...) are used for proofs or in statements of lemmas that need
+      smaller value range.
+    - We usually prove the equality as a bridge from the suffixed definitions into the
+      non-suffixed definitions (e.g. `distFromCode'_eq_distFromCode`, ...)
+
   ## Main Definitions
-
-  - `dist C`: The Hamming distance of a code `C`, defined as the infimum (in `ℕ∞`) of the
-    Hamming distances between any two distinct elements of `C`. This is noncomputable.
-
-  - `dist' C`: A computable version of `dist C`, assuming `C` is a `Fintype`.
+  1. Distance between two words:
+    - `hammingDist u v (Δ₀(u, v))`: The Hamming distance between two words `u` and `v`
+    - `relHammingDist u v (δᵣ(u, v))`: The relative Hamming distance between two words `u` and `v`
+  2. Distance of code:
+    - `dist C (‖"C‖₀)`: The Hamming distance of a code `C`, defined as the infimum (in `ℕ∞`) of the
+      Hamming distances between any two distinct elements of `C`. This is noncomputable.
+      + `minDist C`: another statement of `dist C` using equality, we have `dist_eq_minDist`
+    - `dist' C (‖C‖₀')`: A computable version of `dist C`, assuming `C` is a `Fintype`.
+  3. Distance from a word to a code:
+    - `distFromCode u C (Δ₀(u, C))`: The hamming distance from a word `u` to a code `C`
+      + `distFromCode_of_empty`: `Δ₀(u, ∅) = ⊤`
+      + `distFromCode_eq_top_iff_empty`: `Δ₀(u, C) = ⊤ ↔ C = ∅`
+    - `distFromCode' u C (Δ₀'(u, C))`: A computable version of `distFromCode u C`,
+      assuming `C` is a `Fintype`.
+      + `distFromCode'_eq_distFromCode`: `Δ₀'(u, C) = Δ₀(u, C)`
+    - `relDistFromCode u C (δᵣ(u, C))`: The relative Hamming distance from a word `u` to a code `C`
+      + `relDistFromCode' u C (δᵣ'(u, C))`: A computable version of `relDistFromCode u C`,
+      assuming `C` is a `Fintype` and `C` is **non-empty**.
+      + `relDistFromCode'_eq_relDistFromCode`: `δᵣ'(u, C) = δᵣ(u, C)`
+  4. Switching between different distance realms:
+    - `relDistFromCode_eq_distFromCode_div`: `δᵣ(u, C) = Δ₀(u, C) / |ι|`
+    - `pairDist_eq_distFromCode_iff_eq_relDistFromCode_div`:
+      `Δ₀(u, v) = Δ₀(u, C) ↔ δᵣ(u, v) = δᵣ(u, C)`
+    - `relDistFromCode_le_relDist_to_mem`: `δᵣ(u, C) ≤ δᵣ(u, v)`
+    - `relCloseToCode_iff_relCloseToCodeword_of_minDist`: `δᵣ(u, C) ≤ δ ↔ ∃ v ∈ C, δᵣ(u, v) ≤ δ`
+    - `pairRelDist_le_iff_pairDist_le`:
+      `(δᵣ(u, v) ≤ δ) ↔ (Δ₀(u, v) ≤ Nat.floor (δ * Fintype.card ι))`
+    - `distFromCode_le_iff_relDistFromCode_le`:
+      `Δ₀(u, C) ≤ e ↔ δᵣ(u, C) ≤ (e : ℝ≥0) / (Fintype.card ι : ℝ≥0)`
+    - `relDistFromCode_le_iff_distFromCode_le`:
+      `δᵣ(u, C) ≤ δ ↔ Δ₀(u, C) ≤ Nat.floor (δ * Fintype.card ι)`
+    - `relCloseToWord_iff_exists_possibleDisagreeCols`
+    - `relCloseToWord_iff_exists_agreementCols`
+    - `relDist_floor_bound_iff_complement_bound`
+    - `distFromCode_le_dist_to_mem`: `Δ₀(u, C) ≤ Δ₀(u, v), given v ∈ C`
+    - `distFromCode_le_card_index_of_Nonempty`: `Δ₀(u, C) ≤ |ι|, given C is non-empty`
+  5. Unique decoding radius:
+    - `uniqueDecodingRadius C (UDR(C))`: The unique decoding radius of a code `C`
+    - `relativeUniqueDecodingRadius C (relUDR(C))`:
+      The relative unique decoding radius of a code `C`
+    - `UDR_close_iff_exists_unique_close_codeword`:
+      `Δ₀(u, C) ≤ UDR(C) ↔ ∃! v ∈ C, Δ₀(u, v) ≤ UDR(C)`
+    - `UDRClose_iff_two_mul_proximity_lt_d_UDR`: `e ≤ UDR(C) ↔ 2 * e < ‖C‖₀`
+    - `eq_of_le_uniqueDecodingRadius`
+    - `UDR_close_iff_relURD_close`: `Δ₀(u, C) ≤ UDR(C) ↔ δᵣ(u, C) ≤ relUDR(C)`
+    - `dist_le_UDR_iff_relDist_le_relUDR`:
+      `e ≤ UDR(C) ↔ (e : ℝ≥0) / (Fintype.card ι : ℝ≥0) ≤ relUDR(C)`
 
   We define the block length, rate, and distance of `C`. We prove simple properties of linear codes
   such as the singleton bound.
 -/
-
 
 variable {n : Type*} [Fintype n] {R : Type*} [DecidableEq R]
 
@@ -78,7 +130,7 @@ notation "Δ₀(" u ", " C ")" => distFromCode u C
 
 /-- The distance to a code is at most the distance to any specific codeword. -/
 lemma distFromCode_le_dist_to_mem (u : n → R) {C : Set (n → R)} (v : n → R) (hv : v ∈ C) :
-    Δ₀(u, C) ≤ ↑(hammingDist u v) := by
+    Δ₀(u, C) ≤ Δ₀(u, v) := by
   apply csInf_le
   · -- Show the set is bounded below
     use 0
@@ -479,6 +531,25 @@ theorem distFromCode_eq_top_iff_empty (u : n → R) (C : Set (n → R)) : Δ₀(
     · norm_num
   · intro h; subst h; simp
 
+lemma distFromCode_le_card_index_of_Nonempty (u : n → R) {C : Set (n → R)} [Nonempty C] :
+    Δ₀(u, C) ≤ Fintype.card n := by
+  -- exact an element from C since C is nonempty
+  letI h_nonempty : Set.Nonempty C := by (expose_names; exact Set.nonempty_coe_sort.mp inst_2)
+  let v : n → R := Classical.choose h_nonempty
+  have hv : v ∈ C := Classical.choose_spec h_nonempty
+  have h_dist_u_C_le_dist_u_v : Δ₀(u, C) ≤ Δ₀(u, v) := by
+    apply distFromCode_le_dist_to_mem u v hv
+  have h_dist_u_v_le_card_index : Δ₀(u, v) ≤ Fintype.card n := by
+    exact hammingDist_le_card_fintype
+  have h_dist_u_C_ne_top : Δ₀(u, C) ≠ ⊤ := by
+    by_contra h_dist_u_C_eq_top
+    rw [distFromCode_eq_top_iff_empty (n := n) (u := u) (C := C)] at h_dist_u_C_eq_top
+    have h_C_ne_empty: C ≠ ∅ := by (expose_names; exact Set.nonempty_iff_ne_empty'.mp inst_2)
+    exact h_C_ne_empty h_dist_u_C_eq_top
+  lift Δ₀(u, C) to ℕ using h_dist_u_C_ne_top with d
+  norm_cast at ⊢ h_dist_u_C_le_dist_u_v
+  exact Nat.le_trans h_dist_u_C_le_dist_u_v h_dist_u_v_le_card_index
+
 @[simp]
 theorem distFromCode_of_mem (C : Set (n → R)) {u : n → R} (h : u ∈ C) : Δ₀(u, C) = 0 := by
   simp only [distFromCode]
@@ -844,17 +915,20 @@ notation "δᵣ(" u ", " v ")" => relHammingDist u v
 
 /-- The relative Hamming distance from a vector to a code, defined as the infimum
     of all relative distances from `u` to codewords in `C`.
-    The type is `ENNReal` (ℝ≥0∞) to correctly handle the case `C = ∅`. -/
+    The type is `ENNReal` (ℝ≥0∞) to correctly handle the case `C = ∅`.
+  For case of Nonempty C, we can use `relDistFromCode (δᵣ')` for smaller value range in
+    `ℚ≥0`, which is equal to this definition. -/
 noncomputable def relDistFromCode (u : ι → F) (C : Set (ι → F)) : ENNReal :=
   sInf {d | ∃ v ∈ C, (relHammingDist u v) ≤ d}
 
-/-- `δᵣ(u,C)` denotes this new relative distance. -/
+/-- `δᵣ(u,C)` denotes the relative distance from u to C. This is the main standard definition
+used in statements. The NNRat version of it is `δᵣ'(u, C)`. -/
 notation "δᵣ(" u ", " C ")" => relDistFromCode u C
 
 omit [Nonempty ι] in
 /-- The relative distance to a code is at most the relative distance to any specific codeword. -/
 lemma relDistFromCode_le_relDist_to_mem (u : ι → F) {C : Set (ι → F)} (v : ι → F) (hv : v ∈ C) :
-    δᵣ(u, C) ≤ ↑(relHammingDist u v) := by
+    δᵣ(u, C) ≤ δᵣ(u, v) := by
   apply csInf_le
   · -- Show the set is bounded below
     use 0
@@ -952,7 +1026,7 @@ lemma exists_relClosest_codeword_of_Nonempty_Code {ι : Type*} [Fintype ι] {F :
   -- This is exactly `h_sInf_mem`.
   exact h_sInf_mem
 
-theorem relDistFromCode_eq_distFromCode_div (u : ι → F) (C : Set (ι → F)) [Nonempty C] :
+theorem relDistFromCode_eq_distFromCode_div (u : ι → F) (C : Set (ι → F)) :
     δᵣ(u, C) = (Δ₀(u, C) : ENNReal) / (Fintype.card ι : ENNReal) := by
   -- 1. Unfold definitions
   -- 2. Handle the case where C is empty
@@ -965,7 +1039,7 @@ theorem relDistFromCode_eq_distFromCode_div (u : ι → F) (C : Set (ι → F)) 
     rw [ENNReal.top_div]
     simp only [ENNReal.natCast_ne_top, ↓reduceIte]
   · -- 3. Handle the non-empty case
-    have hC_nonempty : C.Nonempty := Set.nonempty_iff_ne_empty.mpr hC_empty
+    letI : Nonempty C := by exact Set.nonempty_iff_ne_empty'.mpr hC_empty
     rcases exists_closest_codeword_of_Nonempty_Code C u with ⟨M, hM_mem, hM_is_min_abs⟩
     -- ⊢ δᵣ(u, C) = ↑Δ₀(u, C) / ↑(Fintype.card ι)
     have h_rhs : (Δ₀(u, C) : ENNReal) / (Fintype.card ι : ENNReal) =
@@ -1008,15 +1082,16 @@ theorem relDistFromCode_eq_distFromCode_div (u : ι → F) (C : Set (ι → F)) 
       -- And we know `Δ₀(u, C) ≤ ↑Δ₀(u, v)` for *any* v, including M'
       exact distFromCode_le_dist_to_mem u M' hM'_mem
 
-theorem pairDist_eq_distToCode_iff_eq_relDistToCode_div
+theorem pairDist_eq_distFromCode_iff_eq_relDistFromCode_div
     (u v : ι → F) (C : Set (ι → F)) [Nonempty C] : Δ₀(u, v) = Δ₀(u, C) ↔ δᵣ(u, v) = δᵣ(u, C) := by
   conv_rhs => rw [relDistFromCode_eq_distFromCode_div]
   constructor
   · intro h_dist_eq
     dsimp only [relHammingDist]
-    conv_lhs => rw [ENNReal.coe_NNRat_coe_NNReal, NNRat.cast_div]; simp only [NNRat.cast_natCast, ne_eq,
-      Nat.cast_eq_zero, Fintype.card_ne_zero, not_false_eq_true, ENNReal.coe_div,
-      ENNReal.coe_natCast]
+    conv_lhs =>
+      rw [ENNReal.coe_NNRat_coe_NNReal, NNRat.cast_div];
+      simp only [NNRat.cast_natCast, ne_eq, Nat.cast_eq_zero, Fintype.card_ne_zero,
+        not_false_eq_true, ENNReal.coe_div, ENNReal.coe_natCast]
     rw [←h_dist_eq]; rfl
   · intro h_rel_dist_eq
     dsimp only [relHammingDist] at h_rel_dist_eq
@@ -1048,9 +1123,10 @@ lemma relDistFromPickRelClosestCodeword_of_Nonempty_Code
   have h_M_spec := Classical.choose_spec h_exists
   let h_absolute_closest := h_M_spec.2.symm
   apply Eq.symm
-  let h_pairDist_eq_relDistToCode_iff := pairDist_eq_distToCode_iff_eq_relDistToCode_div (u := u)
+  let h_pairDist_eq_relDistFromCode_iff :=
+    pairDist_eq_distFromCode_iff_eq_relDistFromCode_div (u := u)
     (v := pickRelClosestCodeword_of_Nonempty_Code C u) (C := C)
-  rw [←h_pairDist_eq_relDistToCode_iff]
+  rw [←h_pairDist_eq_relDistFromCode_iff]
   exact id (Eq.symm h_absolute_closest)
 
 omit [Nonempty ι] [DecidableEq F] in
@@ -1106,8 +1182,7 @@ lemma relCloseToCode_iff_relCloseToCodeword_of_minDist [Nonempty ι] [DecidableE
 
 /-- Equivalence between relative and natural distance bounds. -/
 lemma pairRelDist_le_iff_pairDist_le (δ : NNReal) :
-    ((relHammingDist u v : NNReal) ≤ δ) ↔
-    (hammingDist u v ≤ Nat.floor (δ * Fintype.card ι)) := by
+    (δᵣ(u, v) ≤ δ) ↔ (Δ₀(u, v) ≤ Nat.floor (δ * Fintype.card ι)) := by
   -- 1. Get n > 0 from [Nonempty ι]
   have h_n_pos : 0 < Fintype.card ι := Fintype.card_pos
   have h_n_pos_nnreal : 0 < (Fintype.card ι : NNReal) := by exact_mod_cast h_n_pos
@@ -1375,45 +1450,119 @@ lemma finite_possibleRelHammingDistsToCode [Nonempty ι] [DecidableEq F] :
 instance [Nonempty ι] [DecidableEq F] : Fintype (possibleDistsToCode w C relHammingDist)
   := @Fintype.ofFinite _ finite_possibleRelHammingDistsToCode
 
-open Classical in
-/-- The relative Hamming distance from a vector to a code.
--/
-def relHammingDistToCode [Nonempty ι] [DecidableEq F] (w : ι → F) (C : Set (ι → F)) : ℚ≥0 :=
-  if h : (possibleDistsToCode w C relHammingDist).Nonempty
-  then distToCode w C relHammingDist finite_possibleRelHammingDistsToCode |>.get (p h)
-  else 0
-  where p (h : (possibleDistsToCode w C relHammingDist).Nonempty) := by
-          by_contra c
-          simp [distToCode] at c ⊢
-          rw [WithTop.none_eq_top, Finset.min_eq_top, Set.toFinset_eq_empty] at c
-          simp_all
+-- NOTE: this does not look clean, also `possibleDistsToCode` has the condition `c ≠ w`
+-- which seems not a standard since `w` can be a codeword, so commented out for now
+-- open Classical in
+-- /-- The relative Hamming distance from a vector to a code.
+-- -/
+-- def relDistFromCode [Nonempty ι] [DecidableEq F] (w : ι → F) (C : Set (ι → F)) : ℚ≥0 :=
+--   if h : (possibleDistsToCode w C relHammingDist).Nonempty
+--   then distToCode w C relHammingDist finite_possibleRelHammingDistsToCode |>.get (p h)
+--   else 0
+--   where p (h : (possibleDistsToCode w C relHammingDist).Nonempty) := by
+--           by_contra c
+--           simp [distToCode] at c ⊢
+--           rw [WithTop.none_eq_top, Finset.min_eq_top, Set.toFinset_eq_empty] at c
+--           simp_all
 
-/-- `δᵣ(w,C)` denotes the relative Hamming distance between a vector `w` and a code `C`.
--/
-notation "δᵣ'(" w ", " C ")" => relHammingDistToCode w C
+/-- Computable version of the relative Hamming distance from a vector `w` to a finite
+non-empty code `C`. This one is intended to mimic the definition of `distFromCode'`.
+However, **we don't have `ENNRat (ℚ≥0∞)` (as counterpart of `ENat (ℕ∞)` in `distFromCode'`)**
+so we require `[Nonempty C]`.
+TODO: define `ENNRat (ℚ≥0∞)` so we can migrate both `relDistFromCode`
+  and `relDistFromCode'` to `ℚ≥0∞` -/
+def relDistFromCode' {ι : Type*} [Fintype ι] [Nonempty ι] {F : Type*} [DecidableEq F]
+    (w : ι → F) (C : Set (ι → F)) [Fintype C] [Nonempty C] : ℚ≥0 :=
+  Finset.min'
+    (Finset.univ.image (fun (c : C) => relHammingDist w c))
+    (Finset.univ_nonempty.image _)
+
+/-- `δᵣ'(w,C)` denotes the relative Hamming distance between a vector `w` and a code `C`.
+This is a different statement of the generic definition `δᵣ(w,C)`. -/
+notation "δᵣ'(" w ", " C ")" => relDistFromCode' w C
+
+lemma relDistFromCode'_eq_relDistFromCode {ι : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι]
+    {F : Type*} [DecidableEq F]
+    (w : ι → F) (C : Set (ι → F)) [Fintype C] [Nonempty C] :
+    (δᵣ(w, C)) = δᵣ'(w, C) := by
+  -- 1. Identify the set of distances V
+  let V : Finset ℚ≥0 := Finset.univ.image (fun (c : C) => relHammingDist w c)
+  conv_rhs => rw [ENNReal.coe_NNRat_coe_NNReal]
+  have h_C_ne_empty : C ≠ ∅ := by
+    (expose_names; exact Set.nonempty_iff_ne_empty'.mp inst_5)
+  have h_dist_w_C_ne_top: Δ₀(w, C) ≠ ⊤ := by
+    by_contra dist_w_C_eq_top
+    rw [distFromCode_eq_top_iff_empty (n := ι) (u := w) (C := C)] at dist_w_C_eq_top
+    exact h_C_ne_empty dist_w_C_eq_top
+  apply (ENNReal.toNNReal_eq_toNNReal_iff' ?_ ?_).mp ?_
+  · -- ⊢ δᵣ(w, C) ≠ ⊤
+    rw [relDistFromCode_eq_distFromCode_div]
+    apply ENNReal.div_ne_top (h1 := by -- ⊢ ↑Δ₀(w, C) ≠ ⊤
+      simp only [ne_eq, ENat.toENNReal_eq_top, h_dist_w_C_ne_top, not_false_eq_true]
+    ) (h2 := by -- ⊢ ↑(Fintype.card ι) ≠ 0
+      simp only [ne_eq, Nat.cast_eq_zero, Fintype.card_ne_zero, not_false_eq_true])
+  · -- ⊢ ↑↑δᵣ'(w, C) ≠ ⊤ => trivial because δᵣ'(w, C) is a ℚ≥0
+    simp only [ne_eq, ENNReal.coe_ne_top, not_false_eq_true]
+  · -- ⊢ δᵣ(w, C).toNNReal = (↑↑δᵣ'(w, C)).toNNReal
+    change δᵣ(w, C).toNNReal = (δᵣ'(w, C) : NNReal)
+
+    -- 2. Prove the core equality in ENNReal: δᵣ(w, C) = δᵣ'(w, C)
+    have h_eq : δᵣ(w, C) = (δᵣ'(w, C) : ENNReal) := by
+      unfold relDistFromCode relDistFromCode'
+      apply le_antisymm
+      · -- Part A: sInf (LHS) ≤ min' (RHS)
+        -- The minimum is achieved by some codeword c, which is in the set defining sInf
+        apply sInf_le
+        simp only [Set.mem_setOf_eq]
+        -- Extract the witness c from the Finset minimum
+        let S := Finset.univ.image (fun (c : C) => relHammingDist w c)
+        have h_mem := Finset.min'_mem S (Finset.univ_nonempty.image _)
+        rcases Finset.mem_image.mp h_mem with ⟨c, _, h_val⟩
+        -- Use c as the witness. Note: c is a subtype element, c.prop is c ∈ C
+        use c
+        constructor
+        · exact c.property
+        · rw [←h_val]
+      · -- Part B: min' (RHS) ≤ sInf (LHS)
+        -- The minimum is a lower bound for all distances in the code
+        apply le_sInf
+        intro d hd
+        rcases hd with ⟨v, hv_mem, h_dist_le⟩
+        -- Transitivity: min' ≤ dist(w, v) ≤ d
+        apply le_trans _ h_dist_le
+        -- ⊢ ↑((Finset.image (fun c ↦ δᵣ(w, ↑c)) Finset.univ).min' ⋯) ≤ ↑δᵣ(w, v)
+        apply ENNReal.coe_le_coe.mpr
+        -- ⊢ ↑((Finset.image (fun c ↦ δᵣ(w, ↑c)) Finset.univ).min' ⋯) ≤ ↑δᵣ(w, v)
+        simp only [NNRat.cast_le]
+        apply Finset.min'_le
+        simp only [Finset.mem_image, Finset.mem_univ, true_and, Subtype.exists, exists_prop]
+        -- ⊢ ∃ a ∈ C, δᵣ(w, a) = δᵣ(w, v)
+        use v
+    rw [h_eq] -- 3. Use the equality to close the goal
+    rfl
 
 @[simp]
 lemma zero_mem_relHammingDistRange : 0 ∈ relHammingDistRange ι := by use 0; simp
 
-/-- The relative Hamming distances between a vector and a codeword is in the
-  range of the relative Hamming distance function.
--/
-@[simp]
-lemma relHammingDistToCode_mem_relHammingDistRange [Nonempty ι] [DecidableEq F] :
-  δᵣ'(c, C) ∈ relHammingDistRange ι := by
-  unfold relHammingDistToCode
-  split_ifs with h
-  · exact Set.mem_of_subset_of_mem
-            (s₁ := (possibleDistsToCode c C relHammingDist).toFinset)
-            (by simp)
-            (by simp_rw [distToCode_of_nonempty (h₁ := by simp) (h₂ := h)]
-                simp [←WithTop.some_eq_coe]
-                have := Finset.min'_mem
-                          (s := (possibleDistsToCode c C relHammingDist).toFinset)
-                          (H := by simpa)
-                simpa)
-  · simp
-end
+-- /-- The relative Hamming distances between a vector and a codeword is in the
+--   range of the relative Hamming distance function.
+-- -/
+-- @[simp]
+-- lemma relHammingDistToCode_mem_relHammingDistRange [Nonempty ι] [DecidableEq F] :
+--   δᵣ'(c, C) ∈ relHammingDistRange ι := by
+--   unfold relDistFromCode
+--   split_ifs with h
+--   · exact Set.mem_of_subset_of_mem
+--             (s₁ := (possibleDistsToCode c C relHammingDist).toFinset)
+--             (by simp)
+--             (by simp_rw [distToCode_of_nonempty (h₁ := by simp) (h₂ := h)]
+--                 simp [←WithTop.some_eq_coe]
+--                 have := Finset.min'_mem
+--                           (s := (possibleDistsToCode c C relHammingDist).toFinset)
+--                           (H := by simpa)
+--                 simpa)
+--   · simp
+-- end
 
 section DecodingRadius
 
@@ -1421,12 +1570,16 @@ section DecodingRadius
 noncomputable def uniqueDecodingRadius {ι : Type*} [Fintype ι] {F : Type*} [DecidableEq F]
     (C : Set (ι → F)) : ℕ := (‖C‖₀ - 1) / 2 -- Nat.division instead of Nat.floor
 
+alias UDR := uniqueDecodingRadius
+
 /-- The relative unique decoding radius, obtained from the absolute radius by normalizing with the
 block length. This also works with `≤`. -/
 noncomputable def relativeUniqueDecodingRadius {ι : Type*} [Fintype ι] {F : Type*} [DecidableEq F]
     (C : Set (ι → F)) : ℝ≥0 :=
   (((‖C‖₀ : ℝ≥0) - 1) / 2) / (Fintype.card ι : ℝ≥0)
 -- TODO: define `Johnson bound` radius, capacity bounds, etc for generic code `C`
+
+alias relUDR := relativeUniqueDecodingRadius
 
 @[simp]
 lemma uniqueDecodingRadius_eq_floor_div_2 {ι : Type*} [Fintype ι] {F : Type*} [DecidableEq F]
@@ -1610,7 +1763,7 @@ theorem dist_le_UDR_iff_relDist_le_relUDR {ι : Type*} [Fintype ι] {F : Type*} 
     rw [Nat.le_floor_iff (ha := by simp only [zero_le])]
 
 end DecodingRadius
-noncomputable section
+section
 
 variable {F : Type*} [DecidableEq F]
          {ι : Type*} [Fintype ι]
@@ -1631,6 +1784,7 @@ lemma wt_eq_zero_iff [Zero F] {v : ι → F} :
 
 end
 
+end
 end Code
 
 variable [Finite R]

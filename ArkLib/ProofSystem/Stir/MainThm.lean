@@ -88,9 +88,9 @@ instance {ι : Type} : OracleInterface (OracleStatement ι F ()) := OracleInterf
 def stirRelation
     {F : Type} [Field F] [Fintype F] [DecidableEq F]
     {ι : Type} [Fintype ι] [Nonempty ι]
-    (degree : ℕ) (φ : ι ↪ F) (err : ℝ)
+    (degree : ℕ) (φ : ι ↪ F) (err : ℝ≥0)
     : Set ((Unit × ∀ i, (OracleStatement ι F i)) × Unit) :=
-  fun ⟨⟨_, oracle⟩, _⟩ => δᵣ'(oracle (), ReedSolomon.code φ degree) ≤ err
+  fun ⟨⟨_, oracle⟩, _⟩ => δᵣ(oracle (), ReedSolomon.code φ degree) ≤ err
 
 /-- Theorem 5.1 : STIR main theorem
   Consider the following ingrediants,
@@ -166,7 +166,7 @@ theorem stir_rbr_soundness
     {hParams : ParamConditions ι P} {Dist : Distances M}
     {Codes : CodeParams ι P Dist}
     (h_not_code : ∀ f₀ : (ι 0) → F, f₀ ∉ (Codes.C 0))
-    (hδ₀Le : ∀ f₀ : (ι 0) → F, Dist.δ 0 ≤ (δᵣ'(f₀, (Codes.C 0)) : ℝ) ∧
+    (hδ₀Le : ∀ f₀ : (ι 0) → F, Dist.δ 0 ≤ δᵣ(f₀, (Codes.C 0)) ∧
       Dist.δ 0 < (1 - Bstar (rate (code (P.φ 0) P.deg))))
     (hδᵢ : ∀ {j : Fin (M + 1)}, j ≠ 0 →
         Dist.δ j < (1 - rate (code (P.φ j) (degree ι P j))

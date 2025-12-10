@@ -147,13 +147,13 @@ open LinearCode Classical ProbabilityTheory ReedSolomon STIR in
 lemma combine_theorem
   {φ : ι ↪ F} {dstar m degree : ℕ}
   (fs : Fin m → ι → F) (degs : Fin m → ℕ) (hdegs : ∀ i, degs i ≤ dstar)
-  (δ : ℝ) (hδPos : δ > 0)
+  (δ : ℝ≥0) (hδPos : δ > 0)
   (hδLt : δ < (min (1 - Bstar (rate (code φ degree)))
                    (1 - (rate (code φ degree)) - 1 / Fintype.card ι)))
-  (hProb : Pr_{ let r ← $ᵖ F}[δᵣ'((combine φ dstar r fs degs), (code φ dstar)) ≤ δ] >
-    ENNReal.ofReal (proximityError F dstar (rate (code φ degree)) δ (m * (dstar + 1) - ∑ i, degs i))) :
-      ProximityGap.jointAgreement (F := F) (κ := Fin m) (ι := ι) (C := code φ degree)
-        (W := fs) (δ := ⟨δ, by linarith⟩)
-      := by sorry
+  (hProb : Pr_{ let r ← $ᵖ F}[δᵣ((combine φ dstar r fs degs), (code φ dstar)) ≤ δ] >
+    proximityError F dstar (rate (code φ degree)) δ (m * (dstar + 1) - ∑ i, degs i)) :
+    ProximityGap.jointAgreement (F := F) (κ := Fin m) (ι := ι) (C := code φ degree)
+      (W := fs) (δ := δ)
+    := by sorry
 
 end Combine

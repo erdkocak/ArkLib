@@ -3738,11 +3738,11 @@ noncomputable instance instAlgebraTowerEquiv : AlgebraTowerEquiv
   commutesLeft' := fun i j h r => by
     exact towerEquiv_commutes_left (i:=i) (j:=j) (h:=h) (r:=r)
 
-#check instAlgebraTowerEquiv.toAlgEquivOverLeft 7 100 (by omega)
-#check instAlgebraTowerEquiv.toAlgEquivOverRight 7 100 (by omega)
+-- #check instAlgebraTowerEquiv.toAlgEquivOverLeft 7 100 (by omega)
+-- #check instAlgebraTowerEquiv.toAlgEquivOverRight 7 100 (by omega)
 
 end TowerEquivalence
 
 end ConcreteBinaryTower
 
-#check ConcreteBinaryTower.instFieldConcrete
+-- #check ConcreteBinaryTower.instFieldConcrete

@@ -177,7 +177,7 @@ open scoped BigOperators
 variable {ι : Type*} [Fintype ι] [Nonempty ι]
          {F : Type*} [Field F] [Fintype F]
 
-abbrev RScodeSet (domain : ι ↪ F) (deg : ℕ) : Set (ι → F) := (ReedSolomon.code domain deg).carrier
+abbrev RScodeSet (domain : ι ↪ F) (deg : ℕ) : Set (ι → F) := ReedSolomon.code domain deg
 
 open Classical in
 def toFinset (domain : ι ↪ F) (deg : ℕ) : Finset (ι → F) :=

@@ -25,7 +25,7 @@ lemma proximity_gap
   {degree m : ℕ} {δ : ℝ≥0} {f : Fin m → ι → F} {GenFun : F → Fin m → F}
   (h : ∀ (hδLe : δ < 1 - Bstar (LinearCode.rate (code φ degree))) {f : Fin m → ι → F},
         Pr_{
-          let r ← $ᵖ F}[δᵣ'((fun x => ∑ j : Fin m, (GenFun r j) * f j x), code φ degree) ≤ (δ : ℝ)]
+          let r ← $ᵖ F}[δᵣ((fun x => ∑ j : Fin m, (GenFun r j) * f j x), code φ degree) ≤ δ]
             > ENNReal.ofReal (proximityError F degree (LinearCode.rate (code φ degree)) δ m)) :
 
         ∃ S : Finset ι,

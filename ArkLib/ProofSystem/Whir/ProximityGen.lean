@@ -41,8 +41,8 @@ variable {F : Type*} [Semiring F] [Fintype F] [DecidableEq F]
     code `C`.
 -/
 noncomputable def proximityCondition
-   (f : parℓ → ι → F) (δ : ℝ) (r : parℓ → F) (C : LinearCode ι F) : Prop :=
-  δᵣ'( (fun x => ∑ j : parℓ, (r j) * f j x) , C ) ≤ (δ : ℝ)
+   (f : parℓ → ι → F) (δ : ℝ≥0) (r : parℓ → F) (C : LinearCode ι F) : Prop :=
+  δᵣ( (fun x => ∑ j : parℓ, (r j) * f j x) , C ) ≤ δ
 
 
 /-- A proximity generator for a linear code `C`, Definition 4.7 -/

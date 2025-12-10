@@ -90,7 +90,18 @@ lemma ENNReal.coe_div_of_NNRat {a b : ℚ≥0} (hb : b ≠ 0) :
 lemma ENNReal.coe_Nat_coe_NNRat (x : ℕ) : (x : ENNReal) = ((x : ℚ≥0) : ENNReal) := by rfl
 -- We can use `NNRat.cast_div` or so after `ENNReal.coe_NNRat_coe_NNReal`
 
+lemma ENNReal.coe_NNRat_eq_coe_NNRat (x y : ℚ≥0) : (x : ENNReal) = (y : ENNReal) ↔ x = y := by
+  constructor
+  · intro h
+    rw [ENNReal.coe_NNRat_coe_NNReal, ENNReal.coe_NNRat_coe_NNReal] at h
+    have h_coe_eq : ((x : ℝ≥0) : ENNReal) = ((y : ℝ≥0) : ENNReal) := h
+    have h_nnreal_eq : (x : ℝ≥0) = (y : ℝ≥0) := ENNReal.coe_injective h_coe_eq
+    exact NNRat.cast_injective h_nnreal_eq
+  · intro h
+    rw [h]
+
 end ENNReal
+
 
 namespace Nat
 

@@ -161,9 +161,9 @@ with number of variables at most `varCount` over domain `φ`, within error `err`
 def whirRelation
     {F : Type} [Field F] [Fintype F] [DecidableEq F]
     {ι : Type} [Fintype ι] [Nonempty ι]
-    (varCount : ℕ) (φ : ι ↪ F) [Smooth φ] (err : ℝ)
+    (varCount : ℕ) (φ : ι ↪ F) [Smooth φ] (err : ℝ≥0)
     : Set ((Unit × ∀ i, (OracleStatement ι F i)) × Unit) :=
-  { ⟨⟨_, oracle⟩, _⟩ | δᵣ'(oracle (), smoothCode φ varCount) ≤ err }
+  { ⟨⟨_, oracle⟩, _⟩ | δᵣ(oracle (), smoothCode φ varCount) ≤ err }
 
 /-- Theorem 5.2: **Round-by-round soundness of the WHIR Vector IOPP** -/
 theorem whir_rbr_soundness
@@ -176,14 +176,14 @@ theorem whir_rbr_soundness
   -- and condition for list decodeability
     {hParams : ParamConditions ι P} {h : GenMutualCorrParams ι P S}
     {m_0 : ℕ} (hm_0 : m_0 = P.varCount 0) {σ₀ : F}
-    {wPoly₀ : MvPolynomial (Fin (m_0 + 1)) F} {δ : ℝ}
+    {wPoly₀ : MvPolynomial (Fin (m_0 + 1)) F} {δ : ℝ≥0}
     [Smooth (P.φ 0)] [Nonempty (ι 0)]
   -- ∀ f₀ : ι₀ → F, f₀ ∉ CRS[F,ι₀,m₀,wPoly₀,σ₀]
     (h_not_code : ∀ f_0 : (ι 0) → F, f_0 ∉ (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀))
   -- ∀ f₀ : ι₀ → F, δ₀ < δᵣ(f₀, CRS[F,ι₀,m₀,wPoly₀,σ₀]),
   -- where δᵣ denotes the relative Hamming distance
     (hδ₀Lt : ∀ f_0 : (ι 0) → F,
-      (h.δ 0) < (δᵣ'(f_0, (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀)) : ℝ))
+      (h.δ 0) < δᵣ(f_0, (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀)))
     (ε_fold : (i : Fin (M + 1)) → Fin (P.foldingParam i) → ℝ≥0) (ε_out : Fin (M + 1) → ℝ≥0)
     (ε_shift : Fin M → ℝ≥0) (ε_fin : ℝ≥0) :
     ∃ n : ℕ,
