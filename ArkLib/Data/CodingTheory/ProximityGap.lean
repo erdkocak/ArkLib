@@ -34,7 +34,9 @@ import Mathlib.RingTheory.PowerSeries.Substitution
 
   We define the proximity gap properties of linear codes over finite fields.
 
-  Using {https://eprint.iacr.org/2020/654}, version 20210703:203025.
+  ## References
+
+  - [BCIKS20] Proximity Gaps for Reed-Solomon Codes, version 20210703:203025
 
   ## Main Definitions and Statements
 

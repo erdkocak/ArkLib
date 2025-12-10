@@ -11,7 +11,11 @@ import ArkLib.Data.CodingTheory.ListDecodability
 # Block Relative Distance for smooth Reed-Solomon Codes
 
 This file formalizes the notion of mutual correlated agreement for proximity generators,
-introduced in Section 4 [WHIR2024].
+introduced in Section 4 [ACFY24].
+
+## References
+
+- [ACFY24] WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification
 
 ## Implementation notes
 

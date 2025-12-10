@@ -17,6 +17,10 @@ import Mathlib.RingTheory.Henselian
 
   TODO: define the Berkelamp-Welch algorithm for unique decoding, and Guruswami-Sudan algorithm for
   list-decoding.
+
+## References
+
+- [ACFY24] WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification
 -/
 
 namespace ReedSolomon

@@ -16,8 +16,11 @@ noncomputable section
   Definition of distances for interleaved codes and statement for the relation between the minimal
   distance of an interleaved code and its underlying linear code.
   Statements of proximity results for Reed Solomon codes (`Lemma 4.3`, `Lemma 4.4` and `Lemma 4.5`
-   from `[AHIV22]` : `Ligero: Lightweight Sublinear Arguments Without a Trusted Setup`
-   by `S. Ames, C. Hazay, Y. Ishai, M. Venkitasubramaniam`.
+   from [AHIV22]).
+
+## References
+
+- [AHIV22] Ligero: Lightweight sublinear arguments without a trusted setup
 -/
 
 variable {F : Type*} [Semiring F]

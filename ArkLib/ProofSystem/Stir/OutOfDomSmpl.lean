@@ -17,7 +17,12 @@ namespace OutOfDomSmpl
 variable {F : Type} [Field F] [Fintype F] [DecidableEq F]
          {ι : Type} [Fintype ι] [DecidableEq ι]
 
-/-! Section 4.3 [ACFY24] -/
+/-! Section 4.3 [ACFY24stir]
+
+## References
+
+- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
+-/
 
 /-- Returns the domain complement `F \ φ(ι)` of an injective map `φ : ι ↪ F` -/
 def domainComplement (φ : ι ↪ F) : Finset F :=

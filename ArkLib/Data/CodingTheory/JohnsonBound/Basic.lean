@@ -12,7 +12,8 @@ In what follows we reference theorems from [listdecoding] by default.
 
 ## References
 
-* [Venkatesan Guruswami, *Algorithmic Results in List Decoding*][listdecoding]
+- [listdecoding] Algorithmic results in list decoding
+- [codingtheory] Essential coding theory
 -/
 
 variable {n : ℕ}
@@ -151,9 +152,6 @@ theorem johnson_bound [Field F]
     (johnson_condition_strong_implies_2_le_F_card h_condition)
 
 /-- Alphabet-free Johnson bound from [codingtheory].
-## References
-
-* [Venkatesan Guruswami, Atri Rudra, Madhu Sudan, *Essential Coding Theory*][codingtheory]
 -/
 theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
   {B : Finset (Fin n → F)}

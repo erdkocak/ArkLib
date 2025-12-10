@@ -16,8 +16,7 @@ Sequential composition of:
 
 ## References
 
-- [DP24] Diamond, Benjamin E., and Jim Posen. "Polylogarithmic Proofs for Multilinears over Binary
-  Towers." Cryptology ePrint Archive (2024).
+- [DP24] Polylogarithmic proofs for multilinears over binary towers
 -/
 
 open AdditiveNTT Polynomial

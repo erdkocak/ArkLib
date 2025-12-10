@@ -14,7 +14,11 @@ import ArkLib.ProofSystem.Whir.MutualCorrAgreement
 
 This file formalizes the notion of folding univariate functions and
 lemmas showing that folding preserves list decocidng,
-introduced in Section 4 [WHIR2024] paper.
+introduced in Section 4 [ACFY24] paper.
+
+## References
+
+- [ACFY24] WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification
 
 ## Implementation notes (corrections from paper)
 

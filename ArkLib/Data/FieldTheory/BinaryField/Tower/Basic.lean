@@ -20,24 +20,6 @@ Define the binary tower field GF(2^{2^k}) as an iterated quadratic extension of 
 
 ## TODOs
 
-## References
-
-- [Wie88] Doug Wiedemann. "An Iterated Quadratic Extension of GF(2)" In : The Fibonacci Quarterly
-  26.4 (1988), pp. 290–295.
-
-- [FP97] John L. Fan and Christof Paar. "On efficient inversion in tower fields of characteristic
-  two". In : Proceedings of IEEE International Symposium on Information Theory. 1997.
-
-- [LCH14] Sian-Jheng Lin, Wei-Ho Chung, and Yunghsiang S. Han. "Novel Polynomial Basis and Its
-  Application to Reed–Solomon Erasure Codes". In : IEEE 55th Annual Symposium on Foundations of
-  Computer Science. 2014, pp. 316–325. doi : 10.1109/FOCS.2014.41.
-
-- [DP23] Diamond, Benjamin E., and Jim Posen. "Succinct arguments over towers of binary fields."
-  Cryptology ePrint Archive (2023).
-
-- [DP24] Diamond, Benjamin E., and Jim Posen. "Polylogarithmic Proofs for Multilinears over Binary
-  Towers." Cryptology ePrint Archive (2024).
-
 -/
 
 namespace BinaryTower

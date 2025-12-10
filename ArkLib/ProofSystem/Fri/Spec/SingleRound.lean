@@ -22,6 +22,10 @@ import ArkLib.ToMathlib.Finset.Basic
   by Ulrich Haböck (Cryptology ePrint Archive, Paper 2022/1216), see:
   https://eprint.iacr.org/2022/1216
 
+## References
+
+- [FRI1216] A summary on the FRI low degree test
+
  -/
 
 namespace Fri

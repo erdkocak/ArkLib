@@ -95,9 +95,9 @@ There are some generalizations that we could consider later:
 
 ## References
 
-[JACM:LFKN92]
-
-[C:BooChiSot21]
+- [LFKN92] Algebraic methods for interactive proof systems
+- [sumcheck] Algebraic methods for interactive proof systems
+- [sumcheck-fv] Formal Verification of the Sumcheck Protocol
 
 -/
 

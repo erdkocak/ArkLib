@@ -13,7 +13,14 @@ open NNReal ProbabilityTheory ReedSolomon
 
 namespace STIR
 
-/-- Theorem 4.1[BCIKS20] from STIR[ACFY24]
+/-!
+## References
+
+- [BCIKS20] Proximity Gaps for Reed-Solomon Codes
+- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
+-/
+
+/-- Theorem 4.1[BCIKS20] from [ACFY24stir]
   Let `C = RS[F, ι, degree]` be a ReedSolomon code with rate `degree / |ι|`
   and let Bstar(ρ) = √ρ. For all `δ ∈ (0, 1 - Bstar(ρ))`, `f₁,...,fₘ : ι → F`, if
   `Pr_{r ← F} [ δᵣ(rⱼ * fⱼ, C) ≤ δ] > err'(degree, ρ, δ, m)`

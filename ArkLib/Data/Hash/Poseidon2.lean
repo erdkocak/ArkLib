@@ -17,9 +17,7 @@ import ArkLib.Data.Vector.Basic
 
   ## References
 
-  - Poseidon2: [Poseidon2: A Faster Version of the Poseidon Hash
-    Function](https://eprint.iacr.org/2023/323)
-
+  - [Poseidon2] Poseidon2: A Faster Version of the Poseidon Hash Function
   - Lean Ethereum spec:
     https://github.com/leanEthereum/leanSpec/blob/main/src/lean_spec/subspecs/poseidon2
 -/

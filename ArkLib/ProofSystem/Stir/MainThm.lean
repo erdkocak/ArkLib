@@ -9,7 +9,12 @@ import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.OracleReduction.VectorIOR
 import ArkLib.ProofSystem.Stir.ProximityBound
 
-/-!Section 5 STIR[ACFY24], Theorem 5.1 and Lemma 5.4 -/
+/-!Section 5 ACFY24stir, Theorem 5.1 and Lemma 5.4
+
+## References
+
+- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
+-/
 
 open BigOperators Finset ListDecodable NNReal ReedSolomon VectorIOP OracleComp LinearCode STIR
 

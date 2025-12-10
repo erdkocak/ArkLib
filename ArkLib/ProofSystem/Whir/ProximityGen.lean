@@ -11,7 +11,11 @@ import ArkLib.Data.Probability.Notation
 # Proximity Generators
 
 This file formalizes the notion of proximity generators,
-introduced in Section 4 of [WHIR2024].
+introduced in Section 4 of [ACFY24].
+
+## References
+
+- [ACFY24] WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification
 
 ## Implementation notes
 

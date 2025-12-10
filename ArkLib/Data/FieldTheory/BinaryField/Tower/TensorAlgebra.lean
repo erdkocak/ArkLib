@@ -27,14 +27,9 @@ for arbitrary field extensions `R/K` and `C/K`, upon the existing `TensorProduct
 
 ## References
 
-- [Lan02] Serge Lang. "Algebra". Revised Third Edition. Vol. 211.
-  Graduate Texts in Mathematics. Springer, 2002.
-
-- [DP24] Diamond, Benjamin E., and Jim Posen. "Polylogarithmic Proofs for Multilinears over Binary
-  Towers." Cryptology ePrint Archive (2024).
-
-- [DP23] Diamond, Benjamin E., and Jim Posen. "Succinct arguments over towers of binary fields."
-  Cryptology ePrint Archive (2023).
+- [Lan02] Algebra.
+- [DP24] Polylogarithmic Proofs for Multilinears over Binary Towers.
+- [DP23] Succinct arguments over towers of binary fields.
 -/
 open TensorProduct
 
