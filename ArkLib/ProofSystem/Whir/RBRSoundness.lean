@@ -15,7 +15,7 @@ import ArkLib.ProofSystem.Whir.ProximityGen
 # Round by round soundness theorem
 
 This file formalizes the round by round soundness theorem of the WHIR IOPP,
-introduced in the Section 5 [WHIR2024].
+introduced in the Section 5 [ACFY24].
 
 ## Implementation notes (corrections from paper)
 
