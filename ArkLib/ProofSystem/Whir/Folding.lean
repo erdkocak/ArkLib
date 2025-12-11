@@ -14,7 +14,7 @@ import ArkLib.ProofSystem.Whir.MutualCorrAgreement
 
 This file formalizes the notion of folding univariate functions and
 lemmas showing that folding preserves list decocidng,
-introduced in Section 4 [ACFY24] paper.
+introduced in Section 4 of [ACFY24].
 
 ## References
 

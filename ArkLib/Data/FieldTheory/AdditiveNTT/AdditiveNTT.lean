@@ -37,6 +37,14 @@ which states whether the result of an encoding round is correct
 - `NTTStage_correctness`: Main correctness statement of each NTT stage in the encoding algorithm,
 this proves that if the previous round satisfies the invariant, then the current round also
 
+## References
+
+* [Diamond, B.E. and Posen, J., *Polylogarithmic proofs for multilinears over binary towers*][DP24]
+* [Lin, S., Chung, W., and Han, Y.S., *Novel polynomial basis and its application to reed-solomon
+    erasure codes*][LCH14]
+* [Von zur Gathen, J. and Gerhard, J., *Arithmetic and factorization of polynomial over F2
+    (extended abstract)*][GGJ96]
+
 ## TODOs
 - Define computable additive NTT and transfer correctness proof to it
 
