@@ -85,10 +85,23 @@ returns (optionally?) a FullData of Option α.
 TODO, if there is a collision, but it isn't used or is only used in a subtree,
 should the rest of the tree work? Or should it all fail?
 -/
-def extractor {α : Type} (s : Skeleton)
-  (cache : (spec α).QueryLog)
-  (root : α) :
-  FullData (Option α) s := sorry
+def extractor {α : Type} [DecidableEq α] [SelectableType α] [Fintype α] [(spec α).FiniteRange]
+    (s : Skeleton)
+    (cache : (spec α).QueryLog)
+    (root : α) :
+    FullData (Option α) s :=
+  let queries := cache.getQ ();
+  let children (node : Option α) : (Option α × Option α) :=
+    match node with
+    | none => (none, none)
+    | some a =>
+      -- Find the first query resulting in this value
+    match queries.find? (fun ⟨_, r⟩ => r == a) with
+      | none => (none, none)
+      | some q =>
+        let child_hashes := q.1;
+        (some child_hashes.1, some child_hashes.2)
+  populate_down_tree s children (some root)
 
 /--
 The game for extractability.
