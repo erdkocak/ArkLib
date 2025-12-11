@@ -4,6 +4,9 @@ import ArkLib.CommitmentScheme.Fold
 import ArkLib.CommitmentScheme.InductiveMerkleTree
 import ArkLib.CommitmentScheme.KZG
 import ArkLib.CommitmentScheme.MerkleTree
+import ArkLib.CommitmentScheme.MerkleTree.Completeness
+import ArkLib.CommitmentScheme.MerkleTree.Defs
+import ArkLib.CommitmentScheme.MerkleTree.Extractability
 import ArkLib.CommitmentScheme.SimpleRO
 import ArkLib.CommitmentScheme.Tensor
 import ArkLib.CommitmentScheme.Trivial
