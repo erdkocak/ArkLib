@@ -57,7 +57,18 @@ def codeOfLinearCode (κ : Type*) [Fintype κ] (LC : LinearCode ι F) : Interlea
 /-- The module of matrices whose rows belong to a linear code is in fact an interleaved code.
 -/
 lemma isInterleaved_codeOfLinearCode : (codeOfLinearCode κ LC).isInterleaved := by
-  sorry
+  intro V hv
+  simp_all [codeOfLinearCode, matrixSubmoduleOfLinearCode]
+  induction hv using Submodule.span_induction <;> intro i
+  case mem M hm => exact hm i
+  case zero => exact Submodule.zero_mem LC
+  case add M N hm hn him hin =>
+    apply Submodule.add_mem
+    · exact him i
+    · exact hin i
+  case smul a M hm him =>
+    apply Submodule.smul_mem
+    ·  exact him i
 
 def lawfulInterleavedCodeOfLinearCode (κ : Type*) [Fintype κ] (LC : LinearCode ι F) :
   LawfulInterleavedCode κ ι F := ⟨codeOfLinearCode κ LC, isInterleaved_codeOfLinearCode⟩

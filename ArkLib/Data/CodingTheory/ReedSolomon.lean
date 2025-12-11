@@ -346,6 +346,15 @@ theorem minDist [Field F] [DecidableEq F] (inj : Function.Injective α) [NeZero 
 
 end
 
+noncomputable scoped instance {α : Type} (s : Set α) [inst : Finite s] : Fintype s
+  := Fintype.ofFinite _
+
+open NNReal Finset Function Finset in
+def finCarrier {ι : Type} [Fintype ι]
+               {F : Type} [Field F] [Fintype F]
+               (domain : ι ↪ F) (deg : ℕ) : Finset (ι → F) :=
+  (ReedSolomon.code domain deg).carrier.toFinset
+
 end ReedSolomonCode
 end
 

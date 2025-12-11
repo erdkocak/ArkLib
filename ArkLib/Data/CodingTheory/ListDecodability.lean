@@ -66,15 +66,13 @@ variable {C : Code ι F} {y : ι → F} {n : ℕ} {r : ℝ} {ℓ : ℝ}
 
 lemma listOfCloseCodewords_eq_zero :
   listOfCloseCodewords C y n = 0 ↔ IsEmpty (hammingBall C y n) ∨ Infinite (hammingBall C y n) := by
-  simp [listOfCloseCodewords, Nat.card_eq_zero] -- this was previously a valid proof?
-  sorry
+  simp [listOfCloseCodewords, hammingBall, Nat.card_eq_zero]
 
 
 lemma listOfCloseCodewordsRel_eq_zero :
   listOfCloseCodewordsRel C y r = 0 ↔
   IsEmpty (relHammingBall C y r) ∨ Infinite (relHammingBall C y r) := by
-  simp [listOfCloseCodewordsRel, Nat.card_eq_zero] -- this was previously a valid proof?
-  sorry
+  simp [listOfCloseCodewordsRel, relHammingBall, Nat.card_eq_zero]
 
 end Lemmas
 
