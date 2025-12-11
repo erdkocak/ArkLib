@@ -20,7 +20,8 @@ the PIOP level), integration with lookup arguments (i.e. logup), high-degree con
 
 ## References
 
-- [GWZC19] Plonk: Permutations over lagrange-bases for oecumenical noninteractive arguments of knowledge
+* [Gabizon, A., Williamson, Z.J., and Ciobotaru, O., *Plonk: Permutations over lagrange-bases
+    for oecumenical noninteractive arguments of knowledge*][GWZC19]
 
 -/
 

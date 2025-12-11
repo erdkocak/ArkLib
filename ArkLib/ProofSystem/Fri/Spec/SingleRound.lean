@@ -22,7 +22,7 @@ import ArkLib.ToMathlib.Finset.Basic
 
 ## References
 
-- [FRI1216] A summary on the FRI low degree test
+* [Haböck, U., *A summary on the FRI low degree test*][FRI1216]
 
  -/
 

@@ -12,8 +12,8 @@ In what follows we reference theorems from [listdecoding] by default.
 
 ## References
 
-- [listdecoding] Algorithmic results in list decoding
-- [codingtheory] Essential coding theory
+* [Guruswami, V. and others, *Algorithmic results in list decoding*][listdecoding]
+* [Guruswami, V., Rudra, A., and Sudan, M., *Essential coding theory*][codingtheory]
 -/
 
 variable {n : ℕ}

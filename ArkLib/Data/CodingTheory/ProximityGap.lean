@@ -36,7 +36,9 @@ import Mathlib.RingTheory.PowerSeries.Substitution
 
   ## References
 
-  - [BCIKS20] Proximity Gaps for Reed-Solomon Codes, version 20210703:203025
+  * [Ben-Sasson, E., Carmon, D., Ishai, Y., Kopparty, S., and Saraf, S., *Proximity Gaps
+      for Reed-Solomon Codes*][BCIKS20]
+      * NB we use version 20210703:203025
 
   ## Main Definitions and Statements
 

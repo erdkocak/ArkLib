@@ -31,8 +31,10 @@ algebra over its prime-characteristic subfield `𝔽q`, and an `𝔽q`-basis `β
 
 ## References
 
-- [LCH14] Novel polynomial basis and its application to Reed–Solomon erasure codes
-- [GGJ96] Arithmetic and factorization of polynomial over F2 (extended abstract)
+* [Lin, S., Chung, W., and Han, Y.S, *Novel polynomial basis and its application to
+    Reed–Solomon erasure codes*][LCH14]
+* [Von zur Gathen, J., and Gerhard, J., *Arithmetic and factorization of polynomial
+    over F2 (extended abstract)*][GGJ96]
 -/
 
 set_option linter.style.longFile 1600

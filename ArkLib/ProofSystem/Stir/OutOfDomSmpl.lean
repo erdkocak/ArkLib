@@ -21,7 +21,8 @@ variable {F : Type} [Field F] [Fintype F] [DecidableEq F]
 
 ## References
 
-- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *STIR: Reed-Solomon proximity testing with
+    fewer queries*][ACFY24stir]
 -/
 
 /-- Returns the domain complement `F \ φ(ι)` of an injective map `φ : ι ↪ F` -/

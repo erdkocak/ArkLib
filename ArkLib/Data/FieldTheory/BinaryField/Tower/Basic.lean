@@ -20,11 +20,12 @@ Define the binary tower field GF(2^{2^k}) as an iterated quadratic extension of 
 
 ## References
 
-- [Wie88] An Iterated Quadratic Extension of GF(2)
-- [FP97] On efficient inversion in tower fields of characteristic two
-- [LCH14] Novel polynomial basis and its application to reed-solomon erasure codes
-- [DP23] Succinct Arguments over Towers of Binary Fields
-- [DP24] Polylogarithmic proofs for multilinears over binary towers
+* [Wiedemann, D., *An Iterated Quadratic Extension of GF(2)*][Wie88]
+* [Fan, J.L. and Paar, C., *On efficient inversion in tower fields of characteristic two*][FP97]
+* [Lin, S., Chung, W., and Han, Y.S., *Novel polynomial basis and its application to Reed-Solomon
+    erasure codes*][LCH14]
+* [Diamond, B.E. and Posen, J., *Succinct Arguments over Towers of Binary Fields*][DP23]
+* [Diamond, B.E. and Posen, J., *Polylogarithmic proofs for multilinears over binary towers*][DP24]
 
 ## TODOs
 

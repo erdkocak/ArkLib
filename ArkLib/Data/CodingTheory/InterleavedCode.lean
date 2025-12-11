@@ -20,7 +20,8 @@ noncomputable section
 
 ## References
 
-- [AHIV22] Ligero: Lightweight sublinear arguments without a trusted setup
+* [Ames, S., Hazay, C., Ishai, Y., and Venkitasubramaniam, M., *Ligero: Lightweight sublinear
+    arguments without a trusted setup*][AHIV22]
 -/
 
 variable {F : Type*} [Semiring F]

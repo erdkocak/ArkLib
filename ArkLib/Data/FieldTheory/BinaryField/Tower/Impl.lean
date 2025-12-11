@@ -22,8 +22,8 @@ This file provides executable implementations for binary tower fields
 
 ## References
 
-- [Wie88] An Iterated Quadratic Extension of GF(2)
-- [FP97] On efficient inversion in tower fields of characteristic two
+* [Wiedemann, D., *An Iterated Quadratic Extension of GF(2)*][Wie88]
+* [Fan, J.L. and Paar, C., *On efficient inversion in tower fields of characteristic two*][FP97]
 -/
 
 set_option linter.style.longFile 3000

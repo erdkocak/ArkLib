@@ -15,8 +15,10 @@ We attempt to define the algebraic group model. Our mechanization follows recent
 
 ## References
 
-- [JM24] Generic and algebraic computation models: When AGM proofs transfer to the GGM
-- [LPS24] On Knowledge-Soundness of Plonk in ROM from Falsifiable Assumptions
+* [Jaeger, J. and Mohan, D.I., *Generic and algebraic computation models: When AGM proofs transfer
+    to the GGM*][JM24]
+* [Lipmaa, H., Parisella, R., and Siim, J., *On Knowledge-Soundness of Plonk in ROM from
+    Falsifiable Assumptions*][LPS24]
 -/
 
 open OracleComp OracleSpec

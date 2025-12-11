@@ -15,7 +15,8 @@ import ArkLib.ProofSystem.Stir.ProximityBound
 
 ## References
 
-- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *STIR: Reed-Solomon proximity testing
+    with fewer queries*][ACFY24stir]
 -/
 
 open BigOperators Finset NNReal

@@ -16,7 +16,7 @@ Sequential composition of:
 
 ## References
 
-- [DP24] Polylogarithmic proofs for multilinears over binary towers
+* [Diamond, B.E. and Posen, J., *Polylogarithmic proofs for multilinears over binary towers*][DP24]
 -/
 
 open AdditiveNTT Polynomial

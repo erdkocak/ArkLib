@@ -19,9 +19,10 @@ import Mathlib.RingTheory.MvPolynomial.Groebner
 
 ## References
 
-- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
-- [STIR2005] Reed-Solomon codes and polynomial reconstruction
-- [BSS08] Short PCPs with polylog query complexity
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *STIR: Reed-Solomon proximity testing
+    with fewer queries*][ACFY24stir]
+* [Sudan, M., *Reed-Solomon codes and polynomial reconstruction*][STIR2005]
+* [Ben-Sasson, E. and Sudan, M., *Short PCPs with polylog query complexity*][BSS08]
 -/
 
 open Polynomial ReedSolomon LinearMap Finset ListDecodable STIR

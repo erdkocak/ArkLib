@@ -95,9 +95,10 @@ There are some generalizations that we could consider later:
 
 ## References
 
-- [LFKN92] Algebraic methods for interactive proof systems
-- [sumcheck] Algebraic methods for interactive proof systems
-- [sumcheck-fv] Formal Verification of the Sumcheck Protocol
+* [Lund, C., Fortnow, L., Karloff, H., and Nisan, N., *Algebraic methods for interactive
+    proof systems*][LFKN92]
+* [Bosshard, A.G., Bootle, J., and Sprenger, C., *Formal Verification of the Sumcheck Protocol*]
+    [BBS24]
 
 -/
 

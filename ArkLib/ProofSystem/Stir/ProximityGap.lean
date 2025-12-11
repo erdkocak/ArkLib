@@ -16,8 +16,10 @@ namespace STIR
 /-!
 ## References
 
-- [BCIKS20] Proximity Gaps for Reed-Solomon Codes
-- [ACFY24stir] STIR: Reed-Solomon proximity testing with fewer queries
+* [Ben-Sasson, E., Carmon, D., Ishai, Y., Kopparty, S., and Saraf, S., *Proximity Gaps
+    for Reed-Solomon Codes*][BCIKS20]
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *STIR: Reed-Solomon proximity testing
+    with fewer queries*][ACFY24stir]
 -/
 
 /-- Theorem 4.1[BCIKS20] from [ACFY24stir]

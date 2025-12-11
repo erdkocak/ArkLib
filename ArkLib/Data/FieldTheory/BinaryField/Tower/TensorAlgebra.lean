@@ -27,9 +27,9 @@ for arbitrary field extensions `R/K` and `C/K`, upon the existing `TensorProduct
 
 ## References
 
-- [Lan02] Algebra.
-- [DP24] Polylogarithmic Proofs for Multilinears over Binary Towers.
-- [DP23] Succinct arguments over towers of binary fields.
+* [Lang, S., *Algebra*][Lan02]
+* [Diamond, B.E. and Posen, J., *Polylogarithmic Proofs for Multilinears over Binary Towers*][DP24]
+* [Diamond, B.E. and Posen, J., *Succinct arguments over towers of binary fields*][DP23]
 -/
 open TensorProduct
 

@@ -18,7 +18,8 @@ introduced in Section 4 [ACFY24] paper.
 
 ## References
 
-- [ACFY24] WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 ## Implementation notes (corrections from paper)
 

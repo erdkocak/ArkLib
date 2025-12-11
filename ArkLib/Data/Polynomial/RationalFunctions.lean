@@ -24,7 +24,8 @@ import Mathlib.RingTheory.PowerSeries.Substitution
 
   ## References
 
-  - [BCIKS20] Proximity Gaps for Reed-Solomon Codes
+  * [Ben-Sasson, E., Carmon, D., Ishai, Y., Kopparty, S., and Saraf, S.,
+      *Proximity Gaps for Reed-Solomon Codes*][BCIKS20]
 
   ## Main Definitions
 
