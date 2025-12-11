@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2024 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Tobias Rothmann Quang Dao
+Authors: Tobias Rothmann and Quang Dao
 -/
 
 import VCVio
@@ -213,7 +213,7 @@ def functionBinding {L : ℕ} (hn : n = 1) (hpSpec : NonInteractive (hn ▸ pSpe
             let (ck,vk) ← liftComp scheme.keygen _
             let (cm, claims) ← liftComp (adversary.claim ck) _
             let reduction := Reduction.mk (adversary.prover ck) (scheme.opening (ck,vk)).verifier
-            claims.toArray.mapM (fun ⟨q, r, st⟩ =>
+            claims.mapM (fun ⟨q, r, st⟩ =>
               do
                 let ⟨_, verifier_accept⟩ ← reduction.run (cm, q, r) st
                 return (q, r, verifier_accept)

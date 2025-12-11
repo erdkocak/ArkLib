@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2024 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Tobias Rothmann Quang Dao
+Authors: Tobias Rothmann
 -/
 
 import VCVio
@@ -11,6 +11,7 @@ import ArkLib.Data.UniPoly.Basic
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Order.Star.Basic
 import Mathlib.Algebra.Polynomial.FieldDivision
+import Mathlib.LinearAlgebra.Lagrange
 
 /-
   # Hardness Assumptions
@@ -56,19 +57,19 @@ def generateSrs (n : ℕ) (a : ZMod p) : Vector G₁ (n + 1) × Vector G₂ 2 :=
 /-- The ARSDH adversary returns a set of size D+1 and two group elements h₁ and h₂ upon receiving
 the srs. -/
 def ARSDHAdversary (D : ℕ) :=
-  Vector G₁ (D + 1) × Vector G₂ 2 → OracleComp oSpec (Finset (ZMod p) × G₁ × G₁)
+  Vector G₁ (D + 1) × Vector G₂ 2 → ProbComp (Finset (ZMod p) × G₁ × G₁)
 
 /-- The probabillity of breaking ARSDH for a specific adversary. -/
-noncomputable def ARSDH_Experiment [(unifSpec ++ₒ oSpec).FiniteRange]
-    (D : ℕ) (adversary : ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p))
+noncomputable def ARSDH_Experiment (D : ℕ)
+    (adversary : ARSDHAdversary D (G₁ := G₁) (G₂ := G₂) (p := p))
     : ℝ≥0∞ :=
   [fun (τ,S,h₁,h₂) =>
-    letI Zₛ := ∏ s ∈ S, (Polynomial.X - Polynomial.C s)
+    letI Zₛ := ∏ s ∈ S, (UniPoly.X - UniPoly.C s)
     S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val
   | do
-    let τ ← liftComp ($ᵗ (ZMod p)) (unifSpec ++ₒ oSpec)
+    let τ ←$ᵗ (ZMod p)
     let srs := generateSrs (g₁ := g₁) (g₂ := g₂) D τ
-    let (S, h₁, h₂) ← liftComp (adversary srs) _
+    let (S, h₁, h₂) ← adversary srs
     return (τ, S, h₁, h₂)
   ]
 
@@ -76,12 +77,11 @@ noncomputable def ARSDH_Experiment [(unifSpec ++ₒ oSpec).FiniteRange]
 Taken from Def. 9.6 in "On the Fiat–Shamir Security of Succinct Arguments from Functional
 Commitments" (see https://eprint.iacr.org/2025/902.pdf)
 -/
-def ARSDHAssumption [(unifSpec ++ₒ oSpec).FiniteRange]
-    (D : ℕ) (error : ℝ≥0)
+def ARSDHAssumption (D : ℕ) (error : ℝ≥0)
     : Prop :=
-     ∀ (adversary : ARSDHAdversary unifSpec D
+     ∀ (adversary : ARSDHAdversary D
         (G₁ := G₁) (G₂ := G₂) (p := p)),
-      ARSDH_Experiment (oSpec := unifSpec) (g₁ := g₁) (g₂ := g₂) D adversary ≤ (error : ℝ≥0∞)
+      ARSDH_Experiment (g₁ := g₁) (g₂ := g₂) D adversary ≤ (error : ℝ≥0∞)
 
 end Pairings
 

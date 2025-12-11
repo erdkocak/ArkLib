@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Quang Dao
+Authors: Tobias Rothmann and Quang Dao
 -/
 
 
@@ -27,19 +27,19 @@ namespace KZG
 variable {G : Type} [Group G] {p : outParam ℕ} [hp : Fact (Nat.Prime p)] [PrimeOrderWith G p]
   {g : G}
 
-variable {G₁ : Type} [Group G₁] [PrimeOrderWith G₁ p] {g₁ : G₁}
+variable {G₁ : Type} [Group G₁] [PrimeOrderWith G₁ p] [DecidableEq G₁] {g₁ : G₁}
   {G₂ : Type} [Group G₂] [PrimeOrderWith G₂ p] {g₂ : G₂}
   {Gₜ : Type} [Group Gₜ] [PrimeOrderWith Gₜ p] [DecidableEq Gₜ]
   [Module (ZMod p) (Additive G₁)] [Module (ZMod p) (Additive G₂)] [Module (ZMod p) (Additive Gₜ)]
   (pairing : (Additive G₁) →ₗ[ZMod p] (Additive G₂) →ₗ[ZMod p] (Additive Gₜ))
 
-omit [DecidableEq Gₜ] in
+omit [DecidableEq Gₜ] [DecidableEq G₁] in
 lemma lin_fst (g₁ : G₁) (g₂ : G₂) (a : ℤ) : a • (pairing g₁ g₂) =  pairing (g₁ ^ a) (g₂) := by
   change a • (pairing (Additive.ofMul g₁) (Additive.ofMul g₂))
     = pairing (Additive.ofMul (g₁ ^ a)) (Additive.ofMul g₂)
   simp [ofMul_zpow]
 
-omit [DecidableEq Gₜ] in
+omit [DecidableEq Gₜ] [DecidableEq G₁] in
 lemma lin_snd (g₁ : G₁) (g₂ : G₂) (a : ℤ) : a • (pairing g₁ g₂) =  pairing (g₁) (g₂ ^ a) := by
   change a • (pairing (Additive.ofMul g₁) (Additive.ofMul g₂))
     = pairing (Additive.ofMul g₁) (Additive.ofMul (g₂ ^ a))
@@ -70,7 +70,7 @@ lemma modp_eq_additive (x y : ℤ) (g : Additive G) (hxy : x ≡ y [ZMOD p]) : x
 def towerOfExponents (g : G) (a : ZMod p) (n : ℕ) : Vector G (n + 1) :=
   .ofFn (fun i => g ^ (a.val ^ i.val))
 
-variable {n : ℕ}
+variable {n : ℕ} -- the maximal degree of polynomials that can be commited to/opened.
 
 /-- The `srs` (structured reference string) for the KZG commitment scheme with secret exponent `a`
     is defined as `#v[g₁, g₁ ^ a, g₁ ^ (a ^ 2), ..., g₁ ^ (a ^ (n - 1))], #v[g₂, g₂ ^ a]` -/
@@ -87,7 +87,7 @@ maximum degree `n`), we compute: `∏ i : Fin (n+1), srs[i] ^ (p.coeff i)` -/
 def commit (srs : Vector G₁ (n + 1)) (coeffs : Fin (n + 1) → ZMod p) : G₁ :=
   ∏ i : Fin (n + 1), srs[i] ^ (coeffs i).val
 
-omit [Module (ZMod p) (Additive G₁)] in
+omit [Module (ZMod p) (Additive G₁)] [DecidableEq G₁] in
 /-- The commitment to a mathlib polynomial `poly` of maximum degree `n` is equal to
 `g₁ ^ (poly.1.eval a).val` -/
 theorem commit_eq {a : ZMod p} (hpG1 : Nat.card G₁ = p)
@@ -113,7 +113,7 @@ theorem commit_eq {a : ZMod p} (hpG1 : Nat.card G₁ = p)
     intro x
     exact mul_comm _ _
 
-omit [Module (ZMod p) (Additive G₁)] in
+omit [Module (ZMod p) (Additive G₁)] [DecidableEq G₁] in
 /-- The commitment to a computable polynomial (UniPoly) `poly` of maximum degree `n+1` is equal to
 `g₁ ^ (poly.eval a).val`.
 Note that the degree of a UniPoly is the mathematical degree + 1 for non-zero polynomials. -/
@@ -183,6 +183,7 @@ def verifyOpening (verifySrs : Vector G₂ 2) (commitment : G₁) (opening : G�
 
 -- p(a) - p(z) = q(a) * (a - z)
 -- e ( C / g₁ ^ v , g₂ ) = e ( O , g₂ ^ a / g₂ ^ z)
+omit [DecidableEq G₁] in
 theorem correctness (hpG1 : Nat.card G₁ = p) (n : ℕ) (a : ZMod p)
   (coeffs : Fin (n + 1) → ZMod p) (z : ZMod p) :
   let poly : UniPoly (ZMod p) := UniPoly.mk (Array.ofFn coeffs)
@@ -336,6 +337,8 @@ def KZG :
 
 open OracleSpec OracleComp SubSpec ProtocolSpec SimOracle
 
+section Correctness
+
 /-- randomOracle never fails on any query.
     The proof follows from the fact that randomOracle either returns a cached value (pure)
     or samples uniformly (which never fails). -/
@@ -377,6 +380,7 @@ lemma neverFails_stateT_run_simulateQ {ι ι' : Type} {spec : OracleSpec ι} {sp
   | failure => simp [neverFails] at h
 
 /- the KZG satisfies perfect correctness as defined in `CommitmentScheme` -/
+omit [DecidableEq G₁] in
 theorem correctness (hpG1 : Nat.card G₁ = p) (_a : ZMod p) {g₁ : G₁} {g₂ : G₂}
     [SelectableType G₁] :
     Commitment.perfectCorrectness (pure ∅) (randomOracle)
@@ -403,22 +407,148 @@ theorem correctness (hpG1 : Nat.card G₁ = p) (_a : ZMod p) {g₁ : G₁} {g₂
         exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
       · exact KZG.correctness (g₁:=g₁) (g₂:=g₂) (pairing:=pairing) hpG1 n a_sample data query
 
+end Correctness
+
+section FunctionBinding
+/- In this section prove that the KZG is function binding under the ARSDH assumption. The proof is a
+reduction to ARSDH following "Proof of Lemma 9.1" from Chiesa, Guan, Knabenhans, and Yu's "On the
+Fiat–Shamir Security of Succinct Arguments from Functional Commitments"
+(https://eprint.iacr.org/2025/902.pdf).
+The paper proof is structured into 5 steps (with substeps), we note each step/substep accordingly in
+our definitions.
+-/
+
 #check probEvent_bind_eq_tsum
 #check probEvent_map
 
-def reduction {ι : Type} (oSpec : OracleSpec ι) (D : ℕ) :
-    Groups.ARSDHAdversary oSpec D (G₁ := G₁) (G₂ := G₂) (p := p) := sorry
+/-- used to decide which strategy the adversary will take
+(breaking ARSDH based on a conflict or breaking ARSDH based on lagrange interpolation) --/
+def find_conflict (points : List (ZMod p × ZMod p × G₁))
+  : Option ((ZMod p × ZMod p × G₁) × (ZMod p × ZMod p × G₁)) :=
+  points.findSome? fun (α₁,β₁,pf₁) =>
+    points.findSome? fun (α₂,β₂,pf₂) =>
+      if α₁ == α₂ && β₁ != β₂ then some ((α₁,β₁, pf₁), (α₂,β₂, pf₂)) else none
+
+-- case 1: there's conflicting evaluations
+
+/- step 3 a) Choose S to be a size-(D + 1) subset of 𝔽 such that αᵢ∈ S and [Zₛ(τ)]₁ ≠ [0]₁ -/
+def choose_S_conflict (αᵢ : ZMod p) (srs : Vector G₁ (n + 1) × Vector G₂ 2)
+    (hn : 1 ≤ n) : Finset (ZMod p) :=
+  let arr := (Array.range p).filterMap fun i =>
+    if h : i < p then
+      let x : ZMod p := (⟨i, h⟩ : Fin p)
+      if srs.1[0] ^ x.val ≠ srs.1[1]'(Nat.lt_add_of_pos_left hn) ∧ x ≠ αᵢ then some x else none
+    else none
+  arr.take n |>.toList.toFinset -- ∪ {αᵢ}
+
+-- case 2: there's no conflicting evaluation, but more than D distinct evaluations
+
+/-- needed to satisfy #S = D+1 -/
+def erase_duplicates : List (ZMod p × ZMod p × G₁) → List (ZMod p × ZMod p × G₁)
+  | [] => []
+  | (αᵢ,βᵢ,pfᵢ)::xs => if xs.any (fun (αⱼ,_,_) => αⱼ = αᵢ) then erase_duplicates xs
+    else (αᵢ,βᵢ,pfᵢ)::erase_duplicates xs
+
+/-- step 4 b) Find i∗ ∈ {D + 2,...,L} such that βi∗ ≠ Lₒ(αi∗) -/
+def find_diversion (L₀ : UniPoly (ZMod p))
+  : List (ZMod p × ZMod p × G₁) → Option (ZMod p × ZMod p × G₁)
+  | [] => none
+  | (αᵢ,βᵢ,pfᵢ)::xs => if eval αᵢ L₀ ≠ βᵢ then some (αᵢ,βᵢ,pfᵢ) else find_diversion L₀ xs
+
+/-- Step 4 c) Find S := {αij}j∈[D+1] from {αi}i∈[D+1]∪{αi∗} such that [Lagrange(S)]₁ ≠ cm
+Try replacing each element in the list with `diversion` and check if the interpolated
+polynomial's commitment differs from `cm`. Returns the first such replacement as a Finset. -/
+def find_S (srs : Vector G₁ (n + 1) × Vector G₂ 2) (cm : G₁) (diversion : ZMod p × ZMod p × G₁)
+  : List (ZMod p × ZMod p × G₁) → List (ZMod p × ZMod p × G₁) →
+    Option (Finset (ZMod p × ZMod p × G₁))
+  | [], _ => none
+  | x::xs, prefix_acc =>
+    let candidate := prefix_acc ++ [diversion] ++ xs
+    let L : UniPoly (ZMod p) := sorry -- interpolate candidate
+    if commit srs.1 (fun i : Fin (n + 1) => L.coeff i) ≠ cm
+    then some candidate.toFinset
+    else find_S srs cm diversion xs (prefix_acc ++ [x])
+
+-- put it together
+
+/-- These are steps 3 and 4 of the reduction listed in the paper (Proof of Lemma 9.1 in https://eprint.iacr.org/2025/902.pdf) -/
+noncomputable def map_FB_instance_to_ARSDH_inst {L : ℕ}
+  (val : (Vector G₁ (n + 1) × Vector G₂ 2) × G₁ × Vector (ZMod p × ZMod p × Bool × G₁) L)
+  : Option (Finset (ZMod p) × G₁ × G₁) :=
+  do
+  let (srs, cm, fb_instance) := val
+  let points := fb_instance.toList.map (fun (αᵢ,βᵢ,bᵢ,pfᵢ) => (αᵢ,βᵢ,pfᵢ))
+  if let some ((α₁,β₁,pf₁),(α₂,β₂,pf₂)) := find_conflict points then
+    -- step 3
+    let S := choose_S_conflict α₁ srs sorry
+    let Zₛ := ∏ s ∈ S, (UniPoly.X - UniPoly.C s)
+    let h₁ := KZG.commit srs.1 (Zₛ.coeff ∘ Fin.val)
+    let h₂ : G₁ := (pf₁ / pf₂) ^ (1 /(β₂ - β₁).val)
+    return (S ∪ {α₁}, h₁, h₂)
+  else
+    -- step 4
+    let distinct_points := erase_duplicates points
+    let L₀ : UniPoly (ZMod p) := sorry -- interpolate distinct_points.take (D+1)
+    let diversion ← find_diversion L₀ (distinct_points.take (n+1))
+    let S_points ← find_S srs cm diversion (distinct_points.drop (n+1)) []
+    let S := S_points.image Prod.fst
+    let Zₛ := ∏ s ∈ S, (UniPoly.X - UniPoly.C s)
+    let Lₛ : UniPoly (ZMod p):= sorry -- interpolate S
+    let h₁ := cm / KZG.commit srs.1 (Lₛ.coeff ∘ Fin.val)
+    let d := fun α => 1 / UniPoly.eval α (UniPoly.divByMonic Zₛ (UniPoly.X - UniPoly.C α))
+      -- 1/(Z_{S \ {α}}(α))
+    let h₂ : G₁ := ∏ ⟨α, β,pf⟩ ∈ S_points, pf ^ (d α).val
+    return (S, h₁, h₂)
+
+/-- Abbreviation for a function binding adversary for KZG. -/
+abbrev KZGFunctionBindingAdversary (p : ℕ) [Fact (Nat.Prime p)] (G₁ G₂ : Type) [Group G₁]
+    [PrimeOrderWith G₁ p] [Group G₂] [PrimeOrderWith G₂ p] (n : ℕ) {ι : Type}
+    (oSpec : OracleSpec ι) (L : ℕ) (AuxState : Type) :=
+  Commitment.FunctionBindingAdversary oSpec (Fin (n + 1) → ZMod p) G₁ AuxState L
+    ⟨!v[.P_to_V], !v[G₁]⟩ (Vector G₁ (n + 1) × Vector G₂ 2)
+
+/-- The reduction breaking ARSDH using a (successful) Function Binding Adversary.
+The redution follows the proof of lemma 9.1 (under Def. 9.6) in https://eprint.iacr.org/2025/902.pdf -/
+noncomputable def reduction (L : ℕ) (AuxState : Type)
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState) :
+    Groups.ARSDHAdversary n (G₁ := G₁) (G₂ := G₂) (p := p) :=
+    fun srs =>
+    letI kzgScheme := KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)
+    -- designed such that ProbEvent_comp can be applied and thus the main task of reasoning
+    -- is discharged to the predicate level.
+    ((fun opt => Option.getD opt (∅, 1, 1)) ∘
+      map_FB_instance_to_ARSDH_inst) <$>
+    -- map_FB_instance_to_ARSDH_inst (Step 3 and 4 of the reduction) is applied to the result
+    -- of the adversary (step 1 and 2 of the reduction)
+    (simulateQ (randomOracle ++ₛₒ (challengeQueryImpl (pSpec := ⟨!v[.P_to_V], !v[G₁]⟩)) :
+          QueryImpl _ (StateT unifSpec.QueryCache ProbComp))
+          (do
+            let (ck, vk) := (srs, srs)
+            let (cm, claims) ← liftComp (adversary.claim ck) _
+            let reduction := Reduction.mk (adversary.prover ck)
+              (kzgScheme.opening (ck, vk)).verifier
+            let evals ← claims.mapM (fun ⟨q, r, st⟩ =>
+              do
+                let ⟨⟨transcript, _⟩, verifier_accept⟩ ← reduction.run (cm, q, r) st
+                let pf := transcript 0
+                return (q, r, verifier_accept, pf)
+              )
+            return (srs, cm, evals)
+          )).run' ∅
 
 /- the KZG satisfies function binding as defined in `CommitmentScheme` provided ARSDH holds. -/
-theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂} {D : ℕ}
+theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂}
     (L : ℕ) (AuxState : Type) [SelectableType G₁] (ARSDHerror : ℝ≥0)
     (hARSDH : Groups.ARSDHAssumption (G₁ := G₁) (G₂ := G₂) (g₁ := g₁) (g₂ := g₂)
-      unifSpec D ARSDHerror) :
+     n ARSDHerror) :
     Commitment.functionBinding (L := L) (init := pure ∅) (impl := randomOracle)
       (hn := rfl) (hpSpec := { prover_first' := by simp }) AuxState
       (KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)) ARSDHerror := by
+    unfold Commitment.functionBinding
     -- bind functionBinding via a reduction to ARSDH(-error)
     sorry
+
+end FunctionBinding
 
 end CommitmentScheme
 
