@@ -36,7 +36,7 @@ open Polynomial.Bivariate
 open ToRatFunc
 open Ideal
 
-namespace AppendixA
+namespace BCIKS20AppendixA
 
 section
 
@@ -261,4 +261,4 @@ def γ' (x₀ : F) (R : F[X][X][Y]) (H_irreducible : Irreducible H) : PowerSerie
 
 end ClaimA2
 end
-end AppendixA
+end BCIKS20AppendixA
