@@ -418,9 +418,6 @@ The paper proof is structured into 5 steps (with substeps), we note each step/su
 our definitions.
 -/
 
-#check probEvent_bind_eq_tsum
-#check probEvent_map
-
 /-- used to decide which strategy the adversary will take
 (breaking ARSDH based on a conflict or breaking ARSDH based on lagrange interpolation) --/
 def find_conflict (points : List (ZMod p × ZMod p × G₁))
@@ -429,9 +426,10 @@ def find_conflict (points : List (ZMod p × ZMod p × G₁))
     points.findSome? fun (α₂,β₂,pf₂) =>
       if α₁ == α₂ && β₁ != β₂ then some ((α₁,β₁, pf₁), (α₂,β₂, pf₂)) else none
 
--- case 1: there's conflicting evaluations
+-- case 1: there's conflicting evaluations (binding failure)
 
-/- step 3 a) Choose S to be a size-(D + 1) subset of 𝔽 such that αᵢ∈ S and [Zₛ(τ)]₁ ≠ [0]₁ -/
+/- step 3 a) Choose S to be a size-(D + 1) subset of 𝔽 such that αᵢ∈ S and [Zₛ(τ)]₁ ≠ [0]₁
+Note the reduction works mostly with S \ {αᵢ}, so this function only returns S \ {αᵢ}. -/
 def choose_S_conflict (αᵢ : ZMod p) (srs : Vector G₁ (n + 1) × Vector G₂ 2)
     (hn : 1 ≤ n) : Finset (ZMod p) :=
   let arr := (Array.range p).filterMap fun i =>
@@ -439,9 +437,9 @@ def choose_S_conflict (αᵢ : ZMod p) (srs : Vector G₁ (n + 1) × Vector G₂
       let x : ZMod p := (⟨i, h⟩ : Fin p)
       if srs.1[0] ^ x.val ≠ srs.1[1]'(Nat.lt_add_of_pos_left hn) ∧ x ≠ αᵢ then some x else none
     else none
-  arr.take n |>.toList.toFinset -- ∪ {αᵢ}
+  arr.take n |>.toList.toFinset -- ∪ {αᵢ} to be the S referenced in the paper
 
--- case 2: there's no conflicting evaluation, but more than D distinct evaluations
+-- case 2: there's no conflicting evaluation, but more than D distinct evaluations (degree failure)
 
 /-- needed to satisfy #S = D+1 -/
 def erase_duplicates : List (ZMod p × ZMod p × G₁) → List (ZMod p × ZMod p × G₁)
@@ -545,8 +543,20 @@ theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂}
       (hn := rfl) (hpSpec := { prover_first' := by simp }) AuxState
       (KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)) ARSDHerror := by
     unfold Commitment.functionBinding
-    -- bind functionBinding via a reduction to ARSDH(-error)
+    -- bind functionBinding via the 'reduction' adversary to ARSDH(-error)
+    -- prove idea (rough sketch):
+    --   [FB_cond | functionBindingGame 𝔸]
+    --   ≤(probEvent_mono) [λx. ARSDH_cond ∘ map_FB_instance_to_ARSDH_inst x | functionBindingGame 𝔸]
+    --   =(probEvent_map) [ARSDH_cond | map_FB_instance_to_ARSDH_inst <$> functionBindingGame 𝔸]
+    --   = [ARSDH_cond | ARSDH_Game (reduction 𝔸)]
+    --   = ARSDH_Experiment (reduction 𝔸)
+    --   ≤(hARSDH) ARSDHerror
     sorry
+
+#check probEvent_mono
+#check probEvent_map
+#check probEvent_bind_eq_tsum
+#check probEvent_eq_tsum_ite
 
 end FunctionBinding
 
