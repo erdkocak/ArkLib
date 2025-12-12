@@ -15,7 +15,12 @@ import ArkLib.ProofSystem.Whir.ProximityGen
 # Round by round soundness theorem
 
 This file formalizes the round by round soundness theorem of the WHIR IOPP,
-introduced in the [Section 5 of the WHIR paper][todo: ArkLib bibliography].
+introduced in the Section 5 [ACFY24].
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 ## Implementation notes (corrections from paper)
 
@@ -29,12 +34,6 @@ introduced in the [Section 5 of the WHIR paper][todo: ArkLib bibliography].
 
 - In in Construction 5.1 and Theorem 5.2,
   we use M + 1 iterations instead of M, for ease of representation in Lean
-
-## References
-
-* G Arnon, A Chiesa, G Fenzi, and E Yogev,
-[*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?

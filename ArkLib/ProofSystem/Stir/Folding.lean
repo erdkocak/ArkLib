@@ -15,7 +15,15 @@ import Mathlib.Probability.ProbabilityMassFunction.Basic
 import Mathlib.Probability.Distributions.Uniform
 import Mathlib.RingTheory.MvPolynomial.Groebner
 
-/-! Section 4.4, [ACFY24] -/
+/-! Section 4.4, [ACFY24stir]
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *STIR: Reed-Solomon proximity testing
+    with fewer queries*][ACFY24stir]
+* [Sudan, M., *Reed-Solomon codes and polynomial reconstruction*][STIR2005]
+* [Ben-Sasson, E. and Sudan, M., *Short PCPs with polylog query complexity*][BSS08]
+-/
 
 open Polynomial NNReal ReedSolomon LinearMap Finset ListDecodable STIR
 
@@ -48,9 +56,8 @@ variable {F : Type*} [Field F] [Fintype F]
 
    This is MonomialOrder.div from Mathlib.RingTheory.MvPolynomial.Groebner
 
-   Using the usual lexicographic order x₀ > x₁ is equal to proposition 6.3 in
-   https://people.csail.mit.edu/madhu/papers/2005/rspcpp-full.pdf under the
-   substitution z = x₀ and y = x₁, hence the following definition constructs
+   Using the usual lexicographic order x₀ > x₁ is equal to proposition 6.3 in [BSS08]
+   under the substitution z = x₀ and y = x₁, hence the following definition constructs
    Q ∈ 𝔽[Z,Y] with P(z,y) = Q'(z,y) * R(z,y) + Q(z,y)
 
    Below we present Fact 4.6.1 from STIR -/
@@ -78,7 +85,7 @@ noncomputable def uni2bi (p : Polynomial F) : MvPolynomial (Fin 2) F :=
   Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X 0) p
 
 /-- Computes Q(z,y) with P(z) = Q'(z,y) * (y- q(z)) + Q(z,y) as in
-    proposition 6.3 from https://people.csail.mit.edu/madhu/papers/2005/rspcpp-full.pdf -/
+    proposition 6.3 from [BSS08] -/
 noncomputable def polyQ (P q : Polynomial F) : MvPolynomial (Fin 2) F :=
   -- Pbi(z,y):= P(z)
   let Pbi : MvPolynomial (Fin 2) F := uni2bi P

@@ -11,7 +11,13 @@ import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.Probability.Notation
 import ArkLib.ProofSystem.Stir.ProximityBound
 
-/-! Section 4.5 from STIR [ACFY24] -/
+/-! Section 4.5 from STIR [ACFY24stir]
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *STIR: Reed-Solomon proximity testing
+    with fewer queries*][ACFY24stir]
+-/
 
 open BigOperators Finset NNReal
 

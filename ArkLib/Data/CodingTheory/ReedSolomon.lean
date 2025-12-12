@@ -18,6 +18,11 @@ import Mathlib.Data.NNReal.Basic -- for instFloorSemiring of ℝ≥0
 
 - The lemmas with suffix `'` (e.g. dim_eq_deg_of_le', minDist', ...) are generalizations of
   their corresponding non-suffixed versions from `Fin m` index to arbitrary finite index type `ι`.
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 -/
 
 namespace ReedSolomon
@@ -493,6 +498,15 @@ theorem relativeUniqueDecodingRadius_RS_eq
     (h := by simp only [Fintype.card_fin, h]) (n := n), Fintype.card_fin]
 
 end
+
+noncomputable scoped instance {α : Type} (s : Set α) [inst : Finite s] : Fintype s
+  := Fintype.ofFinite _
+
+open NNReal Finset Function Finset in
+def finCarrier {ι : Type} [Fintype ι]
+               {F : Type} [Field F] [Fintype F]
+               (domain : ι ↪ F) (deg : ℕ) : Finset (ι → F) :=
+  (ReedSolomon.code domain deg).carrier.toFinset
 
 end ReedSolomonCode
 end

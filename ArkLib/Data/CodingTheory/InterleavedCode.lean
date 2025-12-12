@@ -32,6 +32,12 @@ noncomputable section
    by `S. Ames, C. Hazay, Y. Ishai, M. Venkitasubramaniam`.
 
   -- TODO: use new APIs for AHIV22 & bring its statements to another file
+   from [AHIV22]).
+
+## References
+
+* [Ames, S., Hazay, C., Ishai, Y., and Venkitasubramaniam, M., *Ligero: Lightweight sublinear
+    arguments without a trusted setup*][AHIV22]
 -/
 
 variable {F : Type*} [Semiring F]

@@ -11,8 +11,15 @@ import ArkLib.Data.Classes.Serde
 /-! # The Algebraic Group Model (With Oblivious Sampling)
 
 We attempt to define the algebraic group model. Our mechanization follows recent papers of Jaeger &
- Mohan [JM24](https://link.springer.com/content/pdf/10.1007/978-3-031-68388-6_2) and Lipmaa,
- Parisella, and Siim [LPS24](https://eprint.iacr.org/2024/994.pdf). -/
+ Mohan [JM24] and Lipmaa, Parisella, and Siim [LPS24].
+
+## References
+
+* [Jaeger, J. and Mohan, D.I., *Generic and algebraic computation models: When AGM proofs transfer
+    to the GGM*][JM24]
+* [Lipmaa, H., Parisella, R., and Siim, J., *On Knowledge-Soundness of Plonk in ROM from
+    Falsifiable Assumptions*][LPS24]
+-/
 
 open OracleComp OracleSpec
 

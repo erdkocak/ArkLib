@@ -22,11 +22,8 @@ This file provides executable implementations for binary tower fields
 
 ## References
 
- - [Wie88] Doug Wiedemann. "An Iterated Quadratic Extension of GF(2)" In : The Fibonacci Quarterly
-  26.4 (1988), pp. 290–295.
-
- - [FP97] John L. Fan and Christof Paar. "On efficient inversion in tower fields of characteristic
-  two". In : Proceedings of IEEE International Symposium on Information Theory. 1997.
+* [Wiedemann, D., *An Iterated Quadratic Extension of GF(2)*][Wie88]
+* [Fan, J.L. and Paar, C., *On efficient inversion in tower fields of characteristic two*][FP97]
 -/
 
 set_option linter.style.longFile 3000
