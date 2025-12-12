@@ -598,13 +598,21 @@ lemma trim_add_trim [LawfulBEq R] (p q : UniPoly R) : p.trim + q = p + q := by
   intro i
   rw [add_coeff?, add_coeff?, Trim.coeff_eq_coeff]
 
-def smul_equiv : ∀ (p : UniPoly R) (i : ℕ) (r : R),
-    (smul r p).coeff i = r * (p.coeff i) := by sorry
+def smul_equiv : ∀ (i : ℕ) (r : R),
+    (smul r p).coeff i = r * (p.coeff i) := by
+    intro i r
+    unfold smul mk coeff
+    rcases (Nat.lt_or_ge i p.size) with hi | hi <;> simp [hi]
 
-def nsmul_raw_equiv : ∀ (p : UniPoly R) (n i : ℕ),
-  (nsmul_raw n p).trim.coeff i = n * p.trim.coeff i := by sorry
+def nsmul_raw_equiv [LawfulBEq R] : ∀ (n i : ℕ),
+  (nsmul_raw n p).trim.coeff i = n * p.trim.coeff i := by
+  intro n i
+  unfold nsmul_raw
+  repeat rw [Trim.coeff_eq_coeff]
+  unfold mk
+  rcases (Nat.lt_or_ge i p.size) with hi | hi <;> simp [hi]
 
-def mulPowX_equiv : ∀ (p : UniPoly R) (i j : ℕ),
+def mulPowX_equiv : ∀ (i j : ℕ),
   (mulPowX i p).coeff j = p.coeff (j - i) := by sorry
 
 -- algebra theorems about addition
