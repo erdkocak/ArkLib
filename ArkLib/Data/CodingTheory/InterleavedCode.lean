@@ -24,145 +24,62 @@ import Mathlib.Data.NNReal.Defs
 noncomputable section
 
 /-!
-  Definition of an interleaved code of a linear code over a semiring.
-  Definition of distances for interleaved codes and statement for the relation between the minimal
-  distance of an interleaved code and its underlying linear code.
-  Statements of proximity results for Reed Solomon codes (`Lemma 4.3`, `Lemma 4.4` and `Lemma 4.5`
-   from `[AHIV22]` : `Ligero: Lightweight Sublinear Arguments Without a Trusted Setup`
-   by `S. Ames, C. Hazay, Y. Ishai, M. Venkitasubramaniam`.
+## Main definitions
 
-  -- TODO: use new APIs for AHIV22 & bring its statements to another file
-   from [AHIV22]).
+Interleaved codes for generic codes over a semiring, with **unified global APIs**.
+
+### Core Data Types
+1. **Single vector data structure**: used for computation
+  - **Word**: `(ι → A)` - a word
+  - **Codeword**: `(C : Set (ι → A))` - a codeword in base code `C`
+2. **Horizontal interleaved data structure**: used for computation, the underlying data structure is
+  `Matrix κ ι A`
+  - **WordStack**: `Matrix κ ι A` - each row is a word
+  - **CodewordStack**: `codewordStackSet (κ := κ) (C := C)` - each row is a codeword in C
+3. **Vertical interleaved data structure**: used for security (e.g. Δ₀, δᵣ, ...), the underlying
+  data structure is `Matrix ι κ A`
+  `(κ → A)`.
+  - **InterleavedWord**: `Matrix ι κ A`
+  - **InterleavedCodeword**: `interleavedCodeSet (κ := κ) (C := C)`
+
+### Global Unified APIs (Type Classes)
+- **`GetRow α RowIdx RowType`** - extract rows uniformly across structures
+- **`GetSymbol α SymbolIdx SymbolType`** - extract symbols uniformly
+- **`GetCell α RowIdx SymbolIdx CellTy`** - extract individual cells
+- **`Interleavable α β`** - interleave structures (notation: `⋈|u`)
+- **`Interleavable₂ α β`** - interleave two structures (notation: `u ⋈₂ v`)
+- **`CodeInterleavable Code InterleavedCode`** - interleave codes (notation: `C^⋈κ`)
+- **`Stackifiable α β`** - inverse of interleaving (notation: `⋈⁻¹|v`)
+
+### Key Set
+- **`interleavedCodeSet C`** - set of interleaved codewords for code `C`
+- **`codewordStackSet C`** - set of codeword stacks for code `C`
+- **`ModuleCode.moduleInterleavedCode`** - interleaved code as
+  `ModuleCode ι F (InterleavedSymbol A κ)` (preserves submodule; used with `C^⋈κ`)
+- **`ModuleCode.codewordStackSubmodule`** - codeword stack as
+  `Submodule F (WordStack A κ ι)` (preserves submodule for horizontal interleaving)
+
+### Joint Proximity & Agreement (Consequent of Proximity Gap)
+- **`jointProximity u δ`** - interleaved `u` within relative distance `δ` of `C^⋈κ`
+- **`jointProximityNat u e`** - interleaved `u` within concrete distance `e` of `C^⋈κ`
+- **`jointProximity₂ u₀ u₁ δ`** - interleaved pair within relative distance `δ` of `C^⋈(Fin 2)`
+- **`jointProximityNat₂ u₀ u₁ e`** - interleaved pair within concrete distance `e` of `C^⋈(Fin 2)`
+- **`pairJointProximity u v e`** - two interleaved stacks within distance `e` of each other
+- **`pairJointProximity₂ u₀ u₁ v₀ v₁ e`** - two interleaved pairs within distance `e` of each other
+- **`jointAgreement C δ W`** - words collectively agree on large set with `C`
+  (equivalent to `jointProximity`)
 
 ## References
 
+* [Ben-Sasson, E., Carmon, D., Ishai, Y., Kopparty, S., and Saraf, S., *Proximity Gaps
+    for Reed-Solomon Codes*][BCIKS20]
+    * NB we use version 20210703:203025
+
 * [Ames, S., Hazay, C., Ishai, Y., and Venkitasubramaniam, M., *Ligero: Lightweight sublinear
     arguments without a trusted setup*][AHIV22]
--/
 
-variable {F : Type*} [Semiring F]
-         {κ ι : Type*} [Fintype κ] [Fintype ι]
-         {LC : LinearCode ι F}
-
-abbrev MatrixSubmodule.{u, v, w} (κ : Type u) [Fintype κ] (ι : Type v) [Fintype ι]
-                                 (F : Type w) [Semiring F] : Type (max u v w) :=
-  Submodule F (Matrix κ ι F)
-
-/-- The data needed to construct an interleaved code.
--/
-structure InterleavedCode (κ ι : Type*) [Fintype κ] [Fintype ι] (F : Type*) [Semiring F] where
-  MF : MatrixSubmodule κ ι F
-  LC : LinearCode ι F
-
-namespace InterleavedCode
-
-/-- The condition making the `InterleavedCode` structure an interleaved code.
--/
-def isInterleaved (IC : InterleavedCode κ ι F) :=
-  ∀ V ∈ IC.MF, ∀ i, V i ∈ IC.LC
-
-def LawfulInterleavedCode (κ : Type*) [Fintype κ] (ι : Type*) [Fintype ι]
-                          (F : Type*) [Semiring F] :=
-  { IC : InterleavedCode κ ι F // IC.isInterleaved }
-
-/-- The submodule of the module of matrices whose rows belong to a linear code.
--/
-def matrixSubmoduleOfLinearCode (κ : Type*) [Fintype κ]
-                                (LC : LinearCode ι F) : MatrixSubmodule κ ι F :=
-  Submodule.span F { V | ∀ i, V i ∈ LC }
-
-def codeOfLinearCode (κ : Type*) [Fintype κ] (LC : LinearCode ι F) : InterleavedCode κ ι F :=
-  { MF := matrixSubmoduleOfLinearCode κ LC, LC := LC }
-
-/-- The module of matrices whose rows belong to a linear code is in fact an interleaved code.
--/
-lemma isInterleaved_codeOfLinearCode : (codeOfLinearCode κ LC).isInterleaved := by
-  intro V hv
-  simp_all [codeOfLinearCode, matrixSubmoduleOfLinearCode]
-  induction hv using Submodule.span_induction <;> intro i
-  case mem M hm => exact hm i
-  case zero => exact Submodule.zero_mem LC
-  case add M N hm hn him hin =>
-    apply Submodule.add_mem
-    · exact him i
-    · exact hin i
-  case smul a M hm him =>
-    apply Submodule.smul_mem
-    ·  exact him i
-
-def lawfulInterleavedCodeOfLinearCode (κ : Type*) [Fintype κ] (LC : LinearCode ι F) :
-  LawfulInterleavedCode κ ι F := ⟨codeOfLinearCode κ LC, isInterleaved_codeOfLinearCode⟩
-
-/-- Distance between codewords of an interleaved code.
--/
-def distCodewords [DecidableEq F] (U V : Matrix κ ι F) : ℕ :=
-  (Matrix.neqCols U V).card
-
-/-- `Δ(U,V)` is the distance between codewords `U` and `V` of a `κ`-interleaved code `IC`.
--/
-notation "Δ(" U "," V ")" => distCodewords U V
-
-/-- Minimal distance of an interleaved code.
--/
-def minDist [DecidableEq F] (IC : MatrixSubmodule κ ι F) : ℕ :=
-  sInf { d : ℕ | ∃ U ∈ IC, ∃ V ∈ IC, distCodewords U V = d }
-
-/-- `Δ IC` is the min distance of an interleaved code `IC`.
--/
-notation "Δ" IC => minDist IC
-
-/-- Distance from a matrix to the closest word in an interleaved code.
--/
-def distToCode [DecidableEq F] (U : Matrix κ ι F) (IC : MatrixSubmodule κ ι F) : ℕ :=
- sInf { d : ℕ | ∃ V ∈ IC, distCodewords U V = d }
-
-/-- `Δ(U,C')` denotes distance between a `κ x ι` matrix `U` and `κ`-interleaved code `IC`.
--/
-notation "Δ(" U "," IC ")" => distToCode U IC
-
-/-- Relative distance between codewords of an interleaved code.
--/
-def relDistCodewords [DecidableEq F] (U V : Matrix κ ι F) : ℝ :=
-  (Matrix.neqCols U V).card / Fintype.card ι
-
-/-- The list of codewords of `IC` `r`-close to `U`, with respect to relative distance of
-interleaved codes.
--/
-def relHammingBallInterleavedCode [DecidableEq F] (U : Matrix κ ι F)
-  (IC : MatrixSubmodule κ ι F) (r : ℝ) :=
-    {V | V ∈ IC ∧ relDistCodewords U V < r}
-
-/-- `Λᵢ(U, IC, r)` denotes the list of codewords of IC `r`-close to `U`.
--/
-notation "Λᵢ(" U "," IC "," r ")" => relHammingBallInterleavedCode U IC r
-
-/-- The minimal distance of an interleaved code is the same as the minimal distance of its
-underlying linear code.
--/
-lemma minDist_eq_minDist [DecidableEq F] {IC : LawfulInterleavedCode κ ι F} :
-  Code.minDist (IC.1.LC : Set (ι → F)) = minDist IC.1.MF := by sorry
-
-end InterleavedCode
-
-/-!
-  ## ModuleCode Interleaved Code Infrastructure
-
-  This section provides infrastructure for working with interleaved codes derived from `ModuleCode`.
-  It includes helper functions for transposing and extracting rows from interleaved codewords, as
-  well as instances and lemmas for converting `ModuleCode` to interleaved codes.
-
-Different namings:
-1. Word: a vector (ι → A)
-2. Codeword: a vector (ι → A) that belongs to the base module code MC
-3. Word stack: Matrix (ι → A) where each row is a word
-3. Codeword stack: Matrix (κ → ι → A) where each row is a codeword of the base module code MC
-
-In the interleaved code MC^⋈ κ realm, each column is a symbol, i.e. (κ → A), each row is a codeword
-  of the base module code MC.
-
-5. Interleaved Word: a matrix (ι → (κ → A)).
-6. Interleaved Codeword: a matrix (ι → (κ → A)), where each tranposed row (ι → A) is a codeword
-  of the base module code MC.
+* [Diamond, B. E. and Gruen, A., *Proximity Gaps in Interleaved Codes*, In: IACR
+  Communications in Cryptology 1.4 (Jan. 13, 2025). issn: 3006-5496. doi: 10.62056/a0ljbkrz.][DG25]
 -/
 
 section InterleavedCodeDefinitions
@@ -172,6 +89,7 @@ variable (κ ι : Type*) [Fintype κ] [Fintype ι]
 variable (MC : ModuleCode ι F A)
 variable (C : Set (ι → A))
 
+open NNReal
 namespace Code
 
 /-- A word is a vector (ι → A) -/
@@ -456,6 +374,7 @@ instance {κ₁ κ₂ : Type*} :
       (CodewordStack A (Sum κ₁ κ₂) ι C) where
   hAppend u v := finMapCodewordStacksAppend A ι C (κ₁ := κ₁) (κ₂ := κ₂) u v
 
+
 namespace InterleavedCode
 
 /-!
@@ -633,19 +552,8 @@ lemma getRowOfCodewordStack_mem_code (C : Set (ι → A))
   let getRowAsIC := getRow (show InterleavedCodeword A κ ι C from ⋈|u) rowIdx
   exact getRowAsIC.property
 
-/-! ### Instances -/
-
-variable {κ ι F A : Type*} [Fintype κ] [Fintype ι] [Semiring F] [AddCommMonoid A] [Module F A]
-variable {C : Set (ι → A)}
-
-/-! #### Instance 1: WordStack ↔ InterleavedWord (Generic Sets) -/
-
-end InterleavedCode
-
 /-- Notation for stacking one stack on top of another -/
 infixl:65 " ++ₕ " => HAppend.hAppend
-
--- TODO: HasRowMembership
 
 @[simp]
 instance instNonemptyInterleavedCode [Nonempty C] :
@@ -668,6 +576,8 @@ example (v₀ v₁ : C) :
   let iv_word : InterleavedCodeword A (Fin 2) ι C := v₀ ⋈₂ v₁
   iv_codeword = iv_word
   := by rfl
+
+end InterleavedCode
 
 /-! ### Distance Properties for Interleaved Codes
 **Naming conventions**:
@@ -751,63 +661,143 @@ theorem jointProximityNat_iff_closeToInterleavedCodeword (u : WordStack A κ ι)
       · exact hvClose
     )
     exact res
+
+/-- The consequent of correlated agreement: Words collectively agree on the same set of coordinates
+`S` with the base code `C`.
+Variants of this definition should follow the naming conventions of `jointProximity`
+if possible, for consistency.
+TOOD: this can generalize further to support the consequent of mutual correlated agreement. -/
+def jointAgreement {F κ ι : Type*} [Fintype ι] [DecidableEq F]
+    (C : Set (ι → F)) (δ : ℝ≥0) (W : κ → ι → F) : Prop :=
+  ∃ S : Finset ι, S.card ≥ (1 - δ) * (Fintype.card ι) ∧
+    ∃ v : κ → ι → F, ∀ i, v i ∈ C ∧ S ⊆ Finset.filter (fun j => v i j = W i j) Finset.univ
+
+open InterleavedCode in
+/-- Equivalence between the agreement-based definition `jointAgreement` and
+the distance/proximity-based definition `jointProximity` (the latter is represented in
+upperbound of interleaved-code distance). -/
+@[simp]
+theorem jointAgreement_iff_jointProximity
+    {F : Type*} {κ ι : Type*} [Fintype κ] [Fintype ι] [Nonempty ι] [DecidableEq F] [DecidableEq ι]
+    (C : Set (ι → F)) (u : WordStack F κ ι) (δ : ℝ≥0) :
+    jointAgreement (C := C) (δ := δ) (W := u)  ↔ jointProximity (C := C) (u := u) (δ := δ) := by
+  let e : ℕ := Nat.floor (δ * Fintype.card ι)
+  constructor
+  · -- Forward direction: jointAgreement → jointProximity
+    intro h_words
+    rcases h_words with ⟨S, hS_card, v, hv⟩
+    -- We have: |S| ≥ (1-δ)*|ι| and ∀ i, v i ∈ MC and S ⊆ {j | v i j = u i j}
+    -- Need to show: δᵣ(u_interleaved, MC.interleavedCode) ≤ δ
+    -- Define interleaved word from u
+    let u_interleaved : InterleavedWord F κ ι := ⋈|u
+    -- Construct interleaved codeword from v
+    let v_interleaved : InterleavedWord F κ ι := interleaveWordStack v
+    have hv_interleaved_mem : v_interleaved ∈ interleavedCodeSet C := by
+      rw [mem_interleavedCode_iff]
+      intro k
+      exact (hv k).1
+    -- Now show that u_interleaved and v_interleaved agree on S
+    -- This gives us the distance bound
+    have h_agree_on_S : ∀ j ∈ S, u_interleaved j = getSymbol v_interleaved j := by
+      intro j hj
+      ext k
+      -- u_interleaved j k = u k j, v_interleaved j k = v k j; Need: u k j = v k j
+      have h_agree := (hv k).2
+      have hj_in_filter : j ∈ Finset.filter (fun j => v k j = u k j) Finset.univ := by
+        rw [Finset.mem_filter]
+        constructor
+        · exact Finset.mem_univ j
+        · -- v k j = u k j
+          have h_subset := Finset.subset_iff.mp h_agree
+          have hj_mem : j ∈ S := hj
+          let res := h_subset (x := j) hj_mem
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at res
+          exact res
+      simp only [Finset.mem_filter] at hj_in_filter
+      exact hj_in_filter.2.symm
+    -- From agreement on S, we get distance bound
+    have h_dist : δᵣ(u_interleaved, v_interleaved) ≤ δ := by
+      rw [relCloseToWord_iff_exists_agreementCols]
+      use S
+      rw [relDist_floor_bound_iff_complement_bound]
+      constructor
+      · exact hS_card
+      · intro j
+        constructor
+        · intro hj_in_S
+          have h_agree := h_agree_on_S j hj_in_S
+          exact h_agree
+        · intro hj_not_in_S
+          by_contra hj_in_S
+          exact hj_not_in_S (h_agree_on_S j hj_in_S)
+    rw [←ENNReal.coe_le_coe] at h_dist
+    -- Since v_interleaved ∈ MC.interleavedCode, we have δᵣ(u_interleaved, MC.interleavedCode) ≤ δ
+    unfold jointProximity
+    have h_min_dist : δᵣ(u_interleaved, interleavedCodeSet C) ≤ δᵣ(u_interleaved, v_interleaved)
+      := by
+      apply relDistFromCode_le_relDist_to_mem (u := u_interleaved) (C := interleavedCodeSet C)
+        (v := v_interleaved) (hv := hv_interleaved_mem)
+    exact le_trans h_min_dist h_dist
+  · -- Backward direction: jointProximity → jointAgreement
+    intro h_joint
+    unfold jointProximity at h_joint
+    let u_interleaved : InterleavedWord F κ ι := ⋈|u
+    -- h_joint says: δᵣ(u_interleaved, MC.interleavedCode) ≤ δ
+    -- This means there exists v in the interleaved code with δᵣ(u_interleaved, v) ≤ δ
+    have h_close := Code.closeToCode_iff_closeToCodeword_of_minDist
+      (C := (interleavedCodeSet C)) (u := u_interleaved)
+    -- Convert relative distance to natural distance
+    -- Key: if δᵣ(u, C) ≤ δ, there exists a codeword v with δᵣ(u, v) ≤ δ
+    have h_rel_to_nat : δᵣ(u_interleaved, interleavedCodeSet C) ≤ δ →
+        ∃ v ∈ (interleavedCodeSet C), δᵣ(u_interleaved, v) ≤ δ := by
+      intro h_rel
+      rw [relCloseToCode_iff_relCloseToCodeword_of_minDist] at h_rel
+      exact h_rel
+    have h_exists_v := h_rel_to_nat h_joint
+    rcases h_exists_v with ⟨v, hv_mem, hv_dist⟩
+    -- Now convert relative distance to agreement set
+    -- We need: δᵣ(u_interleaved, v) ≤ δ → ∃ S, |S| ≥ (1-δ)*|ι| and agreement
+    -- Convert relative distance δ to natural distance e
+    have h_nat_dist : Δ₀(u_interleaved, v) ≤ e := by
+      rw [pairRelDist_le_iff_pairDist_le (δ := δ)] at hv_dist
+      exact hv_dist
+    have h_agree := Code.closeToWord_iff_exists_agreementCols
+      (u := u_interleaved) (v := v) (e := e)
+    have h_agree_nat := h_agree.mp h_nat_dist
+    rcases h_agree_nat with ⟨S, hS_card, h_agree_S⟩
+    -- Now extract rows from v to get v : κ → ι → F
+    let v_rows : κ → ι → F := fun k => getRow v k
+    use S
+    constructor
+    · -- Prove |S| ≥ (1-δ)*|ι|
+      rw [ge_iff_le]
+      rw [relDist_floor_bound_iff_complement_bound] at hS_card
+      exact hS_card
+    · -- Prove agreement
+      use v_rows
+      intro i
+      constructor
+      · -- v_rows i ∈ MC
+        simp only [interleavedCodeSet, Set.mem_setOf_eq] at hv_mem
+        exact hv_mem i
+      · -- S ⊆ {j | v_rows i j = u i j}
+        simp only [Finset.subset_iff]
+        intro j hj_mem
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] -- ⊢ v_rows i j = u i j
+        have h_agree := h_agree_S (colIdx := j).1 hj_mem
+        apply congrArg (fun x => x i) at h_agree
+        exact id (Eq.symm h_agree)
+
+/-- The list of `κ`-fold codeword stacks whose interleaved codeword forms are
+(less-than)-`δ`-close to `⋈|u`. -/
+def relHammingBallInterleavedCode (u : WordStack A κ ι) (δ : ℝ≥0) : Set (CodewordStack A κ ι C) :=
+  {v : CodewordStack A κ ι (C := C) | δᵣ(⋈|u, (⋈|v).val) < δ}
+
+/-- `Λᵢ(u, C, δ)` denotes the list of `κ`-fold codeword stacks whose interleaved codeword forms are
+(less-than)-`δ`-close to `⋈|u`. -/
+notation "Λᵢ(" u "," C "," δ ")" => relHammingBallInterleavedCode C u δ
+
 end JointProximityDefinitions
 
 end Code
 end InterleavedCodeDefinitions
-
-noncomputable section
-
-open InterleavedCode
-open Code
-
-variable {F : Type*} [Field F] [Finite F] [DecidableEq F]
-         {κ : Type*} [Fintype κ]
-         {ι : Type*} [Fintype ι]
-
-local instance : Fintype F := Fintype.ofFinite F
-
-/-- `Lemma 4.3` from `[AHIV22]`.
--/
-lemma distInterleavedCodeToCodeLB
-  {IC : LawfulInterleavedCode κ ι F} {U : Matrix κ ι F} {e : ℕ}
-  (hF : Fintype.card F ≥ e)
-  (he : (e : ℚ) ≤ (minDist (IC.1.LC : Set (ι → F)) / 3)) (hU : e < Δ(U,IC.1.MF)) :
-  ∃ v ∈ Matrix.rowSpan U , e < distFromCode v IC.1.LC := sorry
-
-namespace ProximityToRS
-
-open ReedSolomonCode NNReal
-
-/-- The set of points on an affine line, which are within distance `e` from a Reed-Solomon code.
--/
-def closePtsOnAffineLine {ι : Type*} [Fintype ι]
-                         (u v : ι → F) (deg : ℕ) (α : ι ↪ F) (e : ℕ) : Set (ι → F) :=
-  {x : ι → F | x ∈ Affine.line u v ∧ distFromCode x (ReedSolomon.code α deg) ≤ e}
-
-/-- The number of points on an affine line between, which are within distance `e` from a
-Reed-Solomon code.
--/
-def numberOfClosePts (u v : ι → F) (deg : ℕ) (α : ι ↪ F) (e : ℕ) : ℕ :=
-  Fintype.card (closePtsOnAffineLine u v deg α e)
-
-/-- `Lemma 4.4` from `[AHIV22]`
-  Remark: Below, can use (ReedSolomonCode.minDist deg α) instead of ι - deg + 1 once proved.
--/
-lemma e_leq_dist_over_3 [DecidableEq F] {deg : ℕ} {α : ι ↪ F} {e : ℕ} {u v : ι → F}
-  (he : (e : ℚ) < (Code.minDist (RScodeSet α deg) : ℚ) / 3) :
-  ∀ x ∈ Affine.line u v, distFromCode x (ReedSolomon.code α deg) ≤ e
-  ∨ (numberOfClosePts u v deg α e) ≤ Code.minDist (RScodeSet α deg) := by sorry
-
-/-- `Lemma 4.5` from `[AHIV22]`.
--/
-lemma probOfBadPts {deg : ℕ} {α : ι ↪ F} {e : ℕ} {U : Matrix κ ι F}
-  (he : (e : ℚ) < (Code.minDist (RScodeSet α deg) : ℚ) / 3)
-  (hU : e < Δ(U, matrixSubmoduleOfLinearCode κ (ReedSolomon.code α deg))) :
-  (PMF.uniformOfFintype (Matrix.rowSpan U)).toOuterMeasure
-    { w | distFromCode (n := ι) (R := F) w (ReedSolomon.code α deg) ≤ e }
-  ≤ (Code.minDist (RScodeSet α deg) : ℝ≥0) /(Fintype.card F : ℝ≥0) := by
-  sorry
-
-end ProximityToRS
-end

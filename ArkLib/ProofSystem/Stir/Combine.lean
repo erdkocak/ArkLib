@@ -19,7 +19,7 @@ import ArkLib.ProofSystem.Stir.ProximityBound
     with fewer queries*][ACFY24stir]
 -/
 
-open BigOperators Finset NNReal
+open BigOperators Finset NNReal Code
 
 namespace Combine
 variable {m : ℕ}
@@ -158,7 +158,7 @@ lemma combine_theorem
                    (1 - (rate (code φ degree)) - 1 / Fintype.card ι)))
   (hProb : Pr_{ let r ← $ᵖ F}[δᵣ((combine φ dstar r fs degs), (code φ dstar)) ≤ δ] >
     proximityError F dstar (rate (code φ degree)) δ (m * (dstar + 1) - ∑ i, degs i)) :
-    ProximityGap.jointAgreement (F := F) (κ := Fin m) (ι := ι) (C := code φ degree)
+    jointAgreement (F := F) (κ := Fin m) (ι := ι) (C := code φ degree)
       (W := fs) (δ := δ)
     := by sorry
 

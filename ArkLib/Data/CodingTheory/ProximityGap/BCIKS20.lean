@@ -540,7 +540,6 @@ lemma exists_points_with_large_matching_subset
         * D := by sorry
 
 end BCIKS20ProximityGapSection5
-end
 
 section BCIKS20ProximityGapSection6
 variable {F : Type} [Field F] [Fintype F] [DecidableEq F] [DecidableEq (RatFunc F)]
@@ -558,7 +557,7 @@ def curve {l : ℕ} (u : Fin l → Fin n → F) (z : F) : Fin n → F :=
     The set `S` from the proximity gap paper.
 -/
 noncomputable def coeffs_of_close_proximity_curve {l : ℕ}
-  (δ : ℚ) (u : Fin l → Fin n → F) (V : Finset (Fin n → F)) : Finset F :=
+  (δ : ℚ≥0) (u : Fin l → Fin n → F) (V : Finset (Fin n → F)) : Finset F :=
   have : Fintype { z | δᵣ(curve u z, V) ≤ δ} := by infer_instance
   @Set.toFinset _ { z | δᵣ(curve u z, V) ≤ δ} this
 
@@ -571,8 +570,8 @@ noncomputable def coeffs_of_close_proximity_curve {l : ℕ}
     positions.
 -/
 theorem large_agreement_set_on_curve_implies_correlated_agreement {l : ℕ}
-  {rho : ℚ}
-  {δ : ℚ}
+  {rho : ℚ≥0}
+  {δ : ℚ≥0}
   {V : Finset (Fin n → F)}
   (hδ : δ ≤ (1 - rho) / 2)
   {u : Fin l → Fin n → F}
@@ -599,8 +598,8 @@ noncomputable def δ₀ (rho : ℚ) (m : ℕ) : ℝ :=
 theorem large_agreement_set_on_curve_implies_correlated_agreement' {l : ℕ}
   [Finite F]
   {m : ℕ}
-  {rho : ℚ}
-  {δ : ℚ}
+  {rho : ℚ≥0}
+  {δ : ℚ≥0}
   (hm : 3 ≤ m)
   {V : Finset (Fin n → F)}
   (hδ : δ ≤ δ₀ rho m)
@@ -722,7 +721,7 @@ theorem weighted_correlated_agreement_for_parameterized_curves
   (hα₁ : α < 1) →
   letI ε := ProximityGap.errorBound δ deg domain
   letI pr :=
-    let curve := Curve.parametrisedCurveFinite u
+    let curve := Curve.polynomialCurveFinite (F := F) (A := F) u
     Pr_{let u ←$ᵖ curve}[agree_set μ u (finCarrier domain deg) ≥ α]
   (hproximity : pr > (l + 1 : NNReal) * ε) →
   (h_additionally : pr ≥

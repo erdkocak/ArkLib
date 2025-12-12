@@ -39,6 +39,7 @@ import ArkLib.Data.CodingTheory.JohnsonBound.Lemmas
 import ArkLib.Data.CodingTheory.ListDecodability
 import ArkLib.Data.CodingTheory.PolishchukSpielman
 import ArkLib.Data.CodingTheory.Prelims
+import ArkLib.Data.CodingTheory.ProximityGap.AHIV22
 import ArkLib.Data.CodingTheory.ProximityGap.BCIKS20
 import ArkLib.Data.CodingTheory.ProximityGap.Basic
 import ArkLib.Data.CodingTheory.ProximityGap.DG25

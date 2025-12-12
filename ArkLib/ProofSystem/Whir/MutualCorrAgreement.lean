@@ -162,7 +162,7 @@ theorem mca_capacity_bound_CONJECTURE
 
 section
 
-open InterleavedCode ListDecodable
+open ListDecodable
 
 /-- For `parℓ` functions `{f₀,..,f_{parℓ - 1}}`,
   `IC` be the `parℓ`-interleaved code from a linear code C,
@@ -173,11 +173,10 @@ open InterleavedCode ListDecodable
 def proximityListDecodingCondition (C : LinearCode ι F)
   [Fintype ι] [Nonempty ι]
   (r : parℓ → F) [Fintype parℓ]
-  (δ : ℝ) (fs : Matrix parℓ ι F)
-  (IC : InterleavedCode parℓ ι F) : Prop :=
+  (δ : ℝ≥0) (fs : Matrix parℓ ι F) : Prop := -- fs is a WordStack
       let f_r := fun x => ∑ j, r j * fs j x
       let listHamming := relHammingBall C f_r δ
-      let listIC := { fun x => ∑ j, r j * us j x | us ∈ Λᵢ(fs, IC.MF, δ)}
+      let listIC := { fun x => ∑ j, r j * (us.val j x) | us ∈ Λᵢ(fs, (C : Set (ι → F)), δ)}
       listHamming ≠ listIC
 
 
@@ -189,16 +188,14 @@ def proximityListDecodingCondition (C : LinearCode ι F)
 lemma mca_list_decoding
   [Fintype ι] [Nonempty ι]
   (Gen : ProximityGenerator ι F) [Fintype Gen.parℓ]
-  (δ BStar : ℝ) (errStar : ℝ → ENNReal)
+  (δ BStar : ℝ≥0) (errStar : ℝ → ENNReal)
   (fs us : Matrix Gen.parℓ ι F)
-  (IC : InterleavedCode Gen.parℓ ι F)
-  (haveIC : IC = codeOfLinearCode Gen.parℓ Gen.C)
-      (hGen : hasMutualCorrAgreement Gen BStar errStar)
+  (hGen : hasMutualCorrAgreement Gen BStar errStar)
   (C : Set (ι → F)) (hC : C = Gen.C) :
     haveI := Gen.Gen_nonempty
     ∀ {fs : Matrix Gen.parℓ ι F}
-    (hδPos : δ > 0) (hδLt : δ < min (δᵣ C : ℝ) (1 - BStar)),
-      Pr_{let r ←$ᵖ Gen.Gen}[ proximityListDecodingCondition Gen.C r δ fs IC ]
+    (hδPos : δ > 0) (hδLt : δ < min ((δᵣ C) : ℝ≥0) (1 - BStar)),
+      Pr_{let r ←$ᵖ Gen.Gen}[ proximityListDecodingCondition Gen.C r δ fs ]
         ≤ errStar δ
   := by sorry
 

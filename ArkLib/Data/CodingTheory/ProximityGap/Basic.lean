@@ -68,10 +68,9 @@ module codes over (scalar) rings.
 namespace ProximityGap
 
 open NNReal Finset Function
-open scoped BigOperators
-open NNReal Finset Function ProbabilityTheory Finset
+open scoped ProbabilityTheory
 open scoped BigOperators LinearCode
-open Code
+open Code Affine
 
 universe u v w k l
 
@@ -99,133 +98,6 @@ def proximityGap (d : ℕ) (bound : ℕ) : Prop :=
     →
     letI : Fintype (C ^⋈ (Fin 2)) := interleavedCodeSet_fintype (C := C)
     (Δ₀(u ⋈₂ v, C ^⋈ (Fin 2)) ≤ d)
-
-/-- The consequent of correlated agreement: Words collectively agree on the same set of coordinates
-`S` with the base code `C`.
-Variants of this definition **should follow the naming conventions of `jointProximity`**
-if possible, for consistency.
-TOOD: this can generalize further to support the consequent of mutual correlated agreement. -/
-def jointAgreement {κ ι : Type*} [Fintype ι] [DecidableEq F] [DecidableEq ι]
-    (C : Set (ι → F)) (δ : ℝ≥0) (W : κ → ι → F) : Prop :=
-  ∃ S : Finset ι, #(S) ≥ (1 - δ) * (Fintype.card ι) ∧
-    ∃ v : κ → ι → F, ∀ i, v i ∈ C ∧ S ⊆ Finset.filter (fun j => v i j = W i j) Finset.univ
-
-open InterleavedCode in
-omit [Ring F] [Fintype F] [DecidableEq F] in
-/-- Equivalence between the agreement-based definition `jointAgreement` and
-the distance/proximity-based definition `jointProximity` (the latter is represented in
-upperbound of interleaved-code distance). -/
-@[simp]
-theorem jointAgreement_iff_jointProximity
-    {κ ι : Type*} [Fintype κ] [Fintype ι] [Nonempty ι] [DecidableEq F] [DecidableEq ι]
-    (C : Set (ι → F)) (u : WordStack F κ ι) (δ : ℝ≥0) :
-    jointAgreement (C := C) δ u  ↔ jointProximity (C := C) u δ := by
-  let e : ℕ := Nat.floor (δ * Fintype.card ι)
-  constructor
-  · -- Forward direction: jointAgreement → jointProximity
-    intro h_words
-    rcases h_words with ⟨S, hS_card, v, hv⟩
-    -- We have: |S| ≥ (1-δ)*|ι| and ∀ i, v i ∈ MC and S ⊆ {j | v i j = u i j}
-    -- Need to show: δᵣ(u_interleaved, MC.interleavedCode) ≤ δ
-    -- Define interleaved word from u
-    let u_interleaved : InterleavedWord F κ ι := ⋈|u
-    -- Construct interleaved codeword from v
-    let v_interleaved : InterleavedWord F κ ι := interleaveWordStack v
-    have hv_interleaved_mem : v_interleaved ∈ interleavedCodeSet C := by
-      rw [mem_interleavedCode_iff]
-      intro k
-      exact (hv k).1
-    -- Now show that u_interleaved and v_interleaved agree on S
-    -- This gives us the distance bound
-    have h_agree_on_S : ∀ j ∈ S, u_interleaved j = getSymbol v_interleaved j := by
-      intro j hj
-      ext k
-      -- u_interleaved j k = u k j, v_interleaved j k = v k j; Need: u k j = v k j
-      have h_agree := (hv k).2
-      have hj_in_filter : j ∈ Finset.filter (fun j => v k j = u k j) Finset.univ := by
-        rw [Finset.mem_filter]
-        constructor
-        · exact Finset.mem_univ j
-        · -- v k j = u k j
-          have h_subset := Finset.subset_iff.mp h_agree
-          have hj_mem : j ∈ S := hj
-          let res := h_subset (x := j) hj_mem
-          simp only [mem_filter, mem_univ, true_and] at res
-          exact res
-      simp only [Finset.mem_filter] at hj_in_filter
-      exact hj_in_filter.2.symm
-    -- From agreement on S, we get distance bound
-    have h_dist : δᵣ(u_interleaved, v_interleaved) ≤ δ := by
-      rw [relCloseToWord_iff_exists_agreementCols]
-      use S
-      rw [relDist_floor_bound_iff_complement_bound]
-      constructor
-      · exact hS_card
-      · intro j
-        constructor
-        · intro hj_in_S
-          have h_agree := h_agree_on_S j hj_in_S
-          exact h_agree
-        · intro hj_not_in_S
-          by_contra hj_in_S
-          exact hj_not_in_S (h_agree_on_S j hj_in_S)
-    rw [←ENNReal.coe_le_coe] at h_dist
-    -- Since v_interleaved ∈ MC.interleavedCode, we have δᵣ(u_interleaved, MC.interleavedCode) ≤ δ
-    unfold jointProximity
-    have h_min_dist : δᵣ(u_interleaved, interleavedCodeSet C) ≤ δᵣ(u_interleaved, v_interleaved)
-      := by
-      apply relDistFromCode_le_relDist_to_mem (u := u_interleaved) (C := interleavedCodeSet C)
-        (v := v_interleaved) (hv := hv_interleaved_mem)
-    exact le_trans h_min_dist h_dist
-  · -- Backward direction: jointProximity → jointAgreement
-    intro h_joint
-    unfold jointProximity at h_joint
-    let u_interleaved : InterleavedWord F κ ι := ⋈|u
-    -- h_joint says: δᵣ(u_interleaved, MC.interleavedCode) ≤ δ
-    -- This means there exists v in the interleaved code with δᵣ(u_interleaved, v) ≤ δ
-    have h_close := Code.closeToCode_iff_closeToCodeword_of_minDist
-      (C := (interleavedCodeSet C)) (u := u_interleaved)
-    -- Convert relative distance to natural distance
-    -- Key: if δᵣ(u, C) ≤ δ, there exists a codeword v with δᵣ(u, v) ≤ δ
-    have h_rel_to_nat : δᵣ(u_interleaved, interleavedCodeSet C) ≤ δ →
-        ∃ v ∈ (interleavedCodeSet C), δᵣ(u_interleaved, v) ≤ δ := by
-      intro h_rel
-      rw [relCloseToCode_iff_relCloseToCodeword_of_minDist] at h_rel
-      exact h_rel
-    have h_exists_v := h_rel_to_nat h_joint
-    rcases h_exists_v with ⟨v, hv_mem, hv_dist⟩
-    -- Now convert relative distance to agreement set
-    -- We need: δᵣ(u_interleaved, v) ≤ δ → ∃ S, |S| ≥ (1-δ)*|ι| and agreement
-    -- Convert relative distance δ to natural distance e
-    have h_nat_dist : Δ₀(u_interleaved, v) ≤ e := by
-      rw [pairRelDist_le_iff_pairDist_le (δ := δ)] at hv_dist
-      exact hv_dist
-    have h_agree := Code.closeToWord_iff_exists_agreementCols
-      (u := u_interleaved) (v := v) (e := e)
-    have h_agree_nat := h_agree.mp h_nat_dist
-    rcases h_agree_nat with ⟨S, hS_card, h_agree_S⟩
-    -- Now extract rows from v to get v : κ → ι → F
-    let v_rows : κ → ι → F := fun k => getRow v k
-    use S
-    constructor
-    · -- Prove |S| ≥ (1-δ)*|ι|
-      rw [ge_iff_le]
-      rw [relDist_floor_bound_iff_complement_bound] at hS_card
-      exact hS_card
-    · -- Prove agreement
-      use v_rows
-      intro i
-      constructor
-      · -- v_rows i ∈ MC
-        simp only [interleavedCodeSet, Set.mem_setOf_eq] at hv_mem
-        exact hv_mem i
-      · -- S ⊆ {j | v_rows i j = u i j}
-        simp only [Finset.subset_iff]
-        intro j hj_mem
-        simp only [mem_filter, mem_univ, true_and] -- ⊢ v_rows i j = u i j
-        have h_agree := h_agree_S (colIdx := j).1 hj_mem
-        apply congrArg (fun x => x i) at h_agree
-        exact id (Eq.symm h_agree)
 
 variable {ι : Type} [Fintype ι] [Nonempty ι] [DecidableEq ι]
   {F : Type} [Ring F] [Fintype F] [DecidableEq F]
@@ -275,10 +147,12 @@ def δ_ε_multilinearCorrelatedAgreement [CommRing F]
     ] > (ϑ : ℝ≥0) * ε →
     jointAgreement (F := A) (κ := Fin (2 ^ ϑ)) (ι := ι) (C := C) (W := u) (δ := δ)
 
-/-- Definition: `(δ, ε)`-correlated agreement for low-degree parameterised curves.
-For every curve passing through words `u₀, ..., uκ`, if the probability that a random point on the
-curve is `δ`-close to the code `C` is at most `ε`, then the words `u₀, ..., uκ` have
-correlated agreement.
+/-- **`(δ, ε)`-CA for low-degree parameterised (polynomial) curves**: Generalized statement of
+**Theorem 1.5, [BCIKS20]**
+For `k+1` words `u₀, u₁, ..., uₖ ∈ A^ι` let `curve(u) = {∑_{i ∈ {0, ..., k}}, z^i • u_i | z ∈ 𝔽}`
+be a low-degree parameterised polynomial curve. If the probability that a random point in
+`curve(u)` is `δ`-close to `C` exceeds `k * ε` (not `(k+1) * ε`), then the words `u₀, ..., uₖ`
+have correlated agreement.
 **NOTE**: this definition could be converted into the form of Pr_{let r ← $ᵖ F}[...] if we want:
   + consistency with `δ_ε_correlatedAgreementAffineLines`
   + making `A` be of arbitrary type universe (Type*)
@@ -287,17 +161,20 @@ correlated agreement.
 noncomputable def δ_ε_correlatedAgreementCurves {k : ℕ}
     {A : Type 0} [AddCommMonoid A] [Module F A] [Fintype A] [DecidableEq A]
     (C : Set (ι → A)) (δ ε : ℝ≥0) : Prop :=
-  ∀ (u : WordStack (A := A) (κ := Fin k) (ι := ι)),
-    Pr_{let y ← $ᵖ (Curve.parametrisedCurveFinite (F := F) (A := A) u)}[ δᵣ(y.1, C) ≤ δ ] > ε →
-    jointAgreement (F := A) (κ := Fin k) (ι := ι) (C := C) (W := u) (δ := δ)
+  ∀ (u : WordStack (A := A) (κ := Fin (k + 1)) (ι := ι)),
+    Pr_{let y ← $ᵖ (Curve.polynomialCurveFinite (F := F) (A := A) u)}[ δᵣ(y.1, C) ≤ δ ] > k * ε
+      → jointAgreement (F := A) (κ := Fin (k + 1)) (ι := ι) (C := C) (W := u) (δ := δ)
 
+/-- **`(δ, ε)`-CA for affine spaces**: Generalized statement of **Theorem 1.6, [BCIKS20]**
+For `k+1` words `u₀, u₁, ..., uₖ ∈ A^ι` let `U = u₀ + span{u₁, ..., uₖ} ⊂ A^ι` be an affine subspace
+(note that `span` here means linear span, so this formulation is not same as the default
+affine span/affine hull). If the probability that a random point in `U` is `δ`-close to `C`
+exceeds `ε`, then the words `u₀, u₁, ..., uₖ` have correlated agreement. -/
 noncomputable def δ_ε_correlatedAgreementAffineSpaces
     {A : Type 0} [AddCommGroup A] [Module F A] [Fintype A] [DecidableEq A]
     (C : Set (ι → A)) (δ ε : ℝ≥0) : Prop :=
-  ∀ (u : WordStack (A := A) (κ := Fin (k + 1)) (ι := ι)), -- Affine.instFintypeAffineSubspace
-    let affineSubspace : AffineSubspace F (ι → A) :=
-      AffineSubspace.mk' (p := u 0) (direction := Submodule.span F (Finset.univ.image (Fin.tail u)))
-    Pr_{let y ← $ᵖ (affineSubspace)}[ δᵣ(y.1, C) ≤ δ ] > ε →
+  ∀ (u : WordStack (A := A) (κ := Fin (k + 1)) (ι := ι)),
+    Pr_{let y ← $ᵖ (affineSubspaceAtOrigin (F := F) (u 0) (Fin.tail u))}[ δᵣ(y.1, C) ≤ δ ] > ε →
     jointAgreement (F := A) (κ := Fin (k + 1)) (ι := ι) (C := C) (W := u) (δ := δ)
 
 end CoreSecurityDefinitions

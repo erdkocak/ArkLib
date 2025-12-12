@@ -87,6 +87,10 @@ import ArkLib.Data.Nat.Bitwise
 
   We define the block length, rate, and distance of `C`. We prove simple properties of linear codes
   such as the singleton bound.
+
+## TODOs
+- Implement `ENNRat (ℚ≥0∞)`, for usage in `relDistFromCode` and `relDistFromCode'`,
+  as counterpart of `ENat (ℕ∞)` in `distFromCode` and `distFromCode'`.
 -/
 
 variable {n : Type*} [Fintype n] {R : Type*} [DecidableEq R]
