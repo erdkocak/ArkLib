@@ -940,6 +940,48 @@ lemma add_descends [LawfulBEq R] (a₁ b₁ a₂ b₂ : UniPoly R) :
 def add {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : QuotientUniPoly R :=
   Quotient.lift₂ add_descending add_descends p q
 
+-- Scalar multiplication: smul descends to `QuotientUniPoly`
+  -- Scalar multiplication of `UniPoly` by an element of `R`.
+  -- @[inline, specialize]
+  -- def smul (r : R) (p : UniPoly R) : UniPoly R :=
+  --   .mk (Array.map (fun a => r * a) p)
+def smul_descending (r : R) (p : UniPoly R) : QuotientUniPoly R :=
+  Quotient.mk _ (smul r p)
+
+lemma smul_descends [LawfulBEq R] (r : R) (p₁ p₂ : UniPoly R) :
+  equiv p₁ p₂ → smul_descending r p₁ = smul_descending r p₂ := by
+
+  sorry
+
+@[inline, specialize]
+def smul {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (r : R) (p : QuotientUniPoly R) : QuotientUniPoly R :=
+  Quotient.lift (smul_descending r) (smul_descends r) p
+
+-- Scalar multiplication: nsmul_raw descends to `QuotientUniPoly`
+  -- Scalar multiplication of `UniPoly` by a natural number.
+  -- @[inline, specialize]
+  -- def nsmul_raw (n : ℕ) (p : UniPoly R) : UniPoly R :=
+  --   .mk (Array.map (fun a => n * a) p)
+  -- NB this is just the same ..
+
+-- Scalar multiplication: nsmul descends to `QuotientUniPoly`
+  -- Scalar multiplication of `UniPoly` by a natural number, with result trimmed.
+  -- @[inline, specialize]
+  -- def nsmul (n : ℕ) (p : UniPoly R) : UniPoly R :=
+  --   nsmul_raw n p |> trim
+def nsmul_descending (n : ℕ) (p : UniPoly R) : QuotientUniPoly R :=
+  Quotient.mk _ (nsmul n p)
+
+lemma nsmul_descends (n : ℕ) (p₁ p₂ : UniPoly R) :
+  equiv p₁ p₂ → nsmul_descending n p₁ = nsmul_descending n p₂ := by
+  -- unfold raw
+  -- some sort of raw equivalence
+  sorry
+
+@[inline, specialize]
+def nsmul {R : Type*} [Ring R] [BEq R] (n : ℕ) (p : QuotientUniPoly R) : QuotientUniPoly R :=
+  Quotient.lift (nsmul_descending n) (nsmul_descends n) p
+
 -- Negation: neg descends to `QuotientUniPoly`
 def neg_descending (p : UniPoly R) : QuotientUniPoly R :=
   Quotient.mk _ (neg p)
@@ -980,7 +1022,80 @@ lemma sub_descends [LawfulBEq R] (a₁ b₁ a₂ b₂ : UniPoly R) :
 def sub {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : QuotientUniPoly R :=
   Quotient.lift₂ sub_descending sub_descends p q
 
--- TODO the other operations ...
+-- Multiplication by `X ^ i`: mulPowX descends to `QuotientUniPoly`
+  -- Multiplication of a `UniPoly` by `X ^ i`, i.e. pre-pending `i` zeroes to the underlying
+  --   array of coefficients.
+  -- @[inline, specialize]
+  -- def mulPowX (i : Nat) (p : UniPoly R) : UniPoly R := .mk (Array.replicate i 0 ++ p)
+def mulPowX_descending (i : ℕ) (p : UniPoly R) : QuotientUniPoly R :=
+  Quotient.mk _ (mulPowX i p)
+
+lemma mulPowX_descends (i : ℕ) (p₁ p₂ : UniPoly R) :
+  equiv p₁ p₂ → mulPowX_descending i p₁ = mulPowX_descending i p₂ := by
+
+  sorry
+
+@[inline, specialize]
+def mulPowX {R : Type*} [Ring R] [BEq R] (i : ℕ) (p : QuotientUniPoly R) : QuotientUniPoly R :=
+  Quotient.lift (mulPowX_descending i) (mulPowX_descends i) p
+
+-- Multiplication of a `UniPoly` by `X`, reduces to `mulPowX 1`.
+@[inline, specialize]
+def mulX (p : QuotientUniPoly R) : QuotientUniPoly R := p.mulPowX 1
+
+-- Multiplication: mul descends to `QuotientPoly`
+def mul_descending (p q : UniPoly R) : QuotientUniPoly R :=
+  Quotient.mk _ (mul p q)
+
+lemma mul_equiv (a₁ a₂ b : UniPoly R) :
+  a₁ ≈ a₂ → a₁.mul b ≈ a₂.mul b := by
+  intro heq_a
+  unfold mul
+
+  -- NOTE could be padded with zeros ...
+
+  have hzip : Array.zipIdx a₁ = Array.zipIdx a₂ := by
+    unfold Array.zipIdx
+
+    sorry
+  -- rw [hzip]
+  sorry
+
+lemma mul_comm (a b : UniPoly R) :
+  a.mul b ≈ b.mul a := by
+  unfold mul
+
+  sorry
+
+lemma mul_descends [LawfulBEq R] (a₁ b₁ a₂ b₂ : UniPoly R) :
+  equiv a₁ a₂ → equiv b₁ b₂ → mul_descending a₁ b₁ = mul_descending a₂ b₂ := by
+  unfold mul_descending
+  intros heq_a heq_b
+  rw [Quotient.eq]
+  simp [instSetoidUniPoly]
+  calc
+    a₁.mul b₁ ≈ a₂.mul b₁ := mul_equiv a₁ a₂ b₁ heq_a
+    _ ≈ b₁.mul a₂ := mul_comm a₂ b₁
+    _ ≈ b₂.mul a₂ := mul_equiv b₁ b₂ a₂ heq_b
+    _ ≈ a₂.mul b₂ := mul_comm b₂ a₂
+
+@[inline, specialize]
+def mul {R : Type} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : QuotientUniPoly R :=
+  Quotient.lift₂ mul_descending mul_descends p q
+
+-- Exponentiation: pow descends to `QuotientUniPoly`
+  -- Exponentiation of a `UniPoly` by a natural number `n` via repeated multiplication.
+  -- @[inline, specialize]
+  -- def pow (p : UniPoly R) (n : Nat) : UniPoly R := (mul p)^[n] (C 1)
+def pow_descending (p : UniPoly R) (n : ℕ) : QuotientUniPoly R :=
+  Quotient.mk _ (pow p n)
+
+lemma pow_descends (n : ℕ) (p₁ p₂ : UniPoly R) :
+  equiv p₁ p₂ → pow_descending p₁ n = pow_descending p₂ n := by sorry
+
+@[inline, specialize]
+def pow {R : Type*} [Ring R] [BEq R] (p : QuotientUniPoly R) (n : ℕ) : QuotientUniPoly R :=
+  Quotient.lift (fun p => pow_descending p n) (pow_descends n) p
 
 end QuotientUniPoly
 
