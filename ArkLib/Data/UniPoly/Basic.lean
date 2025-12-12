@@ -598,6 +598,15 @@ lemma trim_add_trim [LawfulBEq R] (p q : UniPoly R) : p.trim + q = p + q := by
   intro i
   rw [add_coeff?, add_coeff?, Trim.coeff_eq_coeff]
 
+def smul_equiv : ∀ (p : UniPoly R) (i : ℕ) (r : R),
+    (smul r p).coeff i = r * (p.coeff i) := by sorry
+
+def nsmul_raw_equiv : ∀ (p : UniPoly R) (n i : ℕ),
+  (nsmul_raw n p).trim.coeff i = n * p.trim.coeff i := by sorry
+
+def mulPowX_equiv : ∀ (p : UniPoly R) (i j : ℕ),
+  (mulPowX i p).coeff j = p.coeff (j - i) := by sorry
+
 -- algebra theorems about addition
 
 omit [Ring Q] in
@@ -919,6 +928,15 @@ def QuotientUniPoly (R : Type*) [Ring R] [BEq R] := Quotient (@instSetoidUniPoly
 -- operations on `UniPoly` descend to `QuotientUniPoly`
 namespace QuotientUniPoly
 
+lemma mul_equiv (a₁ a₂ b : UniPoly R) :
+  equiv a₁ a₂ → equiv (a₁.mul b) (a₂.mul b) := by sorry
+
+lemma mul_comm (a b : UniPoly R) :
+  a.mul b ≈ b.mul a := by sorry
+
+lemma pow_equiv : ∀ (p : UniPoly R) (n : ℕ),
+  (p.mul^[n + 1] (C 1)) ≈ (p.mul (p.mul^[n] (C 1))) := by sorry
+
 -- Addition: add descends to `QuotientUniPoly`
 def add_descending (p q : UniPoly R) : QuotientUniPoly R :=
   Quotient.mk _ (add p q)
@@ -941,45 +959,43 @@ def add {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : Q
   Quotient.lift₂ add_descending add_descends p q
 
 -- Scalar multiplication: smul descends to `QuotientUniPoly`
-  -- Scalar multiplication of `UniPoly` by an element of `R`.
-  -- @[inline, specialize]
-  -- def smul (r : R) (p : UniPoly R) : UniPoly R :=
-  --   .mk (Array.map (fun a => r * a) p)
 def smul_descending (r : R) (p : UniPoly R) : QuotientUniPoly R :=
   Quotient.mk _ (smul r p)
 
 lemma smul_descends [LawfulBEq R] (r : R) (p₁ p₂ : UniPoly R) :
   equiv p₁ p₂ → smul_descending r p₁ = smul_descending r p₂ := by
-
-  sorry
+  unfold equiv smul_descending
+  intro heq
+  rw [Quotient.eq]
+  simp [instSetoidUniPoly]
+  intro i
+  rw [smul_equiv p₁, smul_equiv p₂]
+  rw [heq i]
 
 @[inline, specialize]
-def smul {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (r : R) (p : QuotientUniPoly R) : QuotientUniPoly R :=
+def smul {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (r : R) (p : QuotientUniPoly R)
+  : QuotientUniPoly R :=
   Quotient.lift (smul_descending r) (smul_descends r) p
 
 -- Scalar multiplication: nsmul_raw descends to `QuotientUniPoly`
-  -- Scalar multiplication of `UniPoly` by a natural number.
-  -- @[inline, specialize]
-  -- def nsmul_raw (n : ℕ) (p : UniPoly R) : UniPoly R :=
-  --   .mk (Array.map (fun a => n * a) p)
-  -- NB this is just the same ..
-
--- Scalar multiplication: nsmul descends to `QuotientUniPoly`
-  -- Scalar multiplication of `UniPoly` by a natural number, with result trimmed.
-  -- @[inline, specialize]
-  -- def nsmul (n : ℕ) (p : UniPoly R) : UniPoly R :=
-  --   nsmul_raw n p |> trim
 def nsmul_descending (n : ℕ) (p : UniPoly R) : QuotientUniPoly R :=
   Quotient.mk _ (nsmul n p)
 
-lemma nsmul_descends (n : ℕ) (p₁ p₂ : UniPoly R) :
+lemma nsmul_descends [LawfulBEq R] (n : ℕ) (p₁ p₂ : UniPoly R) :
   equiv p₁ p₂ → nsmul_descending n p₁ = nsmul_descending n p₂ := by
-  -- unfold raw
-  -- some sort of raw equivalence
-  sorry
+  unfold equiv
+  intro heq
+  unfold nsmul_descending
+  rw [Quotient.eq]
+  simp [instSetoidUniPoly]
+  unfold nsmul equiv
+  intro i
+  repeat rw [nsmul_raw_equiv, coeff_eq_coeff]
+  rw [heq i]
 
 @[inline, specialize]
-def nsmul {R : Type*} [Ring R] [BEq R] (n : ℕ) (p : QuotientUniPoly R) : QuotientUniPoly R :=
+def nsmul {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (n : ℕ) (p : QuotientUniPoly R)
+  : QuotientUniPoly R :=
   Quotient.lift (nsmul_descending n) (nsmul_descends n) p
 
 -- Negation: neg descends to `QuotientUniPoly`
@@ -1023,17 +1039,19 @@ def sub {R : Type*} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : Q
   Quotient.lift₂ sub_descending sub_descends p q
 
 -- Multiplication by `X ^ i`: mulPowX descends to `QuotientUniPoly`
-  -- Multiplication of a `UniPoly` by `X ^ i`, i.e. pre-pending `i` zeroes to the underlying
-  --   array of coefficients.
-  -- @[inline, specialize]
-  -- def mulPowX (i : Nat) (p : UniPoly R) : UniPoly R := .mk (Array.replicate i 0 ++ p)
 def mulPowX_descending (i : ℕ) (p : UniPoly R) : QuotientUniPoly R :=
   Quotient.mk _ (mulPowX i p)
 
 lemma mulPowX_descends (i : ℕ) (p₁ p₂ : UniPoly R) :
   equiv p₁ p₂ → mulPowX_descending i p₁ = mulPowX_descending i p₂ := by
-
-  sorry
+  unfold equiv
+  intro heq
+  unfold mulPowX_descending
+  rw [Quotient.eq]
+  simp [instSetoidUniPoly]
+  intro j
+  rw [mulPowX_equiv p₁, mulPowX_equiv p₂]
+  rw [heq]
 
 @[inline, specialize]
 def mulPowX {R : Type*} [Ring R] [BEq R] (i : ℕ) (p : QuotientUniPoly R) : QuotientUniPoly R :=
@@ -1046,26 +1064,6 @@ def mulX (p : QuotientUniPoly R) : QuotientUniPoly R := p.mulPowX 1
 -- Multiplication: mul descends to `QuotientPoly`
 def mul_descending (p q : UniPoly R) : QuotientUniPoly R :=
   Quotient.mk _ (mul p q)
-
-lemma mul_equiv (a₁ a₂ b : UniPoly R) :
-  a₁ ≈ a₂ → a₁.mul b ≈ a₂.mul b := by
-  intro heq_a
-  unfold mul
-
-  -- NOTE could be padded with zeros ...
-
-  have hzip : Array.zipIdx a₁ = Array.zipIdx a₂ := by
-    unfold Array.zipIdx
-
-    sorry
-  -- rw [hzip]
-  sorry
-
-lemma mul_comm (a b : UniPoly R) :
-  a.mul b ≈ b.mul a := by
-  unfold mul
-
-  sorry
 
 lemma mul_descends [LawfulBEq R] (a₁ b₁ a₂ b₂ : UniPoly R) :
   equiv a₁ a₂ → equiv b₁ b₂ → mul_descending a₁ b₁ = mul_descending a₂ b₂ := by
@@ -1084,18 +1082,33 @@ def mul {R : Type} [Ring R] [BEq R] [LawfulBEq R] (p q : QuotientUniPoly R) : Qu
   Quotient.lift₂ mul_descending mul_descends p q
 
 -- Exponentiation: pow descends to `QuotientUniPoly`
-  -- Exponentiation of a `UniPoly` by a natural number `n` via repeated multiplication.
-  -- @[inline, specialize]
-  -- def pow (p : UniPoly R) (n : Nat) : UniPoly R := (mul p)^[n] (C 1)
 def pow_descending (p : UniPoly R) (n : ℕ) : QuotientUniPoly R :=
   Quotient.mk _ (pow p n)
 
 lemma pow_descends (n : ℕ) (p₁ p₂ : UniPoly R) :
-  equiv p₁ p₂ → pow_descending p₁ n = pow_descending p₂ n := by sorry
+  equiv p₁ p₂ → pow_descending p₁ n = pow_descending p₂ n := by
+  intro heq
+  unfold pow_descending
+  rw [Quotient.eq]
+  simp [instSetoidUniPoly]
+  unfold pow
+  -- intro i
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    calc
+      p₁.mul^[n + 1] (C 1) ≈ p₁.mul (p₁.mul^[n] (C 1)) := pow_equiv p₁ n
+      _ ≈ (p₁.mul^[n] (C 1)).mul p₁ := mul_comm p₁ (p₁.mul^[n] (C 1))
+      _ ≈ (p₂.mul^[n] (C 1)).mul p₁ := mul_equiv _ _ p₁ ih
+      _ ≈ p₁.mul (p₂.mul^[n] (C 1)) := mul_comm (p₂.mul^[n] (C 1)) p₁
+      _ ≈ p₂.mul (p₂.mul^[n] (C 1)) := mul_equiv _ _ (p₂.mul^[n] (C 1)) heq
+      _ ≈ p₂.mul^[n + 1] (C 1) := equiv_symm (pow_equiv p₂ n)
 
 @[inline, specialize]
 def pow {R : Type*} [Ring R] [BEq R] (p : QuotientUniPoly R) (n : ℕ) : QuotientUniPoly R :=
   Quotient.lift (fun p => pow_descending p n) (pow_descends n) p
+
+-- TODO div?
 
 end QuotientUniPoly
 
