@@ -1,13 +1,13 @@
 /-
 Copyright (c) 2025 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Mirco Richter, Poulami Das (Least Authority)
+Authors: Mirco Richter, Poulami Das (Least Authority), Alexander Hicks
 -/
 
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.CodingTheory.ListDecodability
 import ArkLib.Data.Probability.Notation
-import ArkLib.ProofSystem.Stir.ProximityBound
+import ArkLib.Data.CodingTheory.Proximity.Bound
 
 import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.Algebra.MvPolynomial.Degrees
@@ -139,7 +139,20 @@ lemma degree_bound_bivariate
 
 /-- Definition 4.7
   `polyFold(f, k, r)` "folds" the polynomial `f`
-  producing a new polynomial of deree  `< degree(f)/k`. -/
+  producing a new polynomial of deree  `< degree(f)/k`.
+
+  **Note on Variable Mapping:**
+  The `polyQ` function uses `MonomialOrder.lex` on `Fin 2` to decompose `f`.
+  In Mathlib's `lex`, `X 0 > X 1`. The division reduces the "leading" variable `X 0` (index 0)
+  replacing `(X 0)^k` with `X 1` (index 1).
+  Therefore:
+  * Index 0 (`X 0`) represents the remainder/fiber variable (`Y` in STIR paper), with degree `< k`.
+  * Index 1 (`X 1`) represents the quotient/folded variable (`Z` in STIR paper).
+
+  To implement folding ($f(X) \to \sum r^j G_j(X)$), we must map:
+  * `X 0` (fiber) $\to$ randomness `r`
+  * `X 1` (folded) $\to$ new variable `X`
+-/
 noncomputable def polyFold
   [DecidableEq F] (fPoly : Polynomial F)
   (k : ℕ) (hk0 : 0 < k) (hkfin : k < Fintype.card F)
@@ -151,7 +164,7 @@ noncomputable def polyFold
     let Q : MvPolynomial (Fin 2) F := polyQ fPoly qPoly
     MvPolynomial.eval₂Hom
       (Polynomial.C : F →+* Polynomial F)
-      (fun i : Fin 2 => if i = 0 then Polynomial.X else Polynomial.C r) Q
+      (fun i => if i = 0 then Polynomial.C r else Polynomial.X) Q
 
 open Domain
 
