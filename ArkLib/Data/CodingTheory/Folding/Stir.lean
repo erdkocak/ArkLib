@@ -113,14 +113,14 @@ lemma exists_unique_bivariate
   (hdeg_q_max : qPoly.natDegree < Fintype.card F) (fPoly : Polynomial F) :
     -- Q ∈ 𝔽[X,Y]
     ∃! Q : MvPolynomial (Fin 2) F,
-      -- deg_x(Q) = Floor ( deg(fPoly) / deg(qPoly) )
+      -- deg_y(Q) = Floor ( deg(fPoly) / deg(qPoly) )
       -- This is natural number division towards zero, which is floor
-      (MvPolynomial.degreeOf 0 Q = (Polynomial.natDegree fPoly) / (Polynomial.natDegree qPoly)) ∧
-      -- deg_y(Q) < deg (q)
-      (MvPolynomial.degreeOf 1 Q < Polynomial.natDegree qPoly) ∧
-      -- point‑wise equality on F: f(z) = Q(q(z), z)
-      (∀ z : F, Polynomial.eval z fPoly = evalBivar Q (Polynomial.eval z qPoly) z) ∧
-      (∀ t : ℕ, fPoly.natDegree < t * qPoly.natDegree → MvPolynomial.degreeOf 0 Q < t) :=
+      (MvPolynomial.degreeOf 1 Q = (Polynomial.natDegree fPoly) / (Polynomial.natDegree qPoly)) ∧
+      -- deg_x(Q) < deg (q)
+      (MvPolynomial.degreeOf 0 Q < Polynomial.natDegree qPoly) ∧
+      -- point‑wise equality on F: f(z) = Q(z, q(z))
+      (∀ z : F, Polynomial.eval z fPoly = evalBivar Q z (Polynomial.eval z qPoly)) ∧
+      (∀ t : ℕ, fPoly.natDegree < t * qPoly.natDegree → MvPolynomial.degreeOf 1 Q < t) :=
   /- The proof can follow `def polyQ` using the properties guranteed
   from MonomialOrder.div from Mathlib.RingTheory.MvPolynomial.Groebner -/
   by sorry
@@ -131,10 +131,10 @@ lemma degree_bound_bivariate
   (hdeg_q_min : qPoly.natDegree > 0)
   (hdeg_q_max : qPoly.natDegree < Fintype.card F)
   {t : ℕ} (Q : MvPolynomial (Fin 2) F)
-  (hdegX : MvPolynomial.degreeOf 0 Q < t)
-  (hdegY : MvPolynomial.degreeOf 1 Q < qPoly.natDegree) :
+  (hdegX : MvPolynomial.degreeOf 0 Q < qPoly.natDegree)
+  (hdegY : MvPolynomial.degreeOf 1 Q < t) :
   (MvPolynomial.eval₂Hom (Polynomial.C : F →+* Polynomial F)
-      (fun i : Fin 2 => if i = 0 then qPoly else Polynomial.X) Q).natDegree < t * qPoly.natDegree :=
+      (fun i : Fin 2 => if i = 0 then Polynomial.X else qPoly) Q).natDegree < t * qPoly.natDegree :=
     by sorry
 
 /-- Definition 4.7
