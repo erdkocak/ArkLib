@@ -959,7 +959,7 @@ lemma card_agreeing_cells_notin_D {U₀ U₁ : InterleavedWord A (Fin m) ι} {V�
     simp only [card_product]
   -- 2. Now calculate the cardinality using the set equality
   rw [h_set_card_eq]
-  rw [Finset.card_sdiff (Finset.subset_univ D)]
+  rw [Finset.card_sdiff, Finset.inter_univ]
   rw [Finset.card_univ]
 
 omit [Nonempty ι] [DecidableEq F] [Fintype A] [Nontrivial ↥MC] in

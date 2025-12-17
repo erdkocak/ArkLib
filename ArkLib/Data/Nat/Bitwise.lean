@@ -12,9 +12,6 @@ import Mathlib.Data.Nat.Digits.Defs
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.BigOperators.Fin
-<<<<<<< HEAD
-import Mathlib.Tactic.Cases
-=======
 import Mathlib.Data.NNReal.Defs
 import Mathlib.Data.NNReal.Basic -- for instFloorSemiring of ℝ≥0
 import Mathlib.Algebra.CharP.Defs
@@ -23,7 +20,6 @@ import Mathlib.Data.ENat.Defs
 import Mathlib.Data.ENat.Basic
 import Mathlib.Data.ENNReal.Inv
 import Mathlib.Data.Nat.GCD.Basic
->>>>>>> origin
 
 /-!
 # Bit operations on natural numbers
@@ -47,12 +43,12 @@ open ENNReal
 variable {a b c d : ℝ≥0∞} {r p q : ℝ≥0}
 -- Reference: `FormulaRabbit81`'s PR: https://github.com/leanprover-community/mathlib4/commit/2452ad7288de553bc1201969ed13782affaf3459
 
-lemma ENNReal.div_lt_div_iff_left (hc₀ : c ≠ 0) (hc : c ≠ ∞) : a / c < b / c ↔ a < b :=
-  ENNReal.mul_lt_mul_right (by simpa) (by simpa)
+-- lemma ENNReal.div_lt_div_iff_left (hc₀ : c ≠ 0) (hc : c ≠ ∞) : a / c < b / c ↔ a < b :=
+--   ENNReal.mul_lt_mul_right (by simpa) (by simpa)
 
-@[gcongr]
-lemma ENNReal.div_lt_div_right (hc₀ : c ≠ 0) (hc : c ≠ ∞) (hab : a < b) : a / c < b / c :=
-  (ENNReal.div_lt_div_iff_left hc₀ hc).2 hab
+-- @[gcongr]
+-- lemma ENNReal.div_lt_div_right (hc₀ : c ≠ 0) (hc : c ≠ ∞) (hab : a < b) : a / c < b / c :=
+--   (ENNReal.div_lt_div_iff_left hc₀ hc).2 hab
 
 theorem ENNReal.mul_inv_rev_ENNReal {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0) :
     ((a : ENNReal)⁻¹ * (b : ENNReal)⁻¹) = ((a : ENNReal) * (b : ENNReal))⁻¹ := by

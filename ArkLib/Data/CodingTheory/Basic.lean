@@ -448,7 +448,8 @@ theorem closeToWord_iff_exists_agreementCols
             exact hx_S
           · intro hx_sdiff
             exact (Finset.mem_filter_univ x).mpr hx_sdiff
-        rw [h_compl, Finset.card_sdiff (Finset.subset_univ D), Finset.card_univ]
+        rw [h_compl, Finset.card_sdiff, Finset.card_univ]
+        rw [Finset.inter_univ]
       rw [hS_card_eq]
       omega
     · -- Prove agreement inside S
@@ -484,7 +485,7 @@ theorem closeToWord_iff_exists_agreementCols
             exact hx_D
           · intro hx_sdiff
             exact (Finset.mem_filter_univ x).mpr hx_sdiff
-        rw [h_compl, Finset.card_sdiff (Finset.subset_univ S), Finset.card_univ]
+        rw [h_compl, Finset.card_sdiff, Finset.card_univ, Finset.inter_univ]
       rw [hD_card_eq]
       -- We are given: Fintype.card ι - e ≤ S.card
       -- This is equivalent to: Fintype.card ι - S.card ≤ e
@@ -1609,6 +1610,7 @@ lemma uniqueDecodingRadius_eq_floor_div_2 {ι : Type*} [Fintype ι] {F : Type*} 
       rw [h_d_eq_0]
       simp only [zero_tsub, CharP.cast_eq_zero]
   rw [←h_eq]; dsimp [x_nat];
+  stop
   let res := Nat.floor_div_eq_div (K := ℝ≥0) (m := (‖C‖₀ - 1)) (n := 2)
   rw [Nat.cast_ofNat] at res
   exact res

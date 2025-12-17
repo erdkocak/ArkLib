@@ -30,15 +30,13 @@ open OracleComp OracleSpec ProtocolSpec
 open scoped NNReal
 
 variable {ι : Type} {oSpec : OracleSpec ι}
-  {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type}
-  (Oₛᵢ : (i : ιₛᵢ) → OracleContext Unit (ReaderM (OStmtIn i)))
-  {WitIn : Type}
-  {StmtOut : Type} {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
-  (Oₛₒ : (i : ιₛₒ) → OracleContext Unit (ReaderM (OStmtOut i)))
-  {WitOut : Type}
+  {StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut : Type}
   {n : ℕ} {pSpec : ProtocolSpec n} [∀ i, SampleableType (pSpec.Challenge i)]
   -- Note: `σ` may depend on the previous data, like `StmtIn`, `pSpec`, and so on
   {σ : Type} (init : ProbComp σ) (impl : QueryImpl oSpec (StateT σ ProbComp))
+  {Qₛᵢ} {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
+  {Qₘ} {Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages)}
+  {Qₛₒ} {Oₛₒ : OracleSpec Qₛₒ}
 
 /-
 TODO: the "right" factoring for the security definitions are the following:
@@ -379,12 +377,12 @@ namespace OracleReduction
 --   Reduction.completeness init impl relIn relOut oracleReduction.toReduction completenessError
 
 /-- Perfect completeness of an oracle reduction is the same as for non-oracle reductions. -/
-def perfectCompleteness {Oₛᵢ} {Oₘ} (init : ProbComp σ)
+def perfectCompleteness (init : ProbComp σ)
     (impl : QueryImpl oSpec (StateT σ ProbComp))
-    (relIn : Set ((StmtIn × ∀ i, OStmtIn i) × WitIn))
-    (relOut : Set ((StmtOut × ∀ i, OStmtOut i) × WitOut))
+    (relIn : Set ((StmtIn × OStmtIn) × WitIn))
+    (relOut : Set ((StmtOut × OStmtOut) × WitOut))
     (oracleReduction : OracleReduction oSpec StmtIn OStmtIn WitIn
-      StmtOut OStmtOut WitOut pSpec Oₛᵢ Oₘ) : Prop :=
+      StmtOut OStmtOut WitOut pSpec Oₛᵢ Oₘ Oₛₒ) : Prop :=
   Reduction.perfectCompleteness init impl relIn relOut oracleReduction.toReduction
 
 end OracleReduction
@@ -392,18 +390,17 @@ end OracleReduction
 namespace OracleVerifier
 
 /-- Soundness of an oracle reduction is the same as for non-oracle reductions. -/
-def soundness {Oₘ}
-    (langIn : Set (StmtIn × ∀ i, OStmtIn i))
-    (langOut : Set (StmtOut × ∀ i, OStmtOut i))
-    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ)
+def soundness (langIn : Set (StmtIn × OStmtIn))
+    (langOut : Set (StmtOut × OStmtOut))
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ Oₛₒ)
     (soundnessError : ℝ≥0) : Prop :=
   verifier.toVerifier.soundness init impl langIn langOut soundnessError
 
 /-- Knowledge soundness of an oracle reduction is the same as for non-oracle reductions. -/
-def knowledgeSoundness {Oₘ}
-    (relIn : Set ((StmtIn × ∀ i, OStmtIn i) × WitIn))
-    (relOut : Set ((StmtOut × ∀ i, OStmtOut i) × WitOut))
-    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ)
+def knowledgeSoundness
+    (relIn : Set ((StmtIn × OStmtIn) × WitIn))
+    (relOut : Set ((StmtOut × OStmtOut) × WitOut))
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ Oₛₒ)
     (knowledgeError : ℝ≥0) : Prop :=
   verifier.toVerifier.knowledgeSoundness init impl relIn relOut knowledgeError
 

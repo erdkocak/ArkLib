@@ -10,8 +10,6 @@ import ArkLib.Data.Fin.Basic
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.LinearAlgebra.AffineSpace.Pointwise
 
-<<<<<<< HEAD
-=======
 section TensorCombination
 variable {F : Type*} [CommRing F] [Fintype F] [DecidableEq F]
 variable {A : Type*} [AddCommMonoid A] [Module F A]
@@ -34,7 +32,6 @@ def multilinearCombine {ϑ : ℕ} {ι : Type*}
   fun colIdx => ∑ rowIdx : Fin (2^ϑ), ((multilinearWeight r rowIdx) : F) • ((u rowIdx colIdx) : A)
 notation:20 r " |⨂| " u => multilinearCombine (u := u) (r := r)
 end TensorCombination
->>>>>>> origin
 noncomputable section
 
 variable {F : Type*}

@@ -160,15 +160,6 @@ import ArkLib.ProofSystem.Binius.BinaryBasefold.Prelude
 import ArkLib.ProofSystem.Binius.BinaryBasefold.QueryPhase
 import ArkLib.ProofSystem.Binius.BinaryBasefold.Spec
 import ArkLib.ProofSystem.Binius.BinaryBasefold.Steps
-<<<<<<< HEAD
--- import ArkLib.ProofSystem.Component.CheckClaim
--- import ArkLib.ProofSystem.Component.DoNothing
--- import ArkLib.ProofSystem.Component.NoInteraction
--- import ArkLib.ProofSystem.Component.RandomQuery
--- import ArkLib.ProofSystem.Component.ReduceClaim
--- import ArkLib.ProofSystem.Component.SendClaim
--- import ArkLib.ProofSystem.Component.SendWitness
-=======
 import ArkLib.ProofSystem.Binius.FRIBinius.CoreInteractionPhase
 import ArkLib.ProofSystem.Binius.FRIBinius.General
 import ArkLib.ProofSystem.Binius.FRIBinius.Prelude
@@ -184,7 +175,6 @@ import ArkLib.ProofSystem.Component.RandomQuery
 import ArkLib.ProofSystem.Component.ReduceClaim
 import ArkLib.ProofSystem.Component.SendClaim
 import ArkLib.ProofSystem.Component.SendWitness
->>>>>>> origin
 import ArkLib.ProofSystem.ConstraintSystem.Lookup
 import ArkLib.ProofSystem.ConstraintSystem.MemoryChecking
 import ArkLib.ProofSystem.ConstraintSystem.Plonk

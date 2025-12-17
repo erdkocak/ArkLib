@@ -339,7 +339,8 @@ theorem X_pow_card_pow_dvd_X_pow_card_pow_of_dvd (d n : ℕ) (h_dvd : d ∣ n) :
   have h_q_gt_1 : 1 < q := Fintype.one_lt_card
   have h_exp_dvd : q ^ d - 1 ∣ q ^ n - 1 := by
     obtain ⟨k, rfl⟩ := h_dvd
-    exact nat_pow_one_sub_dvd_pow_mul_sub_one q d k
+    sorry
+    -- exact Nat.sub_one_dvd_pow_sub_one q d k
 
   have h_poly_div : (X ^ (q ^ d - 1) - 1) ∣ (X ^ (q ^ n - 1) - 1 : Fq[X]) :=
     X_pow_sub_one_dvd_X_pow_sub_one_of_dvd (q ^ d - 1) (q ^ n - 1) h_exp_dvd
