@@ -22,7 +22,7 @@ variable {n : ℕ}
 noncomputable def ansPoly (S : Finset F) (Ans : S → F) : Polynomial F :=
   Lagrange.interpolate S.attach (fun i => (i : F)) Ans
 
-/-- VanishingPoly is the vanishing polynomial on S, i.e. the unique polynomial of degree |S|+1
+/-- VanishingPoly is the vanishing polynomial on S, i.e. the unique polynomial of degree |S|
     that is 0 at each s ∈ S and is not the zero polynomial. That is V(X) = ∏(s ∈ S) (X - s). -/
 noncomputable def vanishingPoly (S : Finset F) : Polynomial F :=
   ∏ s ∈ S, (Polynomial.X - Polynomial.C s)
