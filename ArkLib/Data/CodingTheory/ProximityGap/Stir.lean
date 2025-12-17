@@ -7,7 +7,7 @@ Authors: Mirco Richter, Poulami Das (Least Authority)
 import ArkLib.Data.CodingTheory.Basic
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.Probability.Notation
-import ArkLib.ProofSystem.Stir.ProximityBound
+import ArkLib.Data.CodingTheory.Proximity.Bound
 
 open NNReal ProbabilityTheory ReedSolomon
 
@@ -32,9 +32,8 @@ lemma proximity_gap
   {F : Type} [Field F] [Fintype F] [DecidableEq F]
   {ι : Type} [Fintype ι] [Nonempty ι] {φ : ι ↪ F}
   {degree m : ℕ} {δ : ℝ≥0} {f : Fin m → ι → F} {GenFun : F → Fin m → F}
-  (h : ∀ (hδLe : δ < 1 - Bstar (LinearCode.rate (code φ degree))) {f : Fin m → ι → F},
-        Pr_{
-          let r ← $ᵖ F}[δᵣ((fun x => ∑ j : Fin m, (GenFun r j) * f j x), code φ degree) ≤ δ]
+  (hδLe : δ < 1 - Bstar (LinearCode.rate (code φ degree)))
+  (h_prob : Pr_{ let r ← $ᵖ F}[δᵣ((fun x => ∑ j : Fin m, (GenFun r j) * f j x), code φ degree) ≤ δ]
             > ENNReal.ofReal (proximityError F degree (LinearCode.rate (code φ degree)) δ m)) :
 
         ∃ S : Finset ι,
