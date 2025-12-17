@@ -71,7 +71,6 @@ variable
   {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
   {Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages)}
   {Oₛₒ : OracleSpec Qₛₒ}
-  {n : ℕ} {pSpec : ProtocolSpec n}
 
 namespace Prover
 
@@ -174,10 +173,10 @@ def Verifier.run (stmt : StmtIn) (transcript : FullTranscript pSpec)
     both the output statement and oracle statements, and the log of queries made by the verifier.
 -/
 @[inline, specialize]
-def OracleVerifier.run (Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages))
+def OracleVerifier.run
     (stmt : StmtIn) (oStmtIn : OStmtIn) (transcript : FullTranscript pSpec)
-    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ) :
-      OracleComp oSpec (StmtOut × (∀ i, OStmtOut i)) := do
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ Oₛₒ) :
+      OracleComp oSpec (StmtOut × OStmtOut) := do
   sorry
   -- let f := OracleInterface.simOracle2 oSpec oStmtIn transcript.messages
   -- let stmtOut ← simulateQ f (verifier.verify stmt transcript.challenges)

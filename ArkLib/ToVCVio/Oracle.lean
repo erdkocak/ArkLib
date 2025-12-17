@@ -58,7 +58,7 @@ theorem runWithOracle_bind (f : (t : spec.Domain) → spec.Range t)
     runWithOracle f (oa >>= ob) =
     (runWithOracle f oa) >>=
     (fun x => runWithOracle f (ob x)) := by
-  simp
+  simp [runWithOracle]
   rfl
 
 -- Oracle with bounded use; returns `default` if the oracle is used more than `bound` times.
