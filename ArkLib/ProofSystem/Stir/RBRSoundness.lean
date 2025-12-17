@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Poulami Das (Least Authority)
+Authors: Poulami Das (Least Authority), Alexander Hicks
 -/
 
 import ArkLib.Data.CodingTheory.ListDecodability
@@ -99,7 +99,7 @@ def stirRelation
   fun ⟨⟨_, oracle⟩, _⟩ => δᵣ(oracle (), ReedSolomon.code φ degree) ≤ err
 
 /-- Theorem 5.1 : STIR main theorem
-  Consider the following ingrediants,
+  Consider the following ingredients,
   a security parameter `secpar`
   a ReedSolomon code `RS[F, ι, degree]` with rate `ρ = degree/ |ι|`, where ι is a smooth domain
   a proximity parameter `δ ∈ (0, 1 - 1.05 * √ρ)`
@@ -119,7 +119,7 @@ theorem stir_main
   {k proofLen qNumtoInput qNumtoProofstr : ℕ}
   (hk : ∃ p, k = 2 ^ p) (hkGe : k ≥ 4)
   (δ : ℝ≥0) (hδub : δ < 1 - 1.05 * Real.sqrt (degree / Fintype.card ι))
-  (hF : Fintype.card F ≤
+  (hF : Fintype.card F ≥
         secpar * 2 ^ secpar * degree ^ 2 * (Fintype.card ι) ^ (7 / 2) /
           Real.log (1 / rate (code φ degree))) :
   ∃ n : ℕ,

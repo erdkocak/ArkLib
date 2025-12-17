@@ -1,7 +1,6 @@
-import ArkLib.ProofSystem.Stir.Combine
-import ArkLib.ProofSystem.Stir.Folding
+import ArkLib.Data.CodingTheory.Operations.Combine
+import ArkLib.Data.CodingTheory.Folding.Stir
 import ArkLib.ProofSystem.Stir.MainThm
-import ArkLib.ProofSystem.Stir.OutOfDomSmpl
-import ArkLib.ProofSystem.Stir.ProximityBound
-import ArkLib.ProofSystem.Stir.ProximityGap
-import ArkLib.ProofSystem.Stir.Quotienting
+import ArkLib.Data.CodingTheory.OutOfDomSmpl.Stir
+import ArkLib.Data.CodingTheory.Proximity.Bound
+import ArkLib.Data.CodingTheory.Operations.Quotienting
