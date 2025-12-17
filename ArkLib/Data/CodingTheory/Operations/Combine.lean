@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 ArkLib Contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Mirco Richter, Poulami Das (Least Authority)
+Authors: Mirco Richter, Poulami Das (Least Authority), Alexander Hicks
 -/
 
 import Mathlib.Tactic.FieldSimp
@@ -9,7 +9,7 @@ import Mathlib.Tactic.FieldSimp
 import ArkLib.Data.CodingTheory.ProximityGap.Basic
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.Probability.Notation
-import ArkLib.ProofSystem.Stir.ProximityBound
+import ArkLib.Data.CodingTheory.Proximity.Bound
 
 /-! Section 4.5 from STIR [ACFY24stir]
 
@@ -48,7 +48,7 @@ def ri (dstar : ℕ) (degs : Fin m → ℕ) (r : F) (i : Fin m) : F :=
           match i.1 with
           | 0 => 1
           | .succ i' =>
-            let exp := i' + ∑ j < i, (dstar - degs j)
+            let exp := i.1 + ∑ j < i, (dstar - degs j)
             r ^ exp
 
 /-- Definition 4.11.1
