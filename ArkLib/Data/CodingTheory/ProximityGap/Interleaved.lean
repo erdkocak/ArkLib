@@ -7,7 +7,7 @@ import ArkLib.Data.Nat.Bitwise
 import ArkLib.Data.CodingTheory.Basic
 import ArkLib.Data.CodingTheory.InterleavedCode
 import ArkLib.Data.CodingTheory.ReedSolomon
-import ArkLib.Data.CodingTheory.ProximityGap.BCIKS20
+import ArkLib.Data.CodingTheory.ProximityGap.ReedSolomon
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace.Defs
 import ArkLib.Data.Probability.Instances
 import ArkLib.Data.CodingTheory.Prelims
@@ -2107,3 +2107,21 @@ theorem reedSolomon_multilinearCorrelatedAgreement [Nontrivial (ReedSolomon.code
   exact h_CA_Nat
 
 end RSCode_Corollaries
+
+/-!
+## Proximity results from [AHIV22] (Ligero)
+-/
+
+/-- **Lemma 4.3, [AHIV22]**. Let `L` be an `[n, k, d]`-linear code over `𝔽`, `U⋆` be a WordStack in
+`(𝔽ᵐ)ⁿ`. Let `e` be a positive integer such that `e < d/3` and `|𝔽| ≥ e`.
+Suppose `d(U⋆, L^⋈m) > e`. Then, there exists `v⋆ ∈ L⋆` such that `d(v⋆, L) > e`, where `L⋆` is the
+row-span of `U⋆`. -/
+lemma distInterleavedCodeToCodeLB
+  {L : LinearCode ι F} {U_star : WordStack (A := F) κ ι}
+  {e : ℕ} -- Might change e to ℕ+ if really needed
+  (hF : Fintype.card F ≥ e)
+  (he : (e : ℚ≥0) < ‖(L : Set (ι → F))‖₀ / 3) -- `e < d/3`
+  (hU : e < Δ₀(⋈|U_star, L^⋈κ)) : -- `d(U⋆, L^⋈ m) > e`, here we interleave U
+    -- before using `Δ₀` for correct symbol specification
+  ∃ v ∈ Matrix.rowSpan U_star , e < Δ₀(v, L) := by
+  sorry
