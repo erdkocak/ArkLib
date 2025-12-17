@@ -12,11 +12,16 @@ import ArkLib.ProofSystem.ConstraintSystem.Plonk
 # The Plonk Protocol
 
 We aim to formalize the Plonk protocol (as a polynomial IOP) as stated in the original
-[Plonk paper](https://eprint.iacr.org/2019/953.pdf).
+Plonk paper [GWZC19].
 
 As we do so, we will break down Plonk into modular components, such as . We also plan to formalize
 various extensions of Plonk, such as Maller's optimization trick (which can be seen as a change on
 the PIOP level), integration with lookup arguments (i.e. logup), high-degree constraints, and more.
+
+## References
+
+* [Gabizon, A., Williamson, Z.J., and Ciobotaru, O., *Plonk: Permutations over lagrange-bases
+    for oecumenical noninteractive arguments of knowledge*][GWZC19]
 
 -/
 

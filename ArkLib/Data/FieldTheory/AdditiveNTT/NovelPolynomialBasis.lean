@@ -31,13 +31,10 @@ algebra over its prime-characteristic subfield `𝔽q`, and an `𝔽q`-basis `β
 
 ## References
 
-- [LCH14] Sian-Jheng Lin, Wei-Ho Chung, and Yunghsiang S. Han. "Novel Polynomial Basis and Its
-  Application to Reed–Solomon Erasure Codes". In: IEEE 55th Annual Symposium on Foundations of
-  Computer Science. 2014, pp. 316–325. doi : 10.1109/FOCS.2014.41.
-
-- [GGJ96] J. von zur Gathen and J. Gerhard, "Arithmetic and factorization of polynomial over F2
-  (extended abstract)", in Proceedings of the 1996 International Symposium on Symbolic and Algebraic
-  Computation, Zurich, Switzerland, 1996, pp. 1–9.
+* [Lin, S., Chung, W., and Han, Y.S, *Novel polynomial basis and its application to
+    Reed–Solomon erasure codes*][LCH14]
+* [Von zur Gathen, J., and Gerhard, J., *Arithmetic and factorization of polynomial
+    over F2 (extended abstract)*][GGJ96]
 -/
 
 set_option linter.style.longFile 1600
@@ -397,7 +394,7 @@ section LinearityOfSubspaceVanishingPolynomials
 ### Formalization of linearity of subspace vanishing polynomials
 
 This section formalizes the key properties of the subspace vanishing polynomials `Wᵢ`,
-including their recursive structure and `𝔽q`-linearity as described in Lemma 2.3 of [GG96].
+including their recursive structure and `𝔽q`-linearity as described in Lemma 2.3 of [GGJ96].
 The proofs are done by simultaneous induction on `i`.
 -/
 
@@ -1060,7 +1057,7 @@ lemma inductive_linear_map_W (i : Fin r) (h_i_add_1 : i + 1 < r)
 
 omit hF₂ in
 /--
-**Simultaneous Proof of Linearity for `Wᵢ`** from the paper [GG96] (Lemma 2.3)
+**Simultaneous Proof of Linearity for `Wᵢ`** from the paper [GGJ96] (Lemma 2.3)
 `Wᵢ` is an 𝔽q-linearized polynomial. This means for all polynomials `f, g` with coefficients
   in `L` (i.e. `L[X]`) and for all `c ∈ 𝔽q`, we have: `Wᵢ(f + g) = Wᵢ(f) + Wᵢ(g)` and
   `Wᵢ(c * f) = c * Wᵢ(f)`. As a corollary of this, `Wᵢ` is 𝔽q-linear when evaluated on elements

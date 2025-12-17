@@ -9,7 +9,7 @@ import Batteries.Data.Vector.Basic
 import ArkLib.OracleReduction.OracleInterface
 import Mathlib.Data.FinEnum
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
-import ArkLib.Data.CodingTheory.ProximityGap
+import ArkLib.Data.CodingTheory.ProximityGap.Basic
 
 /-!
   # Folding-based Polynomial Commitment Schemes

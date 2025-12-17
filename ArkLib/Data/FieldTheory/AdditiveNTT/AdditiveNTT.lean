@@ -37,21 +37,17 @@ which states whether the result of an encoding round is correct
 - `NTTStage_correctness`: Main correctness statement of each NTT stage in the encoding algorithm,
 this proves that if the previous round satisfies the invariant, then the current round also
 
+## References
+
+* [Diamond, B.E. and Posen, J., *Polylogarithmic proofs for multilinears over binary towers*][DP24]
+* [Lin, S., Chung, W., and Han, Y.S., *Novel polynomial basis and its application to reed-solomon
+    erasure codes*][LCH14]
+* [Von zur Gathen, J. and Gerhard, J., *Arithmetic and factorization of polynomial over F2
+    (extended abstract)*][GGJ96]
+
 ## TODOs
 - Define computable additive NTT and transfer correctness proof to it
 
-## References
-
-- [DP24] Diamond, Benjamin E., and Jim Posen. "Polylogarithmic Proofs for Multilinears over Binary
-  Towers." Cryptology ePrint Archive (2024).
-
-- [LCH14] Sian-Jheng Lin, Wei-Ho Chung, and Yunghsiang S. Han. "Novel Polynomial Basis and Its
-  Application to Reed–Solomon Erasure Codes". In: IEEE 55th Annual Symposium on Foundations of
-  Computer Science. 2014, pp. 316–325. doi: 10.1109/FOCS.2014.41.
-
-- [GGJ96] J. von zur Gathen and J. Gerhard, "Arithmetic and factorization of polynomial
-  over F2 (extended abstract)", in Proceedings of the 1996 International Symposium on
-  Symbolic and Algebraic Computation, Zurich, Switzerland, 1996, pp. 1–9.
 -/
 
 set_option linter.style.longFile 2400

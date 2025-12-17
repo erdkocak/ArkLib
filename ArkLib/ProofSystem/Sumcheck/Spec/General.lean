@@ -95,9 +95,10 @@ There are some generalizations that we could consider later:
 
 ## References
 
-[JACM:LFKN92]
-
-[C:BooChiSot21]
+* [Lund, C., Fortnow, L., Karloff, H., and Nisan, N., *Algebraic methods for interactive
+    proof systems*][LFKN92]
+* [Bosshard, A.G., Bootle, J., and Sprenger, C., *Formal Verification of the Sumcheck Protocol*]
+    [BBS24]
 
 -/
 
