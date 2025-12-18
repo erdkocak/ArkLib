@@ -190,7 +190,7 @@ import ArkLib.ProofSystem.Sumcheck.Spec.SingleRound
 import ArkLib.ProofSystem.Whir
 import ArkLib.Data.CodingTheory.Distance.BlockRel
 import ArkLib.Data.CodingTheory.Folding.Whir
-import ArkLib.Data.CodingTheory.Proximity.Agreement
+import ArkLib.Data.CodingTheory.Proximity.MutualCorrAgreement
 import ArkLib.Data.CodingTheory.OutOfDomSmpl.Whir
 import ArkLib.Data.CodingTheory.Proximity.Generator
 import ArkLib.ProofSystem.Whir.RBRSoundness

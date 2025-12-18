@@ -1,6 +1,6 @@
-import ArkLib.ProofSystem.Whir.BlockRelDistance
-import ArkLib.ProofSystem.Whir.Folding
-import ArkLib.ProofSystem.Whir.MutualCorrAgreement
+import ArkLib.Data.CodingTheory.Distance.BlockRel
+import ArkLib.Data.CodingTheory.Folding.Whir
+import ArkLib.Data.CodingTheory.Proximity.MutualCorrAgreement
 import ArkLib.ProofSystem.Whir.RBRSoundness
-import ArkLib.ProofSystem.Whir.OutofDomainSmpl
-import ArkLib.ProofSystem.Whir.ProximityGen
+import ArkLib.Data.CodingTheory.OutOfDomSmpl.Whir
+import ArkLib.Data.CodingTheory.Proximity.Generator

@@ -6,8 +6,8 @@ Authors: Poulami Das, Miguel Quaresma (Least Authority), Alexander Hicks
 
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.MvPolynomial.LinearMvExtension
-import ArkLib.ProofSystem.Whir.BlockRelDistance
-import ArkLib.ProofSystem.Whir.MutualCorrAgreement
+import ArkLib.Data.CodingTheory.Distance.BlockRel
+import ArkLib.Data.CodingTheory.Proximity.MutualCorrAgreement
 
 /-!
 # Folding
