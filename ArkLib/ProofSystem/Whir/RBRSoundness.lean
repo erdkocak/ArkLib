@@ -7,9 +7,9 @@ Authors: Poulami Das (Least Authority), Alexander Hicks
 import ArkLib.Data.CodingTheory.ReedSolomon
 import ArkLib.Data.CodingTheory.ListDecodability
 import ArkLib.OracleReduction.VectorIOR
-import ArkLib.ProofSystem.Whir.BlockRelDistance
-import ArkLib.ProofSystem.Whir.MutualCorrAgreement
-import ArkLib.ProofSystem.Whir.ProximityGen
+import ArkLib.Data.CodingTheory.Distance.BlockRel
+import ArkLib.Data.CodingTheory.Proximity.MutualCorrAgreement
+import ArkLib.Data.CodingTheory.Proximity.Generator
 
 /-!
 # Round by round soundness theorem

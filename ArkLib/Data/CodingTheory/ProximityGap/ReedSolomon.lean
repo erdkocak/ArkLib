@@ -6,6 +6,7 @@ Authors: Quang Dao, Katerina Hristova, František Silváši, Julian Sutherland,
 -/
 
 import ArkLib.Data.CodingTheory.ProximityGap.Basic
+import ArkLib.Data.Probability.Notation
 
 /-!
   # Definitions and Theorems about Proximity Gaps
@@ -915,3 +916,57 @@ end WeightedAgreement
 end BCIKS20ProximityGapSection7
 
 end ProximityGap
+
+/-!
+## Combinatorial Proximity results from [AHIV22] (Ligero)
+-/
+
+namespace ProximityToRS
+
+noncomputable section
+variable {F : Type*} [Field F] [Finite F] [DecidableEq F]
+         {κ : Type*} [Fintype κ]
+         {ι : Type*} [Fintype ι]
+
+local instance : Fintype F := Fintype.ofFinite F
+
+open ReedSolomonCode Code
+
+/-- The set of points on an affine line, which are within distance `e` from a Reed-Solomon code.
+-/
+def closePtsOnAffineLine (u v : ι → F) (deg : ℕ) (α : ι ↪ F) (e : ℕ) : Set (ι → F) :=
+  {x : ι → F | x ∈ Affine.affineLineAtOrigin (F := F) (origin := u) (direction := v)
+    ∧ Δ₀(x, ReedSolomon.code α deg) ≤ e}
+
+/-- The number of points on an affine line between, which are within distance `e` from a
+Reed-Solomon code.
+-/
+def numberOfClosePts (u v : ι → F) (deg : ℕ) (α : ι ↪ F) (e : ℕ) : ℕ :=
+  Fintype.card (closePtsOnAffineLine u v deg α e)
+
+/-- **Lemma 4.4, [AHIV22] (Combinatorial proximity gap for affine lines)**
+Let `L = RS_{𝔽, n, k, η}` be a Reed-Solomon code with minimal distance
+`d = n - k + 1`. Let `e` be a positive integer such that `e < d / 3`. Then for every two words
+`u, v ∈ 𝔽^n`, defining an affine line `ℓ_{u, v} = {u + α v : α ∈ 𝔽}`.
+**Either (i.e. mutually exclusive/XOR)**
+- (1) for every `x ∈ ℓ_{u, v}` we have `d(x, L) ≤ e`,
+- or (2) for at most `d` points `x ∈ ℓ_{u, v}` we have `d(x, L) ≤ e`.
+This is a concrete statement via cardinality of proximity gap for affine lines.
+-/
+lemma e_leq_dist_over_3 [DecidableEq F] {deg : ℕ} {α : ι ↪ F} {e : ℕ} {u v : ι → F}
+  (he : (e : ℚ≥0) < ‖(RScodeSet α deg)‖₀ / 3) :
+  Xor'
+    (∀ x ∈ Affine.affineLineAtOrigin (F := F) u v, Δ₀(x, ReedSolomon.code α deg) ≤ e)
+    ((numberOfClosePts u v deg α e) ≤ ‖(RScodeSet α deg)‖₀) := by sorry
+
+/-- **`Lemma 4.5` from `[AHIV22]`.** Let `L = RS_{𝔽, n, k, η}` be a Reed-Solomon code with minimal
+distance `d = n - k + 1` and `e` a positive integer such that `e < d / 3`. Suppose `d(U⋆, L^m) > e`.
+Then, for a random `w⋆` in the row-span of `U⋆`, we have: `Pr[d(w⋆, L) ≤ e] ≤ d / |𝔽|` -/
+lemma probOfBadPts {deg : ℕ} {α : ι ↪ F} {e : ℕ} {U_star : WordStack (A := F) κ ι}
+  (he : (e : ℚ≥0) < ‖(RScodeSet α deg)‖₀ / 3)
+  (hU : e < Δ₀(⋈|U_star, (ReedSolomon.code α deg)^⋈κ)) :
+  (PMF.uniformOfFintype (Matrix.rowSpan U_star)).toOuterMeasure
+    {w_star | Δ₀(w_star, RScodeSet α deg) ≤ e} ≤ ‖(RScodeSet α deg)‖₀ /(Fintype.card F) := by
+  sorry
+
+end
