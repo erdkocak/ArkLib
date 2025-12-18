@@ -2108,6 +2108,16 @@ theorem reedSolomon_multilinearCorrelatedAgreement [Nontrivial (ReedSolomon.code
 
 end RSCode_Corollaries
 
+
+noncomputable section
+
+open Code ProbabilityTheory
+
+variable {F : Type*} [Field F] [Finite F] [DecidableEq F]
+         {κ : Type*} [Fintype κ]
+         {ι : Type*} [Fintype ι]
+
+local instance : Fintype F := Fintype.ofFinite F
 /-!
 ## Proximity results from [AHIV22] (Ligero)
 -/
