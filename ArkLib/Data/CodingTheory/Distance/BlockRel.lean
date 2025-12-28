@@ -131,8 +131,7 @@ lemma blockRelDistance_eq_relHammingDist_of_k_eq_i -- Renamed for clarity
   (hS' : S' = Finset.univ) -- This now works.
   (φ' : (indexPowT S φ i) ↪ F)
   [h_dec : DecidableBlockDisagreement i i f S' φ'] [DecidableEq (indexPowT S φ i)] :
-  Δᵣ(i, i, f, S', φ', g) = δᵣ(f, g) := by
-  sorry
+  Δᵣ(i, i, f, S', φ', g) = δᵣ(f, g) := by sorry
 
 /-- For the set S ⊆ F^ι, we define the minimum block relative distance wrt set S. -/
 noncomputable def minBlockRelDistance
