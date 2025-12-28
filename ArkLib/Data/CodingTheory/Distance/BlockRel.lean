@@ -131,7 +131,8 @@ lemma blockRelDistance_eq_relHammingDist_of_k_eq_i -- Renamed for clarity
   (hS' : S' = Finset.univ) -- This now works.
   (φ' : (indexPowT S φ i) ↪ F)
   [h_dec : DecidableBlockDisagreement i i f S' φ'] [DecidableEq (indexPowT S φ i)] :
-  Δᵣ(i, i, f, S', φ', g) = δᵣ(f, g) := by sorry
+  Δᵣ(i, i, f, S', φ', g) = δᵣ(f, g) := by
+  sorry
 
 /-- For the set S ⊆ F^ι, we define the minimum block relative distance wrt set S. -/
 noncomputable def minBlockRelDistance
@@ -175,7 +176,8 @@ lemma relHammingDist_le_blockRelDistance
   [h_fintype : ∀ i : ℕ, Fintype (indexPowT S φ i)]
   [DecidableEq (indexPowT S φ i)] [Smooth φ']
   [h_dec : DecidableBlockDisagreement i k f S' φ'] :
-  δᵣ(f, g) ≤ Δᵣ(i, k, f, S', φ', g) := by sorry
+  δᵣ(f, g) ≤ Δᵣ(i, k, f, S', φ', g) := by
+  sorry
 
 /-- Claim 4.19, Part 2
   As a consequence of `relHammingDist_le_blockRelDistance`, the list of codewords
@@ -190,7 +192,8 @@ lemma listBlock_subset_listHamming
   (C : Set ((indexPowT S φ i) → F)) (hcode : C = smoothCode φ' m)
   [h_dec : DecidableBlockDisagreement i k f S' φ']
   (δ : ℝ≥0) (hδLe : δ ≤ 1) :
-  Λᵣ(i, k, f, S', C, hcode, δ) ⊆ relHammingBall C f δ := by sorry
+  Λᵣ(i, k, f, S', C, hcode, δ) ⊆ relHammingBall C f δ := by
+  sorry
 
 
 end BlockRelDistance
