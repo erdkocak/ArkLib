@@ -94,10 +94,41 @@ def processRound (j : Fin n)
     let ⟨msg, newState⟩ ← prover.sendMessage ⟨j, hDir⟩ state
     return ⟨transcript.concat msg, newState⟩
 
-/-- Run the prover in an interactive reduction up to round index `i`, via first inputting the
-  statement and witness, and then processing each round up to round `i`. Returns the transcript up
-  to round `i`, and the prover's state after round `i`.
--/
+/-- Simplification lemma for `processRound` when the direction is `P_to_V`. -/
+lemma processRound_P_to_V (j : Fin n)
+    (h : pSpec.dir j = .P_to_V)
+    (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec)
+    (currentResult : OracleComp (oSpec ++ₒ [pSpec.Challenge]ₒ)
+      (pSpec.Transcript j.castSucc × prover.PrvState j.castSucc)) :
+      (prover.processRound j currentResult = do
+        let ⟨transcript, state⟩ ← currentResult
+        let ⟨msg, newState⟩ ← prover.sendMessage ⟨j, h⟩ state
+        return ⟨transcript.concat msg, newState⟩) := by
+  unfold processRound
+  split
+  · rename_i hDir
+    rw [h] at hDir
+    contradiction
+  · simp
+
+/-- Simplification lemma for `processRound` when the direction is `V_to_P`. -/
+lemma processRound_V_to_P (j : Fin n)
+    (h : pSpec.dir j = .V_to_P)
+    (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec)
+    (currentResult : OracleComp (oSpec ++ₒ [pSpec.Challenge]ₒ)
+      (pSpec.Transcript j.castSucc × prover.PrvState j.castSucc)) :
+      (prover.processRound j currentResult = do
+        let ⟨transcript, state⟩ ← currentResult
+        let challenge ← pSpec.getChallenge ⟨j, h⟩
+        letI newState := (← prover.receiveChallenge ⟨j, h⟩ state) challenge
+        return ⟨transcript.concat challenge, newState⟩) := by
+  unfold processRound
+  split
+  · simp
+  · rename_i hDir
+    rw [h] at hDir
+    contradiction
+
 @[inline, specialize]
 def runToRound (i : Fin (n + 1))
     (stmt : StmtIn) (wit : WitIn) (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
@@ -175,10 +206,7 @@ def OracleVerifier.run [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
       OracleComp oSpec (StmtOut × (∀ i, OStmtOut i)) := do
   let f := OracleInterface.simOracle2 oSpec oStmtIn transcript.messages
   let stmtOut ← simulateQ f (verifier.verify stmt transcript.challenges)
-  let oStmtOut : ∀ i, OStmtOut i := fun i => match h : verifier.embed i with
-  | .inl j => by simp only [h, verifier.hEq i]; exact oStmtIn j
-  | .inr j => by simp only [h, verifier.hEq i]; exact transcript j
-  return ⟨stmtOut, oStmtOut⟩
+  return ⟨stmtOut, OracleVerifier.mkVerifierOStmtOut verifier.embed verifier.hEq oStmtIn transcript⟩
 
 /-- Running an oracle verifier then is equal to running its non-oracle counterpart -/
 @[simp]
@@ -188,7 +216,6 @@ theorem OracleVerifier.run_eq_run_verifier [Oₘ : ∀ i, OracleInterface (pSpec
       verifier.run stmt oStmt transcript =
         verifier.toVerifier.run ⟨stmt, oStmt⟩ transcript := by
   simp only [run, Verifier.run, toVerifier, eq_mpr_eq_cast, bind_pure_comp]
-  rfl
 
 /-- An execution of an interactive reduction on a given initial statement and witness. Consists of
   first running the prover, and then the verifier. Returns the full transcript, the output statement
@@ -297,7 +324,6 @@ theorem OracleReduction.run_eq_run_reduction [∀ i, OracleInterface (pSpec.Mess
         oracleReduction.toReduction.run ⟨stmt, oStmt⟩ wit := by
   simp [OracleReduction.run, Reduction.run, OracleReduction.toReduction, OracleVerifier.run,
     Verifier.run, OracleVerifier.toVerifier, liftComp]
-  rfl
 
 /-- Running an oracle reduction with logging of queries to the shared oracle is equal to running its
   non-oracle counterpart with logging of queries to the shared oracle -/
@@ -309,7 +335,6 @@ theorem OracleReduction.runWithLog_eq_runWithLog_reduction [∀ i, OracleInterfa
         oracleReduction.toReduction.run ⟨stmt, oStmt⟩ wit := by
   simp [OracleReduction.run, Reduction.run, OracleReduction.toReduction, OracleVerifier.run,
     Verifier.run, OracleVerifier.toVerifier, liftComp]
-  rfl
 
 @[simp]
 theorem Prover.runToRound_zero_of_prover_first
@@ -352,7 +377,7 @@ theorem OracleReduction.id_run (stmt : StmtIn) (oStmt : ∀ i, OStmtIn i) (wit :
     (OracleReduction.id : OracleReduction oSpec StmtIn OStmtIn WitIn _ _ _ _).run stmt oStmt wit =
       pure ⟨⟨default, ⟨stmt, oStmt⟩, wit⟩, ⟨stmt, oStmt⟩⟩ := by
   simp [OracleReduction.run, OracleVerifier.run,
-    Prover.run, OracleReduction.id, OracleProver.id, OracleVerifier.id, Prover.id]
+    Prover.run, OracleReduction.id, OracleProver.id, OracleVerifier.id, Prover.id]; rfl
 
 /-- Running the identity or trivial oracle reduction results in the same input statement, oracle
   statement, and witness. -/
@@ -361,7 +386,7 @@ theorem OracleReduction.id_runWithLog (stmt : StmtIn) (oStmt : ∀ i, OStmtIn i)
     (OracleReduction.id : OracleReduction oSpec StmtIn OStmtIn WitIn _ _ _ _).runWithLog
       stmt oStmt wit = pure ⟨⟨default, ⟨stmt, oStmt⟩, wit⟩, ⟨stmt, oStmt⟩, [], []⟩ := by
   simp [OracleReduction.runWithLog, OracleVerifier.run,
-    Prover.run, OracleReduction.id, OracleProver.id, OracleVerifier.id, Prover.id]
+    Prover.run, OracleReduction.id, OracleProver.id, OracleVerifier.id, Prover.id]; rfl
 
 end Trivial
 

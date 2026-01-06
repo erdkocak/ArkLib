@@ -308,7 +308,7 @@ theorem oracle_implementation_correct (i : Fin r)
 /-- Computes the twiddle factor used in the butterfly operation.
 Corresponds to `AdditiveNTT.twiddleFactor`.
 -/
-def computableTwiddleFactor (i : Fin ℓ) (u : Fin (2 ^ (ℓ + R_rate - i - 1))) : L :=
+def computableTwiddleFactor (i : Fin r) (u : Fin (2 ^ (ℓ + R_rate - i - 1))) : L := -- i < ℓ
   -- evalNormalizedWAt L i u
   ∑ (⟨k, hk⟩: Fin (ℓ + R_rate - i - 1)),
   if Nat.getBit k u.val = 1 then
@@ -320,11 +320,11 @@ def computableTwiddleFactor (i : Fin ℓ) (u : Fin (2 ^ (ℓ + R_rate - i - 1)))
 
 omit [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
 /-- Prove that `computableTwiddleFactor` equals the standard definition of `twiddleFactor`. -/
-theorem computableTwiddleFactor_eq_twiddleFactor (i : Fin ℓ) :
+theorem computableTwiddleFactor_eq_twiddleFactor (i : Fin r) (h_i : i < ℓ) :
   computableTwiddleFactor (r := r) (ℓ := ℓ) (β := β) (L := L)
     (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := ⟨i, by omega⟩) =
   twiddleFactor (𝔽q := 𝔽q) (L := L) (β := β) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-    (i := ⟨i, by omega⟩) := by
+    (i := i) (h_i := h_i) := by
   unfold computableTwiddleFactor twiddleFactor
   simp_rw [evalNormalizedWAt_eq_normalizedW (𝔽q := 𝔽q) (β := β) (ℓ := ℓ)
     (R_rate := R_rate) (i := ⟨i, by omega⟩)]
@@ -332,7 +332,7 @@ theorem computableTwiddleFactor_eq_twiddleFactor (i : Fin ℓ) :
 /-- Performs one stage of the Additive NTT. This corresponds to `NTTStage` in the abstract
 definition: `b` is the array of coefficients. `i` is the stage index (0 to r-1). -/
 def computableNTTStage [Fact (LinearIndependent 𝔽q β)]
-  (i : Fin ℓ) (b : Fin (2 ^ (ℓ + R_rate)) → L) : Fin (2^(ℓ + R_rate)) → L :=
+  (i : Fin r) (h_i : i < ℓ) (b : Fin (2 ^ (ℓ + R_rate)) → L) : Fin (2^(ℓ + R_rate)) → L := -- i < ℓ
   have h_2_pow_i_lt_2_pow_ℓ_add_R_rate: 2^i.val < 2^(ℓ + R_rate) := by
     calc
       2^i.val < 2 ^ (ℓ) := by
@@ -406,15 +406,15 @@ def computableNTTStage [Fact (LinearIndependent 𝔽q β)]
 
 omit [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in
 /-- Prove that `computableNTTStage` equals the standard definition of `NTTStage`. -/
-theorem computableNTTStage_eq_NTTStage (i : Fin ℓ) :
+theorem computableNTTStage_eq_NTTStage (i : Fin r) (h_i : i < ℓ) :
   computableNTTStage (𝔽q := 𝔽q) (r := r) (L := L) (ℓ := ℓ) (β := β) (R_rate := R_rate)
-    (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := ⟨i, by omega⟩) =
+    (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (h_i := h_i) =
   NTTStage (𝔽q := 𝔽q) (L := L) (β := β) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-    (i := ⟨i, by omega⟩) := by
+    (i := i) (h_i := h_i) := by
   unfold computableNTTStage NTTStage
   simp only [Fin.eta]
   simp_rw [computableTwiddleFactor_eq_twiddleFactor (𝔽q := 𝔽q) (β := β) (ℓ := ℓ)
-    (R_rate := R_rate) (i := ⟨i, by omega⟩)]
+    (R_rate := R_rate) (i := i) (h_i := h_i)]
 
 /-- The main computable Additive NTT function. `a` is the input array of coefficients.
 `r` is the number of stages (dimension of the domain). The input array size must be at least 2^r. -/
@@ -422,7 +422,8 @@ def computableAdditiveNTT (a : Fin (2 ^ ℓ) → L) : Fin (2^(ℓ + R_rate)) →
   let b: Fin (2^(ℓ + R_rate)) → L := tileCoeffs a -- Note: can optimize on this
   Fin.foldl (n:=ℓ) (f:= fun current_b i  =>
     computableNTTStage (𝔽q := 𝔽q) (β := β) (ℓ := ℓ) (R_rate := R_rate)
-      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := ⟨ℓ - 1 - i, by omega⟩) (b:=current_b)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := ⟨ℓ - 1 - i, by omega⟩)
+      (h_i := by simp only; omega) (b:=current_b)
   ) (init:=b)
 
 omit [DecidableEq 𝔽q] h_Fq_char_prime h_β₀_eq_1 in

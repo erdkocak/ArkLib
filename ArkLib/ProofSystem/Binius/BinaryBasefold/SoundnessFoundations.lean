@@ -112,11 +112,11 @@ def preTensorCombine_WordStack (i : Fin ℓ) (steps : ℕ) (h_i_add_steps : i + 
     -- 1. Calculate the folding matrix M_y
     let M_y : Matrix (Fin (2 ^ steps)) (Fin (2 ^ steps)) L :=
       foldMatrix 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-      (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) (y := y)
+      h_destIdx h_destIdx_le (y := y)
     -- 2. Get the evaluation of f on the fiber of y
     let fiber_vals : Fin (2 ^ steps) → L :=
       fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-      (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) (f := f_i) y
+      h_destIdx h_destIdx_le (f := f_i) y
     -- 3. The result is the j-th component of the matrix-vector product
     (M_y *ᵥ fiber_vals) j
 
@@ -144,7 +144,7 @@ lemma preTensorCombine_row_eq_fold_with_binary_row_challenges
   dsimp [preTensorCombine_WordStack]
   -- 2. Expand the matrix form of iterated_fold (The RHS)
   -- RHS = Tensor(r) • (M_y * f_vals)
-  rw [iterated_fold_eq_matrix_form 𝔽q β (h_i_add_steps := by omega)]
+  rw [iterated_fold_eq_matrix_form 𝔽q β h_destIdx h_destIdx_le]
   unfold localized_fold_matrix_form single_point_localized_fold_matrix_form
   -- 3. Use the Tensor Property
   -- Tensor(bits(rowIdx)) is the indicator vector for rowIdx
@@ -191,7 +191,7 @@ lemma preTensorCombine_is_interleavedCodeword_of_codeword (i : Fin ℓ) (steps :
   -- We rely on Lemma 4.9 (Matrix Form) which states: M_y * vals = iterated_fold(u, r, y)
   let preTensorCombine_Row: S_next → L := preTensorCombine_WordStack 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i steps
     h_i_add_steps (f_i := f) rowIdx
-  let rowIdx_binary_folded_Row: S_next → L := iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩ steps (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) (f := f) (r_challenges := r_binary)
+  let rowIdx_binary_folded_Row: S_next → L := iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩ steps h_destIdx h_destIdx_le (f := f) (r_challenges := r_binary)
   have h_row_eq_fold : preTensorCombine_Row = rowIdx_binary_folded_Row := by
     funext y
     exact preTensorCombine_row_eq_fold_with_binary_row_challenges 𝔽q β i
@@ -201,7 +201,7 @@ lemma preTensorCombine_is_interleavedCodeword_of_codeword (i : Fin ℓ) (steps :
   rw [h_row_eq_fold]
   -- ⊢ rowIdx_binary_folded_Row ∈ C_next (i.e. lhs is of `fold(f, binary_rowIdx_challenges)` form)
   unfold rowIdx_binary_folded_Row
-  exact iterated_fold_preserves_BBF_Code_membership 𝔽q β (i := i) (steps := steps) (h_i_add_steps := h_i_add_steps) (f := f) (r_challenges := r_binary)
+  exact iterated_fold_preserves_BBF_Code_membership 𝔽q β (i := i) (steps := steps) h_destIdx h_destIdx_le (f := f) (r_challenges := r_binary)
 
 /-!
 --------------------------------------------------------------------------------
@@ -394,7 +394,7 @@ lemma preTensorCombine_of_lift_interleavedCodeword_eq_self (i : Fin ℓ) (steps 
   let S_next := sDomain 𝔽q β h_ℓ_add_R_rate ⟨i + steps, by omega⟩
   let C_next := BBF_Code 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i + steps, by omega⟩
   set g := lift_interleavedCodeword 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i)
-    (steps := steps) (h_i_add_steps := h_i_add_steps) (V_codeword := V_codeword)
+    (steps := steps) h_destIdx h_destIdx_le (V_codeword := V_codeword)
 
   -- **FIRST**,
     -- `∀ j : Fin (2^ϑ), (V_codeword j)` and `fold(g, bitsOfIndex j)` agree identically
@@ -407,7 +407,7 @@ lemma preTensorCombine_of_lift_interleavedCodeword_eq_self (i : Fin ℓ) (steps 
 
   let eq_iff_all_rows_eq := (instInterleavedStructureInterleavedWord (A := L) (κ := Fin (2 ^ steps))
     (ι := S_next)).eq_iff_all_rows_eq (u := ⋈|preTensorCombine_WordStack 𝔽q β (i := i)
-      (steps := steps) (h_i_add_steps := h_i_add_steps) (↑g)) (v := V_codeword.val)
+      (steps := steps) h_destIdx h_destIdx_le (↑g)) (v := V_codeword.val)
   simp only
   rw [eq_iff_all_rows_eq]
   intro j
@@ -423,7 +423,7 @@ lemma preTensorCombine_of_lift_interleavedCodeword_eq_self (i : Fin ℓ) (steps 
   unfold preTensorCombine_WordStack
   simp only
   set M_y := foldMatrix 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-    (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) y
+    h_destIdx h_destIdx_le y
   -- ⊢ (foldMatrix 𝔽q β ⟨↑i, ⋯⟩ steps ⋯ y *ᵥ fiberEvaluations 𝔽q β ⟨↑i, ⋯⟩ steps ⋯ (↑g) y) j
     -- = ↑V_codeword y j
   change (M_y *ᵥ G) j = V_codeword.val y j
@@ -441,7 +441,7 @@ lemma preTensorCombine_of_lift_interleavedCodeword_eq_self (i : Fin ℓ) (steps 
 
   let P_j := getRowPoly 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i steps h_i_add_steps V_codeword j
   let lhs := iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩ (steps := steps)
-    (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) (f := g)
+    h_destIdx h_destIdx_le (f := g)
     (r_challenges := bitsOfIndex j)
   let rhs := curRow.val
   let generatedRow : OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i + steps, by omega⟩ :=
@@ -480,9 +480,9 @@ lemma fiberwise_disagreement_isomorphism (i : Fin ℓ) (steps : ℕ) (h_i_add_st
     WordStack.getSymbol (preTensorCombine_WordStack 𝔽q β i steps h_i_add_steps f) y ≠
     WordStack.getSymbol (preTensorCombine_WordStack 𝔽q β i steps h_i_add_steps g) y := by
   -- U_y = M_y * f_vals, V_y = M_y * g_vals
-  let M_y := foldMatrix 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) y
-  let f_vals := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) f y
-  let g_vals := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) g y
+  let M_y := foldMatrix 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) h_destIdx h_destIdx_le y
+  let f_vals := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) h_destIdx h_destIdx_le f y
+  let g_vals := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) h_destIdx h_destIdx_le g y
 
   have h_det : M_y.det ≠ 0 := foldMatrix_det_ne_zero 𝔽q β (i := i) (steps := steps) (h_i := by omega) (y := y)
   constructor
@@ -493,11 +493,11 @@ lemma fiberwise_disagreement_isomorphism (i : Fin ℓ) (steps : ℕ) (h_i_add_st
       rcases h_diff with ⟨x, h_gen_y, h_val_ne⟩ -- h_val_ne : f x ≠ g x
       intro h_eq
       let x_is_fiber_of_y := is_fiber_iff_generates_quotient_point 𝔽q β
-        (i := i) (steps := steps) (h_i_add_steps := by omega)
+        (i := i) (steps := steps) h_destIdx h_destIdx_le
         (x := x) (y := y).mp (by exact id (Eq.symm h_gen_y))
       let x_fiberIdx : Fin (2 ^ steps) :=
         pointToIterateQuotientIndex 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-        (h_i_add_steps := by omega) (x := x)
+        h_destIdx h_destIdx_le (x := x)
       have h_left_eval : f_vals x_fiberIdx = f x := by
         unfold f_vals fiberEvaluations
         rw [x_is_fiber_of_y]
@@ -553,12 +553,12 @@ lemma fiberwise_disagreement_isomorphism (i : Fin ℓ) (steps : ℕ) (h_i_add_st
       -- fiberEvaluations f y idx = f (qMap_total_fiber ... y idx)
       -- fiberEvaluations g y idx = g (qMap_total_fiber ... y idx)
       let x := qMap_total_fiber 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-        (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) (y := y) idx
+        h_destIdx h_destIdx_le (y := y) idx
       -- x is in the fiber of y, so iteratedQuotientMap ... x = y
       have h_x_in_fiber : iteratedQuotientMap 𝔽q β h_ℓ_add_R_rate i steps (by omega) x = y := by
         -- This follows from generates_quotient_point_if_is_fiber_of_y
         have h := generates_quotient_point_if_is_fiber_of_y 𝔽q β (i := i) (steps := steps)
-          (h_i_add_steps := h_i_add_steps) (x := x) (y := y) (hx_is_fiber := by use idx)
+          h_destIdx h_destIdx_le (x := x) (y := y) (hx_is_fiber := by use idx)
         exact h.symm
       -- Since h_fiber_eq says no point in the fiber has f x ≠ g x,
       -- we have f x = g x for all x in the fiber
@@ -605,7 +605,7 @@ lemma prop_4_20_case_1_fiberwise_close (i : Fin ℓ) (steps : ℕ) [NeZero steps
     (h_i_add_steps : i + steps ≤ ℓ)
     (f_i : OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩)
     (h_close : fiberwiseClose 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-      (i := i) (steps := steps) (h_i_add_steps := h_i_add_steps) (f := f_i)) :
+      (i := i) (steps := steps) h_destIdx h_destIdx_le (f := f_i)) :
     let S_next := sDomain 𝔽q β h_ℓ_add_R_rate ⟨i + steps, by omega⟩
     let domain_size := Fintype.card S_next
     Pr_{ let r_challenges ←$ᵖ (Fin steps → L) }[
@@ -743,9 +743,9 @@ lemma prop_4_20_case_1_fiberwise_close (i : Fin ℓ) (steps : ℕ) [NeZero steps
     -- 1. Apply Lemma 4.9 to express folding as Matrix Form
     -- Equality holds iff [Tensor(r)] * [M_y] * [f - f_bar] = 0
     let vals_f : Fin (2 ^ steps) → L := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-      (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) f_i y
+      h_destIdx h_destIdx_le f_i y
     let vals_f_bar : Fin (2 ^ steps) → L := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-      (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) f_bar_i y
+      h_destIdx h_destIdx_le f_bar_i y
     let v_diff : Fin (2 ^ steps) → L := vals_f - vals_f_bar
 
     -- 2. Show `v_diff ≠ 0` because `y ∈ Δ_fiber`, this is actually by definition of `Δ_fiber`.
@@ -760,10 +760,10 @@ lemma prop_4_20_case_1_fiberwise_close (i : Fin ℓ) (steps : ℕ) [NeZero steps
         rcases h_prop_xL with ⟨xL_mem_sDomain, h_quot, h_ne⟩
         set xSDomain : sDomain 𝔽q β h_ℓ_add_R_rate (i := ⟨i, by omega⟩) := ⟨xL, xL_mem_sDomain⟩
         let x_is_fiber_of_y :=
-          is_fiber_iff_generates_quotient_point 𝔽q β (i := i) (steps := steps) (h_i_add_steps := by omega)
+          is_fiber_iff_generates_quotient_point 𝔽q β (i := i) (steps := steps) h_destIdx h_destIdx_le
           (x := xSDomain) (y := y).mp (by exact id (Eq.symm h_quot))
         let x_fiberIdx : Fin (2 ^ steps) := pointToIterateQuotientIndex 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-          (h_i_add_steps := by omega) (x := xSDomain)
+          h_destIdx h_destIdx_le (x := xSDomain)
         use x_fiberIdx
         have h_left_eval : vals_f x_fiberIdx = f_i xSDomain := by
           unfold vals_f fiberEvaluations
@@ -785,7 +785,7 @@ lemma prop_4_20_case_1_fiberwise_close (i : Fin ℓ) (steps : ℕ) [NeZero steps
 
     -- 3. M_y is nonsingular (from Lemma 4.9 context/properties of AdditiveNTT)
     let M_y := foldMatrix 𝔽q β (i := ⟨i, by omega⟩) (steps := steps)
-      (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega)  y
+      h_destIdx h_destIdx_le  y
     have hMy_det_ne_zero : M_y.det ≠ 0 := by
       apply foldMatrix_det_ne_zero 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps)
         (h_i := by omega) (y := y)
@@ -907,7 +907,7 @@ lemma prop_4_20_case_1_fiberwise_close (i : Fin ℓ) (steps : ℕ) [NeZero steps
     · apply prob_schwartz_zippel_mv_polynomial P hP_nonzero hP_deg
     · intro r
       -- Show that (Folding Eq) ↔ (P(r) = 0)
-      rw [iterated_fold_eq_matrix_form 𝔽q β (h_i_add_steps := by omega), iterated_fold_eq_matrix_form 𝔽q β (h_i_add_steps := by omega)]
+      rw [iterated_fold_eq_matrix_form 𝔽q β h_destIdx h_destIdx_le, iterated_fold_eq_matrix_form 𝔽q β h_destIdx h_destIdx_le]
       -- Expand the dot product logic:
       unfold localized_fold_matrix_form single_point_localized_fold_matrix_form
       rw [hP_eval]
@@ -961,7 +961,7 @@ lemma lemma_4_21_interleaved_word_UDR_far (i : Fin ℓ) (steps : ℕ) [NeZero st
     (h_i_add_steps : i + steps ≤ ℓ)
     (f_i : OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩)
     (h_far : ¬fiberwiseClose 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps)
-      (h_i_add_steps := h_i_add_steps) (f := f_i)) :
+      h_destIdx h_destIdx_le (f := f_i)) :
     let U := preTensorCombine_WordStack 𝔽q β i steps h_i_add_steps f_i
     let C_next : Set (sDomain 𝔽q β h_ℓ_add_R_rate ⟨i + steps, by omega⟩ → L) :=
       BBF_Code 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i + steps, by omega⟩
@@ -1045,7 +1045,7 @@ lemma lemma_4_21_interleaved_word_UDR_far (i : Fin ℓ) (steps : ℕ) [NeZero st
       (∃ x, iteratedQuotientMap 𝔽q β h_ℓ_add_R_rate i steps (by omega) x = y ∧ f_i x ≠ g.val x) ↔
       getSymbol U_interleaved y ≠ getSymbol V_codeword y := by
     intro y
-    let res := fiberwise_disagreement_isomorphism 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps) (h_i_add_steps := h_i_add_steps) (f := f_i) (g := g) (y := y)
+    let res := fiberwise_disagreement_isomorphism 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps) h_destIdx h_destIdx_le (f := f_i) (g := g) (y := y)
     unfold fiberDiff at res
     rw [res]
     have h_col_U_y_eq : (preTensorCombine_WordStack 𝔽q β i steps h_i_add_steps f_i).getSymbol y
@@ -1124,7 +1124,7 @@ lemma prop_4_20_case_2_fiberwise_far (i : Fin ℓ) (steps : ℕ) [NeZero steps]
     (h_i_add_steps : i + steps ≤ ℓ)
     (f_i : OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩)
     (h_far : ¬fiberwiseClose 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps)
-      (h_i_add_steps := h_i_add_steps) (f := f_i)) :
+      h_destIdx h_destIdx_le (f := f_i)) :
     let next_domain_size := Fintype.card (sDomain 𝔽q β h_ℓ_add_R_rate ⟨i + steps, by omega⟩)
     Pr_{ let r ←$ᵖ (Fin steps → L) }[
       let f_next := iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩ steps
@@ -1161,7 +1161,7 @@ lemma prop_4_20_case_2_fiberwise_far (i : Fin ℓ) (steps : ℕ) [NeZero steps]
   -- So U is strictly greater than e_prox distance away.
   have h_U_not_UDR_close : ¬ (jointProximityNat (u := U) (e := e_prox) (C := C_next)) := by
     apply lemma_4_21_interleaved_word_UDR_far 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i)
-      (steps := steps) (h_i_add_steps := h_i_add_steps) (f_i := f_i) (h_far := h_far)
+      (steps := steps) h_destIdx h_destIdx_le (f_i := f_i) (h_far := h_far)
 
   -- The epsilon for RS codes / Tensor Gaps is typically |S_next| * steps (or similar).
   -- In DG25 Cor 3.7, ε = |S_next|. The bound is ϑ * ε / |L|.
@@ -1204,11 +1204,11 @@ lemma prop_4_20_case_2_fiberwise_far (i : Fin ℓ) (steps : ℕ) [NeZero steps]
   -- Lemma 4.9 (iterated_fold_eq_matrix_form) essentially establishes this connection
   -- multilinearCombine U r = Tensor(r) ⬝ U = iterated_fold f r
   have h_fold_eq_combine : ∀ r,
-    (iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩ (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) f_i r) =
+    (iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i, by omega⟩ (steps := steps) h_destIdx h_destIdx_le f_i r) =
     multilinearCombine U r := by
     intro r
     ext y
-    rw [iterated_fold_eq_matrix_form 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps) (h_i_add_steps := by omega) (f := f_i) (r_challenges := r)]
+    rw [iterated_fold_eq_matrix_form 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i) (steps := steps) h_destIdx h_destIdx_le (f := f_i) (r_challenges := r)]
     unfold localized_fold_matrix_form single_point_localized_fold_matrix_form multilinearCombine
     simp only [dotProduct, smul_eq_mul]
     apply Finset.sum_congr rfl
@@ -1255,11 +1255,11 @@ lemma prop_4_20_bad_event_probability (i : Fin ℓ) (steps : ℕ) [NeZero steps]
   -- Unfold the event definition to split into the two cases
   unfold foldingBadEvent
   by_cases h_close : fiberwiseClose 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-    (i := i) (steps := steps) (h_i_add_steps := h_i_add_steps) (f := f_i)
+    (i := i) (steps := steps) h_destIdx h_destIdx_le (f := f_i)
   · -- CASE 1: Fiber-wise Close (The main focus of the provided text)
     simp only [h_close, ↓reduceDIte]
     let res := prop_4_20_case_1_fiberwise_close 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i)
-      (steps := steps) (h_i_add_steps := h_i_add_steps) (f_i := f_i) (h_close := h_close)
+      (steps := steps) h_destIdx h_destIdx_le (f_i := f_i) (h_close := h_close)
     exact res
   · -- CASE 2: Fiber-wise Far
     -- The bad event is that the folded function becomes UDRClose.
@@ -1267,7 +1267,7 @@ lemma prop_4_20_bad_event_probability (i : Fin ℓ) (steps : ℕ) [NeZero steps]
     -- If fiberwise distance is "far" (≥ d_next / 2),
     -- then the probability of becoming "close" (< d_next / 2) is bounded.
     apply prop_4_20_case_2_fiberwise_far 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (steps := steps)
-      (h_i_add_steps := h_i_add_steps) (h_far := h_close)
+      h_destIdx h_destIdx_le (h_far := h_close)
 
 open Classical in
 omit [CharP L 2] [DecidableEq 𝔽q] hF₂ [NeZero ℓ] in
@@ -1284,21 +1284,21 @@ lemma fold_agreement_of_fiber_agreement (i : Fin ℓ) (steps : ℕ)
       (by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) g (r_challenges := r_challenges) (y := y))) := by
   intro h_fiber_agree
   -- Expand to matrix form: fold(y) = Tensor(r) * M_y * fiber_vals
-  rw [iterated_fold_eq_matrix_form 𝔽q β (h_i_add_steps := by omega)]
-  rw [iterated_fold_eq_matrix_form 𝔽q β (h_i_add_steps := by omega)]
+  rw [iterated_fold_eq_matrix_form 𝔽q β h_destIdx h_destIdx_le]
+  rw [iterated_fold_eq_matrix_form 𝔽q β h_destIdx h_destIdx_le]
   -- ⊢ localized_fold_matrix_form 𝔽q β i steps h_i_add_steps f r y =
   -- localized_fold_matrix_form 𝔽q β i steps h_i_add_steps g r y
   unfold localized_fold_matrix_form single_point_localized_fold_matrix_form
   simp only
   congr 2
-  let left := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) f y
-  let right := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) g y
+  let left := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) h_destIdx h_destIdx_le f y
+  let right := fiberEvaluations 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) h_destIdx h_destIdx_le g y
   have h_fiber_eval_eq : left = right := by
     unfold left right fiberEvaluations
     ext idx
-    let x := qMap_total_fiber 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) (h_i_add_steps := by simp only; apply Nat.lt_add_of_pos_right_of_le; omega) y idx
+    let x := qMap_total_fiber 𝔽q β (i := ⟨i, by omega⟩) (steps := steps) h_destIdx h_destIdx_le y idx
     have h_x_folds_to_y := generates_quotient_point_if_is_fiber_of_y 𝔽q β (i := i) (steps := steps)
-          (h_i_add_steps := h_i_add_steps) (x := x) (y := y) (hx_is_fiber := by use idx)
+          h_destIdx h_destIdx_le (x := x) (y := y) (hx_is_fiber := by use idx)
     exact h_fiber_agree x h_x_folds_to_y.symm
   unfold left right at h_fiber_eval_eq
   rw [h_fiber_eval_eq]

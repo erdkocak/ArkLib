@@ -124,7 +124,7 @@ theorem oracleReduction_completeness (hInit : init.neverFails) :
     simp [challengeQueryImpl, liftM, monadLift, MonadLift.monadLift, StateT.lift]
     have := SelectableType.probFailure_selectElem (β := Query OStatement)
     aesop
-  · aesop
+  · unfold OracleVerifier.mkVerifierOStmtOut; aesop
 
 -- def langIn : Set (Unit × (∀ _ : Fin 2, OStatement)) := setOf fun ⟨(), oracles⟩ =>
 --   oracles 0 = oracles 1
@@ -149,6 +149,7 @@ def stateFunction [Inhabited OStatement] : (oracleVerifier oSpec OStatement).Sta
       exists_prop, forall_exists_index, and_imp, Prod.forall]
     intro a b s hs s' hSupp
     simp [OracleVerifier.toVerifier, Verifier.run, oracleVerifier] at hSupp
+    unfold OracleVerifier.mkVerifierOStmtOut at hSupp
     simp [hSupp.1, h]
 
 /-- The round-by-round extractor is trivial since the output witness is `Unit`. -/
@@ -170,7 +171,8 @@ def knowledgeStateFunction :
   toFun_empty := fun stmt => by simp
   toFun_next | 0 => fun hDir ⟨stmt, oStmt⟩ tr h => by simp_all
   toFun_full := fun ⟨stmt, oStmt⟩ tr _ h => by
-    simp_all [oracleVerifier, OracleVerifier.toVerifier, Verifier.run]
+    simp_all [oracleVerifier, OracleVerifier.toVerifier, Verifier.run,
+      OracleVerifier.mkVerifierOStmtOut]
 
 variable [Fintype (Query OStatement)] [DecidableEq (Response OStatement)]
 

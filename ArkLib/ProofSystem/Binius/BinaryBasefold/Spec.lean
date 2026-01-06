@@ -413,6 +413,37 @@ instance : ∀ i, SelectableType ((pSpecQuery 𝔽q β γ_repetitions
 instance : ∀ j, SelectableType ((fullPSpec 𝔽q β γ_repetitions (ϑ:=ϑ)
   (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Challenge j) := instSelectableTypeChallengeAppend
 
+/-! ## Additional OracleInterface and FiniteRange instances -/
+
+/-- OracleInterface instance for the matrix-indexed message type family using instDefault. -/
+instance : ∀ i, OracleInterface (![↥L⦃≤ 2⦄[X], L] i)
+  | ⟨0, h⟩ => by exact OracleInterface.instDefault  -- Polynomial message
+  | ⟨1, h⟩ => by exact OracleInterface.instDefault  -- Field element message
+  | ⟨n+2, h⟩ => by omega  -- Only 2 elements in the matrix
+
+/-! ## FiniteRange instances for oracle specifications -/
+
+/-- FiniteRange instance for pSpecFold message oracle specification.
+    The messages are polynomials `L⦃≤ 2⦄[X]` and field elements `L`,
+    both of which use `OracleInterface.instDefault` (Query = Unit, Response = Message type).
+    The response types are the polynomial and field element themselves, both finite and inhabited. -/
+instance : ([(pSpecFold (L:=L)).Message]ₒ).FiniteRange := by sorry
+
+instance instOracleStatementFiniteRange {i : Fin (ℓ + 1)} :
+  [OracleStatement 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i]ₒ.FiniteRange := by sorry
+
+instance : ∀ i, Fintype ((pSpecFinalSumcheckStep (L:=L)).Challenge i) := by sorry
+  -- (i : pSpecFinalSumcheckStep.ChallengeIdx) → Fintype (pSpecFinalSumcheckStep.Challenge i)
+
+instance instFiniteRangePSpecFinalSumcheckStepChallenge : [pSpecFinalSumcheckStep (L := L).Challenge]ₒ.FiniteRange := by sorry
+
+instance instFiniteRangeOracleStatementFinLast : [fun j => OracleStatement 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+      (Fin.last ℓ) j]ₒ.FiniteRange := by sorry
+
+instance instFiniteRangePSpecFinalSumcheckStepMessage : [(pSpecFinalSumcheckStep (L := L)).Message]ₒ.FiniteRange := by sorry
+
+instance instInhabitedPSpecFinalSumcheckStepChallenge : ∀ i, Inhabited ((pSpecFinalSumcheckStep (L:=L)).Challenge i) := by sorry
+
 end Pspec
 
 end
