@@ -13,12 +13,12 @@ open OracleSpec OracleComp
 
 universe u v
 
-variable {ι : Type} {α β γ : Type}
+variable {ι : Type} {α β γ : Type} {spec : OracleSpec ι}
 
--- /-- A function that implements the oracle interface specified by `spec`, and queries no further
---   oracles.
--- -/
--- def OracleSpec.FunctionType (spec : OracleSpec ι) := (i : ι) → spec.domain i → spec.range i
+/-- A function that implements the oracle interface specified by `spec`, and queries no further
+  oracles.
+-/
+def OracleSpec.FunctionType (spec : OracleSpec ι) := QueryImpl spec Id
 
 -- namespace OracleSpec
 
@@ -39,15 +39,15 @@ variable {ι : Type} {α β γ : Type}
 
 --   TODO: add state for `f`
 -- -/
--- def runWithOracle (f : spec.FunctionType) : OracleComp spec α → Option α :=
-
---   OracleComp.construct' (spec := spec) (C := fun _ => Option α)
---     -- For a pure value, return that value successfully
---     (fun x => some x)
---     -- When a query bind is made, run the oracle function `f` and compute on the result
---     (fun i q _ g => g (f i q))
---     -- If the computation fails, return `none`
---     (none)
+def runWithOracle (f : spec.FunctionType) : OracleComp spec α → α :=
+  fun mx => Id.run <| simulateQ f mx
+  -- OracleComp.construct' (spec := spec) (C := fun _ => Option α)
+  --   -- For a pure value, return that value successfully
+  --   (fun x => some x)
+  --   -- When a query bind is made, run the oracle function `f` and compute on the result
+  --   (fun i q _ g => g (f i q))
+  --   -- If the computation fails, return `none`
+  --   (none)
 
 -- @[simp]
 -- theorem runWithOracle_pure (f : spec.FunctionType) (a : α) :

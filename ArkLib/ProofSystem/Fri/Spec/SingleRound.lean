@@ -75,14 +75,12 @@ def FinalStatement (F : Type) (k : ℕ) : Type := Fin (k + 1) → F
   beginning purported codeword, and `i` more for each of the rounds `0` to `i - 1`. After the `i`-th
   round, we append the `i`-th message sent by the prover to the oracle statement. -/
 @[reducible]
-def OracleStatement (i : Fin (k + 1)) : Fin (i.val + 1) → Type :=
-  fun j =>
-    evalDomain D x (∑ j' ∈ finRangeTo j.1, s j')
-      → F
+def OracleStatement (i : Fin (k + 1)) : Type :=
+  (j : Fin (i.val + 1)) → evalDomain D x (∑ j' ∈ finRangeTo j.1, s j') → F
 
 @[reducible]
-def FinalOracleStatement : Fin (k + 2) → Type :=
-  fun j =>
+def FinalOracleStatement : Type :=
+  (j : Fin (k + 2)) →
     if j.1 = k + 1
     then (Unit → F[X])
     else (evalDomain D x (∑ j' ∈ finRangeTo j.1, s j') → F)
@@ -196,64 +194,64 @@ private lemma witness_lift {F : Type} [NonBinaryField F]
           )
         simp
 
-instance {i : Fin (k + 1)} : ∀ j, OracleInterface (OracleStatement D x s i j) :=
-  fun _ => inferInstance
+-- def roundOracleContext {i : Fin (k + 1)} :
+--     OracleContext (Fin (i + 1)) (ReaderM (OracleStatement D x s i j))
 
-instance : ∀ j, OracleInterface (FinalOracleStatement D x s j) :=
-  fun j =>
-    if h : j = k + 1
-    then {
-           Query := Unit
-           Response := F[X]
-           answer := cast (by simp [h, FinalOracleStatement])
-                          (id (α := Unit → F[X]))
-         }
-    else {
-           Query :=
-            ↑(
-              evalDomain D x
-              (∑ j' ∈ finRangeTo j.1, s j')
-            )
-           Response := F
-           answer := cast (by simp [h, FinalOracleStatement])
-                          (id (α := ↑(evalDomain D x (∑ j' ∈ finRangeTo j.1, s j')) → F))
-         }
+-- def FinalOracleStatementSpec
 
-omit [Finite F] in
-@[simp]
-lemma range_lem₁ {i : Fin (k + 1)} :
-    [FinalOracleStatement D x s]ₒ.range ⟨i.1, Nat.lt_succ_of_lt i.2⟩ = F := by
-  unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
-  unfold OracleInterface.Query
-  unfold instOracleInterfaceFinalOracleStatement
-  simp [Nat.ne_of_lt i.2]
+-- instance : ∀ j, OracleInterface (FinalOracleStatement D x s j) :=
+--   fun j =>
+--     if h : j = k + 1
+--     then {
+--            spec := Unit →ₒ F[X]
+--            impl _ := sorry
+--          }
+--     else {
+--            Query :=
+--             ↑(
+--               evalDomain D x
+--               (∑ j' ∈ finRangeTo j.1, s j')
+--             )
+--            Response := F
+--            answer := cast (by simp [h, FinalOracleStatement])
+--                           (id (α := ↑(evalDomain D x (∑ j' ∈ finRangeTo j.1, s j')) → F))
+--          }
 
-omit [Finite F] in
-@[simp]
-lemma domain_lem₁ {i : Fin (k + 1)} :
-    [FinalOracleStatement D x s]ₒ.domain ⟨i.1, Nat.lt_succ_of_lt i.2⟩ =
-      evalDomain D x (∑ j' ∈ finRangeTo i.1, s j') := by
-  unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
-  unfold OracleInterface.Query
-  unfold instOracleInterfaceFinalOracleStatement
-  simp [Nat.ne_of_lt i.2]
+-- omit [Finite F] in
+-- @[simp]
+-- lemma range_lem₁ {i : Fin (k + 1)} :
+--     [FinalOracleStatement D x s]ₒ.range ⟨i.1, Nat.lt_succ_of_lt i.2⟩ = F := by
+--   unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
+--   unfold OracleInterface.Query
+--   unfold instOracleInterfaceFinalOracleStatement
+--   simp [Nat.ne_of_lt i.2]
 
-omit [Finite F] in
-@[simp]
-lemma range_lem₂ : [FinalOracleStatement D x s]ₒ.range (Fin.last (k + 1)) = F[X] := by
-  unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
-  unfold OracleInterface.Query
-  unfold instOracleInterfaceFinalOracleStatement
-  simp
+-- omit [Finite F] in
+-- @[simp]
+-- lemma domain_lem₁ {i : Fin (k + 1)} :
+--     [FinalOracleStatement D x s]ₒ.domain ⟨i.1, Nat.lt_succ_of_lt i.2⟩ =
+--       evalDomain D x (∑ j' ∈ finRangeTo i.1, s j') := by
+--   unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
+--   unfold OracleInterface.Query
+--   unfold instOracleInterfaceFinalOracleStatement
+--   simp [Nat.ne_of_lt i.2]
 
-omit [Finite F] in
-@[simp]
-lemma domain_lem₂ :
-  [FinalOracleStatement D x s]ₒ.domain (Fin.last (k + 1)) = Unit := by
-  unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
-  unfold OracleInterface.Query
-  unfold instOracleInterfaceFinalOracleStatement
-  simp
+-- omit [Finite F] in
+-- @[simp]
+-- lemma range_lem₂ : [FinalOracleStatement D x s]ₒ.range (Fin.last (k + 1)) = F[X] := by
+--   unfold OracleSpec.range FinalOracleStatement OracleInterface.toOracleSpec
+--   unfold OracleInterface.Query
+--   unfold instOracleInterfaceFinalOracleStatement
+--   simp
+
+-- omit [Finite F] in
+-- @[simp]
+-- lemma domain_lem₂ :
+--   [FinalOracleStatement D x s]ₒ.domain (Fin.last (k + 1)) = Unit := by
+--   unfold OracleSpec.domain FinalOracleStatement OracleInterface.toOracleSpec
+--   unfold OracleInterface.Query
+--   unfold instOracleInterfaceFinalOracleStatement
+--   simp
 
 namespace FoldPhase
 
@@ -304,7 +302,7 @@ namespace FoldPhase
 def inputRelation (cond : ∑ i, (s i).1 ≤ n) [DecidableEq F] (δ : ℝ≥0) :
     Set
       (
-        (Statement F i.castSucc × (∀ j, OracleStatement D x s i.castSucc j)) ×
+        (Statement F i.castSucc × OracleStatement D x s i.castSucc) ×
         Witness F s d i.castSucc.castSucc
       ) := sorry
 
@@ -313,7 +311,7 @@ def inputRelation (cond : ∑ i, (s i).1 ≤ n) [DecidableEq F] (δ : ℝ≥0) :
 def outputRelation (cond : ∑ i, (s i).1 ≤ n) [DecidableEq F] (δ : ℝ≥0) :
     Set
       (
-        (Statement F i.succ × (∀ j, OracleStatement D x s i.succ j)) ×
+        (Statement F i.succ × OracleStatement D x s i.succ) ×
         Witness F s d i.succ.castSucc
       ) := sorry
 
@@ -331,14 +329,6 @@ def pSpec : ProtocolSpec 2 :=
       ]
   ⟩
 
-/- `OracleInterface` instance for `pSpec` of the non-final folding rounds. -/
-instance {i : Fin k} : ∀ j, OracleInterface ((pSpec D x s i).Message j)
-  | ⟨0, h⟩ => nomatch h
-  | ⟨1, _⟩ => by
-      unfold pSpec Message
-      simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
-      infer_instance
-
 /-- The prover for the `i`-th round of the FRI protocol. It first receives the challenge,
     then does an `s` degree split of this polynomial. Finally, it returns the evaluation of
     this polynomial on the next evaluation domain. -/
@@ -349,10 +339,10 @@ noncomputable def foldProver :
     (pSpec D x s i) where
   PrvState
   | 0 =>
-    (Statement F i.castSucc × ((j : Fin (↑i.castSucc + 1)) → OracleStatement D x s i.castSucc j)) ×
+    (Statement F i.castSucc × OracleStatement D x s i.castSucc) ×
       Witness F s d i.castSucc.castSucc
   | _ =>
-    (Statement F i.succ × ((j : Fin (↑i.castSucc + 1)) → OracleStatement D x s i.castSucc j)) ×
+    (Statement F i.succ × OracleStatement D x s i.castSucc) ×
       Witness F s d i.castSucc.succ
 
   input := id
@@ -387,38 +377,66 @@ noncomputable def foldProver :
       p
     ⟩
 
+def foldVerifierOStmtContext : OracleContext
+    ((j : Fin (i + 1)) × evalDomain D x (∑ j' ∈ finRangeTo j.1, s j'))
+    (ReaderM (OracleStatement D x s i.castSucc)) where
+  spec := ((j : Fin (i.val + 1)) × evalDomain D x (∑ j' ∈ finRangeTo j.1, s j')) →ₒ F
+  impl t := do return (← read) t.1 t.2
+
+def foldVerifierMsgContext : OracleContext
+    (evalDomain D x (∑ j' ∈ finRangeTo i.1, s j'))
+    (ReaderM (OracleStatement D x s i.castSucc)) where
+  spec := (evalDomain D x (∑ j' ∈ finRangeTo i.1, s j')) →ₒ F
+  impl t := do return (← read) t.1 t.2
+
+def foldVerifierOStmtOutSpec : OracleSpec
+    ((j : Fin (i.castSucc + 1)) × evalDomain D x (∑ j' ∈ finRangeTo j.1, s j')) := by
+  convert (foldVerifierOStmtContext D x s i).spec +
+    (foldVerifierMsgContext D x s i).spec
+  sorry
+
 /-- The oracle verifier for the `i`-th non-final folding round of the FRI protocol. -/
 noncomputable def foldVerifier :
   OracleVerifier []ₒ
     (Statement F i.castSucc) (OracleStatement D x s i.castSucc)
     (Statement F i.succ) (OracleStatement D x s i.succ)
-    (pSpec D x s i) where
+    (pSpec D x s i)
+    (foldVerifierOStmtContext D x s i)
+    (foldVerifierMsgContext D x s i)
+    (foldVerifierOStmtOutSpec D x s i) where
   verify := fun prevChallenges roundChallenge =>
     pure (Fin.vappend prevChallenges (fun _ => roundChallenge ⟨0, by simp⟩))
-  embed :=
-    ⟨
-      fun j =>
-        if h : j.val = (i.val + 1)
-        then Sum.inr ⟨1, by simp⟩
-        else Sum.inl ⟨j.val, by have := Nat.lt_succ_iff_lt_or_eq.mp j.2; aesop⟩,
-      by intros _; aesop
-    ⟩
-  hEq := by
-    unfold OracleStatement pSpec
-    intros j
-    simp only [Fin.val_succ, Fin.coe_castSucc, Fin.vcons_fin_zero,
-      Nat.reduceAdd, MessageIdx, Fin.isValue, Function.Embedding.coeFn_mk,
-      Message]
-    split_ifs with h
-    · simp [h]
-    · rfl
+  embed := by
+
+    sorry
+    -- ⟨
+    --   fun j =>
+    --     if h : j.val = (i.val + 1)
+    --     then Sum.inr ⟨1, by simp⟩
+    --     else Sum.inl ⟨j.val, by have := Nat.lt_succ_iff_lt_or_eq.mp j.2; aesop⟩,
+    --   by intros _; aesop
+    -- ⟩
+  embedOStmtOut := sorry
+  hEq := by sorry
+
+    -- unfold OracleStatement pSpec
+    -- intros j
+    -- simp only [Fin.val_succ, Fin.coe_castSucc, Fin.vcons_fin_zero,
+    --   Nat.reduceAdd, MessageIdx, Fin.isValue, Function.Embedding.coeFn_mk,
+    --   Message]
+    -- split_ifs with h
+    -- · simp [h]
+    -- · rfl
 
 /-- The oracle reduction that is the `i`-th round of the FRI protocol. -/
 noncomputable def foldOracleReduction :
   OracleReduction []ₒ
     (Statement F i.castSucc) (OracleStatement D x s i.castSucc) (Witness F s d i.castSucc.castSucc)
     (Statement F i.succ) (OracleStatement D x s i.succ) (Witness F s d i.succ.castSucc)
-    (pSpec D x s i) where
+    (pSpec D x s i)
+    (foldVerifierOStmtContext D x s i)
+    (foldVerifierMsgContext D x s i)
+    (foldVerifierOStmtOutSpec D x s i) where
   prover := foldProver D x s d i
   verifier := foldVerifier D x s i
 
@@ -495,13 +513,13 @@ def outputRelation (cond : ∑ i, (s i).1 ≤ n) [DecidableEq F] (δ : ℝ≥0) 
 @[reducible]
 def pSpec (F : Type) [Semiring F] : ProtocolSpec 2 := ⟨!v[.V_to_P, .P_to_V], !v[F, Unit → F[X]]⟩
 
-/- `OracleInterface` instance for the `pSpec` of the final folding round of the FRI protocol. -/
-instance : ∀ j, OracleInterface ((pSpec F).Message j)
-  | ⟨0, h⟩ => nomatch h
-  | ⟨1, _⟩ => by
-      unfold pSpec Message
-      simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
-      exact OracleInterface.instFunction
+-- /- `OracleInterface` instance for the `pSpec` of the final folding round of the FRI protocol. -/
+-- instance : ∀ j, OracleInterface ((pSpec F).Message j)
+--   | ⟨0, h⟩ => nomatch h
+--   | ⟨1, _⟩ => by
+--       unfold pSpec Message
+--       simp only [Fin.vcons_fin_zero, Nat.reduceAdd, Fin.isValue, Fin.vcons_one]
+--       exact OracleInterface.instFunction
 
 /- Prover for the final folding round of the FRI protocol. -/
 noncomputable def finalFoldProver :
@@ -572,7 +590,7 @@ noncomputable def finalFoldVerifier :
   OracleVerifier []ₒ
     (Statement F (Fin.last k)) (OracleStatement D x s (Fin.last k))
     (FinalStatement F k) (FinalOracleStatement D x s)
-    (pSpec F)  where
+    (pSpec F) _ where
   verify := fun prevChallenges roundChallenge => do
     let p ← getConst F
     guard (p.natDegree < d)

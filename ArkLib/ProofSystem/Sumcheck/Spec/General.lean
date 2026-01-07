@@ -144,85 +144,85 @@ def StmtIn := R
 
 variable [DecidableEq R] [SampleableType R]
 
-/-- The verifier for the (full) sum-check protocol -/
-@[reducible]
-def verifier : Verifier oSpec (StatementRound R n 0 × (∀ i, OracleStatement R n deg i))
-    (StatementRound R n (.last n) × (∀ i, OracleStatement R n deg i)) (pSpec R deg n) :=
-  Verifier.seqCompose (oSpec := oSpec)
-    (Stmt := fun i => StatementRound R n i × (∀ j, OracleStatement R n deg j))
-    (pSpec := fun _ => SingleRound.pSpec R deg)
-    (SingleRound.verifier R n deg D oSpec)
+-- /-- The verifier for the (full) sum-check protocol -/
+-- @[reducible]
+-- def verifier : Verifier oSpec (StatementRound R n 0 × (∀ i, OracleStatement R n deg i))
+--     (StatementRound R n (.last n) × (∀ i, OracleStatement R n deg i)) (pSpec R deg n) :=
+--   Verifier.seqCompose (oSpec := oSpec)
+--     (Stmt := fun i => StatementRound R n i × (∀ j, OracleStatement R n deg j))
+--     (pSpec := fun _ => SingleRound.pSpec R deg)
+--     (SingleRound.verifier R n deg D oSpec)
 
-/-- The oracle verifier for the (full) sum-check protocol -/
-@[reducible]
-def oracleVerifier : OracleVerifier oSpec (StatementRound R n 0) (OracleStatement R n deg)
-    (StatementRound R n (.last n)) (OracleStatement R n deg) (pSpec R deg n) :=
-  OracleVerifier.seqCompose (oSpec := oSpec)
-    (Stmt := StatementRound R n)
-    (OStmt := fun _ => OracleStatement R n deg)
-    (pSpec := fun _ => SingleRound.pSpec R deg)
-    (SingleRound.oracleVerifier R n deg D oSpec)
+-- /-- The oracle verifier for the (full) sum-check protocol -/
+-- @[reducible]
+-- def oracleVerifier : OracleVerifier oSpec (StatementRound R n 0) (OracleStatement R n deg)
+--     (StatementRound R n (.last n)) (OracleStatement R n deg) (pSpec R deg n) :=
+--   OracleVerifier.seqCompose (oSpec := oSpec)
+--     (Stmt := StatementRound R n)
+--     (OStmt := fun _ => OracleStatement R n deg)
+--     (pSpec := fun _ => SingleRound.pSpec R deg)
+--     (SingleRound.oracleVerifier R n deg D oSpec)
 
-/-- The sum-check protocol as a reduction -/
-@[reducible]
-def reduction : Reduction oSpec
-    (StatementRound R n 0 × ∀ i, OracleStatement R n deg i) Unit
-    (StatementRound R n (.last n) × ∀ i, OracleStatement R n deg i) Unit
-    (pSpec R deg n) :=
-  Reduction.seqCompose (oSpec := oSpec)
-    (Stmt := fun i => StatementRound R n i × (∀ j, OracleStatement R n deg j))
-    (Wit := fun _ => Unit)
-    (pSpec := fun _ => SingleRound.pSpec R deg)
-    (SingleRound.reduction R n deg D oSpec)
+-- /-- The sum-check protocol as a reduction -/
+-- @[reducible]
+-- def reduction : Reduction oSpec
+--     (StatementRound R n 0 × ∀ i, OracleStatement R n deg i) Unit
+--     (StatementRound R n (.last n) × ∀ i, OracleStatement R n deg i) Unit
+--     (pSpec R deg n) :=
+--   Reduction.seqCompose (oSpec := oSpec)
+--     (Stmt := fun i => StatementRound R n i × (∀ j, OracleStatement R n deg j))
+--     (Wit := fun _ => Unit)
+--     (pSpec := fun _ => SingleRound.pSpec R deg)
+--     (SingleRound.reduction R n deg D oSpec)
 
-/-- The sum-check protocol as an oracle reduction -/
-@[reducible]
-def oracleReduction : OracleReduction oSpec
-    (StatementRound R n 0) (OracleStatement R n deg) Unit
-    (StatementRound R n (.last n)) (OracleStatement R n deg) Unit
-    (pSpec R deg n) :=
-  OracleReduction.seqCompose (oSpec := oSpec)
-    (Stmt := StatementRound R n)
-    (OStmt := fun _ => OracleStatement R n deg)
-    (Wit := fun _ => Unit)
-    (pSpec := fun _ => SingleRound.pSpec R deg)
-    (SingleRound.oracleReduction R n deg D oSpec)
+-- /-- The sum-check protocol as an oracle reduction -/
+-- @[reducible]
+-- def oracleReduction : OracleReduction oSpec
+--     (StatementRound R n 0) (OracleStatement R n deg) Unit
+--     (StatementRound R n (.last n)) (OracleStatement R n deg) Unit
+--     (pSpec R deg n) :=
+--   OracleReduction.seqCompose (oSpec := oSpec)
+--     (Stmt := StatementRound R n)
+--     (OStmt := fun _ => OracleStatement R n deg)
+--     (Wit := fun _ => Unit)
+--     (pSpec := fun _ => SingleRound.pSpec R deg)
+--     (SingleRound.oracleReduction R n deg D oSpec)
 
-omit [SampleableType R] in
-@[simp]
-lemma reduction_verifier_eq_verifier :
-    (reduction R deg D n oSpec).verifier = verifier R deg D n oSpec := by
-  rfl
+-- omit [SampleableType R] in
+-- @[simp]
+-- lemma reduction_verifier_eq_verifier :
+--     (reduction R deg D n oSpec).verifier = verifier R deg D n oSpec := by
+--   rfl
 
-omit [SampleableType R] in
-@[simp]
-lemma oracleReduction_verifier_eq_oracleVerifier :
-    (oracleReduction R deg D n oSpec).verifier = oracleVerifier R deg D n oSpec := by
-  rfl
+-- omit [SampleableType R] in
+-- @[simp]
+-- lemma oracleReduction_verifier_eq_oracleVerifier :
+--     (oracleReduction R deg D n oSpec).verifier = oracleVerifier R deg D n oSpec := by
+--   rfl
 
-variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl oSpec (StateT σ ProbComp)}
+-- variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl oSpec (StateT σ ProbComp)}
 
-open NNReal
+-- open NNReal
 
-/-- Perfect completeness for the (full) sum-check protocol -/
-theorem reduction_perfectCompleteness (hInit : init.neverFails) :
-    (reduction R deg D n oSpec).perfectCompleteness init impl
-      (relationRound R n deg D 0) (relationRound R n deg D (.last n)) :=
-  Reduction.seqCompose_perfectCompleteness hInit
-    (rel := relationRound R n deg D)
-    (R := SingleRound.reduction R n deg D oSpec)
-    (h := fun i => SingleRound.reduction_perfectCompleteness i hInit)
+-- /-- Perfect completeness for the (full) sum-check protocol -/
+-- theorem reduction_perfectCompleteness (hInit : init.neverFails) :
+--     (reduction R deg D n oSpec).perfectCompleteness init impl
+--       (relationRound R n deg D 0) (relationRound R n deg D (.last n)) :=
+--   Reduction.seqCompose_perfectCompleteness hInit
+--     (rel := relationRound R n deg D)
+--     (R := SingleRound.reduction R n deg D oSpec)
+--     (h := fun i => SingleRound.reduction_perfectCompleteness i hInit)
 
-/-- Round-by-round knowledge soundness with error `deg / |R|` per challenge for the (full)
-  sum-check protocol -/
-theorem oracleVerifier_rbrKnowledgeSoundness [Fintype R] :
-    (oracleVerifier R deg D n oSpec).rbrKnowledgeSoundness init impl
-      (relationRound R n deg D 0) (relationRound R n deg D (.last n))
-      (fun _ => (deg : ℝ≥0) / (Fintype.card R)) :=
-  OracleVerifier.seqCompose_rbrKnowledgeSoundness
-    (rel := relationRound R n deg D)
-    (V := SingleRound.oracleVerifier R n deg D oSpec)
-    (h := fun i => SingleRound.oracleVerifier_rbrKnowledgeSoundness i)
+-- /-- Round-by-round knowledge soundness with error `deg / |R|` per challenge for the (full)
+--   sum-check protocol -/
+-- theorem oracleVerifier_rbrKnowledgeSoundness [Fintype R] :
+--     (oracleVerifier R deg D n oSpec).rbrKnowledgeSoundness init impl
+--       (relationRound R n deg D 0) (relationRound R n deg D (.last n))
+--       (fun _ => (deg : ℝ≥0) / (Fintype.card R)) :=
+--   OracleVerifier.seqCompose_rbrKnowledgeSoundness
+--     (rel := relationRound R n deg D)
+--     (V := SingleRound.oracleVerifier R n deg D oSpec)
+--     (h := fun i => SingleRound.oracleVerifier_rbrKnowledgeSoundness i)
 
 end Spec
 

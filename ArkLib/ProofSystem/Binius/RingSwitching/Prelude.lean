@@ -236,7 +236,7 @@ def MLPEvalRelation (ιₛᵢ : Type) (OStmtIn : ιₛᵢ → Type)
 structure AbstractOStmtIn where
   ιₛᵢ : Type
   OStmtIn : ιₛᵢ → Type
-  Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)
+  Oₛᵢ : OracleContext ιₛᵢ (ReaderM (∀ i, OStmtIn i)) -- dtumad: I think this is what is wanted?
   -- The abstract initial compatibility relation, which along with
   -- MLPEvalRelation, forms the initial input relation for the MLIOPCS.
   initialCompatibility : (MultilinearPoly L ℓ') × (∀ j, OStmtIn j) → Prop
@@ -251,20 +251,20 @@ structure MLIOPCS extends (AbstractOStmtIn L ℓ') where
   /-- Protocol specification -/
   numRounds : ℕ
   pSpec : ProtocolSpec numRounds
-  Oₘ: ∀ j, OracleInterface (pSpec.Message j)
+  Oₘ: OracleContext pSpec.MessageIdx (ReaderM <| ∀ j, pSpec.Message j)
   O_challenges: ∀ (i : pSpec.ChallengeIdx), SampleableType (pSpec.Challenge i)
   -- /-- The evaluation protocol Π' as an OracleReduction -/
   oracleReduction : OracleReduction (oSpec:=[]ₒ)
-    (StmtIn := MLPEvalStatement L ℓ') (OStmtIn:= OStmtIn)
-    (StmtOut := Bool) (OStmtOut := fun _: Empty => Unit)
+    (StmtIn := MLPEvalStatement L ℓ') (OStmtIn:= ∀ i, OStmtIn i)
+    (StmtOut := Bool) (OStmtOut := Unit)
     (WitIn := WitMLP L ℓ') (WitOut := Unit)
-    (pSpec := pSpec)
+    (pSpec := pSpec) sorry sorry sorry
   -- Security properties
   perfectCompleteness : ∀ {σ : Type} {init : ProbComp σ} {impl : QueryImpl []ₒ (StateT σ ProbComp)},
-    init.neverFails →
+    HasEvalSPMF.NeverFail init →
     OracleReduction.perfectCompleteness (oSpec:=[]ₒ)
-      (StmtIn:=MLPEvalStatement L ℓ') (OStmtIn:=OStmtIn)
-      (StmtOut:=Bool) (OStmtOut:=fun _: Empty => Unit)
+      (StmtIn:=MLPEvalStatement L ℓ') (OStmtIn:= ∀ i, OStmtIn i)
+      (StmtOut:=Bool) (OStmtOut:= Empty → Unit)
       (WitIn:=WitMLP L ℓ') (WitOut:=Unit) (pSpec:=pSpec) (init:=init) (impl:=impl)
       (relIn := toAbstractOStmtIn.toRelInput)
       (relOut := acceptRejectOracleRel)
@@ -287,8 +287,8 @@ end MLIOPCS
 section OStmt
 variable (aOStmtIn : AbstractOStmtIn L ℓ')
 
-instance instOstmtMLIOPCS : ∀ (i : aOStmtIn.ιₛᵢ), OracleInterface (aOStmtIn.OStmtIn i) :=
-  fun i => aOStmtIn.Oₛᵢ i
+-- instance instOstmtMLIOPCS : ∀ (i : aOStmtIn.ιₛᵢ), OracleInterface (aOStmtIn.OStmtIn i) :=
+--   fun i => aOStmtIn.Oₛᵢ i
 
 end OStmt
 

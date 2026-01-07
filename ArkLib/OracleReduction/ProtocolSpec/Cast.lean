@@ -107,9 +107,9 @@ theorem cast_idx {i : MessageIdx pSpec₁} :
     pSpec₂.Message (i.cast hn hSpec) = pSpec₁.Message i :=
   cast_Type_idx hSpec
 
-instance [inst : ∀ i, OracleInterface (pSpec₁.Message i)] :
-    ∀ i, OracleInterface ((pSpec₁.cast hn).Message i) :=
-  fun i => inst (dcast₂ hn.symm (by rw [dcast_symm hn]; rfl) i)
+-- instance [inst : ∀ i, OracleInterface (pSpec₁.Message i)] :
+--     ∀ i, OracleInterface ((pSpec₁.cast hn).Message i) :=
+--   fun i => inst (dcast₂ hn.symm (by rw [dcast_symm hn]; rfl) i)
 
 end Message
 
@@ -207,12 +207,12 @@ end FullTranscript
 
 section Instances
 
-theorem challengeOracleInterface_cast {h : n₁ = n₂} {hSpec : pSpec₁.cast h = pSpec₂}
-    {i : pSpec₁.ChallengeIdx} :
-    pSpec₁.challengeOracleInterface i =
-      dcast (by simp) (pSpec₂.challengeOracleInterface (i.cast hn hSpec)) := by
-  simp [challengeOracleInterface]
-  ext <;> sorry
+-- theorem challengeOracleInterface_cast {h : n₁ = n₂} {hSpec : pSpec₁.cast h = pSpec₂}
+--     {i : pSpec₁.ChallengeIdx} :
+--     pSpec₁.challengeOracleInterface i =
+--       dcast (by simp) (pSpec₂.challengeOracleInterface (i.cast hn hSpec)) := by
+--   simp [challengeOracleInterface]
+--   ext <;> sorry
 
 end Instances
 

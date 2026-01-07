@@ -63,15 +63,15 @@ end ProtocolSpec
 
 namespace OracleReduction
 
-variable {pSpec : ProtocolSpec n} {ι : Type} {oSpec : OracleSpec ι}
-    [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
+-- variable {pSpec : ProtocolSpec n} {ι : Type} {oSpec : OracleSpec ι}
+--     [Oₘ : ∀ i, OracleInterface (pSpec.Message i)]
 
-variable {nCom : pSpec.MessageIdx → ℕ} {pSpecCom : ∀ i, ProtocolSpec (nCom i)}
-    {Randomness : pSpec.MessageIdx → Type} {CommitmentType : pSpec.MessageIdx → Type}
+-- variable {nCom : pSpec.MessageIdx → ℕ} {pSpecCom : ∀ i, ProtocolSpec (nCom i)}
+--     {Randomness : pSpec.MessageIdx → Type} {CommitmentType : pSpec.MessageIdx → Type}
 
-variable {StmtIn StmtOut WitIn WitOut : Type}
-    {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type} [Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)]
-    {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
+-- variable {StmtIn StmtOut WitIn WitOut : Type}
+--     {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type} [Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)]
+--     {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
 
 -- def BCSTransform (reduction : OracleReduction pSpec oSpec StmtIn StmtOut WitIn WitOut OStmtIn OStmtOut) :
 --     Reduction (pSpec.BCSTransform commitmentScheme) oSpec StmtIn StmtOut WitIn WitOut :=

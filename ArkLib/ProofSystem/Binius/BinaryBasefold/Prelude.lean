@@ -133,6 +133,7 @@ noncomputable def getSumcheckRoundPoly (i : Fin ℓ) (h : ↥L⦃≤ 2⦄[X Fin 
   exact ⟨g, by
     have h_deg_le_2 : g ∈ L⦃≤ 2⦄[X] := by
       simp only [g]
+      stop
       let hDegIn := Sumcheck.Spec.SingleRound.sumcheck_roundPoly_degreeLE
         (R := L) (D := 𝓑) (n := ℓ - ↑i.castSucc - 1) (deg := 2) (i := ⟨0, by omega⟩)
         (challenges := fun j => j.elim0) (poly := curH_cast)

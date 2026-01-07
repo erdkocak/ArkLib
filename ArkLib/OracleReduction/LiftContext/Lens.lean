@@ -63,10 +63,14 @@ end Statement.Lens
   TODO: figure out the right way to define this -/
 @[inline, reducible]
 def OracleStatement.Lens (OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type)
-    {Outer_ιₛᵢ : Type} (OuterOStmtIn : Outer_ιₛᵢ → Type) [∀ i, OracleInterface (OuterOStmtIn i)]
-    {Outer_ιₛₒ : Type} (OuterOStmtOut : Outer_ιₛₒ → Type) [∀ i, OracleInterface (OuterOStmtOut i)]
-    {Inner_ιₛᵢ : Type} (InnerOStmtIn : Inner_ιₛᵢ → Type) [∀ i, OracleInterface (InnerOStmtIn i)]
-    {Inner_ιₛₒ : Type} (InnerOStmtOut : Inner_ιₛₒ → Type) [∀ i, OracleInterface (InnerOStmtOut i)]
+    {Outer_ιₛᵢ : Type} (OuterOStmtIn : Outer_ιₛᵢ → Type)
+    (O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i))
+    {Outer_ιₛₒ : Type} (OuterOStmtOut : Outer_ιₛₒ → Type)
+    (O₂ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtOut i))
+    {Inner_ιₛᵢ : Type} (InnerOStmtIn : Inner_ιₛᵢ → Type)
+    (O₃ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtIn i))
+    {Inner_ιₛₒ : Type} (InnerOStmtOut : Inner_ιₛₒ → Type)
+    (O₄ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtOut i))
   :=
     Statement.Lens (OuterStmtIn × ∀ i, OuterOStmtIn i) (OuterStmtOut × ∀ i, OuterOStmtOut i)
                   (InnerStmtIn × ∀ i, InnerOStmtIn i) (InnerStmtOut × ∀ i, InnerOStmtOut i)
@@ -96,12 +100,16 @@ def OracleStatement.Lens (OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Ty
 namespace OracleStatement.Lens
 
 variable {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type}
-    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type} [∀ i, OracleInterface (OuterOStmtIn i)]
-    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type} [∀ i, OracleInterface (OuterOStmtOut i)]
-    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type} [∀ i, OracleInterface (InnerOStmtIn i)]
-    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type} [∀ i, OracleInterface (InnerOStmtOut i)]
+    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type}
+    {O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i)}
+    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type}
+    {O₂ : ∀ i, OracleContext Unit (ReaderM <|OuterOStmtOut i)}
+    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type}
+    {O₃ : ∀ i, OracleContext Unit (ReaderM <|InnerOStmtIn i)}
+    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type}
+    {O₄ : ∀ i, OracleContext Unit (ReaderM <|InnerOStmtOut i)}
     (lens : OracleStatement.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                OuterOStmtIn OuterOStmtOut InnerOStmtIn InnerOStmtOut)
+                OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄)
 /-- Transport input statements from the outer context to the inner context
 
 TODO: refactor etc. -/
@@ -190,27 +198,35 @@ end Context.Lens
 /-- A structure collecting a lens for the prover, and a lens for the oracle verifier, for
   transporting between the contexts of an outer oracle reduction and an inner oracle reduction. -/
 structure OracleContext.Lens (OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type)
-    {Outer_ιₛᵢ : Type} (OuterOStmtIn : Outer_ιₛᵢ → Type) [∀ i, OracleInterface (OuterOStmtIn i)]
-    {Outer_ιₛₒ : Type} (OuterOStmtOut : Outer_ιₛₒ → Type) [∀ i, OracleInterface (OuterOStmtOut i)]
-    {Inner_ιₛᵢ : Type} (InnerOStmtIn : Inner_ιₛᵢ → Type) [∀ i, OracleInterface (InnerOStmtIn i)]
-    {Inner_ιₛₒ : Type} (InnerOStmtOut : Inner_ιₛₒ → Type) [∀ i, OracleInterface (InnerOStmtOut i)]
+    {Outer_ιₛᵢ : Type} (OuterOStmtIn : Outer_ιₛᵢ → Type)
+    (O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i))
+    {Outer_ιₛₒ : Type} (OuterOStmtOut : Outer_ιₛₒ → Type)
+    (O₂ : ∀ i, OracleContext Unit (ReaderM <|OuterOStmtOut i))
+    {Inner_ιₛᵢ : Type} (InnerOStmtIn : Inner_ιₛᵢ → Type)
+    (O₃ : ∀ i, OracleContext Unit (ReaderM <|InnerOStmtIn i))
+    {Inner_ιₛₒ : Type} (InnerOStmtOut : Inner_ιₛₒ → Type)
+    (O₄ : ∀ i, OracleContext Unit (ReaderM <|InnerOStmtOut i))
     (OuterWitIn OuterWitOut InnerWitIn InnerWitOut : Type) where
   stmt : OracleStatement.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                                  OuterOStmtIn OuterOStmtOut InnerOStmtIn InnerOStmtOut
+                                  OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄
   wit : Witness.Lens (OuterStmtIn × ∀ i, OuterOStmtIn i) (InnerStmtOut × ∀ i, InnerOStmtOut i)
                           OuterWitIn OuterWitOut InnerWitIn InnerWitOut
 
 namespace OracleContext.Lens
 
 variable {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type}
-    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type} [∀ i, OracleInterface (OuterOStmtIn i)]
-    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type} [∀ i, OracleInterface (OuterOStmtOut i)]
-    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type} [∀ i, OracleInterface (InnerOStmtIn i)]
-    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type} [∀ i, OracleInterface (InnerOStmtOut i)]
+    {Outer_ιₛᵢ : Type} (OuterOStmtIn : Outer_ιₛᵢ → Type)
+    (O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i))
+    {Outer_ιₛₒ : Type} (OuterOStmtOut : Outer_ιₛₒ → Type)
+    (O₂ : ∀ i, OracleContext Unit (ReaderM <|OuterOStmtOut i))
+    {Inner_ιₛᵢ : Type} (InnerOStmtIn : Inner_ιₛᵢ → Type)
+    (O₃ : ∀ i, OracleContext Unit (ReaderM <|InnerOStmtIn i))
+    {Inner_ιₛₒ : Type} (InnerOStmtOut : Inner_ιₛₒ → Type)
+    (O₄ : ∀ i, OracleContext Unit (ReaderM <|InnerOStmtOut i))
     {OuterWitIn OuterWitOut InnerWitIn InnerWitOut : Type}
     (lens : OracleContext.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                                    OuterOStmtIn OuterOStmtOut InnerOStmtIn InnerOStmtOut
-                                    OuterWitIn OuterWitOut InnerWitIn InnerWitOut)
+                                OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄
+                                OuterWitIn OuterWitOut InnerWitIn InnerWitOut)
 /-- Projection of the context. -/
 @[inline, reducible]
 def proj : (OuterStmtIn × (∀ i, OuterOStmtIn i)) × OuterWitIn →
@@ -330,10 +346,14 @@ class Context.Lens.IsComplete {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
   context lens -/
 @[reducible, simp]
 def OracleContext.Lens.IsComplete {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type}
-    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type} [∀ i, OracleInterface (OuterOStmtIn i)]
-    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type} [∀ i, OracleInterface (OuterOStmtOut i)]
-    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type} [∀ i, OracleInterface (InnerOStmtIn i)]
-    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type} [∀ i, OracleInterface (InnerOStmtOut i)]
+    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type}
+    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type}
+    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type}
+    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type}
+    (O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i))
+    (O₂ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtOut i))
+    (O₃ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtIn i))
+    (O₄ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtOut i))
     {OuterWitIn OuterWitOut InnerWitIn InnerWitOut : Type}
     (outerRelIn : Set ((OuterStmtIn × (∀ i, OuterOStmtIn i)) × OuterWitIn))
     (innerRelIn : Set ((InnerStmtIn × (∀ i, InnerOStmtIn i)) × InnerWitIn))
@@ -342,8 +362,8 @@ def OracleContext.Lens.IsComplete {OuterStmtIn OuterStmtOut InnerStmtIn InnerStm
     (compat : (OuterStmtIn × (∀ i, OuterOStmtIn i)) × OuterWitIn →
               (InnerStmtOut × (∀ i, InnerOStmtOut i)) × InnerWitOut → Prop)
     (lens : OracleContext.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                                    OuterOStmtIn OuterOStmtOut InnerOStmtIn InnerOStmtOut
-                                    OuterWitIn OuterWitOut InnerWitIn InnerWitOut) :=
+                              OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄
+                              OuterWitIn OuterWitOut InnerWitIn InnerWitOut) :=
   Context.Lens.IsComplete outerRelIn innerRelIn outerRelOut innerRelOut compat lens.toContext
 
 /-- Conditions for the lens / transformation to preserve soundness -/
@@ -365,10 +385,14 @@ class Statement.Lens.IsSound {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut 
   statement lens -/
 @[reducible, simp]
 def OracleStatement.Lens.IsSound {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type}
-    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type} [∀ i, OracleInterface (OuterOStmtIn i)]
-    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type} [∀ i, OracleInterface (OuterOStmtOut i)]
-    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type} [∀ i, OracleInterface (InnerOStmtIn i)]
-    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type} [∀ i, OracleInterface (InnerOStmtOut i)]
+    {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type}
+    {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type}
+    {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type}
+    {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type}
+    (O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i))
+    (O₂ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtOut i))
+    (O₃ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtIn i))
+    (O₄ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtOut i))
     (outerLangIn : Set (OuterStmtIn × (∀ i, OuterOStmtIn i)))
     (outerLangOut : Set (OuterStmtOut × (∀ i, OuterOStmtOut i)))
     (innerLangIn : Set (InnerStmtIn × (∀ i, InnerOStmtIn i)))
@@ -376,7 +400,7 @@ def OracleStatement.Lens.IsSound {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmt
     (compatStmt :
       OuterStmtIn × (∀ i, OuterOStmtIn i) → InnerStmtOut × (∀ i, InnerOStmtOut i) → Prop)
     (lens : OracleStatement.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                                    OuterOStmtIn OuterOStmtOut InnerOStmtIn InnerOStmtOut) :=
+                            OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄) :=
   Statement.Lens.IsSound outerLangIn outerLangOut innerLangIn innerLangOut compatStmt lens
 
 /-- Conditions for the extractor lens to preserve knowledge soundness -/
@@ -468,10 +492,14 @@ section SpecialCases
 -- output context)
 
 variable {OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut : Type}
-  {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type} [∀ i, OracleInterface (OuterOStmtIn i)]
-  {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type} [∀ i, OracleInterface (OuterOStmtOut i)]
-  {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type} [∀ i, OracleInterface (InnerOStmtIn i)]
-  {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type} [∀ i, OracleInterface (InnerOStmtOut i)]
+  {Outer_ιₛᵢ : Type} {OuterOStmtIn : Outer_ιₛᵢ → Type}
+  {Outer_ιₛₒ : Type} {OuterOStmtOut : Outer_ιₛₒ → Type}
+  {Inner_ιₛᵢ : Type} {InnerOStmtIn : Inner_ιₛᵢ → Type}
+  {Inner_ιₛₒ : Type} {InnerOStmtOut : Inner_ιₛₒ → Type}
+  (O₁ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtIn i))
+  (O₂ : ∀ i, OracleContext Unit (ReaderM <| OuterOStmtOut i))
+  (O₃ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtIn i))
+  (O₄ : ∀ i, OracleContext Unit (ReaderM <| InnerOStmtOut i))
   {OuterWitIn OuterWitOut InnerWitIn InnerWitOut : Type}
 
 namespace Statement.Lens
@@ -509,7 +537,7 @@ namespace OracleStatement.Lens
 @[inline, reducible]
 protected def id :
     OracleStatement.Lens OuterStmtIn OuterStmtOut OuterStmtIn OuterStmtOut
-                        OuterOStmtIn OuterOStmtOut OuterOStmtIn OuterOStmtOut :=
+                        OuterOStmtIn O₁ OuterOStmtOut O₂ OuterOStmtIn O₁ OuterOStmtOut O₂ :=
   PFunctor.Lens.id _
 
 alias trivial := OracleStatement.Lens.id
@@ -520,7 +548,7 @@ alias trivial := OracleStatement.Lens.id
 def ofInputOnly
     (projStmt : OuterStmtIn × (∀ i, OuterOStmtIn i) → InnerStmtIn × (∀ i, InnerOStmtIn i)) :
     OracleStatement.Lens OuterStmtIn OuterStmtOut InnerStmtIn OuterStmtOut
-                        OuterOStmtIn OuterOStmtOut InnerOStmtIn OuterOStmtOut :=
+                        OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ OuterOStmtOut O₂ :=
   ⟨projStmt, fun _ => id⟩
 
 /-- Lens for the statement which keeps the input the same, and hence only requires a
@@ -530,7 +558,7 @@ def ofOutputOnly
     (liftStmt : OuterStmtIn × (∀ i, OuterOStmtIn i) → InnerStmtOut × (∀ i, InnerOStmtOut i) →
                 OuterStmtOut × (∀ i, OuterOStmtOut i)) :
     OracleStatement.Lens OuterStmtIn OuterStmtOut OuterStmtIn InnerStmtOut
-                        OuterOStmtIn OuterOStmtOut OuterOStmtIn InnerOStmtOut :=
+                        OuterOStmtIn O₁ OuterOStmtOut O₂ OuterOStmtIn O₁ InnerOStmtOut O₄ :=
   ⟨id, liftStmt⟩
 
 end OracleStatement.Lens
@@ -634,9 +662,9 @@ namespace OracleContext.Lens
 @[inline, reducible]
 protected def id :
     OracleContext.Lens OuterStmtIn OuterStmtOut OuterStmtIn OuterStmtOut
-                OuterOStmtIn OuterOStmtOut OuterOStmtIn OuterOStmtOut
+                OuterOStmtIn O₁ OuterOStmtOut O₂ OuterOStmtIn O₁ OuterOStmtOut O₂
                 OuterWitIn OuterWitOut OuterWitIn OuterWitOut where
-  stmt := OracleStatement.Lens.id
+  stmt := OracleStatement.Lens.id O₁ O₂
   wit := Witness.Lens.id
 
 alias trivial := OracleContext.Lens.id
@@ -648,9 +676,9 @@ def ofInputOnly
     (stmtProj : OuterStmtIn × (∀ i, OuterOStmtIn i) → InnerStmtIn × (∀ i, InnerOStmtIn i))
     (witProj : (OuterStmtIn × (∀ i, OuterOStmtIn i)) × OuterWitIn → InnerWitIn) :
     OracleContext.Lens OuterStmtIn OuterStmtOut InnerStmtIn OuterStmtOut
-                OuterOStmtIn OuterOStmtOut InnerOStmtIn OuterOStmtOut
+                OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ OuterOStmtOut O₂
                 OuterWitIn OuterWitOut InnerWitIn OuterWitOut where
-  stmt := OracleStatement.Lens.ofInputOnly stmtProj
+  stmt := OracleStatement.Lens.ofInputOnly _ _ _ stmtProj
   wit := Witness.Lens.ofInputOnly witProj
 
 /-- Lens for the oracle context which keeps the input contexts the same, and only requires lifts on
@@ -662,9 +690,9 @@ def ofOutputOnly
     (witLift : (OuterStmtIn × (∀ i, OuterOStmtIn i)) × OuterWitIn →
                (InnerStmtOut × (∀ i, InnerOStmtOut i)) × InnerWitOut → OuterWitOut) :
     OracleContext.Lens OuterStmtIn OuterStmtOut OuterStmtIn InnerStmtOut
-                OuterOStmtIn OuterOStmtOut OuterOStmtIn InnerOStmtOut
+                OuterOStmtIn O₁ OuterOStmtOut O₂ OuterOStmtIn O₁ InnerOStmtOut O₄
                 OuterWitIn OuterWitOut OuterWitIn InnerWitOut where
-  stmt := OracleStatement.Lens.ofOutputOnly stmtLift
+  stmt := OracleStatement.Lens.ofOutputOnly _ _ _ stmtLift
   wit := Witness.Lens.ofOutputOnly witLift
 
 end OracleContext.Lens

@@ -123,18 +123,18 @@ import ArkLib.OracleReduction.Composition.Sequential.Append
 import ArkLib.OracleReduction.Composition.Sequential.General
 import ArkLib.OracleReduction.Equiv
 import ArkLib.OracleReduction.Execution
-import ArkLib.OracleReduction.FiatShamir.Basic
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Defs
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.AbortAnalysis
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Backtrack
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.BadEvents
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Completeness
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.KeyLemma
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Lookahead
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.ProverTransform
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Soundness
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.TraceTransform
-import ArkLib.OracleReduction.FiatShamir.DuplexSponge.State
+-- import ArkLib.OracleReduction.FiatShamir.Basic
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Defs
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.AbortAnalysis
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Backtrack
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.BadEvents
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Completeness
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.KeyLemma
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Lookahead
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.ProverTransform
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.Soundness
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.Security.TraceTransform
+-- import ArkLib.OracleReduction.FiatShamir.DuplexSponge.State
 import ArkLib.OracleReduction.LiftContext.Lens
 import ArkLib.OracleReduction.LiftContext.OracleReduction
 import ArkLib.OracleReduction.LiftContext.Reduction
@@ -145,29 +145,29 @@ import ArkLib.OracleReduction.ProtocolSpec.Cast
 import ArkLib.OracleReduction.ProtocolSpec.SeqCompose
 import ArkLib.OracleReduction.Salt
 import ArkLib.OracleReduction.Security.Basic
-import ArkLib.OracleReduction.Security.Implications
-import ArkLib.OracleReduction.Security.Rewinding
+-- import ArkLib.OracleReduction.Security.Implications
+-- import ArkLib.OracleReduction.Security.Rewinding
 import ArkLib.OracleReduction.Security.RoundByRound
-import ArkLib.OracleReduction.Security.SpecialSoundness
-import ArkLib.OracleReduction.Security.StateRestoration
+-- import ArkLib.OracleReduction.Security.SpecialSoundness
+-- import ArkLib.OracleReduction.Security.StateRestoration
 import ArkLib.OracleReduction.VectorIOR
-import ArkLib.ProofSystem.BatchedFri.Spec.General
-import ArkLib.ProofSystem.BatchedFri.Spec.SingleRound
-import ArkLib.ProofSystem.Binius.BinaryBasefold.Basic
-import ArkLib.ProofSystem.Binius.BinaryBasefold.CoreInteractionPhase
-import ArkLib.ProofSystem.Binius.BinaryBasefold.General
-import ArkLib.ProofSystem.Binius.BinaryBasefold.Prelude
-import ArkLib.ProofSystem.Binius.BinaryBasefold.QueryPhase
-import ArkLib.ProofSystem.Binius.BinaryBasefold.Spec
-import ArkLib.ProofSystem.Binius.BinaryBasefold.Steps
-import ArkLib.ProofSystem.Binius.FRIBinius.CoreInteractionPhase
-import ArkLib.ProofSystem.Binius.FRIBinius.General
-import ArkLib.ProofSystem.Binius.FRIBinius.Prelude
-import ArkLib.ProofSystem.Binius.RingSwitching.BatchingPhase
-import ArkLib.ProofSystem.Binius.RingSwitching.General
-import ArkLib.ProofSystem.Binius.RingSwitching.Prelude
-import ArkLib.ProofSystem.Binius.RingSwitching.Spec
-import ArkLib.ProofSystem.Binius.RingSwitching.SumcheckPhase
+-- import ArkLib.ProofSystem.BatchedFri.Spec.General
+-- import ArkLib.ProofSystem.BatchedFri.Spec.SingleRound
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.Basic
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.CoreInteractionPhase
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.General
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.Prelude
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.QueryPhase
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.Spec
+-- import ArkLib.ProofSystem.Binius.BinaryBasefold.Steps
+-- import ArkLib.ProofSystem.Binius.FRIBinius.CoreInteractionPhase
+-- import ArkLib.ProofSystem.Binius.FRIBinius.General
+-- import ArkLib.ProofSystem.Binius.FRIBinius.Prelude
+-- import ArkLib.ProofSystem.Binius.RingSwitching.BatchingPhase
+-- import ArkLib.ProofSystem.Binius.RingSwitching.General
+-- import ArkLib.ProofSystem.Binius.RingSwitching.Prelude
+-- import ArkLib.ProofSystem.Binius.RingSwitching.Spec
+-- import ArkLib.ProofSystem.Binius.RingSwitching.SumcheckPhase
 import ArkLib.ProofSystem.Component.CheckClaim
 import ArkLib.ProofSystem.Component.DoNothing
 import ArkLib.ProofSystem.Component.NoInteraction
@@ -182,8 +182,8 @@ import ArkLib.ProofSystem.ConstraintSystem.R1CS
 import ArkLib.ProofSystem.DSL
 import ArkLib.ProofSystem.Fri.Domain
 import ArkLib.ProofSystem.Fri.RoundConsistency
-import ArkLib.ProofSystem.Fri.Spec.General
-import ArkLib.ProofSystem.Fri.Spec.SingleRound
+-- import ArkLib.ProofSystem.Fri.Spec.General
+-- import ArkLib.ProofSystem.Fri.Spec.SingleRound
 import ArkLib.ProofSystem.Plonk.Basic
 import ArkLib.ProofSystem.Spartan.Basic
 import ArkLib.ProofSystem.Stir

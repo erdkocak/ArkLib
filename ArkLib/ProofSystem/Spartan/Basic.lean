@@ -151,27 +151,27 @@ abbrev Witness := R1CS.Witness R pp.toSizeR1CS
 @[simp]
 abbrev relation := R1CS.relation R pp.toSizeR1CS
 
-/-- The oracle interface for the input statement is the polynomial evaluation oracle of its
-  multilinear extension. -/
--- For the input oracle statement, we define its oracle interface to be the polynomial evaluation
--- oracle of its multilinear extension.
+-- /-- The oracle interface for the input statement is the polynomial evaluation oracle of its
+--   multilinear extension. -/
+-- -- For the input oracle statement, we define its oracle interface to be the polynomial evaluation
+-- -- oracle of its multilinear extension.
 
-instance : ∀ i, OracleInterface (OracleStatement R pp i) :=
-  fun i => {
-    Query := (Fin pp.ℓ_m → R) × (Fin pp.ℓ_n → R)
-    Response := R
-    answer := fun matrix ⟨x, y⟩ => matrix.toMLE ⸨C ∘ x⸩ ⸨y⸩
-  }
+-- instance : ∀ i, OracleInterface (OracleStatement R pp i) :=
+--   fun i => {
+--     Query := (Fin pp.ℓ_m → R) × (Fin pp.ℓ_n → R)
+--     Response := R
+--     answer := fun matrix ⟨x, y⟩ => matrix.toMLE ⸨C ∘ x⸩ ⸨y⸩
+--   }
 
--- For the input witness, we define its oracle interface to be the polynomial evaluation oracle of
--- its multilinear extension.
+-- -- For the input witness, we define its oracle interface to be the polynomial evaluation oracle of
+-- -- its multilinear extension.
 
--- TODO: define an `OracleInterface.ofEquiv` definition that transfers the oracle interface across
--- an equivalence of types.
-instance : OracleInterface (Witness R pp) where
-  Query := Fin pp.ℓ_w → R
-  Response := R
-  answer := fun 𝕨 evalPoint => (MLE (𝕨 ∘ finFunctionFinEquiv)) ⸨evalPoint⸩
+-- -- TODO: define an `OracleInterface.ofEquiv` definition that transfers the oracle interface across
+-- -- an equivalence of types.
+-- instance : OracleInterface (Witness R pp) where
+--   Query := Fin pp.ℓ_w → R
+--   Response := R
+--   answer := fun 𝕨 evalPoint => (MLE (𝕨 ∘ finFunctionFinEquiv)) ⸨evalPoint⸩
 
 /-!
   ## First message
@@ -191,190 +191,190 @@ abbrev OracleStatement.AfterFirstMessage : R1CS.MatrixIdx ⊕ Fin 1 → Type :=
 @[simp]
 abbrev Witness.AfterFirstMessage : Type := Unit
 
-def oracleReduction.firstMessage :
-    OracleReduction oSpec
-      (Statement R pp) (OracleStatement R pp) (Witness R pp)
-      (Statement.AfterFirstMessage R pp) (OracleStatement.AfterFirstMessage R pp) Unit
-      ⟨!v[.P_to_V], !v[Witness R pp]⟩ :=
-  SendSingleWitness.oracleReduction oSpec
-    (Statement R pp) (OracleStatement R pp) (Witness R pp)
+-- def oracleReduction.firstMessage :
+--     OracleReduction oSpec
+--       (Statement R pp) (OracleStatement R pp) (Witness R pp)
+--       (Statement.AfterFirstMessage R pp) (OracleStatement.AfterFirstMessage R pp) Unit
+--       ⟨!v[.P_to_V], !v[Witness R pp]⟩ :=
+--   SendSingleWitness.oracleReduction oSpec
+--     (Statement R pp) (OracleStatement R pp) (Witness R pp)
 
-/-!
-  ## First challenge
-  We invoke the protocol `RandomQuery` on the "virtual" polynomial:
-    `𝒢(Z) = ∑_{x} eq ⸨Z, x⸩ * (A𝕫 ⸨x⸩ * B𝕫 ⸨x⸩ - C𝕫 ⸨x⸩)`, which is supposed to be `0`.
--/
+-- /-!
+--   ## First challenge
+--   We invoke the protocol `RandomQuery` on the "virtual" polynomial:
+--     `𝒢(Z) = ∑_{x} eq ⸨Z, x⸩ * (A𝕫 ⸨x⸩ * B𝕫 ⸨x⸩ - C𝕫 ⸨x⸩)`, which is supposed to be `0`.
+-- -/
 
-def zeroCheckVirtualPolynomial (𝕩 : Statement.AfterFirstMessage R pp)
-    -- Recall: `oStmt = (A, B, C, 𝕨)`
-    (oStmt : ∀ i, OracleStatement.AfterFirstMessage R pp i) :
-      MvPolynomial (Fin pp.ℓ_m) R :=
-  letI 𝕫 := R1CS.𝕫 𝕩 (oStmt (.inr 0))
-  ∑ x : Fin (2 ^ pp.ℓ_m),
-    (eqPolynomial (finFunctionFinEquiv.symm x : Fin pp.ℓ_m → R)) *
-      C ((oStmt (.inl .A) *ᵥ 𝕫) x * (oStmt (.inl .B) *ᵥ 𝕫) x - (oStmt (.inl .C) *ᵥ 𝕫) x)
-
-/-- Unfolds to `τ : Fin ℓ_m → R` -/
-@[simp]
-abbrev FirstChallenge : Type := Fin pp.ℓ_m → R
-
-/-- Unfolds to `(τ, x) : (Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R) × (Fin (2 ^ ℓ_m) → R)` -/
-@[simp]
-abbrev Statement.AfterFirstChallenge : Type :=
-  FirstChallenge R pp × Statement.AfterFirstMessage R pp
-
-/-- Is equivalent to `((A, B, C), 𝕨) :`
-  `(fun _ => (Matrix (Fin 2 ^ ℓ_m) (Fin 2 ^ ℓ_n) R)) × (Fin 2 ^ ℓ_w → R)` -/
-@[simp]
-abbrev OracleStatement.AfterFirstChallenge : R1CS.MatrixIdx ⊕ Fin 1 → Type :=
-  OracleStatement.AfterFirstMessage R pp
-
-@[simp]
-abbrev Witness.AfterFirstChallenge : Type := Unit
-
-#check RandomQuery.oracleReduction
-
-def oracleReduction.firstChallenge :
-    OracleReduction oSpec
-      (Statement.AfterFirstMessage R pp) (OracleStatement.AfterFirstMessage R pp) (Witness R pp)
-      (Statement.AfterFirstChallenge R pp) (OracleStatement.AfterFirstChallenge R pp) Unit
-      ⟨!v[.V_to_P], !v[FirstChallenge R pp]⟩ :=
-  sorry
-  -- (RandomQuery.oracleReduction oSpec (Statement.AfterFirstMessage R pp)).liftContext sorry
-
-/-!
-  ## First sum-check
-  We invoke the sum-check protocol the "virtual" polynomial:
-    `ℱ(X) = eq ⸨τ, X⸩ * (A ⸨X⸩ * B ⸨X⸩ - C ⸨X⸩)`
--/
-
--- def firstSumCheckVirtualPolynomial (𝕩 : FirstMessageStatement R pp)
---     (oStmt : ∀ i, FirstMessageOracleStatement R pp i) : MvPolynomial (Fin pp.ℓ_n) R :=
+-- def zeroCheckVirtualPolynomial (𝕩 : Statement.AfterFirstMessage R pp)
+--     -- Recall: `oStmt = (A, B, C, 𝕨)`
+--     (oStmt : ∀ i, OracleStatement.AfterFirstMessage R pp i) :
+--       MvPolynomial (Fin pp.ℓ_m) R :=
 --   letI 𝕫 := R1CS.𝕫 𝕩 (oStmt (.inr 0))
---   ∑ x : Fin (2 ^ pp.ℓ_n),
---     (eqPolynomial (finFunctionFinEquiv.symm x : Fin pp.ℓ_n → R)) *
+--   ∑ x : Fin (2 ^ pp.ℓ_m),
+--     (eqPolynomial (finFunctionFinEquiv.symm x : Fin pp.ℓ_m → R)) *
 --       C ((oStmt (.inl .A) *ᵥ 𝕫) x * (oStmt (.inl .B) *ᵥ 𝕫) x - (oStmt (.inl .C) *ᵥ 𝕫) x)
 
-/-- Unfolds to `r_x : Fin ℓ_m → R` -/
-@[simp]
-abbrev FirstSumcheckChallenge : Type := Fin pp.ℓ_m → R
+-- /-- Unfolds to `τ : Fin ℓ_m → R` -/
+-- @[simp]
+-- abbrev FirstChallenge : Type := Fin pp.ℓ_m → R
 
-/-- Unfolds to `(r_x, τ, 𝕩) : (Fin ℓ_m → R) × (Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R) × (Fin ℓ_m → R)` -/
-@[simp]
-abbrev Statement.AfterFirstSumcheck : Type :=
-  FirstSumcheckChallenge R pp × Statement.AfterFirstChallenge R pp
+-- /-- Unfolds to `(τ, x) : (Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R) × (Fin (2 ^ ℓ_m) → R)` -/
+-- @[simp]
+-- abbrev Statement.AfterFirstChallenge : Type :=
+--   FirstChallenge R pp × Statement.AfterFirstMessage R pp
 
-/-- Is equivalent to `((A, B, C), 𝕨) :`
-  `(fun _ => (Matrix (Fin 2 ^ ℓ_m) (Fin 2 ^ ℓ_n) R)) × (Fin 2 ^ ℓ_w → R)` -/
-@[simp]
-abbrev OracleStatement.AfterFirstSumcheck : R1CS.MatrixIdx ⊕ Fin 1 → Type :=
-  OracleStatement.AfterFirstChallenge R pp
+-- /-- Is equivalent to `((A, B, C), 𝕨) :`
+--   `(fun _ => (Matrix (Fin 2 ^ ℓ_m) (Fin 2 ^ ℓ_n) R)) × (Fin 2 ^ ℓ_w → R)` -/
+-- @[simp]
+-- abbrev OracleStatement.AfterFirstChallenge : R1CS.MatrixIdx ⊕ Fin 1 → Type :=
+--   OracleStatement.AfterFirstMessage R pp
 
-@[simp]
-abbrev Witness.AfterFirstSumcheck : Type := Unit
+-- @[simp]
+-- abbrev Witness.AfterFirstChallenge : Type := Unit
 
--- def oracleReduction.firstSumcheck :
---     OracleReduction (Sumcheck.Spec.pSpec R pp.ℓ_m) oSpec
---       (Statement.AfterFirstChallenge R pp) Witness.AfterFirstChallenge
---       (Statement.AfterFirstSumcheck R pp) Witness.AfterFirstSumcheck
---       (OracleStatement.AfterFirstChallenge R pp) (OracleStatement.AfterFirstSumcheck R pp) :=
-  -- Sumcheck.Spec.oracleReduction oSpec
-  --   (Statement.AfterFirstChallenge R pp) (Witness.AfterFirstChallenge R pp)
-  --   (Statement.AfterFirstSumcheck R pp) (Witness.AfterFirstSumcheck R pp)
-  --   (OracleStatement.AfterFirstChallenge R pp) (OracleStatement.AfterFirstSumcheck R pp)
+-- #check RandomQuery.oracleReduction
 
-/-!
-  ## Send evaluation claims
+-- def oracleReduction.firstChallenge :
+--     OracleReduction oSpec
+--       (Statement.AfterFirstMessage R pp) (OracleStatement.AfterFirstMessage R pp) (Witness R pp)
+--       (Statement.AfterFirstChallenge R pp) (OracleStatement.AfterFirstChallenge R pp) Unit
+--       ⟨!v[.V_to_P], !v[FirstChallenge R pp]⟩ :=
+--   sorry
+--   -- (RandomQuery.oracleReduction oSpec (Statement.AfterFirstMessage R pp)).liftContext sorry
 
-  We send the evaluation claims `v_A, v_B, v_C` to the verifier.
+-- /-!
+--   ## First sum-check
+--   We invoke the sum-check protocol the "virtual" polynomial:
+--     `ℱ(X) = eq ⸨τ, X⸩ * (A ⸨X⸩ * B ⸨X⸩ - C ⸨X⸩)`
+-- -/
 
-  (i.e. invoking `SendClaim` on these "virtual" values)
--/
+-- -- def firstSumCheckVirtualPolynomial (𝕩 : FirstMessageStatement R pp)
+-- --     (oStmt : ∀ i, FirstMessageOracleStatement R pp i) : MvPolynomial (Fin pp.ℓ_n) R :=
+-- --   letI 𝕫 := R1CS.𝕫 𝕩 (oStmt (.inr 0))
+-- --   ∑ x : Fin (2 ^ pp.ℓ_n),
+-- --     (eqPolynomial (finFunctionFinEquiv.symm x : Fin pp.ℓ_n → R)) *
+-- --       C ((oStmt (.inl .A) *ᵥ 𝕫) x * (oStmt (.inl .B) *ᵥ 𝕫) x - (oStmt (.inl .C) *ᵥ 𝕫) x)
 
-@[simp]
-abbrev EvalClaim : R1CS.MatrixIdx → Type := fun _ => R
+-- /-- Unfolds to `r_x : Fin ℓ_m → R` -/
+-- @[simp]
+-- abbrev FirstSumcheckChallenge : Type := Fin pp.ℓ_m → R
 
-/-- We equip each evaluation claim with the default oracle interface, which returns the claim upon a
-  trivial query `() : Unit`. -/
-instance : ∀ i, OracleInterface (EvalClaim R i) :=
-  fun _ => default
+-- /-- Unfolds to `(r_x, τ, 𝕩) : (Fin ℓ_m → R) × (Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R) × (Fin ℓ_m → R)` -/
+-- @[simp]
+-- abbrev Statement.AfterFirstSumcheck : Type :=
+--   FirstSumcheckChallenge R pp × Statement.AfterFirstChallenge R pp
 
-@[simp]
-abbrev Statement.AfterSendEvalClaim : Type := Statement.AfterFirstSumcheck R pp
+-- /-- Is equivalent to `((A, B, C), 𝕨) :`
+--   `(fun _ => (Matrix (Fin 2 ^ ℓ_m) (Fin 2 ^ ℓ_n) R)) × (Fin 2 ^ ℓ_w → R)` -/
+-- @[simp]
+-- abbrev OracleStatement.AfterFirstSumcheck : R1CS.MatrixIdx ⊕ Fin 1 → Type :=
+--   OracleStatement.AfterFirstChallenge R pp
 
-@[simp]
-abbrev OracleStatement.AfterSendEvalClaim : R1CS.MatrixIdx ⊕ R1CS.MatrixIdx ⊕ Fin 1 → Type :=
-  Sum.elim (EvalClaim R) (OracleStatement.AfterFirstSumcheck R pp)
+-- @[simp]
+-- abbrev Witness.AfterFirstSumcheck : Type := Unit
 
-@[simp]
-abbrev Witness.AfterSendEvalClaim : Type := Unit
+-- -- def oracleReduction.firstSumcheck :
+-- --     OracleReduction (Sumcheck.Spec.pSpec R pp.ℓ_m) oSpec
+-- --       (Statement.AfterFirstChallenge R pp) Witness.AfterFirstChallenge
+-- --       (Statement.AfterFirstSumcheck R pp) Witness.AfterFirstSumcheck
+-- --       (OracleStatement.AfterFirstChallenge R pp) (OracleStatement.AfterFirstSumcheck R pp) :=
+--   -- Sumcheck.Spec.oracleReduction oSpec
+--   --   (Statement.AfterFirstChallenge R pp) (Witness.AfterFirstChallenge R pp)
+--   --   (Statement.AfterFirstSumcheck R pp) (Witness.AfterFirstSumcheck R pp)
+--   --   (OracleStatement.AfterFirstChallenge R pp) (OracleStatement.AfterFirstSumcheck R pp)
 
-def oracleReduction.sendEvalClaim :
-    OracleReduction oSpec
-      (Statement.AfterFirstSumcheck R pp) (OracleStatement.AfterFirstSumcheck R pp) (Witness R pp)
-      (Statement.AfterSendEvalClaim R pp) (OracleStatement.AfterSendEvalClaim R pp) Unit
-      ⟨!v[.P_to_V], !v[∀ i, EvalClaim R i]⟩ :=
-  sorry
-  -- SendClaim.oracleReduction oSpec
-  --   (Statement.AfterFirstSumcheck R pp)
+-- /-!
+--   ## Send evaluation claims
 
-/-!
-  ## Random linear combination challenges
+--   We send the evaluation claims `v_A, v_B, v_C` to the verifier.
 
-  The verifier sends back random linear combination challenges `r_A, r_B, r_C : R`.
--/
+--   (i.e. invoking `SendClaim` on these "virtual" values)
+-- -/
 
-@[simp]
-abbrev LinearCombinationChallenge : Type := R1CS.MatrixIdx → R
+-- @[simp]
+-- abbrev EvalClaim : R1CS.MatrixIdx → Type := fun _ => R
 
-/-- Unfolds to `((r_A, r_B, r_C), r_x, τ, 𝕩) :`
-  `(R1CS.MatrixIdx → R) × (Fin (2 ^ ℓ_m) → R) × (Fin ℓ_m → R) × (Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R)` -/
-@[simp]
-abbrev Statement.AfterLinearCombination : Type :=
-  LinearCombinationChallenge R × Statement.AfterSendEvalClaim R pp
+-- /-- We equip each evaluation claim with the default oracle interface, which returns the claim upon a
+--   trivial query `() : Unit`. -/
+-- instance : ∀ i, OracleInterface (EvalClaim R i) :=
+--   fun _ => default
 
-@[simp]
-abbrev OracleStatement.AfterLinearCombination : R1CS.MatrixIdx ⊕ R1CS.MatrixIdx ⊕ Fin 1 → Type :=
-  Sum.elim (EvalClaim R) (OracleStatement.AfterFirstSumcheck R pp)
+-- @[simp]
+-- abbrev Statement.AfterSendEvalClaim : Type := Statement.AfterFirstSumcheck R pp
 
-@[simp]
-abbrev Witness.AfterLinearCombination : Type := Unit
+-- @[simp]
+-- abbrev OracleStatement.AfterSendEvalClaim : R1CS.MatrixIdx ⊕ R1CS.MatrixIdx ⊕ Fin 1 → Type :=
+--   Sum.elim (EvalClaim R) (OracleStatement.AfterFirstSumcheck R pp)
 
-def oracleReduction.linearCombination :
-    OracleReduction oSpec
-      (Statement.AfterFirstSumcheck R pp) (OracleStatement.AfterFirstSumcheck R pp) (Witness R pp)
-      (Statement.AfterLinearCombination R pp) (OracleStatement.AfterLinearCombination R pp) Unit
-      ⟨!v[.V_to_P], !v[LinearCombinationChallenge R]⟩ :=
-  sorry
+-- @[simp]
+-- abbrev Witness.AfterSendEvalClaim : Type := Unit
 
-/-!
-  ## Second sum-check
-  We invoke the sum-check protocol the "virtual" polynomial:
-    `ℳ(Y) = r_A * (MLE A) ⸨r_x, Y⸩ * (MLE 𝕫) ⸨Y⸩ + r_B * (MLE B) ⸨r_x, Y⸩ * (MLE 𝕫) ⸨Y⸩`
-      `+ r_C * (MLE C) ⸨r_x, Y⸩ * (MLE 𝕫) ⸨Y⸩`
--/
+-- def oracleReduction.sendEvalClaim :
+--     OracleReduction oSpec
+--       (Statement.AfterFirstSumcheck R pp) (OracleStatement.AfterFirstSumcheck R pp) (Witness R pp)
+--       (Statement.AfterSendEvalClaim R pp) (OracleStatement.AfterSendEvalClaim R pp) Unit
+--       ⟨!v[.P_to_V], !v[∀ i, EvalClaim R i]⟩ :=
+--   sorry
+--   -- SendClaim.oracleReduction oSpec
+--   --   (Statement.AfterFirstSumcheck R pp)
 
-def secondSumCheckVirtualPolynomial
-    (stmt : Statement.AfterLinearCombination R pp)
-    (oStmt : ∀ i, OracleStatement.AfterLinearCombination R pp i) :
-      MvPolynomial (Fin pp.ℓ_n) R := sorry
+-- /-!
+--   ## Random linear combination challenges
 
-@[simp]
-abbrev SecondSumcheckChallenge : Type := Fin pp.ℓ_n → R
+--   The verifier sends back random linear combination challenges `r_A, r_B, r_C : R`.
+-- -/
 
-/-- Unfolds to `(r_y, (r_A, r_B, r_C), r_x, τ, 𝕩) :`
-  `(Fin ℓ_n → R) × (R1CS.MatrixIdx → R) × (Fin (2 ^ ℓ_m) → R) × (Fin ℓ_m → R) ×`
-  `(Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R)` -/
-@[simp]
-abbrev Statement.AfterSecondSumcheck : Type :=
-  SecondSumcheckChallenge R pp × Statement.AfterLinearCombination R pp
+-- @[simp]
+-- abbrev LinearCombinationChallenge : Type := R1CS.MatrixIdx → R
 
-@[simp]
-abbrev OracleStatement.AfterSecondSumcheck : R1CS.MatrixIdx ⊕ R1CS.MatrixIdx ⊕ Fin 1 → Type :=
-  Sum.elim (EvalClaim R) (OracleStatement.AfterFirstSumcheck R pp)
+-- /-- Unfolds to `((r_A, r_B, r_C), r_x, τ, 𝕩) :`
+--   `(R1CS.MatrixIdx → R) × (Fin (2 ^ ℓ_m) → R) × (Fin ℓ_m → R) × (Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R)` -/
+-- @[simp]
+-- abbrev Statement.AfterLinearCombination : Type :=
+--   LinearCombinationChallenge R × Statement.AfterSendEvalClaim R pp
 
-@[simp]
-abbrev Witness.AfterSecondSumcheck : Type := Unit
+-- @[simp]
+-- abbrev OracleStatement.AfterLinearCombination : R1CS.MatrixIdx ⊕ R1CS.MatrixIdx ⊕ Fin 1 → Type :=
+--   Sum.elim (EvalClaim R) (OracleStatement.AfterFirstSumcheck R pp)
+
+-- @[simp]
+-- abbrev Witness.AfterLinearCombination : Type := Unit
+
+-- def oracleReduction.linearCombination :
+--     OracleReduction oSpec
+--       (Statement.AfterFirstSumcheck R pp) (OracleStatement.AfterFirstSumcheck R pp) (Witness R pp)
+--       (Statement.AfterLinearCombination R pp) (OracleStatement.AfterLinearCombination R pp) Unit
+--       ⟨!v[.V_to_P], !v[LinearCombinationChallenge R]⟩ :=
+--   sorry
+
+-- /-!
+--   ## Second sum-check
+--   We invoke the sum-check protocol the "virtual" polynomial:
+--     `ℳ(Y) = r_A * (MLE A) ⸨r_x, Y⸩ * (MLE 𝕫) ⸨Y⸩ + r_B * (MLE B) ⸨r_x, Y⸩ * (MLE 𝕫) ⸨Y⸩`
+--       `+ r_C * (MLE C) ⸨r_x, Y⸩ * (MLE 𝕫) ⸨Y⸩`
+-- -/
+
+-- def secondSumCheckVirtualPolynomial
+--     (stmt : Statement.AfterLinearCombination R pp)
+--     (oStmt : ∀ i, OracleStatement.AfterLinearCombination R pp i) :
+--       MvPolynomial (Fin pp.ℓ_n) R := sorry
+
+-- @[simp]
+-- abbrev SecondSumcheckChallenge : Type := Fin pp.ℓ_n → R
+
+-- /-- Unfolds to `(r_y, (r_A, r_B, r_C), r_x, τ, 𝕩) :`
+--   `(Fin ℓ_n → R) × (R1CS.MatrixIdx → R) × (Fin (2 ^ ℓ_m) → R) × (Fin ℓ_m → R) ×`
+--   `(Fin (2 ^ ℓ_n - 2 ^ ℓ_w) → R)` -/
+-- @[simp]
+-- abbrev Statement.AfterSecondSumcheck : Type :=
+--   SecondSumcheckChallenge R pp × Statement.AfterLinearCombination R pp
+
+-- @[simp]
+-- abbrev OracleStatement.AfterSecondSumcheck : R1CS.MatrixIdx ⊕ R1CS.MatrixIdx ⊕ Fin 1 → Type :=
+--   Sum.elim (EvalClaim R) (OracleStatement.AfterFirstSumcheck R pp)
+
+-- @[simp]
+-- abbrev Witness.AfterSecondSumcheck : Type := Unit
 
 -- def oracleReduction.secondSumcheck :
 --     OracleReduction (Sumcheck.Spec.pSpec R pp.ℓ_n) oSpec

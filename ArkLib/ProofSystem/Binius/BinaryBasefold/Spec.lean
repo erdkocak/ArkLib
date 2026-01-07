@@ -263,70 +263,70 @@ def fullPSpec := (pSpecCoreInteraction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_
 
 /-! ## Oracle Interface instances for Messages-/
 
-instance : ∀ j, OracleInterface ((pSpecFold (L:=L)).Message j) -- this cover .Message and .Challenge
-  | ⟨0, h⟩ => by exact OracleInterface.instDefault -- h_i(X) polynomial
-  | ⟨1, _⟩ => by exact OracleInterface.instDefault -- challenge r'_i
+-- instance : ∀ j, OracleInterface ((pSpecFold (L:=L)).Message j) -- this cover .Message and .Challenge
+--   | ⟨0, h⟩ => by exact OracleInterface.instDefault -- h_i(X) polynomial
+--   | ⟨1, _⟩ => by exact OracleInterface.instDefault -- challenge r'_i
 
-instance : ∀ j, OracleInterface ((pSpecRelay).Message j)
-  | ⟨x, h⟩ => by exact x.elim0
+-- instance : ∀ j, OracleInterface ((pSpecRelay).Message j)
+--   | ⟨x, h⟩ => by exact x.elim0
 
-instance {i : Fin ℓ} :
-    ∀ j, OracleInterface ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Message j)
-  | ⟨0, _⟩ => by exact OracleInterface.instDefault -- oracle commitment (conditional)
+-- instance {i : Fin ℓ} :
+--     ∀ j, OracleInterface ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Message j)
+--   | ⟨0, _⟩ => by exact OracleInterface.instDefault -- oracle commitment (conditional)
 
-instance : ∀ j, OracleInterface ((pSpecRelay).Message j)
-  | ⟨x, hj⟩ => by exact x.elim0
+-- instance : ∀ j, OracleInterface ((pSpecRelay).Message j)
+--   | ⟨x, hj⟩ => by exact x.elim0
 
-instance {i : Fin ℓ} :
-    ∀ j, OracleInterface ((pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Message j) :=
-  instOracleInterfaceMessageAppend (pSpec₁ := pSpecFold (L := L))
-    (pSpec₂ := pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
+-- instance {i : Fin ℓ} :
+--     ∀ j, OracleInterface ((pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Message j) :=
+--   instOracleInterfaceMessageAppend (pSpec₁ := pSpecFold (L := L))
+--     (pSpec₂ := pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
 
-instance : ∀ j, OracleInterface ((pSpecFoldRelay (L:=L)).Message j) :=
-  instOracleInterfaceMessageAppend
+-- instance : ∀ j, OracleInterface ((pSpecFoldRelay (L:=L)).Message j) :=
+--   instOracleInterfaceMessageAppend
 
-instance {i : Fin ℓ} :
-    ∀ j, OracleInterface ((pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Message j) :=
-  instOracleInterfaceMessageAppend
+-- instance {i : Fin ℓ} :
+--     ∀ j, OracleInterface ((pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Message j) :=
+--   instOracleInterfaceMessageAppend
 
-instance {n : ℕ} : ∀ j, OracleInterface ((pSpecFoldRelaySequence (L:=L) n).Message j) :=
-  instOracleInterfaceMessageSeqCompose
+-- instance {n : ℕ} : ∀ j, OracleInterface ((pSpecFoldRelaySequence (L:=L) n).Message j) :=
+--   instOracleInterfaceMessageSeqCompose
 
-instance {bIdx : Fin (ℓ / ϑ - 1)} : ∀ j, OracleInterface ((pSpecFullNonLastBlock 𝔽q β
-  (h_ℓ_add_R_rate := h_ℓ_add_R_rate) bIdx).Message j) :=
-  instOracleInterfaceMessageAppend
+-- instance {bIdx : Fin (ℓ / ϑ - 1)} : ∀ j, OracleInterface ((pSpecFullNonLastBlock 𝔽q β
+--   (h_ℓ_add_R_rate := h_ℓ_add_R_rate) bIdx).Message j) :=
+--   instOracleInterfaceMessageAppend
 
-instance : ∀ j, OracleInterface ((pSpecNonLastBlocks 𝔽q β (ϑ:=ϑ)
-  (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message j) := instOracleInterfaceMessageSeqCompose
+-- instance : ∀ j, OracleInterface ((pSpecNonLastBlocks 𝔽q β (ϑ:=ϑ)
+--   (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message j) := instOracleInterfaceMessageSeqCompose
 
-instance : ∀ j, OracleInterface ((pSpecLastBlock (L:=L) (ϑ:=ϑ)).Message j) :=
-  instOracleInterfaceMessageSeqCompose
+-- instance : ∀ j, OracleInterface ((pSpecLastBlock (L:=L) (ϑ:=ϑ)).Message j) :=
+--   instOracleInterfaceMessageSeqCompose
 
-instance : ∀ j, OracleInterface ((pSpecSumcheckFold 𝔽q β (ϑ:=ϑ)
-  (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message j) := instOracleInterfaceMessageAppend
+-- instance : ∀ j, OracleInterface ((pSpecSumcheckFold 𝔽q β (ϑ:=ϑ)
+--   (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message j) := instOracleInterfaceMessageAppend
 
-instance : ∀ i, OracleInterface ((pSpecFinalSumcheckStep (L:=L)).Message i)
-  | ⟨0, _⟩ => by exact OracleInterface.instDefault
+-- instance : ∀ i, OracleInterface ((pSpecFinalSumcheckStep (L:=L)).Message i)
+--   | ⟨0, _⟩ => by exact OracleInterface.instDefault
 
-instance : ∀ i, OracleInterface ((pSpecCoreInteraction 𝔽q β (ϑ:=ϑ)
-  (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message i) := instOracleInterfaceMessageAppend
+-- instance : ∀ i, OracleInterface ((pSpecCoreInteraction 𝔽q β (ϑ:=ϑ)
+--   (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message i) := instOracleInterfaceMessageAppend
 
-instance : ∀ i, OracleInterface ((pSpecQuery 𝔽q β γ_repetitions
-  (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message i) := fun _ => OracleInterface.instDefault
+-- instance : ∀ i, OracleInterface ((pSpecQuery 𝔽q β γ_repetitions
+--   (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message i) := fun _ => OracleInterface.instDefault
 
-instance : ∀ j, OracleInterface ((fullPSpec 𝔽q β γ_repetitions (ϑ:=ϑ)
-  (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message j) := instOracleInterfaceMessageAppend
+-- instance : ∀ j, OracleInterface ((fullPSpec 𝔽q β γ_repetitions (ϑ:=ϑ)
+--   (h_ℓ_add_R_rate := h_ℓ_add_R_rate)).Message j) := instOracleInterfaceMessageAppend
 
--- Oracle Interface instances for Ostmt
-instance instOracleStatementBinaryBasefold {i : Fin (ℓ + 1)} :
-    ∀ j, OracleInterface (OracleStatement 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i j) :=
-  fun j => {
-    Query := (sDomain 𝔽q β h_ℓ_add_R_rate) ⟨j.val * ϑ, by
-      calc j.val * ϑ < ℓ := by exact toCodewordsCount_mul_ϑ_lt_ℓ ℓ ϑ i j
-      _ < r := by omega⟩
-    Response := L
-    answer := fun oracleData queryPoint => oracleData queryPoint
-  }
+-- -- Oracle Interface instances for Ostmt
+-- instance instOracleStatementBinaryBasefold {i : Fin (ℓ + 1)} :
+--     ∀ j, OracleInterface (OracleStatement 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i j) :=
+--   fun j => {
+--     Query := (sDomain 𝔽q β h_ℓ_add_R_rate) ⟨j.val * ϑ, by
+--       calc j.val * ϑ < ℓ := by exact toCodewordsCount_mul_ϑ_lt_ℓ ℓ ϑ i j
+--       _ < r := by omega⟩
+--     Response := L
+--     answer := fun oracleData queryPoint => oracleData queryPoint
+--   }
 
 /-! ## SampleableType instances -/
 
