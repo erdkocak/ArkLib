@@ -25,9 +25,9 @@ import ArkLib.OracleReduction.Security.RoundByRound
 open OracleComp
 
 variable {ι : Type} {oSpec : OracleSpec ι}
-  {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type} --[Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)]
+  {StmtIn : Type} {ιₛᵢ : Type} {OStmtIn : Type} --[Oₛᵢ : ∀ i, OracleInterface (OStmtIn i)]
   {WitIn : Type}
-  {StmtOut : Type} {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type} --[Oₛₒ : ∀ i, OracleInterface (OStmtOut i)]
+  {StmtOut : Type} {ιₛₒ : Type} {OStmtOut : Type} --[Oₛₒ : ∀ i, OracleInterface (OStmtOut i)]
   {WitOut : Type}
   {n₁ n₂ : ℕ} {pSpec₁ : ProtocolSpec n₁} {pSpec₂ : ProtocolSpec n₂}
   (hn : n₁ = n₂) (hSpec : pSpec₁.cast hn = pSpec₂)

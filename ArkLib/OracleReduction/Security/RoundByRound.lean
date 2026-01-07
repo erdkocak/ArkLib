@@ -18,7 +18,11 @@ open OracleComp OracleSpec ProtocolSpec
 open scoped NNReal
 
 variable {ι : Type} {oSpec : OracleSpec ι}
-  {StmtIn WitIn StmtOut WitOut : Type} {n : ℕ} {pSpec : ProtocolSpec n}
+  {StmtIn WitIn OStmtIn StmtOut WitOut OStmtOut : Type}
+  {n : ℕ} {pSpec : ProtocolSpec n}
+  {Qₛᵢ} {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
+  {Qₘ} {Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages)}
+  {Qₛₒ} {Oₛₒ : OracleSpec Qₛₒ}
   [∀ i, SampleableType (pSpec.Challenge i)]
   {σ : Type} (init : ProbComp σ) (impl : QueryImpl oSpec (StateT σ ProbComp))
 
@@ -434,12 +438,6 @@ open Verifier
 
 section OracleProtocol
 
-variable {StmtIn StmtOut OStmtIn OStmtOut : Type}
-  {n : ℕ} {pSpec : ProtocolSpec n}
-  {Qₛᵢ} {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
-  {Qₘ} {Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages)}
-  {Qₛₒ} {Oₛₒ : OracleSpec Qₛₒ}
-
 namespace OracleVerifier
 
 @[reducible, simp]
@@ -479,21 +477,17 @@ end OracleVerifier
 
 end OracleProtocol
 
-variable {Statement : Type} {OStatement : Type} {Witness : Type}
-  -- [∀ i, OracleInterface (OStatement i)]
-  -- [∀ i, OracleInterface (pSpec.Message i)]
-
 namespace Proof
 
 @[reducible, simp]
-def rbrSoundness (langIn : Set Statement)
-    (verifier : Verifier oSpec Statement Bool pSpec)
+def rbrSoundness (langIn : Set StmtIn)
+    (verifier : Verifier oSpec StmtIn Bool pSpec)
     (rbrSoundnessError : pSpec.ChallengeIdx → ℝ≥0) : Prop :=
   verifier.rbrSoundness init impl langIn acceptRejectRel.language rbrSoundnessError
 
 @[reducible, simp]
-def rbrKnowledgeSoundness (relation : Set (Statement × Bool))
-    (verifier : Verifier oSpec Statement Bool pSpec)
+def rbrKnowledgeSoundness (relation : Set (StmtIn × Bool))
+    (verifier : Verifier oSpec StmtIn Bool pSpec)
     (rbrKnowledgeError : pSpec.ChallengeIdx → ℝ≥0) : Prop :=
   verifier.rbrKnowledgeSoundness init impl relation acceptRejectRel rbrKnowledgeError
 
@@ -503,17 +497,17 @@ namespace OracleProof
 
 /-- Round-by-round soundness of an oracle reduction is the same as for non-oracle reductions. -/
 @[reducible, simp]
-def rbrSoundness {Oₛᵢ} {Oₘ} {Oₛₒ}
-    (langIn : Set (Statement × OStatement))
-    (verifier : OracleVerifier oSpec Statement OStatement Bool (Unit) pSpec Oₛᵢ Oₘ Oₛₒ)
+def rbrSoundness
+    (langIn : Set (StmtIn × OStmtIn))
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn Bool (Empty → Unit) pSpec Oₛᵢ Oₘ Oₛₒ)
     (rbrSoundnessError : pSpec.ChallengeIdx → ℝ≥0) : Prop :=
   verifier.rbrSoundness init impl langIn acceptRejectOracleRel.language rbrSoundnessError
 
 /-- Round-by-round knowledge soundness of an oracle reduction is the same as for non-oracle
 reductions. -/
-def rbrKnowledgeSoundness {Oₛᵢ} {Oₘ}
-    (relIn : Set ((Statement × ∀ i, OStatement i) × Witness))
-    (verifier : OracleVerifier oSpec Statement OStatement Bool (fun _ : Empty => Unit) pSpec Oₛᵢ Oₘ)
+def rbrKnowledgeSoundness
+    (relIn : Set ((StmtIn × OStmtIn) × WitIn))
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn Bool (Empty → Unit) pSpec Oₛᵢ Oₘ Oₛₒ)
     (rbrKnowledgeError : pSpec.ChallengeIdx → ℝ≥0) : Prop :=
   verifier.rbrKnowledgeSoundness init impl relIn acceptRejectOracleRel rbrKnowledgeError
 
@@ -523,8 +517,8 @@ section Trivial
 
 /-- The state function for the identity / trivial verifier, which just returns whether the
   statement is in the language. -/
-def Verifier.StateFunction.id {lang : Set Statement} :
-    (Verifier.id : Verifier oSpec Statement _ _).StateFunction init impl lang lang where
+def Verifier.StateFunction.id {lang : Set StmtIn} :
+    (Verifier.id : Verifier oSpec StmtIn _ _).StateFunction init impl lang lang where
   toFun | ⟨0, _⟩ => fun stmtIn _ => stmtIn ∈ lang
   toFun_empty := fun _ => by simp
   toFun_next := fun i => Fin.elim0 i
@@ -532,23 +526,23 @@ def Verifier.StateFunction.id {lang : Set Statement} :
 
 /-- The identity / trivial verifier is perfectly round-by-round sound. -/
 @[simp]
-lemma Verifier.id_rbrSoundness {lang : Set Statement} :
-    (Verifier.id : Verifier oSpec Statement _ _).rbrSoundness init impl lang lang 0 := by
+lemma Verifier.id_rbrSoundness {lang : Set StmtIn} :
+    (Verifier.id : Verifier oSpec StmtIn _ _).rbrSoundness init impl lang lang 0 := by
   refine ⟨Verifier.StateFunction.id init impl, ?_⟩
   simp [Verifier.id]
 
 /-- The round-by-round extractor for the identity / trivial verifier, which just returns the
   input witness. -/
 def Extractor.RoundByRound.id :
-    Extractor.RoundByRound oSpec Statement Witness Witness !p[] (fun _ => Witness) where
+    Extractor.RoundByRound oSpec StmtIn WitIn WitIn !p[] (fun _ => WitIn) where
   eqIn := rfl
   extractMid := fun i => Fin.elim0 i
   extractOut := fun _ _ => _root_.id
 
 /-- The knowledge state function for the identity / trivial verifier, which just returns whether
-  the statement is in the relation. -/
-def Verifier.KnowledgeStateFunction.id {rel : Set (Statement × Witness)} :
-    (Verifier.id : Verifier oSpec Statement _ _).KnowledgeStateFunction init impl rel rel
+  the StmtIn is in the relation. -/
+def Verifier.KnowledgeStateFunction.id {rel : Set (StmtIn × WitIn)} :
+    (Verifier.id : Verifier oSpec StmtIn _ _).KnowledgeStateFunction init impl rel rel
       (Extractor.RoundByRound.id) where
   toFun | ⟨0, _⟩ => fun stmtIn _ witIn => (stmtIn, witIn) ∈ rel
   toFun_empty := fun _ => by simp
@@ -557,8 +551,8 @@ def Verifier.KnowledgeStateFunction.id {rel : Set (Statement × Witness)} :
 
 /-- The identity / trivial verifier is perfectly round-by-round knowledge sound. -/
 @[simp]
-lemma Verifier.id_rbrKnowledgeSoundness {rel : Set (Statement × Witness)} :
-    (Verifier.id : Verifier oSpec Statement _ _).rbrKnowledgeSoundness
+lemma Verifier.id_rbrKnowledgeSoundness {rel : Set (StmtIn × WitIn)} :
+    (Verifier.id : Verifier oSpec StmtIn _ _).rbrKnowledgeSoundness
       init impl rel rel 0 := by
   refine ⟨_, _, Verifier.KnowledgeStateFunction.id init impl, ?_⟩
   stop
@@ -572,13 +566,13 @@ lemma Verifier.id_rbrKnowledgeSoundness {rel : Set (Statement × Witness)} :
     Set.mem_iUnion, Set.mem_image, Prod.exists, exists_and_right, exists_prop, not_exists, not_and,
     forall_exists_index, and_imp, Prod.forall, Prod.mk.injEq, IsEmpty.forall_iff, implies_true]
 
-/-- The identity / trivial oracle verifier is perfectly round-by-round knowledge sound. -/
-@[simp]
-lemma OracleVerifier.id_rbrKnowledgeSoundness
-    {rel : Set ((Statement × ∀ i, OStatement i) × Witness)} :
-    (OracleVerifier.id : OracleVerifier oSpec Statement OStatement _ _ _ _ _).rbrKnowledgeSoundness
-      init impl rel rel 0 := by
-  sorry
+-- /-- The identity / trivial oracle verifier is perfectly round-by-round knowledge sound. -/
+-- @[simp]
+-- lemma OracleVerifier.id_rbrKnowledgeSoundness
+--     {rel : Set ((StmtIn × ∀ i, OStmtIn i) × Witness)} :
+--     (OracleVerifier.id : OracleVerifier oSpec StmtIn OStmtIn _ _ _ _ _).rbrKnowledgeSoundness
+--       init impl rel rel 0 := by
+--   sorry
   -- rw [rbrKnowledgeSoundness]
 
   -- convert Verifier.id_rbrKnowledgeSoundness init impl

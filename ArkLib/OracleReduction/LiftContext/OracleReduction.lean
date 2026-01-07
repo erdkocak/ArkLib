@@ -33,33 +33,33 @@ variable {ι : Type} {oSpec : OracleSpec ι}
   {InnerStmtIn InnerWitIn InnerStmtOut InnerWitOut : Type}
   {n : ℕ} {pSpec : ProtocolSpec n}
 
-/-- The lifting of the prover from an inner oracle reduction to an outer oracle reduction, requiring
-  an associated oracle context lens -/
-def OracleProver.liftContext
-    (lens : OracleContext.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                              OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄
-                              OuterWitIn OuterWitOut InnerWitIn InnerWitOut)
-    (P : OracleProver oSpec InnerStmtIn InnerOStmtIn InnerWitIn
-                            InnerStmtOut InnerOStmtOut InnerWitOut pSpec) :
-    OracleProver oSpec OuterStmtIn OuterOStmtIn OuterWitIn
-                      OuterStmtOut OuterOStmtOut OuterWitOut pSpec :=
-  Prover.liftContext lens.toContext P
+-- /-- The lifting of the prover from an inner oracle reduction to an outer oracle reduction, requiring
+--   an associated oracle context lens -/
+-- def OracleProver.liftContext
+--     (lens : OracleContext.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
+--                               OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄
+--                               OuterWitIn OuterWitOut InnerWitIn InnerWitOut)
+--     (P : OracleProver oSpec InnerStmtIn InnerOStmtIn InnerWitIn
+--                             InnerStmtOut InnerOStmtOut InnerWitOut pSpec) :
+--     OracleProver oSpec OuterStmtIn OuterOStmtIn OuterWitIn
+--                       OuterStmtOut OuterOStmtOut OuterWitOut pSpec :=
+--   Prover.liftContext lens.toContext P
 
--- variable [∀ i, OracleInterface (pSpec.Message i)]
+-- -- variable [∀ i, OracleInterface (pSpec.Message i)]
 
-/-- The lifting of the verifier from an inner oracle reduction to an outer oracle reduction,
-  requiring an associated oracle statement lens -/
-def OracleVerifier.liftContext
-    (lens : OracleStatement.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
-                              OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄)
-    (V : OracleVerifier oSpec InnerStmtIn InnerOStmtIn InnerStmtOut InnerOStmtOut pSpec O₃ sorry) :
-      OracleVerifier oSpec OuterStmtIn OuterOStmtIn OuterStmtOut OuterOStmtOut pSpec sorry sorry where
-  verify := fun outerStmtIn transcript => sorry
-  embed := by
-    have := V.embed
+-- /-- The lifting of the verifier from an inner oracle reduction to an outer oracle reduction,
+--   requiring an associated oracle statement lens -/
+-- def OracleVerifier.liftContext
+--     (lens : OracleStatement.Lens OuterStmtIn OuterStmtOut InnerStmtIn InnerStmtOut
+--                               OuterOStmtIn O₁ OuterOStmtOut O₂ InnerOStmtIn O₃ InnerOStmtOut O₄)
+--     (V : OracleVerifier oSpec InnerStmtIn InnerOStmtIn InnerStmtOut InnerOStmtOut pSpec O₃ sorry) :
+--       OracleVerifier oSpec OuterStmtIn OuterOStmtIn OuterStmtOut OuterOStmtOut pSpec sorry sorry where
+--   verify := fun outerStmtIn transcript => sorry
+--   embed := by
+--     have := V.embed
 
-    sorry
-  hEq := sorry
+--     sorry
+--   hEq := sorry
 
 -- /-- The lifting of an inner oracle reduction to an outer oracle reduction,
 --   requiring an associated oracle context lens -/

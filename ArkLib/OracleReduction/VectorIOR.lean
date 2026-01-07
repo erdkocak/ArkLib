@@ -24,9 +24,7 @@ We also define complexity measures for V-IORs, such as proof length and verifier
 namespace ProtocolSpec
 
 /-- The protocol specification for a V-IOR, which consists of the direction of each message and its
-  length.
-
-(assumed to be working over a fixed alphabet) -/
+  length. (assumed to be working over a fixed alphabet) -/
 @[ext]
 structure VectorSpec (n : ℕ) where
   dir : Fin n → Direction
@@ -70,7 +68,16 @@ def totalMessageLength (vPSpec : VectorSpec n) : Nat := ∑ i, vPSpec.messageLen
 @[reducible]
 def totalChallengeLength (vPSpec : VectorSpec n) : Nat := ∑ i, vPSpec.challengeLength i
 
-variable {A : Type} {vPSpec : VectorSpec n}
+#check MessageIdx
+/-- Specification and implementation of oracles provided by a `VectorSpec`.
+The indexing set is takes a round `r : Fin n` and an index for the vector at that round.
+The output type of the oracles is always the alphabet type `α`, and the implementation
+applies the natural indexing operations from the vector being read in. -/
+def messageOracleContext (vPSpec : VectorSpec n) (α : Type) :
+    OracleContext ((r : vPSpec.MessageIdx) × Fin (vPSpec.length r))
+      (ReaderM (vPSpec.toProtocolSpec α).Messages) where
+  spec := _ →ₒ α
+  impl | ⟨r, i⟩ => ReaderT.mk fun xss => return (xss r)[i]
 
 -- /-- All messages in an V-IOR have the same vector oracle interface. -/
 -- instance : OracleInterfaces (vPSpec.toProtocolSpec A) where
@@ -79,8 +86,8 @@ variable {A : Type} {vPSpec : VectorSpec n}
 -- instance : ∀ i, OracleInterface ((vPSpec.toProtocolSpec A).Message i) :=
 --   fun _ => OracleInterface.instVector
 
-instance [VCVCompatible A] : ∀ i, VCVCompatible ((vPSpec.toProtocolSpec A).Challenge i) :=
-  fun _ => by dsimp; infer_instance
+-- instance [VCVCompatible A] : ∀ i, VCVCompatible ((vPSpec.toProtocolSpec A).Challenge i) :=
+--   fun _ => by dsimp; infer_instance
 
 end VectorSpec
 
@@ -97,10 +104,13 @@ variable {n : ℕ} {ι : Type}
   be done if needed. -/
 @[reducible]
 def VectorIOR
-    (StmtIn : Type) {ιₛᵢ : Type} (OStmtIn : ιₛᵢ → Type) (WitIn : Type)
-    (StmtOut : Type) {ιₛₒ : Type} (OStmtOut : ιₛₒ → Type) (WitOut : Type)
-    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type) :=
+    (StmtIn : Type) (OStmtIn : Type) (WitIn : Type)
+    (StmtOut : Type) (OStmtOut : Type) (WitOut : Type)
+    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type)
+    {Qₛᵢ} (Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn))
+    {Qₛₒ} (Oₛₒ : OracleSpec Qₛₒ) :=
   OracleReduction []ₒ StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut (vPSpec.toProtocolSpec A)
+    Oₛᵢ (ProtocolSpec.VectorSpec.messageOracleContext vPSpec A) Oₛₒ
 
 /-- Vector Interactive Oracle Proofs
 
@@ -109,9 +119,12 @@ are vectors over some alphabet. We do _not_ require the (oracle) statements and 
 vectors as well, though this can be done if needed. -/
 @[reducible]
 def VectorIOP
-    (Statement : Type) {ιₛ : Type} (OStatement : ιₛ → Type) (Witness : Type)
-    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type) :=
+    (Statement : Type) (OStatement : Type) (Witness : Type)
+    (vPSpec : ProtocolSpec.VectorSpec n) (A : Type)
+    {Qₛᵢ} (Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStatement))
+    {Qₛₒ} (Oₛₒ : OracleSpec Qₛₒ) :=
   OracleProof []ₒ Statement OStatement Witness (vPSpec.toProtocolSpec A)
+    Oₛᵢ (ProtocolSpec.VectorSpec.messageOracleContext vPSpec A) Oₛₒ
 
 variable {n : ℕ} {vPSpec : ProtocolSpec.VectorSpec n} {A : Type}
   [OracleComp.SampleableType A]
@@ -120,17 +133,20 @@ open scoped NNReal
 
 namespace VectorIOR
 
-variable {StmtIn WitIn StmtOut WitOut : Type} {ιₛᵢ : Type} {OStmtIn : ιₛᵢ → Type}
-  {ιₛₒ : Type} {OStmtOut : ιₛₒ → Type}
+variable {StmtIn WitIn StmtOut WitOut : Type}
+  {ιₛᵢ : Type} {OStmtIn : Type}
+  {ιₛₒ : Type} {OStmtOut : Type}
+  {Qₛᵢ} {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
+  {Qₛₒ} {Oₛₒ : OracleSpec Qₛₒ}
 
 /-- A vector IOR is **secure** with respect to input relation `relIn`, output relation `relOut`, and
     round-by-round knowledge error `ε_rbr` if it satisfies (perfect) completeness and round-by-round
     knowledge soundness with respect to `relIn`, `relOut`, and `ε_rbr`. -/
 class IsSecure
-    (relIn : Set ((StmtIn × ∀ i, OStmtIn i) × WitIn))
-    (relOut : Set ((StmtOut × ∀ i, OStmtOut i) × WitOut))
+    (relIn : Set ((StmtIn × OStmtIn) × WitIn))
+    (relOut : Set ((StmtOut × OStmtOut) × WitOut))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOR : VectorIOR StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut vPSpec A sorry sorry) where
+    (vectorIOR : VectorIOR StmtIn OStmtIn WitIn StmtOut OStmtOut WitOut vPSpec A Oₛᵢ Oₛₒ) where
 
   /-- The reduction is perfectly complete. -/
   is_complete : vectorIOR.perfectCompleteness (pure ()) isEmptyElim relIn relOut
@@ -147,16 +163,19 @@ end VectorIOR
 
 namespace VectorIOP
 
-variable {Statement Witness : Type} {ιₛ : Type} {OStatement : ιₛ → Type}
-  -- [∀ i, OracleInterface (OStatement i)]
+variable {StmtIn WitIn StmtOut WitOut : Type}
+  {ιₛᵢ : Type} {OStmtIn : Type}
+  {ιₛₒ : Type} {OStmtOut : Type}
+  {Qₛᵢ} {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
+  {Qₛₒ} {Oₛₒ : OracleSpec Qₛₒ}
 
 /-- A vector IOP is **secure** with respect to relation `relation` and round-by-round knowledge
     error `ε_rbr` if it satisfies (perfect) completeness and round-by-round knowledge soundness
     with respect to `relation` and `ε_rbr`. -/
 class IsSecure
-    (relation : Set ((Statement × ∀ i, OStatement i) × Witness))
+    (relation : Set ((StmtIn × OStmtIn) × WitIn))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOP : VectorIOP Statement OStatement Witness vPSpec A sorry sorry) where
+    (vectorIOP : VectorIOP StmtIn OStmtIn WitIn vPSpec A Oₛᵢ Oₛₒ) where
 
   /-- The reduction is perfectly complete. -/
   is_complete : vectorIOP.perfectCompleteness (pure ()) (isEmptyElim) relation sorry
@@ -172,10 +191,10 @@ class IsSecure
   - (perfect) completeness with respect to `completeRelation`,
   - round-by-round knowledge soundness with respect to `soundRelation` and `ε_rbr`. -/
 class IsSecureWithGap
-    (completeRelation : Set ((Statement × ∀ i, OStatement i) × Witness))
-    (soundRelation : Set ((Statement × ∀ i, OStatement i) × Witness))
+    (completeRelation : Set ((StmtIn × OStmtIn) × WitIn))
+    (soundRelation : Set ((StmtIn × OStmtIn) × WitIn))
     (ε_rbr : vPSpec.ChallengeIdx → ℝ≥0)
-    (vectorIOP : VectorIOP Statement OStatement Witness vPSpec A sorry sorry) where
+    (vectorIOP : VectorIOP StmtIn OStmtIn WitIn vPSpec A Oₛᵢ Oₛₒ) where
 
   /-- The reduction is perfectly complete. -/
   is_complete : vectorIOP.perfectCompleteness (pure ()) (isEmptyElim) completeRelation sorry
@@ -183,6 +202,6 @@ class IsSecureWithGap
   -- /-- The reduction is round-by-round knowledge sound with respect to `relIn`, `relOut`,
   --   `ε_rbr`, and the state function. -/
   -- is_rbr_knowledge_sound :
-  --   OracleProof.rbrKnowledgeSoundness (pure ()) ⟨isEmptyElim⟩ soundRelation vectorIOP.verifier ε_rbr
+  --   OracleProof.rbrKnowledgeSoundness (pure ()) isEmptyElim soundRelation vectorIOP.verifier ε_rbr
 
 end VectorIOP

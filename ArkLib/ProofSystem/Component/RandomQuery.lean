@@ -13,16 +13,19 @@ with same oracle interface) are equal.
 
 In more details: there is no witness nor public statement. There are two `OStatement`s, `a` and `b`,
 of the same type. The relation is `a = b`.
-   - The verifier samples random `q : OracleInterface.Query` for that type and sends it to the
-     prover.
+   - The verifier samples random `q : Q` for that type and sends it to the prover.
    - The verifier does not do any checks.
    - The output relation is that `a` and `b` are equal at that query.
    - We also support a variant where it's `a.query q = r` where `r` is the response, discarding `b`.
+
+Note: we assume the same `OracleContext` in either case, the difference in behavior is assumed
+to come only from the chosen input `OStatement` to the reader monad.
 -/
 
 open OracleSpec OracleComp OracleQuery ProtocolSpec
 
-variable {ι : Type} (oSpec : OracleSpec ι) (OStatement : Type) (Q : Type)
+variable {ι : Type} (oSpec : OracleSpec ι) (OStatement : Type)
+  (Q : Type)
   (Oₛ : OracleContext Q (ReaderM OStatement))
   [inst : SampleableType Q]
 
@@ -31,24 +34,21 @@ namespace RandomQuery
 @[reducible, simp] def StmtIn := Unit
 @[reducible, simp] def StmtOut := Q
 
-@[reducible, simp] def OStmtIn := fun _ : Fin 2 => OStatement
-@[reducible, simp] def OStmtOut := fun _ : Fin 2 => OStatement
-
 @[reducible, simp] def WitIn := Unit
 @[reducible, simp] def WitOut := Unit
 
 /-- The input relation is that the two oracles are equal. -/
 @[reducible, simp]
-def relIn : Set ((StmtIn × ∀ i, OStmtIn OStatement i) × WitIn) :=
-  { ⟨⟨(), oracles⟩, ()⟩ | oracles 0 = oracles 1 }
+def relIn : Set ((StmtIn × (OStatement × OStatement)) × WitIn) :=
+  { ⟨⟨(), oracles⟩, ()⟩ | oracles.1 = oracles.2 }
 
 /--
 The output relation states that if the verifier's single query was `q`, then
 `a` and `b` agree on that `q`, i.e. `answer a q = answer b q`.
 -/
 @[reducible, simp]
-def relOut : Set ((StmtOut Q × ∀ i, OStmtOut OStatement i) × WitOut) :=
-  { ⟨⟨q, oStmt⟩, ()⟩ | Oₛ.impl q (oStmt 0) = Oₛ.impl q (oStmt 1) }
+def relOut : Set ((StmtOut Q × (OStatement × OStatement)) × WitOut) :=
+  { ⟨⟨q, oracles⟩, ()⟩ | Oₛ.impl q (oracles.1) = Oₛ.impl q (oracles.2) }
 
 @[reducible]
 def pSpec : ProtocolSpec 1 := ⟨!v[.V_to_P], !v[Q]⟩
@@ -61,18 +61,26 @@ We keep track of `(a, b)` in the prover's state, along with the single random qu
 -/
 @[inline, specialize]
 def oracleProver : OracleProver oSpec
-    Unit (fun _ : Fin 2 => OStatement) Unit
-    (Q) (fun _ : Fin 2 => OStatement) Unit (pSpec OStatement) where
+    Unit (OStatement × OStatement) Unit
+    (OStatement) (OStatement × OStatement) Unit (pSpec OStatement) where
 
   PrvState
   | 0 => ∀ _ : Fin 2, OStatement
   | 1 => (∀ _ : Fin 2, OStatement) × (Oₛ.spec.Domain)
 
-  input := fun x => x.1.2
+  input := fun x _ => x.1.2.1
 
   sendMessage | ⟨0, h⟩ => nomatch h
 
-  receiveChallenge | ⟨0, _⟩ => fun oracles => pure fun q => (oracles, q)
+  receiveChallenge | ⟨0, _⟩ => fun oracles => pure fun q => (by 
+    simp at *
+    refine (oracles, ?_)
+    convert q
+
+    simp
+    stop
+    refine (oracles, q)
+  )
 
   output := fun (oracles, q) => pure ((q, oracles), ())
 

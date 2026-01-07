@@ -83,8 +83,7 @@ open OracleComp OracleSpec SubSpec ProtocolSpec
 structure Indexer {ι} (oSpec : OracleSpec ι) {n : ℕ} (pSpec : ProtocolSpec n) (Index : Type)
     (Encoding : Type) where
   encode : Index → OracleComp oSpec Encoding
-  impl : OracleContext Unit (ReaderM Encoding) -- dt: doesn't have to be a unit here
-  -- [OracleInterface : OracleInterface Encoding]
+  impl : OracleContext Unit (ReaderM Encoding)
 
 /-
 TODO(dtumad): make use of this using the improved univer polymorphism.
@@ -370,8 +369,7 @@ variable {ι} {oSpec : OracleSpec ι}
     {Qₛᵢ} {Oₛᵢ : OracleContext Qₛᵢ (ReaderM OStmtIn)}
     {Qₘ} {Oₘ : OracleContext Qₘ (ReaderM pSpec.Messages)}
     {Qₛₒ} {Oₛₒ : OracleSpec Qₛₒ}
-    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec
-      Oₛᵢ Oₘ Oₛₒ)
+    (verifier : OracleVerifier oSpec StmtIn OStmtIn StmtOut OStmtOut pSpec Oₛᵢ Oₘ Oₛₒ)
 
 /-- Given a implementation of a `verify` function for some fixed input statmenet and message oracle
 contexts `Oₛᵢ` and `Oₘ`, there is a natural `OracleVerifier` that concatenates the output
