@@ -15,7 +15,7 @@ linter.style.longFile = 1500
 [[require]]
 name = "VCVio"
 git = "https://github.com/Verified-zkEVM/VCV-io"
-rev = "upstream-pfun"
+rev = "dtumad/finalize-4-26"
 
 [[require]]
 name = "«doc-gen4»"
