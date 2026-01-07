@@ -97,7 +97,7 @@ is the backward direction of the random permutation
 @[reducible]
 def duplexSpongeChallengeOracle (StartType : Type) (U : Type) [SpongeUnit U] [SpongeSize] :
     OracleSpec (Unit ⊕ PermuteDir) :=
-  (StartType →ₒ Vector U SpongeSize.C) ++ₒ permutationOracle (CanonicalSpongeState U)
+  (StartType →ₒ Vector U SpongeSize.C) + permutationOracle (CanonicalSpongeState U)
 
 alias 𝒟_𝔖 := duplexSpongeChallengeOracle
 
@@ -123,7 +123,7 @@ namespace ProtocolSpec.Messages
 def deriveTranscriptDSFSAux {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
     (sponge : CanonicalDuplexSponge U)
     (messages : pSpec.Messages) (i : Fin (n + 1)) :
-      OracleComp (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+      OracleComp (oSpec + duplexSpongeChallengeOracle StmtIn U)
         (CanonicalDuplexSponge U × pSpec.Transcript i) :=
   Fin.induction
     (pure (sponge, fun i => i.elim0))
@@ -148,7 +148,7 @@ def deriveTranscriptDSFSAux {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
   Returns the final state of the duplex sponge and the full transcript -/
 def deriveTranscriptDSFS {ι : Type} {oSpec : OracleSpec ι} {StmtIn : Type}
     (stmtIn : StmtIn) (messages : pSpec.Messages) :
-    OracleComp (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+    OracleComp (oSpec + duplexSpongeChallengeOracle StmtIn U)
       (CanonicalDuplexSponge U × pSpec.FullTranscript) := do
   let sponge ← liftM (DuplexSponge.start stmtIn)
   deriveTranscriptDSFSAux sponge messages (Fin.last n)
@@ -167,10 +167,10 @@ This is modified for Fiat-Shamir, where we only accumulate the messages and not 
 @[inline, specialize]
 def Prover.processRoundDSFS [∀ i, VCVCompatible (pSpec.Challenge i)] (j : Fin n)
     (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec)
-    (currentResult : OracleComp (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+    (currentResult : OracleComp (oSpec + duplexSpongeChallengeOracle StmtIn U)
       (pSpec.MessagesUpTo j.castSucc ×
         CanonicalDuplexSponge U × prover.PrvState j.castSucc)) :
-      OracleComp (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+      OracleComp (oSpec + duplexSpongeChallengeOracle StmtIn U)
         (pSpec.MessagesUpTo j.succ ×
           CanonicalDuplexSponge U × prover.PrvState j.succ) := do
   let ⟨messages, sponge, state⟩ ← currentResult
@@ -197,7 +197,7 @@ Run the prover in an interactive reduction up to round index `i`, via first inpu
 def Prover.runToRoundDSFS [∀ i, VCVCompatible (pSpec.Challenge i)] (i : Fin (n + 1))
     (stmt : StmtIn) (prover : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec)
     (state : prover.PrvState 0) :
-        OracleComp (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+        OracleComp (oSpec + duplexSpongeChallengeOracle StmtIn U)
           (pSpec.MessagesUpTo i ×
             DuplexSponge U (Vector U SpongeSize.N) × prover.PrvState i) :=
   Fin.induction
@@ -211,7 +211,7 @@ def Prover.runToRoundDSFS [∀ i, VCVCompatible (pSpec.Challenge i)] (i : Fin (n
 
 /-- The duplex sponge Fiat-Shamir transformation for the prover. -/
 def Prover.duplexSpongeFiatShamir (P : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec) :
-    NonInteractiveProver (∀ i, pSpec.Message i) (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+    NonInteractiveProver (∀ i, pSpec.Message i) (oSpec + duplexSpongeChallengeOracle StmtIn U)
       StmtIn WitIn StmtOut WitOut where
   PrvState := fun i => match i with
     | 0 => StmtIn × P.PrvState 0
@@ -227,7 +227,7 @@ def Prover.duplexSpongeFiatShamir (P : Prover oSpec StmtIn WitIn StmtOut WitOut 
 
 /-- The duplex sponge Fiat-Shamir transformation for the verifier. -/
 def Verifier.duplexSpongeFiatShamir (V : Verifier oSpec StmtIn StmtOut pSpec) :
-    NonInteractiveVerifier (∀ i, pSpec.Message i) (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+    NonInteractiveVerifier (∀ i, pSpec.Message i) (oSpec + duplexSpongeChallengeOracle StmtIn U)
       StmtIn StmtOut where
   verify := fun stmtIn proof => do
     -- Get the messages from the non-interactive proof
@@ -239,7 +239,7 @@ def Verifier.duplexSpongeFiatShamir (V : Verifier oSpec StmtIn StmtOut pSpec) :
 /-- The duplex sponge Fiat-Shamir transformation for an (interactive) reduction, which consists of
   applying the duplex sponge Fiat-Shamir transformation to both the prover and the verifier. -/
 def Reduction.duplexSpongeFiatShamir (R : Reduction oSpec StmtIn WitIn StmtOut WitOut pSpec) :
-    NonInteractiveReduction (∀ i, pSpec.Message i) (oSpec ++ₒ duplexSpongeChallengeOracle StmtIn U)
+    NonInteractiveReduction (∀ i, pSpec.Message i) (oSpec + duplexSpongeChallengeOracle StmtIn U)
       StmtIn WitIn StmtOut WitOut where
   prover := R.prover.duplexSpongeFiatShamir
   verifier := R.verifier.duplexSpongeFiatShamir

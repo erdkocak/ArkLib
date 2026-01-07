@@ -223,7 +223,7 @@ namespace Prover
 
 theorem cast_processRound (j : Fin n₁)
     (P : Prover oSpec StmtIn WitIn StmtOut WitOut pSpec₁)
-    (currentResult : OracleComp (oSpec ++ₒ [pSpec₁.Challenge]ₒ)
+    (currentResult : OracleComp (oSpec + [pSpec₁.Challenge]ₒ)
       (Transcript j.castSucc pSpec₁ × P.PrvState j.castSucc)) :
     P.processRound j currentResult =
       cast (sorry) ((P.cast hn hSpec).processRound (Fin.cast hn j) sorry) := by
@@ -274,8 +274,8 @@ section Security
 open NNReal
 
 variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl oSpec (StateT σ ProbComp)}
-  [inst₁ : ∀ i, SelectableType (pSpec₁.Challenge i)]
-  [inst₂ : ∀ i, SelectableType (pSpec₂.Challenge i)]
+  [inst₁ : ∀ i, SampleableType (pSpec₁.Challenge i)]
+  [inst₂ : ∀ i, SampleableType (pSpec₂.Challenge i)]
   (hChallenge : ∀ i, inst₁ i = dcast (by simp) (inst₂ (i.cast hn hSpec)))
 
 section Protocol

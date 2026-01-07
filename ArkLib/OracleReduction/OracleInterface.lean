@@ -189,7 +189,7 @@ def append {ι₁ : Type u} {T₁ : ι₁ → Type v} [∀ i, OracleInterface (T
   Returns a stateless oracle that routes queries to the appropriate underlying oracle. -/
 def simOracle {ι : Type u} (oSpec : OracleSpec ι) {ι' : Type v} {T : ι' → Type w}
     [∀ i, OracleInterface (T i)] (t : (i : ι') → T i) :
-    SimOracle.Stateless (oSpec ++ₒ [T]ₒ) oSpec :=
+    SimOracle.Stateless (oSpec + [T]ₒ) oSpec :=
   idOracle ++ₛₒ (fnOracle [T]ₒ (fun i => answer (t i)))
 
 /-- Combines multiple oracle specifications into a single oracle by routing queries to the
@@ -201,9 +201,9 @@ def simOracle {ι : Type u} (oSpec : OracleSpec ι) {ι' : Type v} {T : ι' → 
 def simOracle2 {ι : Type u} (oSpec : OracleSpec ι)
     {ι₁ : Type v} {T₁ : ι₁ → Type w} [∀ i, OracleInterface (T₁ i)]
     {ι₂ : Type v} {T₂ : ι₂ → Type w} [∀ i, OracleInterface (T₂ i)]
-    (t₁ : ∀ i, T₁ i) (t₂ : ∀ i, T₂ i) : SimOracle.Stateless (oSpec ++ₒ ([T₁]ₒ ++ₒ [T₂]ₒ)) oSpec :=
+    (t₁ : ∀ i, T₁ i) (t₂ : ∀ i, T₂ i) : SimOracle.Stateless (oSpec + ([T₁]ₒ + [T₂]ₒ)) oSpec :=
   idOracle ++ₛₒ
-    fnOracle ([T₁]ₒ ++ₒ [T₂]ₒ) (fun i => match i with
+    fnOracle ([T₁]ₒ + [T₂]ₒ) (fun i => match i with
       | .inl i => answer (t₁ i)
       | .inr i => answer (t₂ i))
 

@@ -394,7 +394,7 @@ section Protocol
 
 variable {Stmt₁ Wit₁ Stmt₂ Wit₂ Stmt₃ Wit₃ : Type}
     {pSpec₁ : ProtocolSpec m} {pSpec₂ : ProtocolSpec n}
-    [∀ i, SelectableType (pSpec₁.Challenge i)] [∀ i, SelectableType (pSpec₂.Challenge i)]
+    [∀ i, SampleableType (pSpec₁.Challenge i)] [∀ i, SampleableType (pSpec₂.Challenge i)]
     {σ : Type} {init : ProbComp σ} {impl : QueryImpl oSpec (StateT σ ProbComp)}
     {rel₁ : Set (Stmt₁ × Wit₁)} {rel₂ : Set (Stmt₂ × Wit₂)} {rel₃ : Set (Stmt₃ × Wit₃)}
 
@@ -523,7 +523,7 @@ variable {Stmt₁ : Type} {ιₛ₁ : Type} {OStmt₁ : ιₛ₁ → Type} [Oₛ
     {pSpec₁ : ProtocolSpec m} {pSpec₂ : ProtocolSpec n}
     [Oₘ₁ : ∀ i, OracleInterface ((pSpec₁.Message i))]
     [Oₘ₂ : ∀ i, OracleInterface ((pSpec₂.Message i))]
-    [∀ i, SelectableType (pSpec₁.Challenge i)] [∀ i, SelectableType (pSpec₂.Challenge i)]
+    [∀ i, SampleableType (pSpec₁.Challenge i)] [∀ i, SampleableType (pSpec₂.Challenge i)]
     {σ : Type} {init : ProbComp σ} {impl : QueryImpl oSpec (StateT σ ProbComp)}
     {rel₁ : Set ((Stmt₁ × ∀ i, OStmt₁ i) × Wit₁)}
     {rel₂ : Set ((Stmt₂ × ∀ i, OStmt₂ i) × Wit₂)}

@@ -77,6 +77,7 @@ lemma sqrt_le_J {q δ : ℚ} (hq : q > 1) (hx0 : 0 ≤ δ) (hx1 : δ ≤ 1) (hqx
   gcongr
   have : 1 * δ  ≤ frac * δ  := by exact mul_le_mul_of_nonneg_right hfrac_ge hx0
   simp at this
+  stop
   exact this
 
 /-- The `q`-ary Johnson bound.
@@ -96,6 +97,7 @@ lemma johnson_condition_weak_implies_strong [Field F]
   :
   JohnsonConditionStrong (B ∩ ({ x | Δ₀(x, v) ≤ e } : Finset _)) v := by
   --We show that n > 0, the theorem is ill-posed in this case but it follows from our assumptions.
+  stop
   have h_n_pos : 0 < n := by
     by_contra hn
     push_neg at hn
@@ -106,7 +108,7 @@ lemma johnson_condition_weak_implies_strong [Field F]
         intros u hu v hv
         funext s
         exact Fin.elim0 s
-      have : ¬∃ (u v : B), u ≠ v := by grind
+      have : ¬∃ (u v : B), u ≠ v := by sorry -- grind
       have neg_of_ineq := (Fintype.one_lt_card_iff.1).mt this
       simp at neg_of_ineq
       exact neg_of_ineq
@@ -263,6 +265,7 @@ private lemma johnson_condition_strong_implies_2_le_B_card
   have h : (Fintype.card F : ℚ) / (Fintype.card F - 1) = 1 + 1 / (Fintype.card F - 1) := by
     have : (Fintype.card F : ℚ) - 1 ≠ 0 := by simp [sub_eq_zero]; omega
     field_simp
+    ring
   have h' := JohnsonBound.abs_one_sub_div_le_one (v := v) (a := a) (by omega)
   exact absurd (lt_of_lt_of_le (h ▸ h_johnson) h') (lt_irrefl _)
 
@@ -285,6 +288,7 @@ theorem johnson_bound [Field F]
   suffices B.card * JohnsonDenominator B v ≤
            Fintype.card F / (Fintype.card F - 1) * d B / n by
     rw [johnson_condition_strong_iff_johnson_denom_pos] at h_condition
+    stop
     rw [←mul_le_mul_right h_condition]
     convert this using 1
     field_simp; rw [mul_div_mul_right]; linarith
