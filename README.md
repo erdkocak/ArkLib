@@ -9,7 +9,7 @@ For each protocol, we aim to provide:
 - An executable specification of the protocol, constructed modularly using our composition and lifting interfaces,
 - Proofs of completeness & round-by-round knowledge soundness via generic theorems about composition and lifting.
 
-In the future, we plan to verify functional equivalence of the executable spec (or modifications thereof) for certain protocols (e.g., sum-check, FRI, or WHIR), with the extracted code from Rust (via [hax](https://github.com/cryspen/hax)) implementations of the same protocols.
+In the future, we plan to verify functional equivalence of the executable spec (or modifications thereof) for certain protocols (e.g., sum-check, FRI, or WHIR), with the extracted code from Rust implementations of the same protocols (via [hax](https://github.com/cryspen/hax)).
 
 ## Library Structure
 

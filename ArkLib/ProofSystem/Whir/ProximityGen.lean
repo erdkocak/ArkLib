@@ -11,17 +11,16 @@ import ArkLib.Data.Probability.Notation
 # Proximity Generators
 
 This file formalizes the notion of proximity generators,
-introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
+introduced in Section 4 of [ACFY24].
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 ## Implementation notes
 
 Todo?
-
-## References
-
-* G Arnon, A Chies, G Fenzi, and E Yogev,
-  [*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?
@@ -41,8 +40,8 @@ variable {F : Type*} [Semiring F] [Fintype F] [DecidableEq F]
     code `C`.
 -/
 noncomputable def proximityCondition
-   (f : parℓ → ι → F) (δ : ℝ) (r : parℓ → F) (C : LinearCode ι F) : Prop :=
-  δᵣ( (fun x => ∑ j : parℓ, (r j) * f j x) , C ) ≤ (δ : ℝ)
+   (f : parℓ → ι → F) (δ : ℝ≥0) (r : parℓ → F) (C : LinearCode ι F) : Prop :=
+  δᵣ( (fun x => ∑ j : parℓ, (r j) * f j x) , C ) ≤ δ
 
 
 /-- A proximity generator for a linear code `C`, Definition 4.7 -/

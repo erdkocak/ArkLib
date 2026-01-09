@@ -11,7 +11,7 @@ import ArkLib.Data.CodingTheory.ListDecodability
 # Block Relative Distance for smooth Reed-Solomon Codes
 
 This file formalizes the notion of mutual correlated agreement for proximity generators,
-introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
+introduced in Section 4 [ACFY24].
 
 ## Implementation notes
 
@@ -24,11 +24,11 @@ as per Section 4.3.1, [ACFY24].
 We have generalized the definitions for a generic i to present (i,k)-wise distance measures.
 This modification is necessary to support following lemmas from Section  4.3.2.
 The definitions from Section 4.3.1 correspond to i = 0.
+
 ## References
 
-* G Arnon, A Chiesa, G Fenzi, and E Yogev,
-[*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 -/
 

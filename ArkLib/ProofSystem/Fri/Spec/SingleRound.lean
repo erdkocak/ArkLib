@@ -18,9 +18,11 @@ import ArkLib.ToMathlib.Finset.Basic
   codewords.
 
   This formalisation tries to encompass all of the generalisations of the FRI
-  low-degree test covered in the "A summary on the {FRI} low degree test" paper
-  by Ulrich Haböck (Cryptology ePrint Archive, Paper 2022/1216), see:
-  https://eprint.iacr.org/2022/1216
+  low-degree test covered in [FRI1216].
+
+## References
+
+* [Haböck, U., *A summary on the FRI low degree test*][FRI1216]
 
  -/
 

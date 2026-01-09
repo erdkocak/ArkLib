@@ -13,11 +13,13 @@ import ArkLib.ToMathlib.NumberTheory.PrattCertificate
 
   This prime has 2-adicity 47.
 
+  This is called `r` in [BCGMMW18].
+
   ## References
 
-  This is called `r` in (https://eprint.iacr.org/2018/962.pdf).
-
-  See also (https://github.com/ProvableHQ/snarkOS/tree/c9e5f823b8493f8c3a6c43e6f4dfd16173b99957/curves).
+  * [Bowe, S., Chiesa, A., Green, M., Miers, I., Mishra, P., and Wu, H.,
+      *Zexe: Enabling Decentralized Private Computation*][BCGMMW18]
+  * See also [snarkos-curves](https://github.com/ProvableHQ/snarkOS/tree/c9e5f823b8493f8c3a6c43e6f4dfd16173b99957/curves), from which this is adapted.
 
 -/
 

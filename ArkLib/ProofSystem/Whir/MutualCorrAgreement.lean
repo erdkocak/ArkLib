@@ -15,18 +15,17 @@ import ArkLib.ProofSystem.Whir.ProximityGen
 # Mutual Correlated Agreement for Proximity Generators
 
 This file formalizes the notion of mutual correlated agreement for proximity generators,
-introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
+introduced in Section 4 of [ACFY24].
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 ## Implementation notes
 
 The reference paper is phrased in terms of a minimum distance,
 which should be understood as being the minimum relative hamming distance, which is used here.
-
-## References
-
-* G Arnon, A Chiesa, G Fenzi, and E Yogev,
-[*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?
@@ -163,7 +162,7 @@ theorem mca_capacity_bound_CONJECTURE
 
 section
 
-open InterleavedCode ListDecodable
+open ListDecodable
 
 /-- For `parℓ` functions `{f₀,..,f_{parℓ - 1}}`,
   `IC` be the `parℓ`-interleaved code from a linear code C,
@@ -174,11 +173,10 @@ open InterleavedCode ListDecodable
 def proximityListDecodingCondition (C : LinearCode ι F)
   [Fintype ι] [Nonempty ι]
   (r : parℓ → F) [Fintype parℓ]
-  (δ : ℝ) (fs : Matrix parℓ ι F)
-  (IC : InterleavedCode parℓ ι F) : Prop :=
+  (δ : ℝ≥0) (fs : Matrix parℓ ι F) : Prop := -- fs is a WordStack
       let f_r := fun x => ∑ j, r j * fs j x
       let listHamming := relHammingBall C f_r δ
-      let listIC := { fun x => ∑ j, r j * us j x | us ∈ Λᵢ(fs, IC.MF, δ)}
+      let listIC := { fun x => ∑ j, r j * (us.val j x) | us ∈ Λᵢ(fs, (C : Set (ι → F)), δ)}
       listHamming ≠ listIC
 
 
@@ -190,16 +188,14 @@ def proximityListDecodingCondition (C : LinearCode ι F)
 lemma mca_list_decoding
   [Fintype ι] [Nonempty ι]
   (Gen : ProximityGenerator ι F) [Fintype Gen.parℓ]
-  (δ BStar : ℝ) (errStar : ℝ → ENNReal)
+  (δ BStar : ℝ≥0) (errStar : ℝ → ENNReal)
   (fs us : Matrix Gen.parℓ ι F)
-  (IC : InterleavedCode Gen.parℓ ι F)
-  (haveIC : IC = codeOfLinearCode Gen.parℓ Gen.C)
-      (hGen : hasMutualCorrAgreement Gen BStar errStar)
+  (hGen : hasMutualCorrAgreement Gen BStar errStar)
   (C : Set (ι → F)) (hC : C = Gen.C) :
     haveI := Gen.Gen_nonempty
     ∀ {fs : Matrix Gen.parℓ ι F}
-    (hδPos : δ > 0) (hδLt : δ < min (δᵣ C : ℝ) (1 - BStar)),
-      Pr_{let r ←$ᵖ Gen.Gen}[ proximityListDecodingCondition Gen.C r δ fs IC ]
+    (hδPos : δ > 0) (hδLt : δ < min ((δᵣ C) : ℝ≥0) (1 - BStar)),
+      Pr_{let r ←$ᵖ Gen.Gen}[ proximityListDecodingCondition Gen.C r δ fs ]
         ≤ errStar δ
   := by sorry
 

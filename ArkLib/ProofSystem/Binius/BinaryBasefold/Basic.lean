@@ -512,7 +512,9 @@ Basic structures and definitions used throughout the Binary Basefold protocol.
 -/
 
 /-- Input context for the sumcheck protocol, used mainly in BinaryBasefold.
-For other protocols, there might be other context data. -/
+For other protocols, there might be other context data.
+NOTE: might add a flag `rejected` to indicate if prover has been rejected before. But that seems
+like a fundamental feature of OracleReduction instead, so no action taken for now. -/
 structure SumcheckBaseContext (L : Type) (ℓ : ℕ) where
   t_eval_point : Fin ℓ → L         -- r = (r_0, ..., r_{ℓ-1}) => shared input
   original_claim : L               -- s = t(r) => the original claim to verify
@@ -873,7 +875,7 @@ variable {Context : Type} {mp : SumcheckMultiplierParam L ℓ Context} -- Sumche
 /-- This condition ensures that the witness polynomial `H` has the
 correct structure `eq(...) * t(...)` -/
 def witnessStructuralInvariant {i : Fin (ℓ + 1)} (stmt : Statement (L := L) Context i)
-    (wit : Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i): Prop :=
+    (wit : Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i) : Prop :=
   wit.H = projectToMidSumcheckPoly ℓ wit.t (m:=mp.multpoly stmt.ctx) i stmt.challenges ∧
   wit.f = getMidCodewords 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) wit.t stmt.challenges
 
@@ -1078,9 +1080,6 @@ def roundRelation (i : Fin (ℓ + 1)) :
       (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i j)) ×
       Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i) :=
   { input | roundRelationProp (mp := mp) (𝓑 := 𝓑) 𝔽q β i input}
-
--- instance : ∀ i j, OracleInterface (OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i j) :=
---   fun _ _ => OracleInterface.instDefault
 
 /-- Relation for final sumcheck step -/
 def finalSumcheckRelOutProp

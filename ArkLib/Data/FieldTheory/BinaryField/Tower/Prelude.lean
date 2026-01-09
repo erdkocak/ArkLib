@@ -1599,6 +1599,8 @@ instance irreducible_quadratic_defining_poly_of_traceMap_eq_1
   have c1_pow_card_eq := x_pow_exp_of_2_repr (x:=c1) (z:=s)
     (h_z_non_zero:=NeZero.ne s) (h_x_square:=h_c1_square) (i:=2^(k))
   rw [c1_pow_card_eq_c1] at c1_pow_card_eq
+  -- c1_pow_card_eq : c1 = c1 * s ^ (2 ^ 2 ^ k - 1)
+    -- + ∑ j ∈ Finset.Icc 1 (2 ^ k), s ^ (2 ^ 2 ^ k - 2 ^ j)
 
   have h_1_le_fin_card : 1 ≤ Fintype.card F := by
     rw [fieldFintypeCard] -- ⊢ 1 ≤ 2 ^ 2 ^ k
@@ -1608,7 +1610,7 @@ instance irreducible_quadratic_defining_poly_of_traceMap_eq_1
   let instDivisionSemiring : DivisionSemiring F := instDivisionRing.toDivisionSemiring
   let instGroupWithZero : GroupWithZero F := instDivisionSemiring.toGroupWithZero
 
-  have u_pow_card_sub_one : s^(2^2^(k) - 1) = 1 := by
+  have u_pow_card_sub_one : s ^ (2 ^ 2 ^ k - 1) = 1 := by
     rw [←FiniteField.pow_card_sub_one_eq_one (a:=s) (ha:=NeZero.ne s)]
     rw [fieldFintypeCard]
 

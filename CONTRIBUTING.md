@@ -32,6 +32,27 @@ This covers naming conventions, proof style, formatting, and more.
 
 Adhering to this style guide ensures consistency across the library, making it easier for everyone to read, understand, and maintain the code. Our [linting script](`./scripts/lint-style.sh`) helps enforce some aspects of the style guide. Please ensure your code passes the linter checks.
 
+#### Citation Standards
+
+When referencing papers in Lean docstrings:
+
+* **Use citation keys in text**: Reference papers with citation keys like `[ACFY24]` rather than full titles or URLs.
+
+* **Include a References section**: Each file that cites papers should have a `## References` section in its docstring header:
+  ```lean
+  ## References
+  
+  * [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+      with Super-Fast Verification*][ACFY24]
+  * [Ben-Sasson, E., Carmon, D., Ishai, Y., Kopparty, S., and Saraf, S., *Proximity Gaps
+      for Reed-Solomon Codes*][BCIKS20]
+  ```
+  Format: `* [Author Last Name, First Initial, *Title*][citation_key]`.
+
+* **Add BibTeX entries**: All academic papers must have entries in `blueprint/src/references.bib`. When adding a new paper, add the BibTeX entry, use the citation key in your Lean file, and list it in the References section.
+
+* **Non-academic references**: Implementation references (GitHub repos, specifications) may include URLs directly and typically don't need BibTeX entries.
+
 ## Code of Conduct
 
 To ensure a welcoming and collaborative environment, ArkLib follows the principles outlined in the [mathlib Code of Conduct](https://github.com/leanprover-community/mathlib4/blob/master/CODE_OF_CONDUCT.md).

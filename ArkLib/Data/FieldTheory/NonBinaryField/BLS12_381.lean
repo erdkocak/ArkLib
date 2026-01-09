@@ -15,7 +15,7 @@ import ArkLib.ToMathlib.NumberTheory.PrattCertificate
 
   ## References
 
-  This is `r` in (https://electriccoin.co/blog/new-snark-curve/).
+  This is `r` in [BCGMMW18].
 
   See also (https://github.com/ProvableHQ/snarkOS/tree/c9e5f823b8493f8c3a6c43e6f4dfd16173b99957/curves).
 

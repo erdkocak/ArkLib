@@ -14,7 +14,12 @@ import ArkLib.ProofSystem.Whir.MutualCorrAgreement
 
 This file formalizes the notion of folding univariate functions and
 lemmas showing that folding preserves list decocidng,
-introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
+introduced in Section 4 of [ACFY24].
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 ## Implementation notes (corrections from paper)
 
@@ -28,12 +33,6 @@ introduced in the [Section 4 of the WHIR paper][todo: ArkLib bibliography].
 
 - Lemmas 4.21,4.22,4.23
 -- these lemmas refer to the specific case when k set to 1, so it's safe to use the hypothesis 1 ≤ m
-
-## References
-
-* G Arnon, A Chiesa, G Fenzi, and E Yogev,
-[*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?

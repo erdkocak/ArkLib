@@ -22,10 +22,10 @@ import Mathlib.RingTheory.PowerSeries.Substitution
 
   We define the notions of Appendix A of [BCIKS20].
 
-  [BCIKS20] refers to the paper "Proximity Gaps for Reed-Solomon Codes" by Eli Ben-Sasson,
-  Dan Carmon, Yuval Ishai, Swastik Kopparty, and Shubhangi Saraf.
+  ## References
 
-
+  * [Ben-Sasson, E., Carmon, D., Ishai, Y., Kopparty, S., and Saraf, S.,
+      *Proximity Gaps for Reed-Solomon Codes*][BCIKS20]
 
   ## Main Definitions
 

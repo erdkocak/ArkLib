@@ -15,7 +15,12 @@ import ArkLib.ProofSystem.Whir.ProximityGen
 # Round by round soundness theorem
 
 This file formalizes the round by round soundness theorem of the WHIR IOPP,
-introduced in the [Section 5 of the WHIR paper][todo: ArkLib bibliography].
+introduced in the Section 5 [ACFY24].
+
+## References
+
+* [Arnon, G., Chiesa, A., Fenzi, G., and Yogev, E., *WHIR: Reed–Solomon Proximity Testing
+    with Super-Fast Verification*][ACFY24]
 
 ## Implementation notes (corrections from paper)
 
@@ -29,12 +34,6 @@ introduced in the [Section 5 of the WHIR paper][todo: ArkLib bibliography].
 
 - In in Construction 5.1 and Theorem 5.2,
   we use M + 1 iterations instead of M, for ease of representation in Lean
-
-## References
-
-* G Arnon, A Chiesa, G Fenzi, and E Yogev,
-[*WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification*][todo: ArkLib bibliography]
-Freely available at https://eprint.iacr.org/2024/1586
 
 ## Tags
 Todo: should we aim to add tags?
@@ -161,7 +160,7 @@ with number of variables at most `varCount` over domain `φ`, within error `err`
 def whirRelation
     {F : Type} [Field F] [Fintype F] [DecidableEq F]
     {ι : Type} [Fintype ι] [Nonempty ι]
-    (varCount : ℕ) (φ : ι ↪ F) [Smooth φ] (err : ℝ)
+    (varCount : ℕ) (φ : ι ↪ F) [Smooth φ] (err : ℝ≥0)
     : Set ((Unit × ∀ i, (OracleStatement ι F i)) × Unit) :=
   { ⟨⟨_, oracle⟩, _⟩ | δᵣ(oracle (), smoothCode φ varCount) ≤ err }
 
@@ -176,14 +175,14 @@ theorem whir_rbr_soundness
   -- and condition for list decodeability
     {hParams : ParamConditions ι P} {h : GenMutualCorrParams ι P S}
     {m_0 : ℕ} (hm_0 : m_0 = P.varCount 0) {σ₀ : F}
-    {wPoly₀ : MvPolynomial (Fin (m_0 + 1)) F} {δ : ℝ}
+    {wPoly₀ : MvPolynomial (Fin (m_0 + 1)) F} {δ : ℝ≥0}
     [Smooth (P.φ 0)] [Nonempty (ι 0)]
   -- ∀ f₀ : ι₀ → F, f₀ ∉ CRS[F,ι₀,m₀,wPoly₀,σ₀]
     (h_not_code : ∀ f_0 : (ι 0) → F, f_0 ∉ (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀))
   -- ∀ f₀ : ι₀ → F, δ₀ < δᵣ(f₀, CRS[F,ι₀,m₀,wPoly₀,σ₀]),
   -- where δᵣ denotes the relative Hamming distance
     (hδ₀Lt : ∀ f_0 : (ι 0) → F,
-      (h.δ 0) < (δᵣ(f_0, (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀)) : ℝ))
+      (h.δ 0) < δᵣ(f_0, (constrainedCode (P.φ 0) m_0 wPoly₀ σ₀)))
     (ε_fold : (i : Fin (M + 1)) → Fin (P.foldingParam i) → ℝ≥0) (ε_out : Fin (M + 1) → ℝ≥0)
     (ε_shift : Fin M → ℝ≥0) (ε_fin : ℝ≥0) :
     ∃ n : ℕ,
