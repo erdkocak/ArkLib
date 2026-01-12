@@ -48,15 +48,15 @@ noncomputable def codewordToPoly
   {deg : ℕ} {domain : ι ↪ F} (f : code domain deg) : F[X] :=
   Lagrange.interpolate Finset.univ domain.toFun f
 
-variable [Semiring F]
-
 /-- The generator matrix of the Reed-Solomon code of degree `deg` and evaluation points `domain`. -/
-def genMatrix (deg : ℕ) : Matrix (Fin deg) ι F :=
+def genMatrix (deg : ℕ) [Semiring F] : Matrix (Fin deg) ι F :=
   .of fun i j => domain j ^ (i : ℕ)
 
 /-- The (parity)-check matrix of the Reed-Solomon code, assuming `ι` is finite. -/
-def checkMatrix (deg : ℕ) [Fintype ι] : Matrix (Fin (Fintype.card ι - deg)) ι F :=
-  sorry
+noncomputable def checkMatrix (deg : ℕ) [Fintype ι] [Field F] :
+  Matrix (Fin (Fintype.card ι - deg)) ι F :=
+  let P := Finset.univ.prod fun j => (X - C (domain j))
+  .of fun i j => domain j ^ (i : ℕ) * (P.derivative.eval (domain j))⁻¹
 
 -- theorem code_by_genMatrix (deg : ℕ) :
 --     code deg = codeByGenMatrix (genMatrix deg) := by
