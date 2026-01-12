@@ -190,10 +190,10 @@ theorem foldOracleReduction_perfectCompleteness (hInit : init.neverFails) (i : F
   [(i : pSpecFold.ChallengeIdx) → Inhabited ((pSpecFold (L := L)).Challenge i)] :
     OracleReduction.perfectCompleteness
       (pSpec := pSpecFold (L := L))
-      (relIn := roundRelation 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑 := 𝓑) i.castSucc (mp := mp) (includeBadEvents := false))
-      (relOut := foldStepRelOut 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑 := 𝓑) i (mp := mp) (includeBadEvents := false))
+      (relIn := strictRoundRelation 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (𝓑 := 𝓑) i.castSucc (mp := mp))
+      (relOut := strictFoldStepRelOut 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (𝓑 := 𝓑) i (mp := mp))
       (oracleReduction := foldOracleReduction 𝔽q β (ϑ := ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (mp := mp) i)
       (init := init)
@@ -530,7 +530,8 @@ def getCommitProverFinalOutput (i : Fin ℓ)
   let (stmt, oStmtIn, wit) := inputPrvState
   let fᵢ_succ := wit.f
   let oStmtOut := snoc_oracle 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-    oStmtIn fᵢ_succ -- The only thing the prover does is to sends f_{i+1} as an oracle
+    (oStmtIn := oStmtIn) (newOracleFn := fᵢ_succ) (h_destIdx := by rfl)
+    -- The only thing the prover does is to sends f_{i+1} as an oracle
   (fᵢ_succ, (stmt, oStmtOut, wit))
 
 /-- The prover for the `i`-th round of Binary commitmentfold. -/
@@ -634,10 +635,10 @@ theorem commitOracleReduction_perfectCompleteness (hInit : init.neverFails) (i :
       Inhabited ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Challenge j)] :
     OracleReduction.perfectCompleteness
       (pSpec := pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
-      (relIn := foldStepRelOut (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑 := 𝓑) (includeBadEvents := false) i)
-      (relOut := roundRelation (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑 := 𝓑) (includeBadEvents := false) i.succ)
+      (relIn := strictFoldStepRelOut (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (𝓑 := 𝓑) i)
+      (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (𝓑 := 𝓑) i.succ)
       (oracleReduction := commitOracleReduction 𝔽q β (ϑ := ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (mp := mp) i hCR)
       (init := init)
@@ -922,113 +923,103 @@ variable {R : Type} [CommSemiring R] [DecidableEq R] [SelectableType R]
 
 variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl []ₒ (StateT σ ProbComp)}
 
-omit [CharP L 2] [SelectableType L] in
-lemma oracleFoldingConsistencyProp_relay_reindex
-    (i : Fin ℓ) (hNCR : ¬ isCommitmentRound ℓ ϑ i)
-    (challenges : Fin i.succ → L)
-    (oStmtIn : ∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-      ϑ i.castSucc j) :
-  oracleFoldingConsistencyProp 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-      (i := i.castSucc) (challenges := Fin.init challenges) (oStmt := oStmtIn)
-  ↔
-  oracleFoldingConsistencyProp 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-      (i := i.succ) (challenges := challenges)
-      (oStmt := mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) := by
-  stop
-  have h_oracle_size_eq : toOutCodewordsCount ℓ ϑ i.castSucc = toOutCodewordsCount ℓ ϑ i.succ :=
-    h_oracle_size_eq_relay i hNCR
-  unfold oracleFoldingConsistencyProp
-  constructor
-  · -- Forward direction: i.castSucc with Fin.init challenges → i.succ with challenges
-    intro h j hj
-    -- Map j to the corresponding index in i.castSucc
-    have hj_mapped : j.val < toOutCodewordsCount ℓ ϑ i.castSucc := by omega
-    let j_orig : Fin (toOutCodewordsCount ℓ ϑ i.castSucc) := ⟨j.val, hj_mapped⟩
-    have hj_orig : j_orig.val + 1 < toOutCodewordsCount ℓ ϑ i.castSucc := by
-      simp only [j_orig, h_oracle_size_eq] at hj ⊢; omega
-    have h_spec := h j_orig hj_orig
-    -- The oracle statements match after reindexing
-    have h_oStmt_eq : (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) ⟨j.val, by omega⟩ =
-      oStmtIn ⟨j.val, hj_mapped⟩ := by
-      unfold mapOStmtOutRelayStep; simp only [h_oracle_size_eq, Fin.eta]
-    have h_oStmt_next_eq : getNextOracle 𝔽q β i.succ
-        (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-          (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) j hj =
-      getNextOracle 𝔽q β i.castSucc oStmtIn j_orig hj_orig := by
-      unfold getNextOracle mapOStmtOutRelayStep
-      simp only [h_oracle_size_eq, Fin.eta]
-      rfl
-    rw [h_oStmt_eq, h_oStmt_next_eq]
-    exact h_spec
-  · -- Backward direction: i.succ with challenges → i.castSucc with Fin.init challenges
-    intro h j hj
-    -- Map j to the corresponding index in i.succ
-    let j_new : Fin (toOutCodewordsCount ℓ ϑ i.succ) := ⟨j.val, by omega⟩
-    have hj_new : j_new.val + 1 < toOutCodewordsCount ℓ ϑ i.succ := by
-      simp only [j_new, h_oracle_size_eq] at hj ⊢; omega
-    have h_spec := h j_new hj_new
-    -- The oracle statements match after reindexing
-    have h_oStmt_eq : oStmtIn ⟨j.val, by omega⟩ =
-      (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) ⟨j.val, by omega⟩ := by
-      unfold mapOStmtOutRelayStep; simp only [h_oracle_size_eq, Fin.eta]
-    have h_oStmt_next_eq : getNextOracle 𝔽q β i.castSucc oStmtIn j hj =
-      getNextOracle 𝔽q β i.succ
-        (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
-          (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) j_new hj_new := by
-      unfold getNextOracle mapOStmtOutRelayStep
-      simp only [h_oracle_size_eq, Fin.eta]
-      rfl
-    rw [h_oStmt_eq, h_oStmt_next_eq]
-    exact h_spec
+-- omit [CharP L 2] [SelectableType L] in
+-- lemma oracleFoldingConsistencyProp_relay_reindex
+--     (i : Fin ℓ) (hNCR : ¬ isCommitmentRound ℓ ϑ i)
+--     (challenges : Fin i.succ → L)
+--     (oStmtIn : ∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+--       ϑ i.castSucc j) :
+--   oracleFoldingConsistencyProp 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--       (i := i.castSucc) (challenges := Fin.init challenges) (oStmt := oStmtIn)
+--   ↔
+--   oracleFoldingConsistencyProp 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--       (i := i.succ) (challenges := challenges)
+--       (oStmt := mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) := by
+--   stop
+--   have h_oracle_size_eq : toOutCodewordsCount ℓ ϑ i.castSucc = toOutCodewordsCount ℓ ϑ i.succ :=
+--     h_oracle_size_eq_relay i hNCR
+--   unfold oracleFoldingConsistencyProp
+--   constructor
+--   · -- Forward direction: i.castSucc with Fin.init challenges → i.succ with challenges
+--     intro h j hj
+--     -- Map j to the corresponding index in i.castSucc
+--     have hj_mapped : j.val < toOutCodewordsCount ℓ ϑ i.castSucc := by omega
+--     let j_orig : Fin (toOutCodewordsCount ℓ ϑ i.castSucc) := ⟨j.val, hj_mapped⟩
+--     have hj_orig : j_orig.val + 1 < toOutCodewordsCount ℓ ϑ i.castSucc := by
+--       simp only [j_orig, h_oracle_size_eq] at hj ⊢; omega
+--     have h_spec := h j_orig hj_orig
+--     -- The oracle statements match after reindexing
+--     have h_oStmt_eq : (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) ⟨j.val, by omega⟩ =
+--       oStmtIn ⟨j.val, hj_mapped⟩ := by
+--       unfold mapOStmtOutRelayStep; simp only [h_oracle_size_eq, Fin.eta]
+--     have h_oStmt_next_eq : getNextOracle 𝔽q β i.succ
+--         (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--           (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) j hj =
+--       getNextOracle 𝔽q β i.castSucc oStmtIn j_orig hj_orig := by
+--       unfold getNextOracle mapOStmtOutRelayStep
+--       simp only [h_oracle_size_eq, Fin.eta]
+--       rfl
+--     rw [h_oStmt_eq, h_oStmt_next_eq]
+--     exact h_spec
+--   · -- Backward direction: i.succ with challenges → i.castSucc with Fin.init challenges
+--     intro h j hj
+--     -- Map j to the corresponding index in i.succ
+--     let j_new : Fin (toOutCodewordsCount ℓ ϑ i.succ) := ⟨j.val, by omega⟩
+--     have hj_new : j_new.val + 1 < toOutCodewordsCount ℓ ϑ i.succ := by
+--       simp only [j_new, h_oracle_size_eq] at hj ⊢; omega
+--     have h_spec := h j_new hj_new
+--     -- The oracle statements match after reindexing
+--     have h_oStmt_eq : oStmtIn ⟨j.val, by omega⟩ =
+--       (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) ⟨j.val, by omega⟩ := by
+--       unfold mapOStmtOutRelayStep; simp only [h_oracle_size_eq, Fin.eta]
+--     have h_oStmt_next_eq : getNextOracle 𝔽q β i.castSucc oStmtIn j hj =
+--       getNextOracle 𝔽q β i.succ
+--         (mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ)
+--           (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn) j_new hj_new := by
+--       unfold getNextOracle mapOStmtOutRelayStep
+--       simp only [h_oracle_size_eq, Fin.eta]
+--       rfl
+--     rw [h_oStmt_eq, h_oStmt_next_eq]
+--     exact h_spec
 
 omit [CharP L 2] [SelectableType L] in
-lemma roundRelation_relay_preserved (i : Fin ℓ)
+lemma strictRoundRelation_relay_preserved (i : Fin ℓ)
     (hNCR : ¬ isCommitmentRound ℓ ϑ i)
     (stmtIn : Statement Context i.succ)
     (oStmtIn : ∀ j, OracleStatement 𝔽q β ϑ i.castSucc j)
     (witIn : Witness 𝔽q β i.succ)
-    (h_relIn : ((stmtIn, oStmtIn), witIn) ∈ foldStepRelOut (mp := mp) 𝔽q β (ϑ := ϑ)
-      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (includeBadEvents := false) i) :
+    (h_relIn : ((stmtIn, oStmtIn), witIn) ∈ strictFoldStepRelOut (mp := mp) 𝔽q β (ϑ := ϑ)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) i) :
     ((stmtIn, fun (j : Fin (toOutCodewordsCount ℓ ϑ i.succ)) ↦
       oStmtIn ⟨j.val, by rw [h_oracle_size_eq_relay i hNCR]; omega⟩), witIn)
-      ∈ roundRelation (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-      (𝓑 := 𝓑) (includeBadEvents := false) i.succ := by
-  dsimp only [roundRelation, roundRelationProp, foldStepRelOut, foldStepRelOutProp,
-    masterKStateProp, Fin.val_succ, Set.mem_setOf_eq] at ⊢ h_relIn
-  -- simp only [true_and] at ⊢ h_relIn
-  -- -- Approach: just pure index casting
-  -- rcases h_relIn with h_bad | h_consist
-  -- · left
-  --   dsimp only [Fin.coe_castSucc, badEventExistsProp] at h_bad ⊢
-  --   simp only [foldingBadEventAtBlock, ge_iff_le, ne_eq, Fin.val_succ, dite_else_true] at h_bad ⊢
-  --   rw! (castMode := .all) [(h_oracle_size_eq_relay i hNCR).symm]
-  --   simp only [Fin.eta] at h_bad ⊢
-  --   obtain ⟨j, hj⟩ := h_bad
-  --   use j
-  -- · right
-  --   dsimp only [oracleWitnessConsistency, Fin.val_succ, ne_eq, firstOracleWitnessConsistencyProp,
-  --     Fin.coe_castSucc, Fin.eta, Lean.Elab.WF.paramLet] at h_consist ⊢
-  --   obtain ⟨h_witness_struct_inv, h_sumcheck_consist, h_first_oracle_consist, h_oracle_folding_consist⟩ := h_consist
-  --   simp only [h_witness_struct_inv, h_sumcheck_consist, h_first_oracle_consist, Fin.take_eq_self,
-  --     true_and]
-  --   show oracleFoldingConsistencyProp 𝔽q β (ℓ := ℓ) (ϑ := ϑ) (i := i.succ) (challenges := stmtIn.challenges)
-  --     (oStmt := mapOStmtOutRelayStep 𝔽q β (ℓ := ℓ) (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR oStmtIn)
-  --   rw [←oracleFoldingConsistencyProp_relay_reindex (i := i) (hNCR := hNCR) (challenges := stmtIn.challenges) (oStmtIn := oStmtIn)]
-  --   exact h_oracle_folding_consist
-  sorry
+      ∈ strictRoundRelation (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+      (𝓑 := 𝓑) i.succ := by
+  dsimp only [strictRoundRelation, strictRoundRelationProp,
+    strictFoldStepRelOut, strictFoldStepRelOutProp, Fin.val_succ, Set.mem_setOf_eq] at ⊢ h_relIn
+  dsimp only [strictOracleWitnessConsistency, strictOracleFoldingConsistencyProp] at h_relIn ⊢
+  constructor
+  · exact h_relIn.1
+  · constructor
+    · exact h_relIn.2.1
+    · dsimp only [OracleFrontierIndex.mkFromStmtIdx]
+      dsimp only [OracleFrontierIndex.mkFromStmtIdxCastSuccOfSucc] at h_relIn
+      intro (j : Fin (toOutCodewordsCount ℓ ϑ i.succ))
+      have h_toOutCodewordsCount_eq : toOutCodewordsCount ℓ ϑ i.succ =
+        toOutCodewordsCount ℓ ϑ i.castSucc := (h_oracle_size_eq_relay i hNCR).symm
+      exact h_relIn.2.2 ⟨j, by omega⟩
 
 omit [CharP L 2] [SelectableType L] in
 theorem relayOracleReduction_perfectCompleteness (hInit : init.neverFails) (i : Fin ℓ)
     (hNCR : ¬ isCommitmentRound ℓ ϑ i) :
     OracleReduction.perfectCompleteness
       (pSpec := pSpecRelay)
-      (relIn := foldStepRelOut (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑 := 𝓑) (includeBadEvents := false) i)
-      (relOut := roundRelation (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑 := 𝓑) (includeBadEvents := false) i.succ)
+      (relIn := strictFoldStepRelOut (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (𝓑 := 𝓑) i)
+      (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (𝓑 := 𝓑) i.succ)
       (oracleReduction := relayOracleReduction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
         i hNCR)
       (init := init)
@@ -1050,10 +1041,10 @@ theorem relayOracleReduction_perfectCompleteness (hInit : init.neverFails) (i : 
     Function.comp_apply, Prod.mk.injEq, true_and]
   intro (s : σ) (hs : s ∈ OracleComp.support init)
   dsimp only [MessageIdx, Fin.isValue]
-  -- ⊢ ((stmtIn, fun i_1 ↦ oStmtIn ⟨↑i_1, ⋯⟩), witIn) ∈ roundRelation 𝔽q β i.succ ∧
+  -- ⊢ ((stmtIn, fun i_1 ↦ oStmtIn ⟨↑i_1, ⋯⟩), witIn) ∈ strictRoundRelation 𝔽q β i.succ ∧
   -- mapOStmtOutRelayStep 𝔽q β i hNCR oStmtIn = fun i_1 ↦ oStmtIn ⟨↑i_1, ⋯⟩
   constructor
-  · exact (roundRelation_relay_preserved (i := i) (hNCR := hNCR) (stmtIn := stmtIn)
+  · exact (strictRoundRelation_relay_preserved (i := i) (hNCR := hNCR) (stmtIn := stmtIn)
     (oStmtIn := oStmtIn) (witIn := witIn) (h_relIn := h_relIn))
   · rfl
 
@@ -1249,10 +1240,9 @@ theorem finalSumcheckOracleReduction_perfectCompleteness {σ : Type}
   (hInit : init.neverFails) :
   OracleReduction.perfectCompleteness
     (pSpec := pSpecFinalSumcheckStep (L := L))
-    (relIn := roundRelation 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-      (𝓑 := 𝓑) (mp := BBF_SumcheckMultiplierParam) (Fin.last ℓ) (includeBadEvents := false))
-    (relOut := finalSumcheckRelOut 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-      (includeBadEvents := false))
+    (relIn := strictRoundRelation 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+      (𝓑 := 𝓑) (mp := BBF_SumcheckMultiplierParam) (Fin.last ℓ))
+    (relOut := strictFinalSumcheckRelOut 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
     (oracleReduction := finalSumcheckOracleReduction 𝔽q β (ϑ := ϑ)
       (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑)) (init := init) (impl := impl) := by
   -- Step 1: Unroll the 2-message reduction to convert from probability to logic

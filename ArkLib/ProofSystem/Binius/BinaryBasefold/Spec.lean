@@ -228,6 +228,7 @@ def pSpecFoldRelaySequence (n : ℕ) :=
 -- Block-level reductions
 
 /-- A non-last block consists of `(ϑ-1)` fold-relay round and `1` fold-commit round -/
+@[reducible]
 def pSpecFullNonLastBlock (bIdx : Fin (ℓ / ϑ - 1)) :=
   (pSpecFoldRelaySequence (L:=L) (n:=ϑ - 1) ++ₚ
       pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
@@ -327,6 +328,13 @@ instance instOracleStatementBinaryBasefold {i : Fin (ℓ + 1)} :
     Response := L
     answer := fun oracleData queryPoint => oracleData queryPoint
   }
+
+omit [CharP L 2] [SelectableType L] [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero 𝓡] hdiv in
+@[simp]
+lemma instOracleStatementBinaryBasefold_heq_of_fin_eq {i₁ i₂ : Fin (ℓ + 1)} (h : i₁ = i₂) :
+    HEq (instOracleStatementBinaryBasefold 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := i₁))
+      (instOracleStatementBinaryBasefold 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        (i := i₂)) := by subst h; rfl
 
 /-! ## SelectableType instances -/
 

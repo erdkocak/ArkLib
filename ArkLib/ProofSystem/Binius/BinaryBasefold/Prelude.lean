@@ -1372,6 +1372,62 @@ lemma iterated_fold_last (i : Fin r) {midIdx destIdx : Fin r} (steps : ℕ)
     Fin.val_succ, id_eq]
   rfl
 
+omit [CharP L 2] [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero ℓ] in
+lemma iterated_fold_congr_source_index
+    {i i' : Fin r} (h : i = i')
+    (steps : ℕ) {destIdx : Fin r}
+    (h_destIdx : destIdx = i.val + steps)
+    (h_destIdx' : destIdx = i'.val + steps)
+    (h_destIdx_le : destIdx ≤ ℓ)
+    (f : sDomain 𝔽q β h_ℓ_add_R_rate (i := i) → L)
+    (r_challenges : Fin steps → L) :
+  iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+    (i := i)  steps h_destIdx  h_destIdx_le f r_challenges =
+  iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+    (i := i') steps h_destIdx' h_destIdx_le
+    (fun x => f (cast (h := by rw [h]) x)) r_challenges := by
+  subst h
+  simp only [cast_eq]
+
+omit [CharP L 2] [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero ℓ] in
+lemma iterated_fold_congr_dest_index
+    {i : Fin r} (steps : ℕ) {destIdx destIdx' : Fin r}
+    (h_destIdx : destIdx = i.val + steps)
+    (h_destIdx_le : destIdx ≤ ℓ) (h_destIdx_eq_destIdx' : destIdx = destIdx')
+    (f : sDomain 𝔽q β h_ℓ_add_R_rate (i := i) → L)
+    (r_challenges : Fin steps → L) (y : sDomain 𝔽q β h_ℓ_add_R_rate (i := destIdx))
+    :
+  iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (destIdx := destIdx)
+    (i := i)  steps h_destIdx  h_destIdx_le f r_challenges y =
+  iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (destIdx := destIdx')
+    (i := i) steps (by omega) (h_destIdx_le := by omega)
+    (f) r_challenges (y := cast (h := by rw [h_destIdx_eq_destIdx']) y) := by
+  subst h_destIdx_eq_destIdx'; rfl
+
+omit [CharP L 2] [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero ℓ] in
+lemma iterated_fold_congr_steps_index
+    {i : Fin r} (steps steps' : ℕ) {destIdx : Fin r}
+    (h_destIdx : destIdx = i.val + steps)
+    (h_destIdx_le : destIdx ≤ ℓ) (h_steps_eq_steps' : steps = steps')
+    (f : sDomain 𝔽q β h_ℓ_add_R_rate (i := i) → L)
+    (r_challenges : Fin steps → L) (y : sDomain 𝔽q β h_ℓ_add_R_rate (i := destIdx))
+    :
+  iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (destIdx := destIdx)
+    (i := i)  steps h_destIdx  h_destIdx_le f r_challenges y =
+  iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (destIdx := destIdx)
+    (i := i) steps' (by omega) (h_destIdx_le := by omega)
+    (f) (fun (cIdx : Fin steps') => r_challenges ⟨cIdx, by omega⟩) (y := y) := by
+  subst h_steps_eq_steps'; rfl
+
+-- ⊢ iterated_fold 𝔽q β 0 (k_steps + ϑ) ⋯ ⋯
+--     (fun y ↦ Polynomial.eval ↑y ↑(polynomialFromNovelCoeffsF₂ 𝔽q β ℓ ⋯ fun ω ↦ (MvPolynomial.eval ↑↑ω) ↑witIn.t))
+--     (fun cIdx ↦ stmtIn.challenges ⟨↑cIdx, ⋯⟩) y =
+--   iterated_fold 𝔽q β 0 ℓ ⋯ ⋯
+--     (fun x ↦
+--       Polynomial.eval ↑x ↑(polynomialFromNovelCoeffsF₂ 𝔽q β ℓ ⋯ fun ω ↦ (MvPolynomial.eval (bitsOfIndex ω)) ↑witIn.t))
+--     stmtIn.challenges ⟨0, ⋯⟩
+
+
 /--
 Transitivity of iterated_fold : folding for `steps₁` and then for `steps₂`
 equals folding for `steps₁ + steps₂` with concatenated challenges.

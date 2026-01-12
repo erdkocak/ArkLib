@@ -5,6 +5,9 @@ Authors: Chung Thai Nguyen, Quang Dao
 -/
 
 import ArkLib.ProofSystem.Binius.BinaryBasefold.Steps
+import ArkLib.OracleReduction.Cast
+
+-- Note: should filter errors when doing compilation
 
 /-!
 ## Binary Basefold Core Interaction Phase
@@ -57,6 +60,46 @@ variable [hdiv : Fact (ϑ ∣ ℓ)]
 section ComponentReductions
 variable {Context : Type} {mp : SumcheckMultiplierParam L ℓ Context} -- Sumcheck context
 
+/-! ### Helper Lemmas for Fin Equality and Type Congruence -/
+
+omit [NeZero ℓ] [NeZero ϑ] hdiv in
+/-- Fin equality for 0 * ϑ = 0 -/
+lemma fin_zero_mul_eq (h : 0 * ϑ < ℓ + 1) : (⟨0 * ϑ, h⟩ : Fin (ℓ + 1)) = 0 := by
+  ext; simp only [zero_mul, Fin.coe_ofNat_eq_mod, Nat.zero_mod]
+
+omit [Field L] [Fintype L] [DecidableEq L] [CharP L 2] [SelectableType L] [NeZero ℓ] in
+/-- Statement equality from Fin equality -/
+lemma Statement.of_fin_eq {i j : Fin (ℓ + 1)} (h : i = j) :
+    Statement (L := L) (ℓ := ℓ) Context i = Statement (L := L) (ℓ := ℓ) Context j := by
+  subst h; rfl
+
+omit [NeZero ℓ] [NeZero ϑ] hdiv in
+/-- OracleStatement index type equality from Fin equality -/
+lemma OracleStatement.idx_eq {i j : Fin (ℓ + 1)} (h : i = j) :
+    Fin (toOutCodewordsCount ℓ ϑ i) = Fin (toOutCodewordsCount ℓ ϑ j) := by
+  subst h; rfl
+
+omit [CharP L 2] [SelectableType L] [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero 𝓡] hdiv in
+/-- OracleStatement function HEq from Fin equality -/
+lemma OracleStatement.heq_of_fin_eq {i j : Fin (ℓ + 1)} (h : i = j) :
+    HEq (fun k => OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i k)
+        (fun k => OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) j k) := by
+  subst h; rfl
+
+omit [CharP L 2] [SelectableType L] [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero ℓ] [NeZero 𝓡] in
+/-- Witness equality from Fin equality -/
+lemma Witness.of_fin_eq {i j : Fin (ℓ + 1)} (h : i = j) :
+    Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ := ℓ) i =
+    Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ := ℓ) j := by
+  subst h; rfl
+
+omit [CharP L 2] [SelectableType L] [DecidableEq 𝔽q] h_β₀_eq_1 in
+/-- Relation equality from Fin equality -/
+lemma strictRoundRelation.of_fin_eq {i j : Fin (ℓ + 1)} (h : i = j) :
+    strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i ≍
+    strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) j := by
+  subst h; rfl
+
 section FoldRelayRound -- foldRound + relay
 
 @[reducible]
@@ -71,7 +114,7 @@ def foldRelayOracleVerifier (i : Fin ℓ)
   OracleVerifier.append
         (pSpec₁ := pSpecFold (L:=L))
     (pSpec₂ := pSpecRelay)
-    (foldOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
+    (foldOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i)
     (relayOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR)
 
 @[reducible]
@@ -88,7 +131,7 @@ def foldRelayOracleReduction (i : Fin ℓ)
   OracleReduction.append
     (pSpec₁ := pSpecFold (L:=L))
     (pSpec₂ := pSpecRelay)
-        (foldOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i)
+        (foldOracleReduction 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i)
     (relayOracleReduction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR)
 
 
@@ -97,28 +140,36 @@ variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl []ₒ (StateT σ Pro
 /-- Perfect completeness of the non-commitment round reduction follows by append composition
     of the fold-round and the transfer-round reductions. -/
 theorem foldRelayOracleReduction_perfectCompleteness
-    (hInit : init.neverFails) (i : Fin ℓ) (hNCR : ¬ isCommitmentRound ℓ ϑ i) :
+    (hInit : init.neverFails) (i : Fin ℓ) (hNCR : ¬ isCommitmentRound ℓ ϑ i)
+    [(i : pSpecFold.ChallengeIdx) → Fintype ((pSpecFold (L := L)).Challenge i)]
+    [(i : pSpecFold.ChallengeIdx) → Inhabited ((pSpecFold (L := L)).Challenge i)] :
   OracleReduction.perfectCompleteness
     (pSpec := pSpecFoldRelay (L:=L))
-    (relIn := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+    (relIn := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
       (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.castSucc)
-    (relOut := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+    (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
       (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.succ)
-    (oracleReduction := foldRelayOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+    (oracleReduction := foldRelayOracleReduction 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
       (𝓑:=𝓑) i hNCR) (init := init) (impl := impl) := by
   unfold foldRelayOracleReduction pSpecFoldRelay
-  sorry
+  apply OracleReduction.append_perfectCompleteness
+  · -- Perfect completeness of foldOracleReduction
+    exact foldOracleReduction_perfectCompleteness (L := L) 𝔽q β (ϑ := ϑ)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (mp := mp) (init := init) (impl := impl) hInit i
+  · -- Perfect completeness of relayOracleReduction
+    exact relayOracleReduction_perfectCompleteness (L := L) 𝔽q β (ϑ := ϑ)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (mp := mp) (init := init) (impl := impl) hInit i hNCR
 
 /-- RBR Knowledge Soundness of the non-commitment round verifier via append composition
     of fold-round and transfer-round RBR KS. -/
 theorem foldRelayOracleVerifier_rbrKnowledgeSoundness
     (i : Fin ℓ) (hNCR : ¬ isCommitmentRound ℓ ϑ i) :
-    (foldRelayOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hNCR).rbrKnowledgeSoundness
+    (foldRelayOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i hNCR).rbrKnowledgeSoundness
       init impl
       (relIn := roundRelation 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑:=𝓑) i.castSucc (mp := mp))
+        (𝓑:=𝓑) i.castSucc (includeBadEvents := true) (mp := mp))
       (relOut := roundRelation 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-        (𝓑:=𝓑) i.succ (mp := mp))
+        (𝓑:=𝓑) i.succ (includeBadEvents := true) (mp := mp))
       (rbrKnowledgeError := fun m => foldKnowledgeError 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i ⟨m, by
         match m with
@@ -143,8 +194,8 @@ def foldCommitOracleVerifier (i : Fin ℓ) (hCR : isCommitmentRound ℓ ϑ i) :
     OracleVerifier.append (oSpec:=[]ₒ)
       (pSpec₁ := pSpecFold (L:=L))
       (pSpec₂ := pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
-      (V₁ := foldOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
-      (V₂ := commitOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hCR)
+      (V₁ := foldOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i)
+      (V₂ := commitOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i hCR)
 
 @[reducible]
 def foldCommitOracleReduction (i : Fin ℓ)
@@ -160,35 +211,46 @@ def foldCommitOracleReduction (i : Fin ℓ)
   OracleReduction.append (oSpec:=[]ₒ)
     (pSpec₁ := pSpecFold (L:=L))
     (pSpec₂ := pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
-    (R₁ := foldOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i)
-    (R₂ := commitOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hCR)
+    (R₁ := foldOracleReduction 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i)
+    (R₂ := commitOracleReduction 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i hCR)
 
 variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl []ₒ (StateT σ ProbComp)}
 
 /-- Perfect completeness for Fold+Commitment block by append composition. -/
 theorem foldCommitOracleReduction_perfectCompleteness
-    (hInit : init.neverFails) (i : Fin ℓ) (hCR : isCommitmentRound ℓ ϑ i) :
+    (hInit : init.neverFails) (i : Fin ℓ) (hCR : isCommitmentRound ℓ ϑ i)
+    [(i : pSpecFold.ChallengeIdx) → Fintype ((pSpecFold (L := L)).Challenge i)]
+    [(i : pSpecFold.ChallengeIdx) → Inhabited ((pSpecFold (L := L)).Challenge i)]
+    [(j : (pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).ChallengeIdx) →
+      Fintype ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Challenge j)]
+    [(j : (pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).ChallengeIdx) →
+      Inhabited ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Challenge j)] :
     OracleReduction.perfectCompleteness
       (pSpec := pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i)
-      (relIn := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+      (relIn := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.castSucc)
-      (relOut := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+      (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.succ)
-      (oracleReduction := foldCommitOracleReduction 𝔽q β (ϑ:=ϑ)
+      (oracleReduction := foldCommitOracleReduction 𝔽q β (ϑ:=ϑ) (mp := mp)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i hCR) (init := init) (impl := impl) := by
   unfold foldCommitOracleReduction pSpecFoldCommit
-  -- apply append completeness using fold and commitment lemmas
-  sorry
+  apply OracleReduction.append_perfectCompleteness
+  · -- Perfect completeness of foldOracleReduction
+    exact foldOracleReduction_perfectCompleteness (L := L) 𝔽q β (ϑ := ϑ)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (mp := mp) (init := init) (impl := impl) hInit i
+  · -- Perfect completeness of commitOracleReduction
+    exact commitOracleReduction_perfectCompleteness (L := L) 𝔽q β (ϑ := ϑ)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑 := 𝓑) (mp := mp) (init := init) (impl := impl) hInit i hCR
 
 /-- RBR KS for Fold+Commitment block by append composition. -/
 theorem foldCommitOracleVerifier_rbrKnowledgeSoundness
     (i : Fin ℓ) (hCR : isCommitmentRound ℓ ϑ i) :
-    (foldCommitOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i hCR).rbrKnowledgeSoundness
+    (foldCommitOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i hCR).rbrKnowledgeSoundness
       init impl
       (relIn := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.castSucc)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.castSucc (includeBadEvents := true))
       (relOut := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.succ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) i.succ (includeBadEvents := true))
       (rbrKnowledgeError := fun _ => foldKnowledgeError 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i ⟨1, by rfl⟩
       ) := by
@@ -207,7 +269,7 @@ Iterative composition across ℓ rounds: for each i, use Fold+Commitment when
 block verifiers/reductions built earlier to avoid dependent casts.
 -/
 section composedOracleVerifiers
-def nonLastBlockOracleVerifier (bIdx : Fin (ℓ / ϑ - 1)) :=
+def nonLastSingleBlockOracleVerifier (bIdx : Fin (ℓ / ϑ - 1)) :=
   let stmt : Fin (ϑ - 1 + 1) → Type :=
     fun i => Statement (L := L) Context ⟨bIdx * ϑ + i, bIdx_mul_ϑ_add_i_cast_lt_ℓ_succ bIdx i⟩
   let oStmt := fun i: Fin (ϑ - 1 + 1) => OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ
@@ -220,7 +282,7 @@ def nonLastBlockOracleVerifier (bIdx : Fin (ℓ / ϑ - 1)) :=
       (V := fun i => by
         have nHCR : ¬ isCommitmentRound ℓ ϑ ⟨bIdx * ϑ + i, bIdx_mul_ϑ_add_i_fin_ℓ_pred_lt_ℓ bIdx i⟩
           := isNeCommitmentRound (r:=r) (ℓ:=ℓ) (𝓡:=𝓡) (ϑ:=ϑ) bIdx (x:=i.val) (hx:=by omega)
-        exact foldRelayOracleVerifier (L:=L) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        exact foldRelayOracleVerifier (L:=L) 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
           ⟨bIdx * ϑ + i, bIdx_mul_ϑ_add_i_fin_ℓ_pred_lt_ℓ bIdx i⟩ nHCR
       )
   let h1 : ↑bIdx * ϑ + (ϑ - 1) < ℓ := by
@@ -233,10 +295,10 @@ def nonLastBlockOracleVerifier (bIdx : Fin (ℓ / ϑ - 1)) :=
     apply bIdx_mul_ϑ_add_i_lt_ℓ_succ
   let h1_succ :  ↑bIdx * ϑ + (ϑ - 1) < ℓ + 1 := by omega
 
-  let lastOracleVerifier := foldCommitOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+  let lastOracleVerifier := foldCommitOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
     (i := ⟨bIdx * ϑ + (ϑ - 1), h1⟩) (hCR:=isCommitmentRoundOfNonLastBlock (𝓡:=𝓡) (r:=r) bIdx)
 
-  let nonLastBlockOracleVerifier :=
+  let nonLastSingleBlockOracleVerifier :=
     OracleVerifier.append (oSpec:=[]ₒ)
       (Stmt₁:=Statement (L := L) (ℓ := ℓ) Context ⟨bIdx * ϑ, by
         apply Nat.lt_trans (m:=ℓ) (h₁:=by
@@ -248,27 +310,69 @@ def nonLastBlockOracleVerifier (bIdx : Fin (ℓ / ϑ - 1)) :=
       (Stmt₃:=Statement (L := L) Context ⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩)
       (OStmt₁:=OracleStatement 𝔽q β ϑ ⟨bIdx * ϑ, Nat.lt_of_add_right_lt h1_succ⟩)
       (OStmt₂:=OracleStatement 𝔽q β ϑ ⟨bIdx * ϑ + (ϑ - 1), h1_succ⟩)
-      (OStmt₃:=OracleStatement 𝔽q β ϑ ⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩)
+      (OStmt₃:=OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩ : Fin (ℓ+1)))
       (pSpec₁:=pSpecFoldRelaySequence (L:=L) (n:=ϑ - 1))
-      (pSpec₂:=pSpecFoldCommit 𝔽q β ⟨bIdx * ϑ + (ϑ - 1), h1⟩)
-      (V₁:=by
-        simp [stmt, oStmt, Nat.zero_mod] at firstFoldRelayRoundsOracleVerifier
-        rw! (castMode:=.all) [Nat.zero_mod] at firstFoldRelayRoundsOracleVerifier
-        simp only [Nat.add_zero] at firstFoldRelayRoundsOracleVerifier
-        exact firstFoldRelayRoundsOracleVerifier
-      )
-      (V₂:=by
-        simp at lastOracleVerifier
-        have h: ↑bIdx * ϑ + (ϑ - 1) + 1 = (↑bIdx + 1) * ϑ := by
-          rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le)]
-          rw [Nat.add_mul, Nat.one_mul]
-        rw! (castMode:=.all) [h] at lastOracleVerifier
-        exact lastOracleVerifier
+      (pSpec₂:=pSpecFoldCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨bIdx * ϑ + (ϑ - 1), h1⟩)
+      (V₁:= firstFoldRelayRoundsOracleVerifier.castOutSimple (h_stmt := by rfl) (h_ostmt := by rfl))
+      (V₂:= OracleVerifier.castInOut (V := lastOracleVerifier)
+          (StmtIn₁ := (Statement Context (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).castSucc))
+          (StmtIn₂ := Statement (L := L) Context ⟨bIdx * ϑ + (ϑ - 1), h1_succ⟩)
+          (StmtOut₁ := Statement Context (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).succ)
+          (StmtOut₂ := Statement (L := L) Context ⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩)
+          (OStmtIn₁ := (OracleStatement 𝔽q β ϑ (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).castSucc))
+          (OStmtIn₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨bIdx * ϑ + (ϑ - 1), h1_succ⟩)
+          (OStmtOut₁ := OracleStatement 𝔽q β ϑ (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).succ)
+          (OStmtOut₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩ : Fin (ℓ+1)))
+          (pSpec := pSpecFoldCommit 𝔽q β ⟨↑bIdx * ϑ + (ϑ - 1), h1⟩)
+          (h_stmtIn := by
+            apply Statement.of_fin_eq
+            simp [Fin.castSucc, Fin.eta])
+          (h_stmtOut := by
+            apply Statement.of_fin_eq
+            ext; simp [Fin.val_succ]
+            rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+          (h_idxIn := by
+            apply OracleStatement.idx_eq
+            simp [Fin.castSucc, Fin.eta])
+          (h_idxOut := by
+            apply OracleStatement.idx_eq
+            ext; simp [Fin.val_succ]
+            rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+          (h_ostmtIn := by
+            apply OracleStatement.heq_of_fin_eq
+            simp [Fin.castSucc, Fin.eta])
+          (h_ostmtOut := by
+            apply OracleStatement.heq_of_fin_eq
+            ext; simp [Fin.val_succ]
+            rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+          (h_Oₛᵢ := by
+            apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+            ext; simp only [Fin.castSucc, Fin.castAdd_mk])
       )
 
-  nonLastBlockOracleVerifier
+  nonLastSingleBlockOracleVerifier
+
+def nonLastBlocksOracleVerifier :
+  OracleVerifier []ₒ
+    (StmtIn := Statement (L := L) (ℓ := ℓ) Context ⟨0 * ϑ, by omega⟩)
+    (OStmtIn := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ ⟨0 * ϑ, by omega⟩)
+    (StmtOut := Statement (L := L) (ℓ := ℓ) Context ⟨(ℓ / ϑ - 1) * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+    (OStmtOut := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ ⟨(ℓ / ϑ - 1) * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+    (pSpec := pSpecNonLastBlocks 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)) :=
+  let stmt : Fin (ℓ / ϑ - 1 + 1) → Type :=
+    fun i => Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let oStmt := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let res := OracleVerifier.seqCompose (oSpec := []ₒ)
+      (Stmt := stmt)
+      (OStmt := oStmt)
+      (pSpec := fun (bIdx: Fin (ℓ / ϑ - 1)) => pSpecFullNonLastBlock 𝔽q β (ϑ:=ϑ) bIdx)
+      (V := fun bIdx => nonLastSingleBlockOracleVerifier (L:=L) 𝔽q β (mp := mp)
+        (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (bIdx:=bIdx))
+  res
 
 def lastBlockOracleVerifier :=
+  have h_le: ϑ ≤ ℓ := by apply Nat.le_of_dvd (by exact Nat.pos_of_neZero ℓ); exact hdiv.out
   let bIdx := ℓ / ϑ - 1
   let stmt : Fin (ϑ + 1) → Type := fun i => Statement (L := L) (ℓ:=ℓ) Context
     ⟨bIdx * ϑ + i, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (hx:=by omega)⟩
@@ -288,55 +392,100 @@ def lastBlockOracleVerifier :=
       (V := fun i => by
         have nHCR : ¬ isCommitmentRound ℓ ϑ ⟨bIdx * ϑ + i, lastBlockIdx_mul_ϑ_add_fin_lt_ℓ i⟩
           := lastBlockIdx_isNeCommitmentRound i
-        exact foldRelayOracleVerifier (L:=L) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        exact foldRelayOracleVerifier (L:=L) 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
           ⟨bIdx * ϑ + i, lastBlockIdx_mul_ϑ_add_fin_lt_ℓ i⟩ nHCR
       )
-    simp [stmt, oStmt, Nat.zero_mod] at cur
-    rw! (castMode:=.all) [Nat.zero_mod] at cur
-    simp only [Nat.add_zero] at cur
-    have h: (⟨bIdx * ϑ + ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (hx:=by omega)⟩)
-      = Fin.last ℓ := by
-      apply Fin.eq_of_val_eq
-      simp only [Fin.val_last]; dsimp [bIdx];
-      rw [Nat.sub_mul, one_mul, Nat.div_mul_cancel (hdiv.out)]
-      rw [Nat.sub_add_cancel (by exact Nat.le_of_dvd (h:=by exact Nat.pos_of_neZero ℓ) (hdiv.out))]
-    rw! [h] at cur
-    exact cur
+    exact OracleVerifier.castInOut (V := cur)
+      (StmtIn₂ := Statement (L := L) (ℓ := ℓ) Context ⟨bIdx * ϑ, by
+        apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+      (OStmtIn₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        ⟨bIdx * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+      -- (WitIn₂ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ)
+        -- ⟨bIdx * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+      (StmtOut₂ := Statement (L := L) (ℓ := ℓ) Context (Fin.last ℓ))
+      (OStmtOut₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (Fin.last ℓ))
+      -- (WitOut₂ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) (Fin.last ℓ))
+      (pSpec := pSpecLastBlock (L:=L) (ϑ:=ϑ))
+      (h_stmtIn := by
+        apply Statement.of_fin_eq
+        ext; simp)
+      (h_stmtOut := by
+        apply Statement.of_fin_eq
+        ext
+        simp [Fin.val_last]
+        have : bIdx * ϑ + ϑ = ℓ := by
+          have h_div : ϑ ∣ ℓ := hdiv.out
+          have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+          have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+          dsimp only [bIdx]
+          rw [Nat.sub_mul, h_mul, Nat.one_mul]; omega
+        simp only [this])
+      (h_idxIn := by
+        apply OracleStatement.idx_eq
+        ext; simp)
+      (h_idxOut := by
+        apply OracleStatement.idx_eq
+        ext
+        simp [Fin.val_last]
+        have : bIdx * ϑ + ϑ = ℓ := by
+          have h_div : ϑ ∣ ℓ := hdiv.out
+          have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+          have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+          dsimp only [bIdx]
+          rw [Nat.sub_mul, h_mul, Nat.one_mul]; omega
+        simp only [this])
+      (h_ostmtIn := by
+        apply OracleStatement.heq_of_fin_eq
+        ext; simp)
+      (h_ostmtOut := by
+        apply OracleStatement.heq_of_fin_eq
+        ext
+        simp [Fin.val_last]
+        have : bIdx * ϑ + ϑ = ℓ := by
+          have h_div : ϑ ∣ ℓ := hdiv.out
+          have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+          have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+          dsimp only [bIdx]
+          rw [Nat.sub_mul, h_mul, Nat.one_mul]; omega
+        simp only [this])
+      (h_Oₛᵢ := by
+        apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+        ext; simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, add_zero])
+
   V
 
 @[reducible]
 def sumcheckFoldOracleVerifier :=
-  let stmt : Fin (ℓ / ϑ - 1 + 1) → Type :=
-    fun i => Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
-  let oStmt :=
-    fun i: Fin (ℓ / ϑ - 1 + 1) => OracleStatement 𝔽q β ϑ ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
-  let nonLastBlocksOracleVerifier :=
-  OracleVerifier.seqCompose (oSpec := []ₒ)
-      (Stmt := stmt)
-      (OStmt := oStmt)
-      (pSpec := fun (bIdx: Fin (ℓ / ϑ - 1)) => pSpecFullNonLastBlock 𝔽q β bIdx)
-      (V := fun bIdx => nonLastBlockOracleVerifier (L:=L) 𝔽q β (ϑ:=ϑ) (bIdx:=bIdx))
+  let nonLastBlocksOracleVerifier := nonLastBlocksOracleVerifier (L:=L) 𝔽q β (mp := mp) (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
 
-  let lastOracleVerifier := lastBlockOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+  let lastOracleVerifier := lastBlockOracleVerifier 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
 
-  let sumcheckFoldOV: OracleVerifier []ₒ
+  let sumcheckFoldOV : OracleVerifier []ₒ
     (StmtIn := Statement (L := L) (ℓ := ℓ) Context 0)
     (OStmtIn := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ 0)
     (StmtOut := Statement (L := L) (ℓ := ℓ) Context (Fin.last ℓ))
     (OStmtOut := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ))
     (pSpec := pSpecSumcheckFold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
-     := by
-    let res := OracleVerifier.append (oSpec:=[]ₒ)
-      (V₁:=by
-        exact nonLastBlocksOracleVerifier
-      )
-      (V₂:=by
-        exact lastOracleVerifier
-      )
-    simp [stmt, oStmt, Nat.zero_mod] at res
-    rw! (castMode:=.all) [Nat.zero_mod, Nat.zero_mul] at res
-    simp only [Fin.zero_eta] at res
-    exact res
+     :=
+    (OracleVerifier.append (oSpec:=[]ₒ)
+      (V₁:=nonLastBlocksOracleVerifier)
+      (V₂:=lastOracleVerifier)
+    ).castInOut
+      (h_stmtIn := by
+        apply Statement.of_fin_eq
+        apply fin_zero_mul_eq)
+      (h_stmtOut := by rfl)
+      (h_idxIn := by
+        apply OracleStatement.idx_eq
+        apply fin_zero_mul_eq)
+      (h_idxOut := by rfl)
+      (h_ostmtIn := by
+        apply OracleStatement.heq_of_fin_eq
+        apply fin_zero_mul_eq)
+      (h_ostmtOut := by rfl)
+      (h_Oₛᵢ := by
+        apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+        ext; simp only [zero_mul, Fin.coe_ofNat_eq_mod, Nat.zero_mod])
 
   sumcheckFoldOV
 
@@ -344,7 +493,7 @@ end composedOracleVerifiers
 
 section composedOracleRedutions
 
-def nonLastBlockOracleReduction (bIdx : Fin (ℓ / ϑ - 1)) :=
+def nonLastSingleBlockOracleReduction (bIdx : Fin (ℓ / ϑ - 1)) :=
   let stmt : Fin (ϑ - 1 + 1) → Type :=
     fun i => Statement (L := L) (ℓ := ℓ) Context ⟨bIdx * ϑ + i, bIdx_mul_ϑ_add_i_cast_lt_ℓ_succ bIdx i⟩
   let oStmt := fun i: Fin (ϑ - 1 + 1) =>
@@ -361,7 +510,7 @@ def nonLastBlockOracleReduction (bIdx : Fin (ℓ / ϑ - 1)) :=
       (R := fun i => by
         have nHCR : ¬ isCommitmentRound ℓ ϑ ⟨bIdx * ϑ + i, bIdx_mul_ϑ_add_i_fin_ℓ_pred_lt_ℓ bIdx i⟩
           := isNeCommitmentRound (r:=r) (ℓ:=ℓ) (𝓡:=𝓡) (ϑ:=ϑ) bIdx (x:=i.val) (hx:=by omega)
-        exact foldRelayOracleReduction (L:=L) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+        exact foldRelayOracleReduction (L:=L) 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
           (𝓑:=𝓑) (i:=⟨bIdx * ϑ + i, bIdx_mul_ϑ_add_i_fin_ℓ_pred_lt_ℓ bIdx i⟩) nHCR
       )
 
@@ -375,11 +524,10 @@ def nonLastBlockOracleReduction (bIdx : Fin (ℓ / ϑ - 1)) :=
     apply bIdx_mul_ϑ_add_i_lt_ℓ_succ
   let h1_succ :  ↑bIdx * ϑ + (ϑ - 1) < ℓ + 1 := by omega
 
-  let lastOracleReduction := foldCommitOracleReduction 𝔽q β (ϑ:=ϑ)
-    (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
-    (𝓑:=𝓑) (i := ⟨bIdx * ϑ + (ϑ - 1), h1⟩) (hCR:=isCommitmentRoundOfNonLastBlock (𝓡:=𝓡) (r:=r) bIdx)
+  let lastOracleReduction := foldCommitOracleReduction 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
+    (i := ⟨bIdx * ϑ + (ϑ - 1), h1⟩) (hCR:=isCommitmentRoundOfNonLastBlock (𝓡:=𝓡) (r:=r) bIdx)
 
-  let nonLastBlockOracleReduction :=
+  let nonLastSingleBlockOracleReduction :=
     OracleReduction.append (oSpec:=[]ₒ)
       (Stmt₁:=Statement (L := L) (ℓ := ℓ) Context ⟨bIdx * ϑ, by
         apply Nat.lt_trans (m:=ℓ) (h₁:=by
@@ -409,24 +557,80 @@ def nonLastBlockOracleReduction (bIdx : Fin (ℓ / ϑ - 1)) :=
       (OStmt₃:=OracleStatement 𝔽q β ϑ ⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩)
       (pSpec₁:=pSpecFoldRelaySequence (L:=L) (n:=ϑ - 1))
       (pSpec₂:=pSpecFoldCommit 𝔽q β ⟨bIdx * ϑ + (ϑ - 1), h1⟩)
-      (R₁:=by
-        simp [stmt, oStmt, Nat.zero_mod] at firstFoldRelayRoundsOracleReduction
-        rw! (castMode:=.all) [Nat.zero_mod] at firstFoldRelayRoundsOracleReduction
-        simp only [Nat.add_zero] at firstFoldRelayRoundsOracleReduction
-        exact firstFoldRelayRoundsOracleReduction
+      (R₁:=firstFoldRelayRoundsOracleReduction.castOutSimple (h_stmt := by rfl) (h_ostmt := by rfl) (h_wit := by rfl)
       )
-      (R₂:=by
-        simp at lastOracleReduction
-        have h: ↑bIdx * ϑ + (ϑ - 1) + 1 = (↑bIdx + 1) * ϑ := by
-          rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le)]
-          rw [Nat.add_mul, Nat.one_mul]
-        rw! (castMode:=.all) [h] at lastOracleReduction
-        exact lastOracleReduction
+      (R₂:= OracleReduction.castInOut (R := lastOracleReduction)
+        (StmtIn₁ := (Statement Context (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).castSucc))
+        (StmtIn₂ := Statement (L := L) Context ⟨bIdx * ϑ + (ϑ - 1), h1_succ⟩)
+        (StmtOut₁ := Statement Context (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).succ)
+        (StmtOut₂ := Statement (L := L) Context ⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩)
+        (OStmtIn₁ := (OracleStatement 𝔽q β ϑ (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).castSucc))
+        (OStmtIn₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨bIdx * ϑ + (ϑ - 1), h1_succ⟩)
+        (OStmtOut₁ := OracleStatement 𝔽q β ϑ (⟨↑bIdx * ϑ + (ϑ - 1), h1⟩ : Fin ℓ).succ)
+        (OStmtOut₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩ : Fin (ℓ+1)))
+        (pSpec := pSpecFoldCommit 𝔽q β ⟨↑bIdx * ϑ + (ϑ - 1), h1⟩)
+        (h_stmtIn := by
+          apply Statement.of_fin_eq
+          simp [Fin.castSucc, Fin.eta])
+        (h_stmtOut := by
+          apply Statement.of_fin_eq
+          ext; simp [Fin.val_succ]
+          rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+        (h_idxIn := by
+          apply OracleStatement.idx_eq
+          simp [Fin.castSucc, Fin.eta])
+        (h_idxOut := by
+          apply OracleStatement.idx_eq
+          ext; simp [Fin.val_succ]
+          rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+        (h_ostmtIn := by
+          apply OracleStatement.heq_of_fin_eq
+          simp [Fin.castSucc, Fin.eta])
+        (h_ostmtOut := by
+          apply OracleStatement.heq_of_fin_eq
+          ext; simp [Fin.val_succ]
+          rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+        (h_witIn := by
+          apply Witness.of_fin_eq
+          simp [Fin.castSucc, Fin.eta])
+        (h_witOut := by
+          apply Witness.of_fin_eq
+          ext; simp [Fin.val_succ]
+          rw [Nat.add_assoc, Nat.sub_add_cancel (by exact NeZero.one_le), Nat.add_mul, Nat.one_mul])
+        (h_Oₛᵢ := by
+          apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+          ext; simp only [Fin.castSucc, Fin.castAdd_mk, Nat.add_left_cancel_iff])
       )
 
-  nonLastBlockOracleReduction
+  nonLastSingleBlockOracleReduction
+
+def nonLastBlocksOracleReduction :
+  OracleReduction []ₒ
+    (StmtIn := Statement (L := L) (ℓ := ℓ) Context ⟨0 * ϑ, by omega⟩)
+    (OStmtIn := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ ⟨0 * ϑ, by omega⟩)
+    (WitIn := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) ⟨0 * ϑ, by omega⟩)
+
+    (StmtOut := Statement (L := L) (ℓ:=ℓ) Context ⟨(ℓ / ϑ - 1) * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+    (OStmtOut := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ ⟨(ℓ / ϑ - 1) *ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+    (WitOut := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) ⟨(ℓ / ϑ - 1) * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+    (pSpec := pSpecNonLastBlocks 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)) :=
+  let stmt : Fin (ℓ / ϑ - 1 + 1) → Type :=
+    fun i => Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let oStmt := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let wit := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ)
+      ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let res := OracleReduction.seqCompose (oSpec := []ₒ)
+      (Stmt := stmt)
+      (OStmt := oStmt) (Wit := wit)
+      (pSpec := fun (bIdx: Fin (ℓ / ϑ - 1)) => pSpecFullNonLastBlock 𝔽q β (ϑ:=ϑ) bIdx)
+        (R := fun bIdx => nonLastSingleBlockOracleReduction (L:=L) 𝔽q β (mp := mp)
+        (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (bIdx:=bIdx))
+  res
 
 def lastBlockOracleReduction :=
+  have h_le: ϑ ≤ ℓ := by apply Nat.le_of_dvd (by exact Nat.pos_of_neZero ℓ); exact hdiv.out
   let bIdx := ℓ / ϑ - 1
   let stmt : Fin (ϑ + 1) → Type := fun i => Statement (L := L) (ℓ := ℓ) Context
     ⟨bIdx * ϑ + i, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (hx:=by omega)⟩
@@ -452,63 +656,129 @@ def lastBlockOracleReduction :=
         (R := fun i => by
           have nHCR : ¬ isCommitmentRound ℓ ϑ ⟨bIdx * ϑ + i, lastBlockIdx_mul_ϑ_add_fin_lt_ℓ i⟩ :=
             lastBlockIdx_isNeCommitmentRound i
-          exact foldRelayOracleReduction (L:=L) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+          exact foldRelayOracleReduction (L:=L) 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
             (𝓑:=𝓑) (i:=⟨bIdx * ϑ + i, lastBlockIdx_mul_ϑ_add_fin_lt_ℓ i⟩) nHCR
         )
-      simp [stmt, oStmt, wit, Nat.zero_mod] at cur
-      rw! (castMode:=.all) [Nat.zero_mod] at cur
-      simp only [Nat.add_zero] at cur
-      have h: (⟨bIdx * ϑ + ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (hx:=by omega)⟩)
-        = Fin.last ℓ := by
-        apply Fin.eq_of_val_eq
-        simp only [Fin.val_last]; dsimp [bIdx];
-        rw [Nat.sub_mul, one_mul, Nat.div_mul_cancel (hdiv.out)]
-        rw [Nat.sub_add_cancel
-          (by exact Nat.le_of_dvd (h:=by exact Nat.pos_of_neZero ℓ) (hdiv.out))]
-      rw! [h] at cur
-      exact cur
+      exact OracleReduction.castInOut (R := cur)
+        (StmtIn₂ := Statement (L := L) (ℓ := ℓ) Context ⟨bIdx * ϑ, by
+          apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+        (OStmtIn₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+          ⟨bIdx * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+        (WitIn₂ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ)
+          ⟨bIdx * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+        (StmtOut₂ := Statement (L := L) (ℓ := ℓ) Context (Fin.last ℓ))
+        (OStmtOut₂ := OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (Fin.last ℓ))
+        (WitOut₂ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) (Fin.last ℓ))
+        (pSpec := pSpecLastBlock (L:=L) (ϑ:=ϑ))
+        (h_stmtIn := by
+          apply Statement.of_fin_eq
+          ext; simp)
+        (h_stmtOut := by
+          apply Statement.of_fin_eq
+          ext
+          simp [Fin.val_last]
+          have : bIdx * ϑ + ϑ = ℓ := by
+            have h_div : ϑ ∣ ℓ := hdiv.out
+            have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+            have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+            dsimp only [bIdx];
+            rw [Nat.sub_mul, h_mul, Nat.one_mul]
+            omega
+          simp [this])
+        (h_idxIn := by
+          apply OracleStatement.idx_eq
+          ext; simp)
+        (h_idxOut := by
+          apply OracleStatement.idx_eq
+          ext
+          simp [Fin.val_last]
+          have : bIdx * ϑ + ϑ = ℓ := by
+            have h_div : ϑ ∣ ℓ := hdiv.out
+            have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+            have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+            dsimp only [bIdx]
+            rw [Nat.sub_mul, h_mul, Nat.one_mul]
+            omega
+          simp [this])
+        (h_ostmtIn := by
+          apply OracleStatement.heq_of_fin_eq
+          ext; simp)
+        (h_ostmtOut := by
+          apply OracleStatement.heq_of_fin_eq
+          ext
+          simp [Fin.val_last]
+          have : bIdx * ϑ + ϑ = ℓ := by
+            have h_div : ϑ ∣ ℓ := hdiv.out
+            have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+            have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+            dsimp [bIdx]
+            rw [Nat.sub_mul, h_mul, Nat.one_mul]
+            omega
+          simp [this])
+          (h_witIn := by
+            apply Witness.of_fin_eq
+            ext; simp)
+          (h_witOut := by
+            apply Witness.of_fin_eq
+            ext
+            simp [Fin.val_last]
+            have : bIdx * ϑ + ϑ = ℓ := by
+              have h_div : ϑ ∣ ℓ := hdiv.out
+              have h_mod : ℓ % ϑ = 0 := Nat.mod_eq_zero_of_dvd h_div
+              have h_mul : ℓ / ϑ * ϑ = ℓ := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h_mod)
+              rw [Nat.sub_mul, h_mul, Nat.one_mul]
+              omega
+            simp [this])
+        (h_Oₛᵢ := by
+          apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+          ext; simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod, add_zero])
+
   V
 
-@[reducible]
-def sumcheckFoldOracleReduction :=
-  let stmt : Fin (ℓ / ϑ - 1 + 1) → Type :=
-    fun i => Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
-  let oStmt := fun i: Fin (ℓ / ϑ - 1 + 1) =>
-    OracleStatement 𝔽q β ϑ ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
-  let wit := fun i: Fin (ℓ / ϑ - 1 + 1) =>
-    Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ)
-      ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
-  let nonLastBlocksOracleReduction :=
-  OracleReduction.seqCompose (oSpec := []ₒ)
-      (Stmt := stmt)
-      (OStmt := oStmt) (Wit := wit)
-      (pSpec := fun (bIdx: Fin (ℓ / ϑ - 1)) => pSpecFullNonLastBlock 𝔽q β bIdx)
-      (R := fun bIdx => nonLastBlockOracleReduction (L:=L) 𝔽q β (ϑ:=ϑ) (𝓑:=𝓑) (bIdx:=bIdx))
-
-  let lastOracleReduction := lastBlockOracleReduction 𝔽q β (ϑ:=ϑ) (𝓑:=𝓑)
-
-  let coreInteractionOracleReduction: OracleReduction []ₒ
+def sumcheckFoldOracleReduction : OracleReduction []ₒ
     (StmtIn := Statement (L := L) (ℓ := ℓ) Context 0)
     (OStmtIn := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ 0)
     (WitIn := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) 0)
     (StmtOut := Statement (L := L) (ℓ:=ℓ) Context (Fin.last ℓ))
     (OStmtOut := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ))
     (WitOut := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) (Fin.last ℓ))
-    (pSpec := pSpecSumcheckFold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
-     := by
-    let res := OracleReduction.append (oSpec:=[]ₒ)
-      (R₁:=by
-        exact nonLastBlocksOracleReduction
-      )
-      (R₂:=by
-        exact lastOracleReduction
-      )
-    simp [stmt, oStmt, wit, Nat.zero_mod] at res
-    rw! (castMode:=.all) [Nat.zero_mod, Nat.zero_mul] at res
-    simp only [Fin.zero_eta] at res
-    exact res
+    (pSpec := pSpecSumcheckFold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ϑ := ϑ)) :=
+  let stmt : Fin (ℓ / ϑ - 1 + 1) → Type :=
+    fun i => Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let oStmt := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let wit := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ)
+      ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let nonLastSingleBlockOracleReduction := nonLastBlocksOracleReduction (L:=L) 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (ϑ := ϑ)
 
-  coreInteractionOracleReduction
+  let lastOracleReduction := lastBlockOracleReduction 𝔽q β (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
+
+  (OracleReduction.append (oSpec:=[]ₒ)
+    (pSpec₁ := pSpecNonLastBlocks 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+    (pSpec₂ := pSpecLastBlock (L:=L) (ϑ:=ϑ))
+    (R₁:=nonLastSingleBlockOracleReduction)
+    (R₂:=lastOracleReduction)
+  ).castInOut
+    (h_stmtIn := by
+      apply Statement.of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_stmtOut := by rfl)
+    (h_witIn := by
+      apply Witness.of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_witOut := by rfl)
+    (h_idxIn := by
+      apply OracleStatement.idx_eq
+      apply fin_zero_mul_eq)
+    (h_idxOut := by rfl)
+    (h_ostmtIn := by
+      apply OracleStatement.heq_of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_ostmtOut := by rfl)
+    (h_Oₛᵢ := by
+      apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+      ext; simp only [zero_mul, Fin.coe_ofNat_eq_mod, Nat.zero_mod])
 
 end composedOracleRedutions
 
@@ -516,20 +786,143 @@ section SecurityProps
 
 variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl []ₒ (StateT σ ProbComp)}
 
+/-- Perfect completeness for a single non-last block -/
+lemma nonLastSingleBlockOracleReduction_perfectCompleteness (hInit : init.neverFails)
+    (bIdx : Fin (ℓ / ϑ - 1)) :
+    OracleReduction.perfectCompleteness (init := init) (impl := impl)
+      (relIn := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
+        ⟨bIdx * ϑ, by
+          apply Nat.lt_trans (m:=ℓ) (h₁:=by
+            change bIdx.val * ϑ + (⟨0, by exact Nat.pos_of_neZero ϑ⟩: Fin ϑ).val < ℓ + 0
+            apply bIdx_mul_ϑ_add_i_lt_ℓ_succ
+          ) (by omega)
+        ⟩)
+      (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) ⟨(bIdx + 1) * ϑ, bIdx_succ_mul_ϑ_lt_ℓ_succ bIdx⟩)
+      (oracleReduction := nonLastSingleBlockOracleReduction 𝔽q β (ϑ:=ϑ) (mp := mp)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) bIdx) := by
+  sorry
+
+/-- Perfect completeness for the last block -/
+lemma lastBlockOracleReduction_perfectCompleteness (hInit : init.neverFails) :
+    OracleReduction.perfectCompleteness (init := init) (impl := impl)
+      (relIn := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
+        ⟨(ℓ / ϑ - 1) * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+      (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
+      (oracleReduction := lastBlockOracleReduction 𝔽q β (ϑ:=ϑ) (mp := mp)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)) := by
+  unfold lastBlockOracleReduction
+  sorry
+
 /-- Perfect completeness for the core interaction oracle reduction -/
 theorem sumcheckFoldOracleReduction_perfectCompleteness (hInit : init.neverFails) :
     OracleReduction.perfectCompleteness
       (pSpec := pSpecSumcheckFold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
-      (relIn := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+      (relIn := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0)
-      (relOut := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+      (relOut := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
-      (oracleReduction := sumcheckFoldOracleReduction 𝔽q β (ϑ:=ϑ)
+      (oracleReduction := sumcheckFoldOracleReduction 𝔽q β (ϑ:=ϑ) (mp := mp)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑))
       (init := init)
       (impl := impl) := by
   unfold sumcheckFoldOracleReduction pSpecSumcheckFold
-  sorry
+
+  let stmt : Fin (ℓ / ϑ - 1 + 1) → Type :=
+    fun i => Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let oStmt := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+  let wit := fun i: Fin (ℓ / ϑ - 1 + 1) =>
+    Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ)
+      ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩
+
+  apply OracleReduction.castInOut_perfectCompleteness
+    (pSpec := pSpecSumcheckFold 𝔽q β (ϑ := ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+    (StmtIn₁ := stmt 0)
+    (StmtIn₂ := Statement (L := L) (ℓ := ℓ) Context 0)
+    (ιₛᵢ₁ := Fin (toOutCodewordsCount ℓ ϑ ⟨0 * ϑ, by omega⟩))
+    (ιₛᵢ₂ := Fin (toOutCodewordsCount ℓ ϑ 0))
+    (OStmtIn₁ := fun i => OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨0 * ϑ, by omega⟩ i)
+    (OStmtIn₂ := fun i => OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ 0 i)
+    (WitIn₁ := wit 0)
+    (WitIn₂ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) 0)
+    (StmtOut₁ := Statement (L := L) (ℓ := ℓ) Context (Fin.last ℓ))
+    (StmtOut₂ := Statement (L := L) (ℓ := ℓ) Context (Fin.last ℓ))
+    (ιₛₒ₁ := Fin (toOutCodewordsCount ℓ ϑ (Fin.last ℓ)))
+    (ιₛₒ₂ := Fin (toOutCodewordsCount ℓ ϑ (Fin.last ℓ)))
+    (OStmtOut₁ := fun i => OracleStatement 𝔽q β ϑ (Fin.last ℓ) i)
+    (OStmtOut₂ := fun i => OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ) i)
+    (WitOut₁ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) (Fin.last ℓ))
+    (WitOut₂ := Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) (Fin.last ℓ))
+    (relIn₁ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) ⟨0 * ϑ, by omega⟩)
+    (relIn₂ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0)
+    (relOut₁ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
+    (relOut₂ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
+    (h_stmtIn := by
+      apply Statement.of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_stmtOut := by rfl)
+    (h_witIn := by
+      apply Witness.of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_witOut := by rfl)
+    (h_idxIn := by
+      apply OracleStatement.idx_eq
+      apply fin_zero_mul_eq)
+    (h_idxOut := by rfl)
+    (h_ostmtIn := by
+      apply OracleStatement.heq_of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_ostmtOut := by rfl)
+    (h_Oₛᵢ := by
+      apply instOracleStatementBinaryBasefold_heq_of_fin_eq
+      ext; simp only [zero_mul, Fin.coe_ofNat_eq_mod, Nat.zero_mod])
+    (h_relIn := by
+      apply strictRoundRelation.of_fin_eq
+      apply fin_zero_mul_eq)
+    (h_relOut := by rfl)
+    (impl := impl)
+    (init := init)
+  apply OracleReduction.append_perfectCompleteness
+    (rel₁ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) ⟨0 * ϑ, by omega⟩)
+    (rel₂ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑)
+        ⟨(ℓ / ϑ - 1) * ϑ, by apply lastBlockIdx_mul_ϑ_add_x_lt_ℓ_succ (x:=0) (hx:=by omega)⟩)
+    (rel₃ := strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
+    (pSpec₁ := pSpecNonLastBlocks 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+    (pSpec₂ := pSpecLastBlock (L:=L) (ϑ:=ϑ))
+    (R₁ := nonLastBlocksOracleReduction 𝔽q β (ϑ:=ϑ) (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑))
+    (R₂ := lastBlockOracleReduction 𝔽q β (ϑ:=ϑ) (mp := mp) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑))
+    (impl := impl)
+    (init := init)
+  ·
+    -- Perfect completeness of nonLastBlocksOracleReduction
+    unfold nonLastBlocksOracleReduction
+    apply OracleReduction.seqCompose_perfectCompleteness
+      (Stmt := fun i : Fin (ℓ / ϑ - 1 + 1) =>
+        Statement (L := L) (ℓ := ℓ) Context ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩)
+      (OStmt := fun i : Fin (ℓ / ϑ - 1 + 1) =>
+        OracleStatement 𝔽q β ϑ (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩)
+      (Wit := fun i : Fin (ℓ / ϑ - 1 + 1) =>
+        Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ℓ:=ℓ) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩)
+      (rel := fun i => strictRoundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) ⟨i * ϑ, blockIdx_mul_ϑ_lt_ℓ_succ i⟩)
+      (pSpec := fun (bIdx: Fin (ℓ / ϑ - 1)) => pSpecFullNonLastBlock 𝔽q β (ϑ:=ϑ) bIdx)
+      (R := fun bIdx => nonLastSingleBlockOracleReduction (L:=L) 𝔽q β (mp := mp)
+        (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (bIdx:=bIdx))
+      (impl := impl)
+      (init := init)
+      hInit
+    intro bIdx
+    -- Prove perfectCompleteness for each individual block
+    exact nonLastSingleBlockOracleReduction_perfectCompleteness 𝔽q β (ϑ:=ϑ) (mp := mp)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (hInit := by exact hInit) (bIdx:=bIdx)
+  · -- Perfect completeness of lastBlockOracleReduction
+    exact lastBlockOracleReduction_perfectCompleteness 𝔽q β (ϑ:=ϑ) (mp := mp)
+      (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (init := init) (impl := impl) hInit
 
 def NBlockMessages := 2 * (ϑ - 1) + 3
 
@@ -542,12 +935,12 @@ def sumcheckFoldKnowledgeError := fun j : (pSpecSumcheckFold 𝔽q β (ϑ:=ϑ)
 
 /-- Round-by-round knowledge soundness for the sumcheck fold oracle verifier -/
 theorem sumcheckFoldOracleVerifier_rbrKnowledgeSoundness :
-    (sumcheckFoldOracleVerifier 𝔽q β).rbrKnowledgeSoundness init impl
+    (sumcheckFoldOracleVerifier 𝔽q β (mp := mp) (𝓑 := 𝓑)).rbrKnowledgeSoundness init impl
       (pSpec := pSpecSumcheckFold 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
       (relIn := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0)
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0 (includeBadEvents := true))
       (relOut := roundRelation (mp := mp) 𝔽q β (ϑ:=ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ) (includeBadEvents := true))
       (rbrKnowledgeError := sumcheckFoldKnowledgeError 𝔽q β (ϑ:=ϑ)) := by
   unfold sumcheckFoldOracleVerifier pSpecSumcheckFold
   sorry
@@ -571,8 +964,8 @@ def coreInteractionOracleVerifier :=
     (OStmt₃ := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ))
     (pSpec₁ := pSpecSumcheckFold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
     (pSpec₂ := pSpecFinalSumcheckStep (L:=L))
-    (V₁ := sumcheckFoldOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
-    (V₂ := finalSumcheckVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+    (V₁ := sumcheckFoldOracleVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (mp := BBF_SumcheckMultiplierParam))
+    (V₂ := finalSumcheckVerifier 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑))
 
 /-- The final oracle reduction that composes sumcheckFold with finalSumcheckStep -/
 @[reducible]
@@ -589,18 +982,27 @@ def coreInteractionOracleReduction :=
     (OStmt₃ := OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ))
     (pSpec₁ := pSpecSumcheckFold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
     (pSpec₂ := pSpecFinalSumcheckStep (L:=L))
-    (R₁ := sumcheckFoldOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑))
-    (R₂ := finalSumcheckOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+    (R₁ := sumcheckFoldOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (mp := BBF_SumcheckMultiplierParam))
+    (R₂ := finalSumcheckOracleReduction 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑))
 
 variable {σ : Type} {init : ProbComp σ} {impl : QueryImpl []ₒ (StateT σ ProbComp)}
 
 /-- Perfect completeness for the core interaction oracle reduction -/
-theorem coreInteractionOracleReduction_perfectCompleteness (hInit : init.neverFails) :
+theorem coreInteractionOracleReduction_perfectCompleteness (hInit : init.neverFails)
+    [(j : pSpecFold.ChallengeIdx) → Fintype ((pSpecFold (L := L)).Challenge j)]
+    [(j : pSpecFold.ChallengeIdx) → Inhabited ((pSpecFold (L := L)).Challenge j)]
+    [(j : pSpecFold.ChallengeIdx) → SelectableType ((pSpecFold (L := L)).Challenge j)]
+    [(i : Fin ℓ) → (j : (pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).ChallengeIdx) →
+      Fintype ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Challenge j)]
+    [(i : Fin ℓ) → (j : (pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).ChallengeIdx) →
+      Inhabited ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Challenge j)]
+    [(i : Fin ℓ) → (j : (pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).ChallengeIdx) →
+      SelectableType ((pSpecCommit 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i).Challenge j)] :
     OracleReduction.perfectCompleteness
       (pSpec := pSpecCoreInteraction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
-      (relIn := roundRelation (mp := BBF_SumcheckMultiplierParam) 𝔽q β (ϑ:=ϑ)
+      (relIn := strictRoundRelation (mp := BBF_SumcheckMultiplierParam) 𝔽q β (ϑ:=ϑ)
         (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0)
-      (relOut := finalSumcheckRelOut 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+      (relOut := strictFinalSumcheckRelOut 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
       (oracleReduction := coreInteractionOracleReduction 𝔽q β (ϑ:=ϑ) (𝓑:=𝓑))
       (init := init)
       (impl := impl) := by
@@ -622,18 +1024,18 @@ def coreInteractionOracleRbrKnowledgeError (j : (pSpecCoreInteraction 𝔽q β (
 
 /-- Round-by-round knowledge soundness for the core interaction oracle verifier -/
 theorem coreInteractionOracleVerifier_rbrKnowledgeSoundness :
-    (coreInteractionOracleVerifier 𝔽q β).rbrKnowledgeSoundness init impl
+    (coreInteractionOracleVerifier 𝔽q β (𝓑 := 𝓑)).rbrKnowledgeSoundness init impl
       (pSpec := pSpecCoreInteraction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
       (relIn := roundRelation (mp := BBF_SumcheckMultiplierParam) 𝔽q β (ϑ:=ϑ)
-        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0)
-      (relOut := finalSumcheckRelOut 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+        (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0 (includeBadEvents := true))
+      (relOut := finalSumcheckRelOut 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (includeBadEvents := true))
       (rbrKnowledgeError := coreInteractionOracleRbrKnowledgeError 𝔽q β (ϑ:=ϑ)) := by
   unfold coreInteractionOracleVerifier pSpecCoreInteraction
   apply OracleVerifier.append_rbrKnowledgeSoundness
     (init:=init) (impl:=impl)
-    (rel₁ := roundRelation 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0)
-    (rel₂ := roundRelation 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ))
-    (rel₃ := finalSumcheckRelOut 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate))
+    (rel₁ := roundRelation 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) 0 (includeBadEvents := true))
+    (rel₂ := roundRelation 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (𝓑:=𝓑) (Fin.last ℓ) (includeBadEvents := true))
+    (rel₃ := finalSumcheckRelOut 𝔽q β (ϑ:=ϑ) (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (includeBadEvents := true))
     (V₁ := sumcheckFoldOracleVerifier 𝔽q β
       (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (ϑ:=ϑ))
     (V₂ := finalSumcheckVerifier 𝔽q β

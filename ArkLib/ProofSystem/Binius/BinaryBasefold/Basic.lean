@@ -348,8 +348,17 @@ lemma oracle_block_k_bound (i : Fin (ℓ + 1)) (j : Fin (toOutCodewordsCount ℓ
     j.val * ϑ < ℓ :=
   toCodewordsCount_mul_ϑ_lt_ℓ ℓ ϑ i j
 
+omit [NeZero ℓ] [NeZero ϑ] hdiv in
+/-- The base index k = j * ϑ is less than or equal to i -/
+@[simp]
+lemma oracle_block_k_le_i (i : Fin (ℓ + 1)) (j : Fin (toOutCodewordsCount ℓ ϑ i))
+    : j.val * ϑ ≤ i := by
+  have h := toCodewordsCount_mul_ϑ_le_i ℓ ϑ i j
+  by_cases hi : i < ℓ <;> simp only [hi, ↓reduceIte] at h <;> omega
+
 /-- The next oracle index k + ϑ = (j+1) * ϑ is at most i -/
-lemma oracle_block_k_next_le (i : Fin (ℓ + 1)) (j : Fin (toOutCodewordsCount ℓ ϑ i))
+@[simp]
+lemma oracle_block_k_next_le_i (i : Fin (ℓ + 1)) (j : Fin (toOutCodewordsCount ℓ ϑ i))
     (hj : j.val + 1 < toOutCodewordsCount ℓ ϑ i) : j.val * ϑ + ϑ ≤ i := by
   have h := toCodewordsCount_mul_ϑ_le_i ℓ ϑ i (j + 1)
   rw [Fin.val_add_one' (h_a_add_1:=hj), Nat.add_mul, Nat.one_mul] at h
@@ -384,6 +393,16 @@ lemma oracle_index_add_steps_le_ℓ (i : Fin (ℓ + 1))
       _ ≤ (i / ϑ) * ϑ := by gcongr; omega
       _ ≤ i := Nat.div_mul_le_self i ϑ
       _ ≤ ℓ := Fin.is_le i
+
+omit [NeZero ℓ] [NeZero ϑ] in
+/-- For any oracle position j, the domain index j*ϑ is at most ℓ.
+This is a key bound for proving fiber-wise closeness requirements. -/
+@[simp]
+lemma oracle_index_le_ℓ (i : Fin (ℓ + 1))
+    (j : Fin (toOutCodewordsCount ℓ ϑ i)) :
+    j.val * ϑ ≤ ℓ := by
+  have h_le := oracle_index_add_steps_le_ℓ ℓ ϑ i j
+  omega
 
 /-- Convert oracle position index to oracle domain index by multiplying by ϑ.
 The position index j corresponds to the j-th oracle in the list of committed oracles,
@@ -680,6 +699,20 @@ lemma projectToMidSumcheckPoly_succ (t : MultilinearPoly L ℓ) (m : Multilinear
     projectToNextSumcheckPoly ℓ i (projectToMidSumcheckPoly ℓ t m i.castSucc challenges) r_i' := by
   sorry
 
+lemma projectToMidSumcheckPoly_eq_prod (t : MultilinearPoly L ℓ)
+    (m : MultilinearPoly L ℓ) (i : Fin (ℓ + 1))
+    (challenges : Fin i → L)
+    : projectToMidSumcheckPoly (ℓ := ℓ) (t := t) (m := m) (i := i) (challenges := challenges) =
+      (fixFirstVariablesOfMQP ℓ (v := i) (H := m) (challenges := challenges)) *
+       (fixFirstVariablesOfMQP ℓ (v := i) (H := t) (challenges := challenges)) := by
+  sorry
+
+lemma fixFirstVariablesOfMQP_full_eval_eq_eval {deg : ℕ} {challenges : Fin (Fin.last ℓ) → L}
+    {poly : L[X Fin ℓ]} (hp : poly ∈ L⦃≤ deg⦄[X Fin ℓ]) (x : Fin (ℓ - ℓ) → L) :
+      (fixFirstVariablesOfMQP ℓ (v := Fin.last ℓ) poly challenges).eval x
+      = poly.eval challenges := by
+  sorry
+
 end SumcheckOperations
 
 variable {r : ℕ} [NeZero r]
@@ -930,10 +963,7 @@ def snoc_oracle {i : Fin ℓ} {destIdx : Fin r} (h_destIdx : destIdx = i.val + 1
         -- Derive the equality between the function's expected domain and the actual domain
         let h_eq := snoc_oracle_dest_eq_j (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
           (ℓ := ℓ) (ϑ := ϑ) h_destIdx j hj hi
-
-        -- Cast the function using the equality.
-        -- `h_eq ▸ fn` compiles to `Eq.rec ... fn` outside the lambda application logic.
-        cast (by rw [h_eq]) newOracleFn
+        fun x => newOracleFn (cast (by rw [h_eq]) x)
       else
         -- Case 3: Impossible (Not commitment round, but index increased)
         (snoc_oracle_impossible hj hi).elim
@@ -980,16 +1010,17 @@ def getLastOracle {oracleFrontierIdx : Fin (ℓ + 1)} {destIdx : Fin r}
     (h_destIdx : destIdx.val = getLastOracleDomainIndex ℓ ϑ oracleFrontierIdx)
     (oStmt : (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ
       (i := oracleFrontierIdx) j)) :
-    OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) destIdx := by
+    OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) destIdx :=
   let res := oStmt ⟨getLastOraclePositionIndex ℓ ϑ oracleFrontierIdx, by omega⟩
   have h_lt : getLastOracleDomainIndex ℓ ϑ oracleFrontierIdx < r := by omega
   have h_eq : destIdx = ⟨getLastOracleDomainIndex ℓ ϑ oracleFrontierIdx, h_lt⟩
     := Fin.eq_of_val_eq (by omega)
-  subst h_eq
-  exact res
+  -- subst h_eq
+  fun y => res (cast (by rw [h_eq]) y)
 
 section SecurityRelations
-/-- Helper to get the k-th challenge slice for folding -/
+/-- Helper to get the challenges for folding.
+k is the starting index of the challenge slice. ϑ is the number of steps. -/
 def getFoldingChallenges (i : Fin (ℓ + 1)) (challenges : Fin i → L)
     (k : ℕ) (h : k + ϑ ≤ i) : Fin ϑ → L :=
   fun cId => challenges ⟨k + cId, by omega⟩
@@ -1014,7 +1045,7 @@ def getNextOracle (i : Fin (ℓ + 1))
     OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) destDomainIdx := by
   --   ⟨j.val * ϑ + ϑ, by
   --   apply Nat.lt_succ_of_le;
-  --   let h_k_next_le_i := oracle_block_k_next_le (ℓ := ℓ) (ϑ := ϑ) (i := i) (j := j) (hj := hj)
+  --   let h_k_next_le_i := oracle_block_k_next_le_i (ℓ := ℓ) (ϑ := ϑ) (i := i) (j := j) (hj := hj)
   --   calc _ ≤ i.val := h_k_next_le_i
   --     _ ≤ ℓ := Fin.is_le i
   -- ⟩ := by
@@ -1036,7 +1067,7 @@ def oracleFoldingConsistencyProp (i : Fin (ℓ + 1)) (challenges : Fin i → L)
   (∀ (j : Fin (toOutCodewordsCount ℓ ϑ i)) (hj : j.val + 1 < toOutCodewordsCount ℓ ϑ i),
     -- let k is j.val * ϑ
     have h_k_bound := oracle_block_k_bound (ℓ := ℓ) (ϑ := ϑ) (i := i) (j := j)
-    have h_k_next_le_i := oracle_block_k_next_le (ℓ := ℓ) (ϑ := ϑ) (i := i) (j := j) (hj := hj)
+    have h_k_next_le_i := oracle_block_k_next_le_i (ℓ := ℓ) (ϑ := ϑ) (i := i) (j := j) (hj := hj)
     let destIdx : Fin r := ⟨oraclePositionToDomainIndex (positionIdx := j) + ϑ, by
       have h_le := oracle_index_add_steps_le_ℓ ℓ ϑ (i := i) (j := j)
       dsimp only [oraclePositionToDomainIndex]
@@ -1193,7 +1224,8 @@ section SumcheckContextIncluded_Relations
 variable {Context : Type} {mp : SumcheckMultiplierParam L ℓ Context} -- Sumcheck context
 
 /-- This condition ensures that the witness polynomial `H` has the
-correct structure `eq(...) * t(...)` -/
+correct structure `eq(...) * t(...)`. At the commitment steps (in commitment rounds),
+wit.f is exactly the same as the last oracle being sent. -/
 def witnessStructuralInvariant {i : Fin (ℓ + 1)} (stmt : Statement (L := L) Context i)
     (wit : Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i) : Prop :=
   wit.H = projectToMidSumcheckPoly ℓ wit.t (m:=mp.multpoly stmt.ctx) i stmt.challenges ∧
@@ -1207,7 +1239,7 @@ def sumcheckConsistencyProp {k : ℕ} (sumcheckTarget : L) (H : L⦃≤ 2⦄[X F
     evaluated on the initial domain S^(0), must be close within unique decoding radius to f^(0) -/
 def firstOracleWitnessConsistencyProp (t : MultilinearPoly L ℓ)
     (f₀ : sDomain 𝔽q β h_ℓ_add_R_rate 0 → L) : Prop :=
-  let P₀: L[X]_(2 ^ ℓ) := polynomialFromNovelCoeffsF₂ 𝔽q β ℓ (by omega) (fun ω => t.val.eval ω)
+  let P₀: L[X]_(2 ^ ℓ) := polynomialFromNovelCoeffsF₂ 𝔽q β ℓ (by omega) (fun ω => t.val.eval (bitsOfIndex ω))
   -- The constraint: P_0 evaluated on S^(0) is close within unique decoding radius to f^(0)
   pair_UDRClose 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := 0) (h_i := by
     simp only [Fin.coe_ofNat_eq_mod, zero_mod, _root_.zero_le]) (f := f₀)
@@ -1251,16 +1283,6 @@ def badEventExistsProp
       (i := oracleIdx.val) j)) (challenges : Fin stmtIdx → L) : Prop :=
   ∃ j, foldingBadEventAtBlock 𝔽q β (stmtIdx := stmtIdx) (oracleIdx := oracleIdx)
     (oStmt := oStmt) (challenges := challenges) j
-
--- -- then simplify the top-level def to use the helper
--- def nonDoomedFoldingProp (i : Fin (ℓ + 1)) (challenges : Fin i → L)
---     (oStmt : ∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i j)
---     : Prop :=
---   let oracleFoldingConsistency := oracleFoldingConsistencyProp 𝔽q β i (challenges := challenges)
---     (oStmt := oStmt)
---   let foldingBadEventExists := badEventExistsProp 𝔽q β i
---     (oracleIdx := OracleFrontierIndex.mkFromStmtIdx i) (challenges := challenges) (oStmt := oStmt)
---   oracleFoldingConsistency ∨ foldingBadEventExists
 
 def oracleWitnessConsistency
     (stmtIdx : Fin (ℓ + 1)) (oracleIdx : OracleFrontierIndex stmtIdx)
@@ -1586,16 +1608,35 @@ def finalFoldingStateProp {h_le : ϑ ≤ ℓ}
   if includeBadEvents then oracleFoldingConsistency ∨ foldingBadEventExists
   else oracleFoldingConsistency
 
-/-- Input relation for round i: R_i must hold at the beginning of round i -/
+/-- **Relaxed fold step output relation for RBR Knowledge Soundness**.
+
+This is a proximity-based relation used for RBR KS. For completeness proofs, use
+`strictFoldStepRelOut` (defined below) instead.
+
+Input relation for round i: R_i must hold at the beginning of round i -/
 def foldStepRelOut (i : Fin ℓ) (includeBadEvents : Bool) :
     Set ((Statement (L := L) Context i.succ ×
       (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i.castSucc j)) ×
       Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i.succ) :=
   { input | foldStepRelOutProp (mp := mp) (𝓑 := 𝓑) 𝔽q β i input includeBadEvents}
 
-/-- Relation at step `i` of the CoreInteraction. `∀ i < ℓ, R_i` must hold at the
+/-- **Relaxed round relation for RBR Knowledge Soundness**.
+
+This relation uses **proximity-based checks** to track whether a prover's state is "doomed"
+(far from any valid codeword) or could potentially be close to a valid witness.
+
+**Important**: This relation is used **only** for RBR Knowledge Soundness proofs.
+For Perfect Completeness proofs, use `strictRoundRelation` (defined below) instead.
+
+Relation at step `i` of the CoreInteraction. `∀ i < ℓ, R_i` must hold at the
 beginning of ITERATION `i`. `R_ℓ` must hold after the last iteration and before sending
-the final constant. -/
+the final constant.
+
+Parameters:
+- `includeBadEvents = true`: Track bad folding events (for soundness analysis)
+- `includeBadEvents = false`: Ignore bad events (for completeness with relaxed checks)
+  **Note**: Even with `false`, this is still a proximity-based relation, not strict equality!
+-/
 def roundRelation (i : Fin (ℓ + 1)) (includeBadEvents : Bool) :
     Set ((Statement (L := L) Context i ×
       (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i j)) ×
@@ -1614,12 +1655,223 @@ def finalSumcheckRelOutProp
     (input := input.1)
     (includeBadEvents := includeBadEvents)
 
-/-- Final sumcheck relation -/
+/-- **Relaxed final sumcheck relation for RBR Knowledge Soundness**.
+
+This is a proximity-based relation used for RBR KS. For completeness proofs, use
+`strictFinalSumcheckRelOut` (defined below) instead. -/
 def finalSumcheckRelOut (includeBadEvents : Bool) :
     Set ((FinalSumcheckStatementOut (L := L) (ℓ := ℓ) ×
       (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ) j)) ×
       (Unit)) :=
   { input | finalSumcheckRelOutProp 𝔽q β input includeBadEvents }
+
+/-!
+## Strict Completeness Relations (Dual-Relations Framework - Left Column)
+
+These relations use **exact algebraic equality** instead of proximity measures.
+They are used **only** for Perfect Completeness proofs (probability 1).
+
+**Key Differences from Relaxed Relations:**
+- No bad events tracking
+- No proximity checks (`pair_UDRClose`, `fiberwiseClose`, `isCompliant`)
+- Only exact equality (`=`) and exact code membership (`∈`)
+- Deterministic preservation (probability 1)
+
+See `dualRelation.md` for the theoretical justification of this separation.
+-/
+
+/-- **Strict folding consistency for round i** (for Completeness).
+
+This directly checks that each oracle function equals the expected codeword computed from `t`
+via `iterated_fold`. This is simpler and more direct than checking code membership and folding
+consistency separately, since the honest prover constructs oracles exactly this way.
+
+For each oracle at position `j` with domain index `sourceIdx = j * ϑ`, we require:
+  `oStmt j = getMidCodewords t (challenges restricted to sourceIdx)`
+
+This ensures deterministic preservation with probability 1 and
+makes completeness proofs straightforward. -/
+def strictOracleFoldingConsistencyProp (t : MultilinearPoly L ℓ) (i : Fin (ℓ + 1))
+    (challenges : Fin i → L)
+    (oStmt : ∀ j, (OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i) j) : Prop :=
+  let P₀: L[X]_(2 ^ ℓ) := polynomialFromNovelCoeffsF₂ 𝔽q β ℓ (by omega) (fun ω => t.val.eval (bitsOfIndex ω))
+  let f₀ := polyToOracleFunc 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (domainIdx := 0) (P := P₀)
+  ∀ (j : Fin (toOutCodewordsCount ℓ ϑ i)),
+    -- The constraint: fⱼ is exactly equal to the folded function of the
+      -- evaluations of P₀ over S⁽⁰⁾
+    let destIdx : Fin r := ⟨oraclePositionToDomainIndex (positionIdx := j), by
+      have h_le := oracle_index_le_ℓ (i := i) (j := j); omega
+    ⟩
+    have h_k_next_le_i := oracle_block_k_le_i (i := i) (j := j);
+    let fⱼ : OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) destIdx := oStmt j
+    let folded_func := iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+      (i := 0) (steps := j * ϑ) (destIdx := destIdx) (h_destIdx := by
+        dsimp only [Fin.coe_ofNat_eq_mod, destIdx]; simp only [zero_mod, zero_add])
+      (h_destIdx_le := by have h_le := oracle_index_le_ℓ (i := i) (j := j); omega)
+      (f := f₀) (r_challenges := getFoldingChallenges (r := r) (𝓡 := 𝓡) i
+        challenges (k := 0) (ϑ := j * ϑ) (h := by omega))
+    fⱼ = folded_func
+
+/-- **Strict oracle-witness consistency** (for Completeness).
+
+This combines all strict consistency checks without any proximity measures or bad events.
+Used only for Perfect Completeness proofs.
+
+The consistency check is straightforward: each oracle must equal the expected codeword
+computed from `wit.t` via `iterated_fold`. This directly captures how the honest prover
+constructs oracles, making completeness proofs simple. -/
+def strictOracleWitnessConsistency
+    (stmtIdx : Fin (ℓ + 1)) (oracleIdx : OracleFrontierIndex stmtIdx)
+    (stmt : Statement (L := L) (Context := Context) stmtIdx)
+    (wit : Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) stmtIdx)
+    (oStmt : ∀ j, (OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate)
+      ϑ (i := oracleIdx.val) j)) : Prop :=
+  let witnessStructuralInvariant: Prop := witnessStructuralInvariant (i:=stmtIdx) 𝔽q β (mp := mp)
+    (h_ℓ_add_R_rate := h_ℓ_add_R_rate) stmt wit
+  let strictOracleFoldingConsistency: Prop := strictOracleFoldingConsistencyProp 𝔽q β
+    (t := wit.t) (i := oracleIdx.val)
+    (challenges := Fin.take (m := oracleIdx.val) (v := stmt.challenges)
+    (h := by simp only [Fin.val_fin_le, OracleFrontierIndex.val_le_i]))
+    (oStmt := oStmt)
+  witnessStructuralInvariant ∧ strictOracleFoldingConsistency
+
+/-- **Strict round relation property** (for Completeness).
+
+This is the strict version of `roundRelationProp` that uses exact equality checks.
+Used only for Perfect Completeness proofs. -/
+def strictRoundRelationProp (i : Fin (ℓ + 1))
+    (input : (Statement (L := L) Context i ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i j)) ×
+      Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i) : Prop :=
+  let stmt := input.1.1
+  let oStmt := input.1.2
+  let wit := input.2
+  let sumCheckConsistency: Prop := sumcheckConsistencyProp (𝓑 := 𝓑) stmt.sumcheck_target wit.H
+  let strictOracleWitnessConsistency: Prop := strictOracleWitnessConsistency 𝔽q β (mp := mp)
+    (stmtIdx := i) (oracleIdx := OracleFrontierIndex.mkFromStmtIdx i) stmt wit oStmt
+  sumCheckConsistency ∧ strictOracleWitnessConsistency
+
+/-- **Strict fold step output relation property** (for Completeness).
+
+This is the strict version of `foldStepRelOutProp` that uses exact equality checks.
+Used only for Perfect Completeness proofs. -/
+def strictFoldStepRelOutProp (i : Fin ℓ)
+    (input : (Statement (L := L) Context i.succ ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i.castSucc j)) ×
+      Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i.succ) : Prop :=
+  let stmt := input.1.1
+  let oStmt := input.1.2
+  let wit := input.2
+  let sumCheckConsistency: Prop := sumcheckConsistencyProp (𝓑 := 𝓑) stmt.sumcheck_target wit.H
+  let strictOracleWitnessConsistency: Prop := strictOracleWitnessConsistency 𝔽q β (mp := mp)
+    (stmtIdx := i.succ) (oracleIdx := OracleFrontierIndex.mkFromStmtIdxCastSuccOfSucc i)
+    stmt wit oStmt
+  sumCheckConsistency ∧ strictOracleWitnessConsistency
+
+/-- **Strict final folding state property** (for Completeness).
+
+This is the strict version of `finalFoldingStateProp` that:
+- Removes all bad event tracking
+- Uses exact code membership and equality instead of proximity-based checks
+- Ensures deterministic preservation with probability 1
+
+Used only for Perfect Completeness proofs. -/
+def strictFinalFoldingStateProp (t : MultilinearPoly L ℓ) {h_le : ϑ ≤ ℓ}
+    (input : (FinalSumcheckStatementOut (L := L) (ℓ := ℓ) ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ) j))) :
+    Prop :=
+  let stmt := input.1
+  let oStmt := input.2
+  -- All oracle folding consistency (including last oracle)
+  let strictOracleFoldingConsistency: Prop :=
+    strictOracleFoldingConsistencyProp 𝔽q β (t := t) (i := Fin.last ℓ)
+      (challenges := stmt.challenges) (oStmt := oStmt)
+  -- Final constant consistency: the last oracle folded with final
+    -- challenges equals constant function
+  let lastDomainIdx := getLastOracleDomainIndex ℓ ϑ (Fin.last ℓ)
+  have h_eq := getLastOracleDomainIndex_last (ℓ := ℓ) (ϑ := ϑ)
+  let k := lastDomainIdx.val
+  have h_k: k = ℓ - ϑ := by
+    dsimp only [k, lastDomainIdx]
+    rw [getLastOraclePositionIndex_last, Nat.sub_mul, Nat.one_mul, Nat.div_mul_cancel (hdiv.out)]
+  let curDomainIdx : Fin r := ⟨k, by omega⟩
+  have h_destIdx_eq: curDomainIdx.val = lastDomainIdx.val := rfl
+  let f_k : OracleFunction 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) curDomainIdx :=
+    getLastOracle (h_destIdx := h_destIdx_eq) (oracleFrontierIdx := Fin.last ℓ)
+      𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (oStmt := oStmt)
+  let finalChallenges : Fin ϑ → L := fun cId => stmt.challenges ⟨k + cId, by
+    rw [h_k]
+    have h_le : ϑ ≤ ℓ := by apply Nat.le_of_dvd (by exact Nat.pos_of_neZero ℓ) (hdiv.out)
+    have h_cId : cId.val < ϑ := cId.isLt
+    have h_last : (Fin.last ℓ).val = ℓ := rfl
+    omega
+  ⟩
+  let destDomainIdx : Fin r := ⟨k + ϑ, by omega⟩
+  let strictFinalConstantConsistency: Prop :=
+    -- Folding the last oracle gives the constant function
+    (iterated_fold 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) (i := curDomainIdx) (steps := ϑ)
+      (destIdx := destDomainIdx) (h_destIdx := by rfl)
+      (h_destIdx_le := by dsimp only [destDomainIdx]; omega) (f := f_k)
+      (r_challenges := finalChallenges) = fun x => stmt.final_constant)
+
+  strictOracleFoldingConsistency ∧ strictFinalConstantConsistency
+
+/-- **Strict round relation for Perfect Completeness**.
+
+This relation uses **exact algebraic equality** instead of proximity measures.
+It ensures deterministic preservation with probability 1.
+
+**Important**: This relation is used **only** for Perfect Completeness proofs.
+For RBR Knowledge Soundness proofs, use `roundRelation` instead.
+
+Relation at step `i` of the CoreInteraction. `∀ i < ℓ, R_i` must hold at the
+beginning of ITERATION `i`. `R_ℓ` must hold after the last iteration and before sending
+the final constant. -/
+def strictRoundRelation (i : Fin (ℓ + 1)) :
+    Set ((Statement (L := L) Context i ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i j)) ×
+      Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i) :=
+  { input | strictRoundRelationProp (mp := mp) (𝓑 := 𝓑) 𝔽q β i input}
+
+/-- **Strict fold step output relation for Perfect Completeness**.
+
+This is a strict relation (exact equality) used for Perfect Completeness proofs.
+For RBR Knowledge Soundness proofs, use `foldStepRelOut` instead.
+
+Input relation for round i: R_i must hold at the beginning of round i -/
+def strictFoldStepRelOut (i : Fin ℓ) :
+    Set ((Statement (L := L) Context i.succ ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ i.castSucc j)) ×
+      Witness (L := L) 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) i.succ) :=
+  { input | strictFoldStepRelOutProp (mp := mp) (𝓑 := 𝓑) 𝔽q β i input}
+
+/-- **Strict final sumcheck relation property** (for Completeness).
+
+This is the strict version of `finalSumcheckRelOutProp` that uses exact equality checks.
+Used only for Perfect Completeness proofs.
+
+Note: This requires `t` to be passed in, which should come from the witness in completeness proofs. -/
+def strictFinalSumcheckRelOutProp
+    (input : ((FinalSumcheckStatementOut (L := L) (ℓ := ℓ) ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ) j)) ×
+      (Unit))) : Prop :=
+  -- Final oracle consistency with exact equality
+  ∃ (t : MultilinearPoly L ℓ), strictFinalFoldingStateProp 𝔽q β (t := t)
+    (h_le := by apply Nat.le_of_dvd (by exact Nat.pos_of_neZero ℓ) (hdiv.out))
+    (input := input.1)
+
+/-- **Strict final sumcheck relation for Perfect Completeness**.
+
+This is a strict relation (exact equality) used for Perfect Completeness proofs.
+For RBR Knowledge Soundness proofs, use `finalSumcheckRelOut` instead.
+
+Note: In completeness proofs, `t` should come from the witness. -/
+def strictFinalSumcheckRelOut :
+    Set ((FinalSumcheckStatementOut (L := L) (ℓ := ℓ) ×
+      (∀ j, OracleStatement 𝔽q β (h_ℓ_add_R_rate := h_ℓ_add_R_rate) ϑ (Fin.last ℓ) j)) ×
+      (Unit)) :=
+  { input | strictFinalSumcheckRelOutProp 𝔽q β input }
+
 end SumcheckContextIncluded_Relations
 end SecurityRelations
 end OracleReductionComponents

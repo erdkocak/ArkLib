@@ -126,6 +126,12 @@ lemma mem_sDomain_of_eq {i j : Fin r} (h : i.val = j.val)
   subst h_eq -- or `rw [h]`
   exact hy
 
+omit [DecidableEq 𝔽q] hF₂ h_β₀_eq_1 [NeZero ℓ] in
+lemma sDomain_eq_of_eq {i j : Fin r} (h : i = j) :
+  sDomain 𝔽q β h_ℓ_add_R_rate i = sDomain 𝔽q β h_ℓ_add_R_rate j := by
+  subst h
+  rfl
+
 /-- The quotient map `q⁽ⁱ⁾(X)` that relates successive domains.
 `q⁽ⁱ⁾(X) := (Wᵢ(βᵢ)^q / Wᵢ₊₁(βᵢ₊₁)) * ∏_{c ∈ 𝔽q} (X - c)`. Usable range is `∀ i ∈ {0, ..., r-2}` -/
 noncomputable def qMap (i : Fin r) : L[X] :=

@@ -304,6 +304,202 @@ lemma seqCompose_toReduction {m : ℕ}
 
 end OracleReduction
 
+section LooseIndexing
+
+/-! ### Loose-Indexed Variants
+
+This section provides loose-indexed variants of the composition operations, following the pattern
+described in `loose_indexing_pattern.md`. These variants help avoid "casting hell" by decoupling
+the index used for type lookup from the computation of that index.
+
+The pattern:
+- Instead of `Stmt i.castSucc`, use `Stmt srcIdx` with a proof `h_src : srcIdx = i.castSucc`
+- This makes types depend on the "loose" index `srcIdx`, not the computed expression
+- Rewriting the proof doesn't change types, avoiding kernel type mismatches
+
+These are fully backward-compatible: existing code continues to use the tight versions,
+but proofs can locally convert to loose form when needed.
+-/
+
+namespace OracleVerifier
+
+/-- Loose-indexed constructor for a single reduction step in a sequential composition.
+
+    Instead of having the verifier's types depend on computed indices `i.castSucc` and `i.succ`,
+    this takes explicit indices `srcIdx` and `dstIdx` with equality proofs. This avoids
+    dependent type issues when rewriting indices in proofs.
+
+    **Usage pattern:** When proving properties about `seqCompose`, you can convert a tight
+    verifier to loose form using this function, manipulate the proofs, then convert back. -/
+def mkLoose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    {n : ℕ} {pSpec : ProtocolSpec n}
+    [Oₘ : ∀ j, OracleInterface (pSpec.Message j)]
+    (i : Fin m) (srcIdx dstIdx : Fin (m + 1))
+    (h_srcIdx : srcIdx.val = i.val)
+    (h_dstIdx : dstIdx.val = i.val + 1)
+    (V : OracleVerifier oSpec (Stmt srcIdx) (OStmt srcIdx)
+                             (Stmt dstIdx) (OStmt dstIdx) pSpec) :
+    OracleVerifier oSpec (Stmt i.castSucc) (OStmt i.castSucc)
+                        (Stmt i.succ) (OStmt i.succ) pSpec := by
+  have h_src : srcIdx = i.castSucc := by ext; simp [Fin.castSucc, h_srcIdx]
+  have h_dst : dstIdx = i.succ := by ext; simp [Fin.succ, h_dstIdx]
+  exact cast (by rw [h_src, h_dst]) V
+
+/-- Extract a verifier in loose form from a tight verifier.
+
+    This is the inverse operation of `mkLoose`: it takes a verifier with tight indices
+    and presents it with loose indices and equality proofs. Useful for local reasoning
+    in proofs where you want to avoid casting issues. -/
+def toLoose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    {n : ℕ} {pSpec : ProtocolSpec n}
+    [Oₘ : ∀ j, OracleInterface (pSpec.Message j)]
+    (i : Fin m)
+    (V : OracleVerifier oSpec (Stmt i.castSucc) (OStmt i.castSucc)
+                             (Stmt i.succ) (OStmt i.succ) pSpec)
+    (srcIdx dstIdx : Fin (m + 1))
+    (h_srcIdx : srcIdx.val = i.val)
+    (h_dstIdx : dstIdx.val = i.val + 1) :
+    OracleVerifier oSpec (Stmt srcIdx) (OStmt srcIdx)
+                        (Stmt dstIdx) (OStmt dstIdx) pSpec := by
+  have h_src : i.castSucc = srcIdx := by ext; simp [Fin.castSucc, h_srcIdx]
+  have h_dst : i.succ = dstIdx := by ext; simp [Fin.succ, h_dstIdx]
+  exact cast (by rw [h_src, h_dst]) V
+
+/-- Loose and tight forms round-trip: converting to loose and back gives the original verifier. -/
+lemma mkLoose_toLoose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    {n : ℕ} {pSpec : ProtocolSpec n}
+    [Oₘ : ∀ j, OracleInterface (pSpec.Message j)]
+    (i : Fin m)
+    (V : OracleVerifier oSpec (Stmt i.castSucc) (OStmt i.castSucc)
+                             (Stmt i.succ) (OStmt i.succ) pSpec)
+    (srcIdx dstIdx : Fin (m + 1))
+    (h_srcIdx : srcIdx.val = i.val)
+    (h_dstIdx : dstIdx.val = i.val + 1) :
+    mkLoose Stmt OStmt i srcIdx dstIdx h_srcIdx h_dstIdx
+      (toLoose Stmt OStmt i V srcIdx dstIdx h_srcIdx h_dstIdx) = V := by
+  unfold mkLoose toLoose
+  simp only [cast_cast, cast_eq]
+
+/-- Sequential composition using loose-indexed verifiers.
+
+    This variant of `seqCompose` takes verifiers parameterized by explicit source and destination
+    indices with equality proofs, rather than computed indices. This can make proofs easier by
+    avoiding dependent type issues.
+
+    The result is definitionally equal to the standard `seqCompose` when given verifiers
+    constructed via `mkLoose`. -/
+def seqCompose_loose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
+    [Oₘ : ∀ i, ∀ j, OracleInterface ((pSpec i).Message j)]
+    (V : (i : Fin m) → (srcIdx dstIdx : Fin (m + 1)) →
+         (h_srcIdx : srcIdx.val = i.val) →
+         (h_dstIdx : dstIdx.val = i.val + 1) →
+         OracleVerifier oSpec (Stmt srcIdx) (OStmt srcIdx)
+                             (Stmt dstIdx) (OStmt dstIdx) (pSpec i)) :
+    OracleVerifier oSpec (Stmt 0) (OStmt 0)
+                        (Stmt (Fin.last m)) (OStmt (Fin.last m))
+                        (ProtocolSpec.seqCompose pSpec) :=
+  OracleVerifier.seqCompose Stmt OStmt (fun i => mkLoose Stmt OStmt i i.castSucc i.succ
+    (by simp [Fin.castSucc]) (by simp [Fin.succ]) (V i i.castSucc i.succ
+      (by simp [Fin.castSucc]) (by simp [Fin.succ])))
+
+/-- The loose variant is equal to the standard seqCompose when given tight verifiers. -/
+lemma seqCompose_eq_seqCompose_loose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
+    [Oₘ : ∀ i, ∀ j, OracleInterface ((pSpec i).Message j)]
+    (V : (i : Fin m) →
+         OracleVerifier oSpec (Stmt i.castSucc) (OStmt i.castSucc)
+                             (Stmt i.succ) (OStmt i.succ) (pSpec i)) :
+    seqCompose Stmt OStmt V =
+    seqCompose_loose Stmt OStmt (fun i srcIdx dstIdx h_srcIdx h_dstIdx =>
+      toLoose Stmt OStmt i (V i) srcIdx dstIdx h_srcIdx h_dstIdx) := by
+  unfold seqCompose_loose
+  rfl
+
+end OracleVerifier
+
+namespace OracleReduction
+
+/-- Loose-indexed constructor for a single reduction step.
+    See `OracleVerifier.mkLoose` for documentation of the loose-indexing pattern. -/
+def mkLoose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    (Wit : Fin (m + 1) → Type)
+    {n : ℕ} {pSpec : ProtocolSpec n}
+    [Oₘ : ∀ j, OracleInterface (pSpec.Message j)]
+    (i : Fin m) (srcIdx dstIdx : Fin (m + 1))
+    (h_srcIdx : srcIdx.val = i.val)
+    (h_dstIdx : dstIdx.val = i.val + 1)
+    (R : OracleReduction oSpec (Stmt srcIdx) (OStmt srcIdx) (Wit srcIdx)
+                               (Stmt dstIdx) (OStmt dstIdx) (Wit dstIdx) pSpec) :
+    OracleReduction oSpec (Stmt i.castSucc) (OStmt i.castSucc) (Wit i.castSucc)
+                         (Stmt i.succ) (OStmt i.succ) (Wit i.succ) pSpec := by
+  have h_src : srcIdx = i.castSucc := by ext; simp [Fin.castSucc, h_srcIdx]
+  have h_dst : dstIdx = i.succ := by ext; simp [Fin.succ, h_dstIdx]
+  exact cast (by rw [h_src, h_dst]) R
+
+/-- Extract a reduction in loose form from a tight reduction. -/
+def toLoose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    (Wit : Fin (m + 1) → Type)
+    {n : ℕ} {pSpec : ProtocolSpec n}
+    [Oₘ : ∀ j, OracleInterface (pSpec.Message j)]
+    (i : Fin m)
+    (R : OracleReduction oSpec (Stmt i.castSucc) (OStmt i.castSucc) (Wit i.castSucc)
+                               (Stmt i.succ) (OStmt i.succ) (Wit i.succ) pSpec)
+    (srcIdx dstIdx : Fin (m + 1))
+    (h_srcIdx : srcIdx.val = i.val)
+    (h_dstIdx : dstIdx.val = i.val + 1) :
+    OracleReduction oSpec (Stmt srcIdx) (OStmt srcIdx) (Wit srcIdx)
+                         (Stmt dstIdx) (OStmt dstIdx) (Wit dstIdx) pSpec := by
+  have h_src : i.castSucc = srcIdx := by ext; simp [Fin.castSucc, h_srcIdx]
+  have h_dst : i.succ = dstIdx := by ext; simp [Fin.succ, h_dstIdx]
+  exact cast (by rw [h_src, h_dst]) R
+
+/-- Sequential composition using loose-indexed reductions.
+    See `OracleVerifier.seqCompose_loose` for documentation. -/
+def seqCompose_loose {m : ℕ}
+    (Stmt : Fin (m + 1) → Type)
+    {ιₛ : Fin (m + 1) → Type} (OStmt : (i : Fin (m + 1)) → ιₛ i → Type)
+    [Oₛ : ∀ i, ∀ j, OracleInterface (OStmt i j)]
+    (Wit : Fin (m + 1) → Type)
+    {n : Fin m → ℕ} {pSpec : ∀ i, ProtocolSpec (n i)}
+    [Oₘ : ∀ i, ∀ j, OracleInterface ((pSpec i).Message j)]
+    (R : (i : Fin m) → (srcIdx dstIdx : Fin (m + 1)) →
+         (h_srcIdx : srcIdx.val = i.val) →
+         (h_dstIdx : dstIdx.val = i.val + 1) →
+         OracleReduction oSpec (Stmt srcIdx) (OStmt srcIdx) (Wit srcIdx)
+                              (Stmt dstIdx) (OStmt dstIdx) (Wit dstIdx) (pSpec i)) :
+    OracleReduction oSpec (Stmt 0) (OStmt 0) (Wit 0)
+                         (Stmt (Fin.last m)) (OStmt (Fin.last m)) (Wit (Fin.last m))
+                         (ProtocolSpec.seqCompose pSpec) :=
+  OracleReduction.seqCompose Stmt OStmt Wit (fun i => mkLoose Stmt OStmt Wit i i.castSucc i.succ
+    (by simp [Fin.castSucc]) (by simp [Fin.succ]) (R i i.castSucc i.succ
+      (by simp [Fin.castSucc]) (by simp [Fin.succ])))
+
+end OracleReduction
+
+end LooseIndexing
+
 end Composition
 
 variable {m : ℕ}
