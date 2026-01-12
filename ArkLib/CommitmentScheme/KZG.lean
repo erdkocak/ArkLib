@@ -339,6 +339,7 @@ open OracleSpec OracleComp SubSpec ProtocolSpec SimOracle
 
 section Correctness
 
+-- TODO next two lemmas should be in VCV-io
 /-- randomOracle never fails on any query.
     The proof follows from the fact that randomOracle either returns a cached value (pure)
     or samples uniformly (which never fails). -/
@@ -520,7 +521,7 @@ abbrev KZGFunctionBindingAdversary (p : ℕ) [Fact (Nat.Prime p)] (G₁ G₂ : T
 
 /-- The reduction breaking ARSDH using a (successful) Function Binding Adversary.
 The redution follows the proof of lemma 9.1 (under Def. 9.6) in https://eprint.iacr.org/2025/902.pdf -/
-noncomputable def reduction (L : ℕ) (AuxState : Type)
+def reduction (L : ℕ) (AuxState : Type)
     (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState) :
     Groups.ARSDHAdversary n (G₁ := G₁) (G₂ := G₂) (p := p) :=
     fun srs =>
@@ -546,8 +547,149 @@ noncomputable def reduction (L : ℕ) (AuxState : Type)
             return (srs, cm, evals)
           )).run' ∅
 
-#check probEvent_mono
-#check probEvent_map
+#check Reduction.run_of_prover_first
+
+/-- ARSDH condition for an adversary "to win" -/
+def ARSDH_cond (D : ℕ) : (ZMod p × Finset (ZMod p) × G₁ × G₁) → Prop :=
+  fun (τ, S, (h₁ : G₁), h₂) =>
+    let Zₛ : UniPoly (ZMod p) := ∏ s ∈ S, (UniPoly.X - UniPoly.C s)
+    S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val
+
+/-- Function binding condition for an adversary "to win" -/
+def FB_cond (n L : ℕ) : Vector (ZMod p × ZMod p × Bool) L → Prop :=
+  fun (x : Vector (ZMod p × ZMod p × Bool) L) =>
+    (∀ (i : Fin x.size), x[i].2.2 = true)
+    ∧ (¬ ∃ (d : Fin (n + 1) → ZMod p),
+      ∀ (i : Fin x.size), OracleInterface.answer d x[i].1 = x[i].2.1)
+
+/-- Extended function binding condition (taking more input values, logic unchanged) -/
+def FB_cond_ext (n L : ℕ) : (ZMod p × (Vector G₁ (n + 1) × Vector G₂ 2) × G₁ ×
+  Vector (ZMod p × ZMod p × Bool × G₁) L) → Prop :=
+  fun (x : ZMod p × (Vector G₁ (n + 1) × Vector G₂ 2) × G₁ ×
+    Vector (ZMod p × ZMod p × Bool × G₁) L) =>
+    let evals := x.2.2.2.map (fun (a, b, c, _d) => (a, b, c))
+    FB_cond n L evals
+
+/-- Function binding game -/
+def FB_game {n L : ℕ} {g₁ : G₁} {g₂ : G₂} (AuxState : Type)
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState)
+    (scheme : Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁
+      (Vector G₁ (n + 1) × Vector G₂ 2) (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩) :=
+  let pSpec' : ProtocolSpec 1 := ⟨!v[.P_to_V], !v[G₁]⟩
+  (simulateQ (randomOracle ++ₛₒ (challengeQueryImpl (pSpec := pSpec')) :
+      QueryImpl _ (StateT unifSpec.QueryCache ProbComp)) <|
+      (do
+        let (ck, vk) ← liftComp scheme.keygen _
+        let (cm, claims) ← liftComp (adversary.claim ck) _
+        let reduction := Reduction.mk (adversary.prover ck) (scheme.opening (ck, vk)).verifier
+        claims.mapM (fun ⟨q, r, st⟩ =>
+          do
+            let ⟨_, verifier_accept⟩ ← reduction.run (cm, q, r) st
+            return (q, r, verifier_accept)
+          )
+      : OracleComp _ _)).run' ∅
+-- TODO: unfold the reduction properly.
+
+/-- Extended function binding game (returning more internal values, logic unchanged) -/
+def FB_game_ext {n L : ℕ} {g₁ : G₁} {g₂ : G₂} (AuxState : Type)
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState)
+    (scheme : Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁
+      (Vector G₁ (n + 1) × Vector G₂ 2) (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩) :=
+  let pSpec' : ProtocolSpec 1 := ⟨!v[.P_to_V], !v[G₁]⟩
+  (simulateQ
+    (randomOracle ++ₛₒ (challengeQueryImpl (pSpec := pSpec')) :
+      QueryImpl _ (StateT unifSpec.QueryCache ProbComp))
+    <|
+    (do
+      let a ← liftComp ($ᵗ (ZMod p)) _
+      let srs := generateSrs (g₁ := g₁) (g₂ := g₂) n a
+      let (cm, claims) ← liftComp (adversary.claim srs) _
+      let reduction := Reduction.mk (adversary.prover srs) (scheme.opening (srs, srs)).verifier
+      let evals ← claims.mapM (fun ⟨q, r, st⟩ =>
+        do
+          let ⟨⟨transcript, _⟩, verifier_accept⟩ ← reduction.run (cm, q, r) st
+          let pf := transcript 0
+          return (q, r, verifier_accept, pf)
+        )
+      return (a, srs, cm, evals) : OracleComp _ _)
+  ).run' ∅
+
+/-- Transition 1: extending output for proofs and commitment preserves the condition -/
+lemma FB_game_ext_eq_FB_game {n L : ℕ} {AuxState : Type} [SelectableType G₁]
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState)
+    (scheme : Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁
+      (Vector G₁ (n + 1) × Vector G₂ 2) (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩) :
+    [FB_cond n L | FB_game (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme]
+    = [FB_cond_ext n L | FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme] := by
+  let proj := fun (x : ZMod p × (Vector G₁ (n + 1) × Vector G₂ 2) × G₁ ×
+    Vector (ZMod p × ZMod p × Bool × G₁) L) => x.2.2.2.map (fun (a, b, c, _) => (a, b, c))
+  -- First show the condition equivalence: FB_cond ∘ proj = FB_cond_ext
+  have h_cond : ∀ x, (FB_cond n L ∘ proj) x ↔ FB_cond_ext n L x := by
+    intro x; simp only [Function.comp_apply, proj, FB_cond_ext]
+  rw [show [FB_cond_ext n L | FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme]
+      = [FB_cond n L ∘ proj | FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme] by
+    apply probEvent_ext; intro x _; exact (h_cond x).symm]
+  rw [← probEvent_map]
+  simp only [FB_game, FB_game_ext, proj]
+  simp only [StateT.run'_eq, Functor.map_map]
+  apply probEvent_congr
+  · simp
+  · dsimp [OracleComp.evalDist, simulateQ]
+    simp only [bind_pure_comp, Fin.isValue, OptionT.run_bind,
+      FreeMonad.monad_pure_def, StateT.run_bind, map_bind]
+    have hpSpec : ProverOnly ⟨!v[.P_to_V], !v[G₁]⟩ := by
+      refine { prover_first' := ?_ }; simp
+    sorry
+
+/-- Transition 2: FB condition implies ARSDH condition after mapping -/
+lemma FB_cond_le_ARSDH_cond {n L : ℕ} {AuxState : Type} [SelectableType G₁]
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState)
+    (scheme : Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁
+      (Vector G₁ (n + 1) × Vector G₂ 2) (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩) :
+    [FB_cond_ext n L | FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme]
+    ≤ [(ARSDH_cond n) ∘ map_FB_to_ARSDH |
+      FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme] := by
+  apply probEvent_mono
+  intro x hx
+  -- simp [map_FB_to_ARSDH, map_FB_instance_to_ARSDH_inst, map_FB_instance_to_ARSDH_inst']
+  admit
+
+/-- Transition 3: dragging the map into the probability event -/
+lemma map_instance_drag {n L : ℕ} {AuxState : Type} [SelectableType G₁]
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState)
+    (scheme : Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁
+      (Vector G₁ (n + 1) × Vector G₂ 2) (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩) :
+    [(ARSDH_cond n) ∘ map_FB_to_ARSDH | FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme]
+    = [(ARSDH_cond n) |
+      map_FB_to_ARSDH <$> FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme] := by
+  simp only [Nat.reduceAdd, Fin.vcons_fin_zero, Fin.isValue, probEvent_map]
+
+/-- Transition 4: the mapped game equals the ARSDH experiment -/
+lemma ARSDH_game_eq {n L : ℕ} {AuxState : Type} [SelectableType G₁]
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState)
+    (scheme : Commitment.Scheme unifSpec (Fin (n + 1) → ZMod p) Unit G₁
+      (Vector G₁ (n + 1) × Vector G₂ 2) (Vector G₁ (n + 1) × Vector G₂ 2) ⟨!v[.P_to_V], !v[G₁]⟩) :
+    [(ARSDH_cond n) | map_FB_to_ARSDH <$>
+      FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme]
+    = Groups.ARSDH_Experiment (g₁ := g₁) (g₂ := g₂) n
+      (reduction (g₁ := g₁) (g₂ := g₂) (pairing := pairing) L AuxState adversary) := by
+  simp only [Groups.ARSDH_Experiment]
+  apply probEvent_congr
+  · intro ⟨τ, S, h₁, h₂⟩
+    simp only [ARSDH_cond]
+  · dsimp [OracleComp.evalDist, simulateQ]
+    simp [map_FB_to_ARSDH, FB_game_ext, reduction]
+    dsimp [OracleComp.evalDist, simulateQ]
+    sorry
+
+/-- The ARSDH experiment is bounded by the ARSDH error -/
+lemma ARSDH_error_bound {n L : ℕ} {AuxState : Type} [SelectableType G₁] (ARSDHerror : ℝ≥0)
+    (hARSDH : Groups.ARSDHAssumption (G₁ := G₁) (G₂ := G₂) (g₁ := g₁) (g₂ := g₂) n ARSDHerror)
+    (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState) :
+    Groups.ARSDH_Experiment (g₁ := g₁) (g₂ := g₂) n (reduction (g₁ := g₁) (g₂ := g₂)
+      (pairing := pairing) L AuxState adversary)
+    ≤ ARSDHerror := by
+  simp_all [Groups.ARSDHAssumption]
 
 /- the KZG satisfies function binding as defined in `CommitmentScheme` provided ARSDH holds. -/
 theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂}
@@ -557,121 +699,24 @@ theorem functionBinding (hpG1 : Nat.card G₁ = p) {g₁ : G₁} {g₂ : G₂}
     Commitment.functionBinding (L := L) (init := pure ∅) (impl := randomOracle)
       (hn := rfl) (hpSpec := { prover_first' := by simp }) AuxState
       (KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)) ARSDHerror := by
-    -- unfold Commitment.functionBinding
-    -- bind functionBinding via the 'reduction' adversary to ARSDH(-error)
-    -- prove idea (rough sketch):
-    --   [FB_cond | functionBindingGame 𝔸]
-    --   ≤(probEvent_mono) [λx. ARSDH_cond ∘ map_FB_instance_to_ARSDH_inst x | functionBindingGame 𝔸]
-    --   =(probEvent_map) [ARSDH_cond | map_FB_instance_to_ARSDH_inst <$> functionBindingGame 𝔸]
-    --   = [ARSDH_cond | ARSDH_Game (reduction 𝔸)]
-    --   = ARSDH_Experiment (reduction 𝔸)
-    --   ≤(hARSDH) ARSDHerror
-
-    -- definitions
     letI scheme := KZG (n := n) (g₁ := g₁) (g₂ := g₂) (pairing := pairing)
-    letI pSpec' : ProtocolSpec 1 := ⟨!v[.P_to_V], !v[G₁]⟩
-    letI ARSDH_cond D := (fun (τ,S,(h₁:G₁),h₂) =>
-      letI Zₛ : UniPoly (ZMod p) := ∏ s ∈ S, (UniPoly.X - UniPoly.C s)
-      S.card = D + 1 ∧ h₁ ≠ 1 ∧ h₂ = h₁ ^ (1 / Zₛ.eval τ).val)
-    letI FB_cond := (fun (x: Vector (ZMod p × ZMod p × Bool) L) =>
-        (∀ (i : Fin x.size), x[i].2.2 = true)
-        ∧ (¬ ∃ (d : Fin (n + 1) → ZMod p),
-          ∀ (i : Fin x.size), OracleInterface.answer d x[i].1 = x[i].2.1))
-    letI FB_game (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState) :=
-      (simulateQ (randomOracle ++ₛₒ (challengeQueryImpl (pSpec := pSpec')) :
-          QueryImpl _ (StateT unifSpec.QueryCache ProbComp)) <|
-          (do
-            let (ck,vk) ← liftComp scheme.keygen _
-            let (cm, claims) ← liftComp (adversary.claim ck) _
-            let reduction := Reduction.mk (adversary.prover ck) (scheme.opening (ck,vk)).verifier
-            claims.mapM (fun ⟨q, r, st⟩ =>
-              do
-                let ⟨_, verifier_accept⟩ ← reduction.run (cm, q, r) st
-                return (q, r, verifier_accept)
-              )
-          : OracleComp _ _)).run' ∅
-
-    -- transition 1: extend output for proofs and commitment
-    letI FB_cond_ext := (fun (x : ZMod p × (Vector G₁ (n + 1) × Vector G₂ 2) × G₁ ×
-      Vector (ZMod p × ZMod p × Bool × G₁) L) =>
-        let evals := x.2.2.2.map (fun (a,b,c,d) => (a,b,c))
-        FB_cond evals)
-    letI FB_game_ext (adversary : KZGFunctionBindingAdversary p G₁ G₂ n unifSpec L AuxState) :=
-        (simulateQ
-          (randomOracle ++ₛₒ (challengeQueryImpl (pSpec := pSpec')) :
-            QueryImpl _ (StateT unifSpec.QueryCache ProbComp))
-          <|
-          (do
-            let a ← liftComp ($ᵗ (ZMod p)) _
-            let srs := generateSrs (g₁:=g₁) (g₂:=g₂) n a
-            let (cm, claims) ← liftComp (adversary.claim srs) _
-            let reduction := Reduction.mk (adversary.prover srs) (scheme.opening (srs,srs)).verifier
-            let evals ← claims.mapM (fun ⟨q, r, st⟩ =>
-              do
-                let ⟨⟨transcript, _⟩, verifier_accept⟩ ← reduction.run (cm, q, r) st
-                let pf := transcript 0
-                return (q, r, verifier_accept, pf)
-              )
-            return (a, srs, cm, evals) : OracleComp _ _)
-        ).run' ∅
-
-    have hFB_game_ext : ∀ adversary, [FB_cond | FB_game adversary]
-    = [FB_cond_ext | FB_game_ext adversary] := by
-      intro adversary
-      let proj := fun (x : ZMod p × (Vector G₁ (n + 1) × Vector G₂ 2) × G₁ ×
-        Vector (ZMod p × ZMod p × Bool × G₁) L) => x.2.2.2.map (fun (a,b,c,_) => (a,b,c))
-      -- First show the condition equivalence: FB_cond ∘ proj = FB_cond_ext
-      have h_cond : ∀ x, (FB_cond ∘ proj) x ↔ FB_cond_ext x := by
-        intro x; simp only [Function.comp_apply, proj, FB_cond_ext]
-      rw [show [FB_cond_ext | FB_game_ext adversary] = [FB_cond ∘ proj | FB_game_ext adversary] by
-        apply probEvent_ext; intro x _; exact (h_cond x).symm]
-      rw [← probEvent_map]
-      congr 1
-      simp only [FB_game, FB_game_ext, proj]
-      simp only [StateT.run'_eq, Functor.map_map]
-      sorry
-
-    -- transition 2: [FB_cond | functionBindingGame 𝔸]
-    --   ≤(probEvent_mono) [λx. ARSDH_cond ∘ map_FB_instance_to_ARSDH_inst x | functionBindingGame 𝔸]
-    have hFB_cond_le_ARSDH_cond : ∀ adversary, [FB_cond_ext | FB_game_ext adversary]
-    ≤ [(ARSDH_cond n) ∘ map_FB_to_ARSDH | FB_game_ext adversary] := by
-      intro adversary
-      apply probEvent_mono
-      intro x hx
-      sorry
-
-    -- transition 3: [λx. ARSDH_cond ∘ map_FB_instance_to_ARSDH_inst x | functionBindingGame 𝔸]
-    --   =(probEvent_map) [ARSDH_cond | map_FB_instance_to_ARSDH_inst <$> functionBindingGame 𝔸]
-    have hmap_instance_drag : ∀ adversary,
-      [(ARSDH_cond n) ∘ map_FB_to_ARSDH | FB_game_ext adversary]
-    = [(ARSDH_cond n) | map_FB_to_ARSDH <$> FB_game_ext adversary] := by
-      simp only [Nat.reduceAdd, Fin.vcons_fin_zero, Fin.isValue, probEvent_map,
-        implies_true]
-
-    have hASRDHGame : ∀ adversary,
-      [(ARSDH_cond n) | map_FB_to_ARSDH <$> FB_game_ext adversary]
-     = Groups.ARSDH_Experiment (g₁ := g₁) (g₂ := g₂) n
-        (reduction (g₁ := g₁) (g₂ := g₂) (pairing := pairing) L AuxState adversary) := by
-      sorry
-
-    have hASRDHerror : ∀ adversary, Groups.ARSDH_Experiment (g₁ := g₁) (g₂ := g₂) n
-        (reduction (g₁ := g₁) (g₂ := g₂) (pairing := pairing) L AuxState adversary)
-        ≤ ARSDHerror := by
-      simp_all [Groups.ARSDHAssumption]
-
     simp only [Commitment.functionBinding]
     intro adversary
+    letI game := FB_game (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme
+    letI game_ext := FB_game_ext (g₁ := g₁) (g₂ := g₂) AuxState adversary scheme
     convert (
-      calc [FB_cond | FB_game adversary]
-      _ = [FB_cond_ext | FB_game_ext adversary] := hFB_game_ext adversary
-      _ ≤ [(ARSDH_cond n) ∘ map_FB_to_ARSDH | FB_game_ext adversary] :=
-        hFB_cond_le_ARSDH_cond adversary
-      _ = [(ARSDH_cond n) | map_FB_to_ARSDH <$> FB_game_ext adversary] :=
-        hmap_instance_drag adversary
+      calc [FB_cond n L | game]
+      _ = [FB_cond_ext n L | game_ext] :=
+        FB_game_ext_eq_FB_game adversary scheme
+      _ ≤ [(ARSDH_cond n) ∘ map_FB_to_ARSDH | game_ext] :=
+        FB_cond_le_ARSDH_cond adversary scheme
+      _ = [(ARSDH_cond n) | map_FB_to_ARSDH <$> game_ext] :=
+        map_instance_drag adversary scheme
       _ = Groups.ARSDH_Experiment (g₁ := g₁) (g₂ := g₂) n
-            (reduction (g₁ := g₁) (g₂ := g₂) (pairing := pairing) L AuxState adversary) :=
-        hASRDHGame adversary
-      _ ≤ ARSDHerror := hASRDHerror adversary)
+        (reduction (g₁ := g₁) (g₂ := g₂) (pairing := pairing) L AuxState adversary) :=
+        ARSDH_game_eq (g₁ := g₁) (g₂ := g₂) (pairing := pairing) adversary scheme
+      _ ≤ ARSDHerror := ARSDH_error_bound (g₁ := g₁) (g₂ := g₂) (pairing := pairing) ARSDHerror
+        hARSDH adversary)
 
 #check probEvent_mono
 #check probEvent_map
