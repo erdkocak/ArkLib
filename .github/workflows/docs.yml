@@ -60,8 +60,8 @@ jobs:
       - name: Prepare deployment directory
         run: |
           mkdir _deploy
-          # Copy landing page
-          cp home_page/index.html _deploy/
+          # Copy landing page and assets
+          cp -r home_page/* _deploy/
           # Create docs directory and copy Lean docs
           mkdir -p _deploy/docs
           cp -r ./.lake/build/doc/* _deploy/docs/

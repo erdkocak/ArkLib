@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArkLib</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f6f8fa;
-            color: #24292e;
-        }
-        .container {
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 0.5em;
-        }
-        a {
-            font-size: 1.2em;
-            color: #0366d6;
-            text-decoration: none;
-            margin: 0 1em;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>ArkLib: Formally Verified SNARKs</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <h1>ArkLib</h1>
-        <p>
-            <a href="docs/">Documentation</a>
-            <a href="blueprint.pdf">Blueprint (PDF)</a>
-            <a href="blueprint/">Blueprint (HTML)</a>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">ArkLib</a>
+                <div class="nav-links">
+                    <a href="docs/">Documentation</a>
+                    <a href="blueprint/">Blueprint</a>
+                    <a href="https://github.com/Verified-zkEVM/ArkLib" target="_blank">GitHub</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container hero">
+        <h1>Formally Verified<br>Arguments of Knowledge</h1>
+        <p class="subtitle">
+            ArkLib aims to provide a modular and composable framework for formally verifying succinct non-interactive
+            arguments of knowledge (SNARKs).
         </p>
+        <div class="cta-group">
+            <a href="docs/" class="btn btn-primary">Read the Docs</a>
+            <a href="blueprint/" class="btn btn-secondary">Explore Blueprint</a>
+        </div>
     </div>
+
+    <!-- <footer>
+        <div class="container">
+            <p>&copy; 2026 Verified zkEVM. open source.</p>
+        </div>
+    </footer> -->
 </body>
+
 </html>
