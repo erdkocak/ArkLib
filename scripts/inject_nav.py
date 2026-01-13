@@ -10,7 +10,8 @@ GLOBAL_NAV_HTML = """
         <a href="{root}index.html" class="logo">ArkLib</a>
         <div class="nav-links">
             <a href="{root}docs/">Documentation</a>
-            <a href="{root}blueprint/">Blueprint</a>
+            <a href="{root}blueprint/">Blueprint (Web)</a>
+            <a href="{root}blueprint.pdf">Blueprint (PDF)</a>
             <a href="https://github.com/Verified-zkEVM/ArkLib" target="_blank">GitHub</a>
         </div>
     </div>

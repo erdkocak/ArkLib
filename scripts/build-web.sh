@@ -40,8 +40,13 @@ fi
 
 # Copy Blueprint
 if [ -d "blueprint/web" ]; then
-    echo "Copying blueprint..."
+    echo "Copying blueprint (HTML)..."
     cp -r blueprint/web/* "$DEST/blueprint/"
+fi
+
+if [ -f "blueprint/print/print.pdf" ]; then
+    echo "Copying blueprint (PDF)..."
+    cp "blueprint/print/print.pdf" "$DEST/blueprint.pdf"
 fi
 
 echo "Website build complete in $DEST/"
