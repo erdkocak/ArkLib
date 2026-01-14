@@ -300,6 +300,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
   {B : Finset (Fin n → F)}
   {v : Fin n → F}
   {e : ℕ}
+  (hB : 1 < B.card)
   :
   let d := sInf { d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d }
   let q : ℚ := Fintype.card F
@@ -307,6 +308,87 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
   e ≤ n - ((n * (n - d)) : ℝ).sqrt
   →
   (B ∩ ({ x | Δ₀(x, v) ≤ e } : Finset _)).card ≤ q * d * n := by
-  sorry
+    intro d q frac _
+    let B' := B ∩ ({ x | Δ₀(x, v) ≤ e } : Finset _)
+
+    by_cases h_size : B'.card < 2
+    -- trivial case
+    ·
+      have q_not_small : q ≥ (2 : ℚ) := by
+        have hF : (2 : ℕ) ≤ Fintype.card F := by
+          classical
+          have : 1 < Fintype.card F := by
+            simpa [Fintype.one_lt_card_iff] using (⟨(0:F), (1:F), by simp⟩ : ∃ a b : F, a ≠ b)
+          omega
+        simpa [q] using (show (2 : ℚ) ≤ (Fintype.card F : ℚ) from by exact_mod_cast hF)
+
+      have d_not_small : d ≥ 1 := by
+        let S : Set ℕ := {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+        have hS_nonempty : S.Nonempty := by
+          rcases Finset.one_lt_card.mp hB with ⟨u, hu, v, hv, huv⟩
+          refine ⟨hammingDist u v, ?_⟩
+          exact ⟨u, hu, v, hv, huv, rfl⟩
+        have hLB : ∀ s ∈ S, (1 : ℕ) ≤ s := by
+          intro s hs
+          rcases hs with ⟨u, hu, v, hv, huv, hdist⟩
+          have hpos : 0 < hammingDist u v := hammingDist_pos.mpr huv
+          have : 1 ≤ hammingDist u v := (Nat.succ_le_iff).2 hpos
+          simpa [S] using (hdist ▸ this)
+        simpa [S] using (sInf.le_sInf_of_LB (S := S) hS_nonempty (i := 1) hLB)
+
+      have n_not_small : n ≥ 1 := by
+        by_contra hn
+        have : n = 0 := by omega
+        subst this
+        have hcard_le : B.card ≤ 1 := by
+          have : ∀ u ∈ B, ∀ v ∈ B, u = v := by
+            intro u hu v hv
+            funext s
+            exact Fin.elim0 s
+          exact Finset.card_le_one.2 (by
+            intro a ha b hb
+            exact this a ha b hb)
+        omega
+
+      have qdn_not_small : (q * d * n) ≥ 2 := by
+        have hdq : (d : ℚ) ≥ (1 : ℚ) := by exact_mod_cast d_not_small
+        have hnq : (n : ℚ) ≥ (1 : ℚ) := by exact_mod_cast n_not_small
+        have dn_ge_one : (d : ℚ) * (n : ℚ) ≥ (1 : ℚ) := by nlinarith [hdq, hnq]
+        have : q * ((d : ℚ) * (n : ℚ)) ≥ (2 : ℚ) := by nlinarith [q_not_small, dn_ge_one]
+        simpa [mul_assoc] using this
+
+      have hcard_nat : B'.card ≤ 1 := by exact Nat.le_of_lt_succ h_size
+
+      have hcard : (B'.card : ℚ) ≤ (1 : ℚ) := by exact_mod_cast hcard_nat
+
+      have rhs_ge_two : (2 : ℚ) ≤ q * (d : ℚ) * (n : ℚ) := by simpa [mul_assoc] using qdn_not_small
+
+      have rhs_ge_one : (1 : ℚ) ≤ q * (d : ℚ) * (n : ℚ) :=
+        le_trans (by norm_num : (1 : ℚ) ≤ 2) rhs_ge_two
+
+      exact le_trans hcard rhs_ge_one
+    -- non-trivial case
+    ·
+      have h_johnson_strong : JohnsonConditionStrong B' v := by
+        have h_johnson_weak : JohnsonConditionWeak B e := by
+          sorry
+        have h_size' : 1 < B'.card := by
+          omega
+        have hF_nontriv : (2 : ℕ) ≤ Fintype.card F := by
+          classical
+          have : 1 < Fintype.card F := by
+            simpa [Fintype.one_lt_card_iff] using (⟨(0:F), (1:F), by simp⟩ : ∃ a b : F, a ≠ b)
+          omega
+        exact johnson_condition_weak_implies_strong h_johnson_weak h_size' hF_nontriv
+
+      have johnson_result := johnson_bound h_johnson_strong
+
+      have current_bound : ↑B'.card ≤ frac * d / ↑n / JohnsonDenominator B' v := by
+        sorry
+
+      have step : frac * d / ↑n / JohnsonDenominator B' v ≤ q * (d : ℚ) * (n : ℚ) := by
+        sorry
+
+      linarith
 
 end JohnsonBound
