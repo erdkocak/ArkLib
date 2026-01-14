@@ -383,10 +383,14 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
 
       have johnson_result := johnson_bound h_johnson_strong
 
-      have current_bound : ↑B'.card ≤ frac * d / ↑n / JohnsonDenominator B' v := by
-        sorry
+      have current_bound :
+          (B'.card : ℚ) ≤
+          frac * (JohnsonBound.d B') / (n : ℚ) / JohnsonDenominator B' v := by
+        simpa using johnson_result
 
-      have step : frac * d / ↑n / JohnsonDenominator B' v ≤ q * (d : ℚ) * (n : ℚ) := by
+      have last_bound :
+          frac * (JohnsonBound.d B') / (n : ℚ) / JohnsonDenominator B' v ≤
+          q * (d : ℚ) * (n : ℚ) := by
         sorry
 
       linarith
