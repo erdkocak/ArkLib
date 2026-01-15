@@ -294,6 +294,8 @@ theorem johnson_bound [Field F]
     (johnson_condition_strong_implies_2_le_B_card h_condition)
     (johnson_condition_strong_implies_2_le_F_card h_condition)
 
+set_option maxHeartbeats 1000000 in
+-- Proof is large; raise the heartbeat limit to avoid timeouts.
 /-- Alphabet-free Johnson bound from [codingtheory].
 -/
 theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
@@ -311,64 +313,381 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
     intro d q frac h
     let B' := B ∩ ({ x | Δ₀(x, v) ≤ e } : Finset _)
 
+    have q_not_small : q ≥ (2 : ℚ) := by
+      have hF : (2 : ℕ) ≤ Fintype.card F := by
+        classical
+        have : 1 < Fintype.card F := by
+          simpa [Fintype.one_lt_card_iff] using (⟨(0:F), (1:F), by simp⟩ : ∃ a b : F, a ≠ b)
+        omega
+      simpa [q] using (show (2 : ℚ) ≤ (Fintype.card F : ℚ) from by exact_mod_cast hF)
+    have d_not_small : d ≥ 1 := by
+      let S : Set ℕ := {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+      have hS_nonempty : S.Nonempty := by
+        rcases Finset.one_lt_card.mp hB with ⟨u, hu, v, hv, huv⟩
+        refine ⟨hammingDist u v, ?_⟩
+        exact ⟨u, hu, v, hv, huv, rfl⟩
+      have hLB : ∀ s ∈ S, (1 : ℕ) ≤ s := by
+        intro s hs
+        rcases hs with ⟨u, hu, v, hv, huv, hdist⟩
+        have hpos : 0 < hammingDist u v := hammingDist_pos.mpr huv
+        have : 1 ≤ hammingDist u v := (Nat.succ_le_iff).2 hpos
+        simpa [S] using (hdist ▸ this)
+      simpa [S] using (sInf.le_sInf_of_LB (S := S) hS_nonempty (i := 1) hLB)
+    have n_not_small : n ≥ 1 := by
+      by_contra hn
+      have : n = 0 := by omega
+      subst this
+      have hcard_le : B.card ≤ 1 := by
+        have : ∀ u ∈ B, ∀ v ∈ B, u = v := by
+          intro u hu v hv
+          funext s
+          exact Fin.elim0 s
+        exact Finset.card_le_one.2 (by
+          intro a ha b hb
+          exact this a ha b hb)
+      omega
+
+    have qdn_not_small : (q * d * n) ≥ 2 := by
+      have hdq : (d : ℚ) ≥ (1 : ℚ) := by exact_mod_cast d_not_small
+      have hnq : (n : ℚ) ≥ (1 : ℚ) := by exact_mod_cast n_not_small
+      have dn_ge_one : (d : ℚ) * (n : ℚ) ≥ (1 : ℚ) := by nlinarith [hdq, hnq]
+      have : q * ((d : ℚ) * (n : ℚ)) ≥ (2 : ℚ) := by nlinarith [q_not_small, dn_ge_one]
+      simpa [mul_assoc] using this
     by_cases h_size : B'.card < 2
     -- trivial case
-    · have q_not_small : q ≥ (2 : ℚ) := by
-        have hF : (2 : ℕ) ≤ Fintype.card F := by
-          classical
-          have : 1 < Fintype.card F := by
-            simpa [Fintype.one_lt_card_iff] using (⟨(0:F), (1:F), by simp⟩ : ∃ a b : F, a ≠ b)
-          omega
-        simpa [q] using (show (2 : ℚ) ≤ (Fintype.card F : ℚ) from by exact_mod_cast hF)
-
-      have d_not_small : d ≥ 1 := by
-        let S : Set ℕ := {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
-        have hS_nonempty : S.Nonempty := by
-          rcases Finset.one_lt_card.mp hB with ⟨u, hu, v, hv, huv⟩
-          refine ⟨hammingDist u v, ?_⟩
-          exact ⟨u, hu, v, hv, huv, rfl⟩
-        have hLB : ∀ s ∈ S, (1 : ℕ) ≤ s := by
-          intro s hs
-          rcases hs with ⟨u, hu, v, hv, huv, hdist⟩
-          have hpos : 0 < hammingDist u v := hammingDist_pos.mpr huv
-          have : 1 ≤ hammingDist u v := (Nat.succ_le_iff).2 hpos
-          simpa [S] using (hdist ▸ this)
-        simpa [S] using (sInf.le_sInf_of_LB (S := S) hS_nonempty (i := 1) hLB)
-
-      have n_not_small : n ≥ 1 := by
-        by_contra hn
-        have : n = 0 := by omega
-        subst this
-        have hcard_le : B.card ≤ 1 := by
-          have : ∀ u ∈ B, ∀ v ∈ B, u = v := by
-            intro u hu v hv
-            funext s
-            exact Fin.elim0 s
-          exact Finset.card_le_one.2 (by
-            intro a ha b hb
-            exact this a ha b hb)
-        omega
-
-      have qdn_not_small : (q * d * n) ≥ 2 := by
-        have hdq : (d : ℚ) ≥ (1 : ℚ) := by exact_mod_cast d_not_small
-        have hnq : (n : ℚ) ≥ (1 : ℚ) := by exact_mod_cast n_not_small
-        have dn_ge_one : (d : ℚ) * (n : ℚ) ≥ (1 : ℚ) := by nlinarith [hdq, hnq]
-        have : q * ((d : ℚ) * (n : ℚ)) ≥ (2 : ℚ) := by nlinarith [q_not_small, dn_ge_one]
-        simpa [mul_assoc] using this
-
-      have hcard_nat : B'.card ≤ 1 := by exact Nat.le_of_lt_succ h_size
-
+    · have hcard_nat : B'.card ≤ 1 := by exact Nat.le_of_lt_succ h_size
       have hcard : (B'.card : ℚ) ≤ (1 : ℚ) := by exact_mod_cast hcard_nat
-
       have rhs_ge_two : (2 : ℚ) ≤ q * (d : ℚ) * (n : ℚ) := by simpa [mul_assoc] using qdn_not_small
-
       have rhs_ge_one : (1 : ℚ) ≤ q * (d : ℚ) * (n : ℚ) :=
         le_trans (by norm_num : (1 : ℚ) ≤ 2) rhs_ge_two
-
       exact le_trans hcard rhs_ge_one
+
     -- non-trivial case
     · by_cases h_d_close_n : q / (q - 1) * (d / n) > 1
-      · sorry
+      -- case when d too big
+      · have hd_le_dB' : (d : ℚ) ≤ JohnsonBound.d B' := by
+          have hB'_gt : 1 < B'.card := by omega
+          let S : Set ℕ :=
+            {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+          let S' : Set ℕ :=
+            {d | ∃ u ∈ B', ∃ v ∈ B', u ≠ v ∧ hammingDist u v = d}
+          have hsubset : S' ⊆ S := by
+            intro t ht
+            rcases ht with ⟨u, hu, w, hw, huw, hdist⟩
+            have hu' : u ∈ B := by
+              have hu'' := hu
+              simp [B'] at hu''
+              exact hu''.1
+            have hw' : w ∈ B := by
+              have hw'' := hw
+              simp [B'] at hw''
+              exact hw''.1
+            exact ⟨u, hu', w, hw', huw, hdist⟩
+          have hS'nonempty : S'.Nonempty := by
+            obtain ⟨u, hu, w, hw, huw⟩ := Finset.one_lt_card.mp hB'_gt
+            refine ⟨hammingDist u w, ?_⟩
+            exact ⟨u, hu, w, hw, huw, rfl⟩
+          have h_inf : sInf S ≤ sInf S' := by
+            have hmem : sInf S' ∈ S := hsubset (Nat.sInf_mem hS'nonempty)
+            exact Nat.sInf_le hmem
+          let dmin : ℕ := sInf S'
+          have h_inf_nat : d ≤ dmin := by
+            simpa [d, S, S', dmin] using h_inf
+          have h_inf_q : (d : ℚ) ≤ (dmin : ℚ) := by
+            exact_mod_cast h_inf_nat
+          have h_min : (dmin : ℚ) ≤ JohnsonBound.d B' := by
+            simpa [S', dmin] using (min_dist_le_d (B := B') (by simpa using hB'_gt))
+          exact le_trans h_inf_q h_min
+        have hfrac_dB'_gt_one : q/(q-1) * (JohnsonBound.d B' / n) > 1 := by
+          have hn_nonneg : (0 : ℚ) ≤ n := by
+            exact_mod_cast (Nat.cast_nonneg n)
+          have h_div_le : (d : ℚ) / n ≤ JohnsonBound.d B' / n := by
+            exact div_le_div_of_nonneg_right hd_le_dB' hn_nonneg
+          have hfrac_nonneg : (0 : ℚ) ≤ q / (q - 1) := by
+            have hq_nonneg : (0 : ℚ) ≤ q := by linarith [q_not_small]
+            have hq1_nonneg : (0 : ℚ) ≤ q - 1 := by linarith [q_not_small]
+            exact div_nonneg hq_nonneg hq1_nonneg
+          have h_mul_le :
+              q / (q - 1) * (d / n) ≤ q / (q - 1) * (JohnsonBound.d B' / n) := by
+            exact mul_le_mul_of_nonneg_left h_div_le hfrac_nonneg
+          exact lt_of_lt_of_le h_d_close_n h_mul_le
+        have h_strong : JohnsonConditionStrong B' v := by
+          have hneg :
+              (1 - (q / (q - 1)) * (JohnsonBound.d B' / n) : ℚ) < 0 := by
+            linarith [hfrac_dB'_gt_one]
+          have hnonneg :
+              (0 : ℚ) ≤ (1 - (q / (q - 1)) * (JohnsonBound.e B' v / n)) ^ 2 := by
+            exact sq_nonneg (1 - (q / (q - 1)) * (JohnsonBound.e B' v / n))
+          have hgoal :
+              (1 - (q / (q - 1)) * (JohnsonBound.d B' / n) : ℚ) <
+                (1 - (q / (q - 1)) * (JohnsonBound.e B' v / n)) ^ 2 := by
+            exact lt_of_lt_of_le hneg hnonneg
+          simpa [JohnsonConditionStrong, q, mul_div_assoc] using hgoal
+
+        have johnson_result := johnson_bound h_strong
+        have current_bound :
+            (B'.card : ℚ) ≤
+            (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v := by
+          simpa using johnson_result
+
+        have hden_ge :
+            JohnsonDenominator B' v ≥
+              frac * (JohnsonBound.d B') / (n : ℚ) - 1 := by
+          have h' :
+              JohnsonDenominator B' v ≥
+                ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                  * (JohnsonBound.d B' / n) - 1 := by
+            have hsq :
+                (0 : ℚ) ≤
+                  (1 -
+                      ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                        * (JohnsonBound.e B' v / n)) ^ 2 := by
+              exact sq_nonneg _
+            calc
+              JohnsonDenominator B' v =
+                  (1 -
+                      ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                        * (JohnsonBound.e B' v / n)) ^ 2
+                    -
+                      (1 -
+                        ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                          * (JohnsonBound.d B' / n)) := by
+                simp [JohnsonDenominator, mul_div_assoc]
+              _ = (1 -
+                      ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                        * (JohnsonBound.e B' v / n)) ^ 2
+                    - 1
+                    + ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                        * (JohnsonBound.d B' / n) := by
+                ring
+              _ ≥ (-1)
+                    + ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                        * (JohnsonBound.d B' / n) := by
+                linarith [hsq]
+              _ = ((Fintype.card F : ℚ) / (Fintype.card F - 1))
+                    * (JohnsonBound.d B' / n) - 1 := by
+                ring
+          simpa [q, frac, mul_div_assoc] using h'
+        have hgap : frac * (JohnsonBound.d B') / (n:ℚ) - 1 ≥ 1 / ((n:ℚ) * (q-1)) := by
+          have hq1_pos : (0 : ℚ) < q - 1 := by
+            linarith [q_not_small]
+          have hn_pos : (0 : ℚ) < n := by
+            have hn' : (1 : ℚ) ≤ n := by exact_mod_cast n_not_small
+            linarith
+          have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
+          have hn_ne : (n : ℚ) ≠ 0 := by exact ne_of_gt hn_pos
+          have hqd_gt : (q - 1) * (n : ℚ) < q * (d : ℚ) := by
+            have h' := h_d_close_n
+            field_simp [hq1_ne, hn_ne] at h'
+            have hden_pos : (0 : ℚ) < (q - 1) * n := by
+              exact mul_pos hq1_pos hn_pos
+            have h'' :
+                (1 : ℚ) * ((q - 1) * n) < q * (d : ℚ) :=
+              (_root_.lt_div_iff₀ hden_pos).1 h'
+            simpa [mul_comm, mul_left_comm, mul_assoc] using h''
+          have hF2 : (2 : ℕ) ≤ Fintype.card F := by
+            exact_mod_cast (by simpa [q] using q_not_small)
+          have hF1 : (1 : ℕ) ≤ Fintype.card F := by omega
+          have hqd_gt' :
+              ((Fintype.card F : ℚ) * (d : ℚ) >
+                ((Fintype.card F - 1 : ℕ) : ℚ) * (n : ℚ)) := by
+            have hqd_gt'' :
+                ((Fintype.card F : ℚ) * (d : ℚ) >
+                  ((Fintype.card F : ℚ) - 1) * (n : ℚ)) := by
+              simpa [q] using hqd_gt
+            simpa [Nat.cast_sub hF1] using hqd_gt''
+          have hqd_gt_nat :
+              (Fintype.card F) * d > (Fintype.card F - 1) * n := by
+            exact_mod_cast hqd_gt'
+          have hqd_ge_nat :
+              (Fintype.card F - 1) * n ≤ (Fintype.card F) * d :=
+            Nat.le_of_lt hqd_gt_nat
+          have hnum_ge_nat :
+              1 ≤ (Fintype.card F) * d - (Fintype.card F - 1) * n := by
+            exact (Nat.succ_le_iff).2 (Nat.sub_pos_of_lt hqd_gt_nat)
+          have hnum_ge_q :
+              (1 : ℚ) ≤ q * (d : ℚ) - (q - 1) * (n : ℚ) := by
+            have hnum_ge_q' :
+                (1 : ℚ) ≤
+                  ((Fintype.card F) * d - (Fintype.card F - 1) * n : ℚ) := by
+              exact_mod_cast hnum_ge_nat
+            simpa [q, Nat.cast_sub hF1, Nat.cast_sub hqd_ge_nat, Nat.cast_mul] using hnum_ge_q'
+          have hgap_d : (1 : ℚ) / ((n : ℚ) * (q - 1)) ≤ frac * (d : ℚ) / n - 1 := by
+            have hden_nonneg : (0 : ℚ) ≤ (q - 1) * n := by
+              exact mul_nonneg (le_of_lt hq1_pos) (le_of_lt hn_pos)
+            calc
+              (1 : ℚ) / ((n : ℚ) * (q - 1))
+                  = (1 : ℚ) / ((q - 1) * n) := by
+                      simp [mul_comm]
+              _ ≤ (q * (d : ℚ) - (q - 1) * (n : ℚ)) / ((q - 1) * n) := by
+                      exact div_le_div_of_nonneg_right hnum_ge_q hden_nonneg
+              _ = frac * (d : ℚ) / n - 1 := by
+                      field_simp [frac, hq1_ne, hn_ne]
+          have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
+          have hfrac_nonneg : (0 : ℚ) ≤ frac := by
+            have hq_nonneg : (0 : ℚ) ≤ q := by linarith [q_not_small]
+            have hq1_nonneg : (0 : ℚ) ≤ q - 1 := by linarith [q_not_small]
+            exact div_nonneg hq_nonneg hq1_nonneg
+          have h_div_le : (d : ℚ) / n ≤ JohnsonBound.d B' / n := by
+            exact div_le_div_of_nonneg_right hd_le_dB' hn_nonneg
+          have h_mul_le' :
+              frac * (d / n) ≤ frac * (JohnsonBound.d B' / n) := by
+            exact mul_le_mul_of_nonneg_left h_div_le hfrac_nonneg
+          have h_mul_le :
+              frac * (d : ℚ) / n ≤ frac * (JohnsonBound.d B') / n := by
+            simpa [mul_div_assoc] using h_mul_le'
+          have h_mul_le' :
+              frac * (d : ℚ) / n - 1 ≤ frac * (JohnsonBound.d B') / n - 1 := by
+            linarith [h_mul_le]
+          exact le_trans hgap_d h_mul_le'
+        have hfrac_bound :
+            (frac * (JohnsonBound.d B') / (n:ℚ)) / JohnsonDenominator B' v ≤
+            q * JohnsonBound.d B' := by
+          have hden_lb : (1 : ℚ) / ((n : ℚ) * (q - 1)) ≤ JohnsonDenominator B' v := by
+            linarith [hden_ge, hgap]
+          have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
+          have hn_pos : (0 : ℚ) < n := by exact_mod_cast hn_pos_nat
+          have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+          have hden_pos : (0 : ℚ) < (1 : ℚ) / ((n : ℚ) * (q - 1)) := by
+            have hmul_pos : (0 : ℚ) < (n : ℚ) * (q - 1) := by
+              exact mul_pos hn_pos hq1_pos
+            exact one_div_pos.mpr hmul_pos
+          have hnum_nonneg : (0 : ℚ) ≤ frac * (JohnsonBound.d B') / (n : ℚ) := by
+            have hd0 : (0 : ℚ) ≤ (d : ℚ) := by exact_mod_cast (Nat.zero_le d)
+            have hd_nonneg : (0 : ℚ) ≤ JohnsonBound.d B' := by
+              exact le_trans hd0 hd_le_dB'
+            have hfrac_nonneg : (0 : ℚ) ≤ frac := by
+              have hq_nonneg : (0 : ℚ) ≤ q := by linarith [q_not_small]
+              have hq1_nonneg : (0 : ℚ) ≤ q - 1 := by linarith [q_not_small]
+              exact div_nonneg hq_nonneg hq1_nonneg
+            have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
+            have hmul_nonneg : (0 : ℚ) ≤ frac * JohnsonBound.d B' := by
+              exact mul_nonneg hfrac_nonneg hd_nonneg
+            exact div_nonneg hmul_nonneg hn_nonneg
+          have hstep :
+              (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v ≤
+              (frac * (JohnsonBound.d B') / (n : ℚ)) /
+                (1 / ((n : ℚ) * (q - 1))) := by
+            exact div_le_div_of_nonneg_left hnum_nonneg hden_pos hden_lb
+          calc
+            (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v
+                ≤ (frac * (JohnsonBound.d B') / (n : ℚ)) /
+                    (1 / ((n : ℚ) * (q - 1))) := hstep
+            _ = q * JohnsonBound.d B' := by
+                  have hn_ne : (n : ℚ) ≠ 0 := by exact ne_of_gt hn_pos
+                  have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
+                  field_simp [frac, hn_ne, hq1_ne]
+                  simp [mul_comm]
+        have le_q_times_d : (B'.card : ℚ) ≤ q * JohnsonBound.d B' := by
+          linarith [current_bound, hfrac_bound]
+        have le_q_times_n : (B'.card : ℚ) ≤ q * (n : ℚ) := by
+          have hB'_ge2 : 2 ≤ B'.card := by
+            exact le_of_not_gt h_size
+          have hq_nonneg : (0 : ℚ) ≤ q := by linarith [q_not_small]
+          have hd_le_n : JohnsonBound.d B' ≤ (n : ℚ) := by
+            classical
+            have hB2_card :
+                2 * choose_2 (B'.card : ℚ) =
+                  {x ∈ B' ×ˢ B' | x.1 ≠ x.2}.card := by
+              simp
+              unfold choose_2
+              ring_nf
+              have BBcard : (B' ×ˢ B').card = B'.card ^ 2 := by
+                rw [Finset.card_product, sq]
+              have BBdiagcard : {x ∈ B' ×ˢ B' | x.1 = x.2}.card = B'.card := by
+                simp
+              have BBdisjoint :
+                  {x ∈ B' ×ˢ B' | x.1 = x.2} ∩ {x ∈ B' ×ˢ B' | x.1 ≠ x.2} = ∅ := by
+                ext x
+                simp
+                tauto
+              have BBunion :
+                  B' ×ˢ B' =
+                    {x ∈ B' ×ˢ B' | x.1 = x.2} ∪ {x ∈ B' ×ˢ B' | x.1 ≠ x.2} := by
+                ext ⟨a, b⟩
+                simp
+                tauto
+              have BBcount :
+                  {x ∈ B' ×ˢ B' | x.1 ≠ x.2}.card
+                    = (B' ×ˢ B').card - {x ∈ B' ×ˢ B' | x.1 = x.2}.card := by
+                rw [BBunion, Finset.card_union, BBdiagcard, BBdisjoint]
+                have doubleindex1 :
+                    {x ∈ {x ∈ B' ×ˢ B' | x.1 = x.2} ∪
+                        {x ∈ B' ×ˢ B' | x.1 ≠ x.2} | x.1 = x.2}
+                      = {x ∈ B' ×ˢ B' | x.1 = x.2} := by
+                  ext x
+                  simp
+                  tauto
+                have doubleindex2 :
+                    {x ∈ {x ∈ B' ×ˢ B' | x.1 = x.2} ∪
+                        {x ∈ B' ×ˢ B' | x.1 ≠ x.2} | x.1 ≠ x.2}
+                      = {x ∈ B' ×ˢ B' | x.1 ≠ x.2} := by
+                  ext x
+                  simp
+                  tauto
+                rw [doubleindex1, BBdiagcard]
+                simp
+                rw [doubleindex2]
+              rw [BBcount, BBcard, BBdiagcard]
+              rw [Nat.cast_sub]
+              ring_nf
+              rfl
+              nlinarith [sq_nonneg (B'.card - 1)]
+            have hdist_le :
+                ∀ x ∈ {x ∈ B' ×ˢ B' | x.1 ≠ x.2},
+                  (Δ₀(x.1, x.2) : ℚ) ≤ n := by
+              intro x hx
+              have : Δ₀(x.1, x.2) ≤ n := by
+                simpa using (hammingDist_le_card_fintype (x := x.1) (y := x.2))
+              exact_mod_cast this
+            have hsum_le :
+                ∑ x ∈ {x ∈ B' ×ˢ B' | x.1 ≠ x.2}, (Δ₀(x.1, x.2) : ℚ)
+                  ≤ (n : ℚ) * ({x ∈ B' ×ˢ B' | x.1 ≠ x.2}.card) := by
+              calc
+                ∑ x ∈ {x ∈ B' ×ˢ B' | x.1 ≠ x.2}, (Δ₀(x.1, x.2) : ℚ)
+                    ≤ ∑ x ∈ {x ∈ B' ×ˢ B' | x.1 ≠ x.2}, (n : ℚ) := by
+                      exact Finset.sum_le_sum hdist_le
+                _ = (n : ℚ) * ({x ∈ B' ×ˢ B' | x.1 ≠ x.2}.card) := by
+                      simp [Finset.sum_const, mul_comm]
+            have hsum_le' :
+                ∑ x ∈ {x ∈ B' ×ˢ B' | x.1 ≠ x.2}, (Δ₀(x.1, x.2) : ℚ)
+                  ≤ (n : ℚ) * (2 * choose_2 (B'.card : ℚ)) := by
+              simpa [hB2_card, mul_comm, mul_left_comm, mul_assoc] using hsum_le
+            have hB'_gt : 1 < B'.card := by
+              omega
+            have hS_nonempty :
+                {x ∈ B' ×ˢ B' | x.1 ≠ x.2}.Nonempty := by
+              obtain ⟨u, hu, v, hv, huv⟩ := Finset.one_lt_card.mp hB'_gt
+              refine ⟨⟨u, v⟩, ?_⟩
+              simp [hu, hv, huv]
+            have hden_pos : (0 : ℚ) < 2 * choose_2 (B'.card : ℚ) := by
+              have hS_pos : (0 : ℚ) < {x ∈ B' ×ˢ B' | x.1 ≠ x.2}.card := by
+                exact_mod_cast (Finset.card_pos.mpr hS_nonempty)
+              simpa [hB2_card] using hS_pos
+            have hdiv_le :
+                (∑ x ∈ {x ∈ B' ×ˢ B' | x.1 ≠ x.2}, (Δ₀(x.1, x.2) : ℚ)) /
+                  (2 * choose_2 (B'.card : ℚ)) ≤ (n : ℚ) := by
+              exact (_root_.div_le_iff₀ hden_pos).2 (by
+                simpa [mul_comm, mul_left_comm, mul_assoc] using hsum_le')
+            simpa [JohnsonBound.d, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using
+              hdiv_le
+          exact le_trans le_q_times_d (mul_le_mul_of_nonneg_left hd_le_n hq_nonneg)
+        have final : (B'.card : ℚ) ≤ q * d * (n : ℚ) := by
+          have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
+          have hq_nonneg : (0 : ℚ) ≤ q := by linarith [q_not_small]
+          have hqn_nonneg : (0 : ℚ) ≤ q * (n : ℚ) := by
+            exact mul_nonneg hq_nonneg hn_nonneg
+          have hd_ge1 : (1 : ℚ) ≤ (d : ℚ) := by
+            exact_mod_cast d_not_small
+          have hstep : q * (n : ℚ) ≤ q * (d : ℚ) * (n : ℚ) := by
+            have hmul :
+                q * (n : ℚ) * (1 : ℚ) ≤ q * (n : ℚ) * (d : ℚ) := by
+              exact mul_le_mul_of_nonneg_left hd_ge1 hqn_nonneg
+            simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+          exact le_trans le_q_times_n hstep
+        exact_mod_cast final
+
+      -- expected case
       · have h_johnson_strong : JohnsonConditionStrong B' v := by
           have h_johnson_weak : JohnsonConditionWeak B e := by
             have h_muln : (e : ℚ) / n ≤ 1 - ((1 - (d : ℚ) / n) : ℝ).sqrt := by
@@ -403,7 +722,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                     ((n * (n - d) : ℝ).sqrt) / n
                         = ((n * (n - d) : ℝ).sqrt) / ((n : ℝ) ^ 2).sqrt := by
                             have h_sqrt_n : ((n : ℝ) ^ 2).sqrt = (n : ℝ) := by
-                              simpa using (Real.sqrt_sq (x := (n : ℝ)) hn_nonneg)
+                              simp [hn_nonneg]
                             simp [h_sqrt_n]
                     _ = (((n * (n - d) : ℝ) / (n : ℝ) ^ 2).sqrt) := by
                             symm
