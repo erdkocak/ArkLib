@@ -294,7 +294,7 @@ theorem johnson_bound [Field F]
     (johnson_condition_strong_implies_2_le_B_card h_condition)
     (johnson_condition_strong_implies_2_le_F_card h_condition)
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 2000000 in
 -- Proof is large; raise the heartbeat limit to avoid timeouts.
 /-- Alphabet-free Johnson bound from [codingtheory].
 -/
@@ -353,6 +353,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
       have dn_ge_one : (d : ℚ) * (n : ℚ) ≥ (1 : ℚ) := by nlinarith [hdq, hnq]
       have : q * ((d : ℚ) * (n : ℚ)) ≥ (2 : ℚ) := by nlinarith [q_not_small, dn_ge_one]
       simpa [mul_assoc] using this
+
     by_cases h_size : B'.card < 2
     -- trivial case
     · have hcard_nat : B'.card ≤ 1 := by exact Nat.le_of_lt_succ h_size
@@ -363,42 +364,42 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
       exact le_trans hcard rhs_ge_one
 
     -- non-trivial case
-    · by_cases h_d_close_n : q / (q - 1) * (d / n) > 1
+    · have hd_le_dB' : (d : ℚ) ≤ JohnsonBound.d B' := by
+        have hB'_gt : 1 < B'.card := by omega
+        let S : Set ℕ :=
+          {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+        let S' : Set ℕ :=
+          {d | ∃ u ∈ B', ∃ v ∈ B', u ≠ v ∧ hammingDist u v = d}
+        have hsubset : S' ⊆ S := by
+          intro t ht
+          rcases ht with ⟨u, hu, w, hw, huw, hdist⟩
+          have hu' : u ∈ B := by
+            have hu'' := hu
+            simp [B'] at hu''
+            exact hu''.1
+          have hw' : w ∈ B := by
+            have hw'' := hw
+            simp [B'] at hw''
+            exact hw''.1
+          exact ⟨u, hu', w, hw', huw, hdist⟩
+        have hS'nonempty : S'.Nonempty := by
+          obtain ⟨u, hu, w, hw, huw⟩ := Finset.one_lt_card.mp hB'_gt
+          refine ⟨hammingDist u w, ?_⟩
+          exact ⟨u, hu, w, hw, huw, rfl⟩
+        have h_inf : sInf S ≤ sInf S' := by
+          have hmem : sInf S' ∈ S := hsubset (Nat.sInf_mem hS'nonempty)
+          exact Nat.sInf_le hmem
+        let dmin : ℕ := sInf S'
+        have h_inf_nat : d ≤ dmin := by
+          simpa [d, S, S', dmin] using h_inf
+        have h_inf_q : (d : ℚ) ≤ (dmin : ℚ) := by
+          exact_mod_cast h_inf_nat
+        have h_min : (dmin : ℚ) ≤ JohnsonBound.d B' := by
+          simpa [S', dmin] using (min_dist_le_d (B := B') (by simpa using hB'_gt))
+        exact le_trans h_inf_q h_min
+      by_cases h_d_close_n : q / (q - 1) * (d / n) > 1
       -- case when d too big
-      · have hd_le_dB' : (d : ℚ) ≤ JohnsonBound.d B' := by
-          have hB'_gt : 1 < B'.card := by omega
-          let S : Set ℕ :=
-            {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
-          let S' : Set ℕ :=
-            {d | ∃ u ∈ B', ∃ v ∈ B', u ≠ v ∧ hammingDist u v = d}
-          have hsubset : S' ⊆ S := by
-            intro t ht
-            rcases ht with ⟨u, hu, w, hw, huw, hdist⟩
-            have hu' : u ∈ B := by
-              have hu'' := hu
-              simp [B'] at hu''
-              exact hu''.1
-            have hw' : w ∈ B := by
-              have hw'' := hw
-              simp [B'] at hw''
-              exact hw''.1
-            exact ⟨u, hu', w, hw', huw, hdist⟩
-          have hS'nonempty : S'.Nonempty := by
-            obtain ⟨u, hu, w, hw, huw⟩ := Finset.one_lt_card.mp hB'_gt
-            refine ⟨hammingDist u w, ?_⟩
-            exact ⟨u, hu, w, hw, huw, rfl⟩
-          have h_inf : sInf S ≤ sInf S' := by
-            have hmem : sInf S' ∈ S := hsubset (Nat.sInf_mem hS'nonempty)
-            exact Nat.sInf_le hmem
-          let dmin : ℕ := sInf S'
-          have h_inf_nat : d ≤ dmin := by
-            simpa [d, S, S', dmin] using h_inf
-          have h_inf_q : (d : ℚ) ≤ (dmin : ℚ) := by
-            exact_mod_cast h_inf_nat
-          have h_min : (dmin : ℚ) ≤ JohnsonBound.d B' := by
-            simpa [S', dmin] using (min_dist_le_d (B := B') (by simpa using hB'_gt))
-          exact le_trans h_inf_q h_min
-        have hfrac_dB'_gt_one : q/(q-1) * (JohnsonBound.d B' / n) > 1 := by
+      · have hfrac_dB'_gt_one : q/(q-1) * (JohnsonBound.d B' / n) > 1 := by
           have hn_nonneg : (0 : ℚ) ≤ n := by
             exact_mod_cast (Nat.cast_nonneg n)
           have h_div_le : (d : ℚ) / n ≤ JohnsonBound.d B' / n := by
@@ -934,7 +935,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           have h_size' : 1 < B'.card := by
             omega
           have hF_nontriv : (2 : ℕ) ≤ Fintype.card F := by
-            classical
             have : 1 < Fintype.card F := by
               simpa [Fintype.one_lt_card_iff] using (⟨(0:F), (1:F), by simp⟩ : ∃ a b : F, a ≠ b)
             omega
@@ -950,8 +950,520 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
         have last_bound :
             (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v ≤
             q * (d : ℚ) * (n : ℚ) := by
-          sorry
+          -- 1. Expand JohnsonDenominator definition
+          have denom_expansion : JohnsonDenominator B' v =
+              frac * (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
+              frac * (JohnsonBound.e B' v / n)^2) := by
+            simp [JohnsonDenominator, q, frac, mul_div_assoc]
+            ring
 
-        linarith
+          -- 2. Simplify the LHS fraction by cancelling 'frac'
+          have term_simplification : (frac * (JohnsonBound.d B') / (n : ℚ)) /
+              JohnsonDenominator B' v =
+              (JohnsonBound.d B' / n) /
+              (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
+              frac * (JohnsonBound.e B' v / n)^2) := by
+            have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
+            have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+            have hfrac_ne : (frac : ℚ) ≠ 0 := by
+              have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
+              have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
+              simpa [frac] using (div_ne_zero hq_ne hq1_ne)
+            set D : ℚ :=
+              JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
+                frac * (JohnsonBound.e B' v / n) ^ 2
+            calc
+              (frac * JohnsonBound.d B' / (n : ℚ)) / JohnsonDenominator B' v
+                  = (frac * (JohnsonBound.d B' / n)) / JohnsonDenominator B' v := by
+                      simp [mul_div_assoc]
+              _ = (frac * (JohnsonBound.d B' / n)) / (frac * D) := by
+                      simp [denom_expansion, D]
+              _ = (JohnsonBound.d B' / n) / D := by
+                      simpa [D] using
+                        (mul_div_mul_left (a := JohnsonBound.d B' / n) (b := D)
+                          (c := frac) hfrac_ne)
+
+          -- 3. Establish monotonicity for e (worst case is larger e)
+          have e_ineq : JohnsonBound.e B' v ≤ e := by
+            have hB'_pos : 0 < B'.card := by
+              have hB'_ge2 : 2 ≤ B'.card := by
+                exact le_of_not_gt h_size
+              omega
+            have hsum_le :
+                ∑ x ∈ B', (Δ₀(v, x) : ℚ) ≤ ∑ x ∈ B', (e : ℚ) := by
+              refine Finset.sum_le_sum ?_
+              intro x hx
+              have hx' : Δ₀(v, x) ≤ e := by
+                have hx' : Δ₀(x, v) ≤ e := by
+                  have hx' : x ∈ B ∧ Δ₀(x, v) ≤ e := by
+                    simpa [B'] using hx
+                  exact hx'.2
+                simpa [hammingDist_comm] using hx'
+              exact_mod_cast hx'
+            have hsum_le' :
+                ∑ x ∈ B', (Δ₀(v, x) : ℚ) ≤ (e : ℚ) * B'.card := by
+              calc
+                ∑ x ∈ B', (Δ₀(v, x) : ℚ)
+                    ≤ ∑ x ∈ B', (e : ℚ) := hsum_le
+                _ = (e : ℚ) * B'.card := by
+                    simp [Finset.sum_const, mul_comm]
+            have hB'_pos_q : (0 : ℚ) < B'.card := by
+              exact_mod_cast hB'_pos
+            have hdiv_le :
+                (∑ x ∈ B', (Δ₀(v, x) : ℚ)) / B'.card ≤ (e : ℚ) := by
+              exact (div_le_iff₀ hB'_pos_q).2 (by
+                simpa [mul_comm] using hsum_le')
+            have h_e :
+                JohnsonBound.e B' v =
+                  (∑ x ∈ B', (Δ₀(v, x) : ℚ)) / B'.card := by
+              simp [JohnsonBound.e, div_eq_mul_inv, mul_comm]
+            simpa [h_e] using hdiv_le
+
+          -- 4. Establish monotonicity for d (worst case is smaller d)
+          have d_ineq : (d : ℚ) ≤ JohnsonBound.d B' := by
+            simp[hd_le_dB']
+
+          -- 5. Substitute worst-case values d and e into the bound
+          -- Note: The function f(d, e) is decreasing in d and
+          -- increasing in e for the relevant range.
+          have worst_case_bound : (JohnsonBound.d B' / n) /
+              (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
+              frac * (JohnsonBound.e B' v / n)^2) ≤
+              (d / n) / (d / n - 2 * e / n + frac * (e / n)^2) := by
+            set D1 : ℚ := JohnsonBound.d B' / n
+            set E1 : ℚ := JohnsonBound.e B' v / n
+            set D0 : ℚ := d / n
+            set E0 : ℚ := e / n
+            have hn_nonneg : (0 : ℚ) ≤ n := by
+              exact_mod_cast (Nat.cast_nonneg n)
+            have hn_pos : (0 : ℚ) < n := by
+              have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
+              exact_mod_cast hn_pos_nat
+            have hfrac_pos : (0 : ℚ) < frac := by
+              have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
+              have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+              exact div_pos hq_pos hq1_pos
+            have hfrac_gt1 : (1 : ℚ) < frac := by
+              have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+              have hq1_lt : (q - 1 : ℚ) < q := by linarith
+              have h := (one_lt_div hq1_pos).2 hq1_lt
+              simpa [frac] using h
+            have hfrac_ge : (1 : ℚ) ≤ frac := by
+              exact le_of_lt hfrac_gt1
+            have hD : D0 ≤ D1 := by
+              simpa [D0, D1] using (div_le_div_of_nonneg_right d_ineq hn_nonneg)
+            have hE : E1 ≤ E0 := by
+              simpa [E1, E0] using (div_le_div_of_nonneg_right e_ineq hn_nonneg)
+            have d_le_n : d ≤ n := by
+              let S : Set ℕ :=
+                {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+              obtain ⟨u, hu, v', hv', huv⟩ := Finset.one_lt_card.mp hB
+              have hdist_le : hammingDist u v' ≤ n := by
+                simpa using (hammingDist_le_card_fintype (x := u) (y := v'))
+              have hdist_in : hammingDist u v' ∈ S := by
+                exact ⟨u, hu, v', hv', huv, rfl⟩
+              have hdist_ge : d ≤ hammingDist u v' := by
+                simpa [d, S] using (Nat.sInf_le hdist_in)
+              exact le_trans hdist_ge hdist_le
+            have h_sqrt_ge :
+                (n : ℝ) - d ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
+              have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
+                exact sub_nonneg.mpr (by exact_mod_cast d_le_n)
+              have h_nd_le_n : (n : ℝ) - d ≤ (n : ℝ) := by linarith
+              have h_sq : ((n : ℝ) - d) ^ 2 ≤ (n : ℝ) * (n - d) := by
+                have hmul := mul_le_mul_of_nonneg_right h_nd_le_n h_nd_nonneg
+                simpa [pow_two, mul_comm, mul_left_comm, mul_assoc] using hmul
+              exact Real.le_sqrt_of_sq_le h_sq
+            have h_e_le_d_real : (e : ℝ) ≤ d := by
+              linarith [h, h_sqrt_ge]
+            have h_e_le_d : (e : ℚ) ≤ (d : ℚ) := by
+              exact_mod_cast h_e_le_d_real
+            have hE0_le_D0 : E0 ≤ D0 := by
+              simpa [E0, D0] using (div_le_div_of_nonneg_right h_e_le_d hn_nonneg)
+            have hD0_le_one_frac : D0 ≤ 1 / frac := by
+              have hmul : D0 * frac ≤ 1 := by
+                have h' : frac * (d / n : ℚ) ≤ 1 := by
+                  exact le_of_not_gt h_d_close_n
+                simpa [D0, mul_comm] using h'
+              exact (le_div_iff₀ hfrac_pos).2 (by simpa using hmul)
+            have hE0_le_one_frac : E0 ≤ 1 / frac := by
+              exact le_trans hE0_le_D0 hD0_le_one_frac
+            have hE1_le_one_frac : E1 ≤ 1 / frac := by
+              exact le_trans hE hE0_le_one_frac
+            have hE0_nonneg : (0 : ℚ) ≤ E0 := by
+              have hE0_nonneg_nat : (0 : ℚ) ≤ (e : ℚ) := by
+                exact_mod_cast (Nat.zero_le e)
+              exact div_nonneg hE0_nonneg_nat hn_nonneg
+            have hsum_nonneg :
+                (0 : ℚ) ≤ ∑ x ∈ B', (Δ₀(v, x) : ℚ) := by
+              refine Finset.sum_nonneg ?_
+              intro x hx
+              exact_mod_cast (Nat.cast_nonneg (Δ₀(v, x)))
+            have hE_nonneg : (0 : ℚ) ≤ JohnsonBound.e B' v := by
+              have hB'_nonneg : (0 : ℚ) ≤ (B'.card : ℚ) := by
+                exact_mod_cast (Nat.cast_nonneg B'.card)
+              have hB'_inv_nonneg : (0 : ℚ) ≤ (1 : ℚ) / B'.card := by
+                exact div_nonneg (show (0 : ℚ) ≤ (1 : ℚ) by norm_num) hB'_nonneg
+              simpa [JohnsonBound.e, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using
+                (mul_nonneg hB'_inv_nonneg hsum_nonneg)
+            have hE1_nonneg : (0 : ℚ) ≤ E1 := by
+              exact div_nonneg hE_nonneg hn_nonneg
+
+            have hden1_pos : (0 : ℚ) <
+                D1 - 2 * E1 + frac * E1 ^ 2 := by
+              have hdenJ :
+                  (0 : ℚ) < JohnsonDenominator B' v := by
+                exact (johnson_condition_strong_iff_johnson_denom_pos).1 h_johnson_strong
+              have hdenJ' :
+                  (0 : ℚ) <
+                    frac * (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
+                    frac * (JohnsonBound.e B' v / n) ^ 2) := by
+                simpa [denom_expansion] using hdenJ
+              have hdenJ'' :
+                  (0 : ℚ) <
+                    JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
+                    frac * (JohnsonBound.e B' v / n) ^ 2 := by
+                rcases (mul_pos_iff.mp hdenJ') with hpos | hneg
+                · exact hpos.2
+                · exfalso
+                  linarith [hneg.1, hfrac_pos]
+              simpa [D1, E1, mul_div_assoc] using hdenJ''
+
+            have h_sqrt_le :
+                Real.sqrt ((n * (n - d)) : ℝ) ≤ (n : ℝ) - e := by
+              linarith [h]
+            have h_sqrt_nonneg :
+                (0 : ℝ) ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
+              exact Real.sqrt_nonneg _
+            have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
+              exact sub_nonneg.mpr (by exact_mod_cast d_le_n)
+            have h_nnd_nonneg : (0 : ℝ) ≤ (n : ℝ) * (n - d) := by
+              exact mul_nonneg (by exact_mod_cast (Nat.cast_nonneg n)) h_nd_nonneg
+            have h_sq_le :
+                (n * (n - d) : ℝ) ≤ ((n : ℝ) - e) ^ 2 := by
+              have h_sq := mul_self_le_mul_self h_sqrt_nonneg h_sqrt_le
+              have h_sq' :
+                  (Real.sqrt (n * (n - d) : ℝ)) ^ 2 ≤ ((n : ℝ) - e) ^ 2 := by
+                -- avoid simp rewriting the sqrt of a product
+                rw [pow_two, pow_two]
+                exact h_sq
+              have h_sq'' := h_sq'
+              rw [Real.sq_sqrt h_nnd_nonneg] at h_sq''
+              exact h_sq''
+            have hn_pos_real : (0 : ℝ) < n := by
+              exact_mod_cast (Nat.succ_le_iff).1 n_not_small
+            have hn_ne_real : (n : ℝ) ≠ 0 := by exact ne_of_gt hn_pos_real
+            have h_div' :
+                1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
+              have h_div :
+                  (n * (n - d) : ℝ) / n ^ 2 ≤ ((n : ℝ) - e) ^ 2 / n ^ 2 := by
+                exact (div_le_div_of_nonneg_right h_sq_le (by nlinarith [hn_pos_real]))
+              have h_left :
+                  (n * (n - d) : ℝ) / n ^ 2 = 1 - (d : ℝ) / n := by
+                field_simp [hn_ne_real]
+                ring
+              have h_right :
+                  ((n : ℝ) - e) ^ 2 / n ^ 2 = (1 - (e : ℝ) / n) ^ 2 := by
+                field_simp [hn_ne_real]
+              simpa [h_left, h_right] using h_div
+            have hden0_nonneg :
+                (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
+              have h_div'_q :
+                  (1 - (d / n : ℚ)) ≤ (1 - (e / n : ℚ)) ^ 2 := by
+                have h_div'_real :
+                    ((1 - (d / n : ℚ)) : ℝ) ≤ ((1 - (e / n : ℚ)) ^ 2 : ℝ) := by
+                  simpa using h_div'
+                exact_mod_cast h_div'_real
+              have htmp_q :
+                  (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
+                linarith [h_div'_q]
+              have h_eq_q :
+                  (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) =
+                    D0 - 2 * E0 + E0 ^ 2 := by
+                ring
+              simpa [h_eq_q] using htmp_q
+            have hden0_pos :
+                (0 : ℚ) < D0 - 2 * E0 + frac * E0 ^ 2 := by
+              have h_expand :
+                  D0 - 2 * E0 + frac * E0 ^ 2 =
+                    (D0 - 2 * E0 + E0 ^ 2) + (frac - 1) * E0 ^ 2 := by
+                ring
+              by_cases hE0_zero : E0 = 0
+              · have hd_pos : (0 : ℚ) < (d : ℚ) := by
+                  exact_mod_cast (Nat.succ_le_iff).1 d_not_small
+                have hD0_pos : (0 : ℚ) < D0 := by
+                  simpa [D0] using (div_pos hd_pos hn_pos)
+                simpa [h_expand, hE0_zero] using hD0_pos
+              · have hE0_sq_pos : (0 : ℚ) < E0 ^ 2 := by
+                  have hE0_sq_pos' : (0 : ℚ) < E0 * E0 := by
+                    exact mul_self_pos.mpr hE0_zero
+                  simpa [pow_two] using hE0_sq_pos'
+                have hfrac1_pos : (0 : ℚ) < frac - 1 := by
+                  linarith [hfrac_gt1]
+                have hterm_pos :
+                    (0 : ℚ) < (frac - 1) * E0 ^ 2 := by
+                  exact mul_pos hfrac1_pos hE0_sq_pos
+                have hden0_pos' :
+                    (0 : ℚ) <
+                      (D0 - 2 * E0 + E0 ^ 2) + (frac - 1) * E0 ^ 2 := by
+                  linarith [hden0_nonneg, hterm_pos]
+                simpa [h_expand] using hden0_pos'
+
+            have hE_sum : E0 + E1 ≤ 2 / frac := by
+              calc
+                E0 + E1 ≤ (1 / frac) + (1 / frac) := by
+                  linarith [hE0_le_one_frac, hE1_le_one_frac]
+                _ = 2 / frac := by ring
+            have h_gmono :
+                D0 - 2 * E1 + frac * E1 ^ 2 ≥ D0 - 2 * E0 + frac * E0 ^ 2 := by
+              have h1 : (0 : ℚ) ≤ E0 - E1 := by linarith [hE]
+              have h2 : (0 : ℚ) ≤ 2 - frac * (E0 + E1) := by
+                have hmul :
+                    frac * (E0 + E1) ≤ 2 := by
+                  have h := mul_le_mul_of_nonneg_left hE_sum (le_of_lt hfrac_pos)
+                  have hfrac_ne : (frac : ℚ) ≠ 0 := by exact ne_of_gt hfrac_pos
+                  have hright : frac * (2 / frac) = (2 : ℚ) := by
+                    field_simp [hfrac_ne]
+                  simpa [hright] using h
+                linarith [hmul]
+              have hdiff :
+                  (0 : ℚ) ≤ (E0 - E1) * (2 - frac * (E0 + E1)) := by
+                exact mul_nonneg h1 h2
+              have hfactor :
+                  (D0 - 2 * E1 + frac * E1 ^ 2) - (D0 - 2 * E0 + frac * E0 ^ 2) =
+                    (E0 - E1) * (2 - frac * (E0 + E1)) := by
+                ring
+              have hdiff' :
+                  (0 : ℚ) ≤
+                    (D0 - 2 * E1 + frac * E1 ^ 2) - (D0 - 2 * E0 + frac * E0 ^ 2) := by
+                simpa [hfactor] using hdiff
+              linarith [hdiff']
+            have hden0_pos' :
+                (0 : ℚ) < D0 - 2 * E1 + frac * E1 ^ 2 := by
+              exact lt_of_lt_of_le hden0_pos h_gmono
+
+            have hC_nonneg :
+                (0 : ℚ) ≤ 2 * E1 - frac * E1 ^ 2 := by
+              have hmul :
+                  frac * E1 ≤ 1 := by
+                have h := mul_le_mul_of_nonneg_left hE1_le_one_frac (le_of_lt hfrac_pos)
+                have hfrac_ne : (frac : ℚ) ≠ 0 := by exact ne_of_gt hfrac_pos
+                have hright : frac * frac⁻¹ = (1 : ℚ) := by
+                  field_simp [hfrac_ne]
+                simpa [div_eq_mul_inv, hright, mul_assoc] using h
+              have h2 : (0 : ℚ) ≤ 2 - frac * E1 := by
+                linarith [hmul]
+              have hprod : (0 : ℚ) ≤ E1 * (2 - frac * E1) := by
+                exact mul_nonneg hE1_nonneg h2
+              have hfactor : E1 * (2 - frac * E1) = 2 * E1 - frac * E1 ^ 2 := by
+                ring
+              simpa [hfactor] using hprod
+
+            have hstep1 :
+                D1 / (D1 - 2 * E1 + frac * E1 ^ 2) ≤
+                D0 / (D0 - 2 * E1 + frac * E1 ^ 2) := by
+              have hmul :
+                  D1 * (D0 - 2 * E1 + frac * E1 ^ 2) ≤
+                  D0 * (D1 - 2 * E1 + frac * E1 ^ 2) := by
+                have h : (0 : ℚ) ≤ (D1 - D0) := by linarith [hD]
+                have h' : (0 : ℚ) ≤ (2 * E1 - frac * E1 ^ 2) := hC_nonneg
+                nlinarith [h, h']
+              exact (div_le_div_iff₀ hden1_pos hden0_pos').2 hmul
+            have hstep2 :
+                D0 / (D0 - 2 * E1 + frac * E1 ^ 2) ≤
+                D0 / (D0 - 2 * E0 + frac * E0 ^ 2) := by
+              have hmul :
+                  D0 * (D0 - 2 * E0 + frac * E0 ^ 2) ≤
+                  D0 * (D0 - 2 * E1 + frac * E1 ^ 2) := by
+                have hD0_nonneg : (0 : ℚ) ≤ D0 := by
+                  have hd0 : (0 : ℚ) ≤ (d : ℚ) := by exact_mod_cast (Nat.zero_le d)
+                  exact div_nonneg hd0 hn_nonneg
+                exact mul_le_mul_of_nonneg_left h_gmono hD0_nonneg
+              exact (div_le_div_iff₀ hden0_pos' hden0_pos).2 hmul
+            have hfinal :
+                D1 / (D1 - 2 * E1 + frac * E1 ^ 2) ≤
+                D0 / (D0 - 2 * E0 + frac * E0 ^ 2) := by
+              exact le_trans hstep1 hstep2
+            simpa [D0, D1, E0, E1, mul_div_assoc] using hfinal
+
+          -- 6. Prove the final algebraic inequality
+          have final_calc : (d / n) / (d / n - 2 * e / n + frac * (e / n)^2) ≤
+              q * d * n := by
+            set D0 : ℚ := d / n
+            set E0 : ℚ := e / n
+            set Den : ℚ := D0 - 2 * E0 + frac * E0 ^ 2
+            have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
+            have hn_pos : (0 : ℚ) < n := by exact_mod_cast hn_pos_nat
+            have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
+            have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
+            have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+            have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
+            have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
+            have hfrac_pos : (0 : ℚ) < frac := by
+              exact div_pos hq_pos hq1_pos
+            have hfrac_gt1 : (1 : ℚ) < frac := by
+              have hq1_lt : (q - 1 : ℚ) < q := by linarith
+              have h := (one_lt_div hq1_pos).2 hq1_lt
+              simpa [frac] using h
+            have hfrac1_pos : (0 : ℚ) < frac - 1 := by linarith [hfrac_gt1]
+            have d_le_n : d ≤ n := by
+              let S : Set ℕ :=
+                {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+              obtain ⟨u, hu, v', hv', huv⟩ := Finset.one_lt_card.mp hB
+              have hdist_le : hammingDist u v' ≤ n := by
+                simpa using (hammingDist_le_card_fintype (x := u) (y := v'))
+              have hdist_in : hammingDist u v' ∈ S := by
+                exact ⟨u, hu, v', hv', huv, rfl⟩
+              have hdist_ge : d ≤ hammingDist u v' := by
+                simpa [d, S] using (Nat.sInf_le hdist_in)
+              exact le_trans hdist_ge hdist_le
+            have h_div' :
+                1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
+              have h_sqrt_le :
+                  Real.sqrt ((n * (n - d)) : ℝ) ≤ (n : ℝ) - e := by
+                linarith [h]
+              have h_sqrt_nonneg :
+                  (0 : ℝ) ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
+                exact Real.sqrt_nonneg _
+              have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
+                exact sub_nonneg.mpr (by exact_mod_cast d_le_n)
+              have h_nnd_nonneg : (0 : ℝ) ≤ (n : ℝ) * (n - d) := by
+                exact mul_nonneg (by exact_mod_cast (Nat.cast_nonneg n)) h_nd_nonneg
+              have h_sq_le :
+                  (n * (n - d) : ℝ) ≤ ((n : ℝ) - e) ^ 2 := by
+                have h_sq := mul_self_le_mul_self h_sqrt_nonneg h_sqrt_le
+                have h_sq' :
+                    (Real.sqrt (n * (n - d) : ℝ)) ^ 2 ≤ ((n : ℝ) - e) ^ 2 := by
+                  rw [pow_two, pow_two]
+                  exact h_sq
+                have h_sq'' := h_sq'
+                rw [Real.sq_sqrt h_nnd_nonneg] at h_sq''
+                exact h_sq''
+              have hn_pos_real : (0 : ℝ) < n := by
+                exact_mod_cast hn_pos_nat
+              have hn_ne_real : (n : ℝ) ≠ 0 := by exact ne_of_gt hn_pos_real
+              have h_div :
+                  (n * (n - d) : ℝ) / n ^ 2 ≤ ((n : ℝ) - e) ^ 2 / n ^ 2 := by
+                exact (div_le_div_of_nonneg_right h_sq_le (by nlinarith [hn_pos_real]))
+              have h_left :
+                  (n * (n - d) : ℝ) / n ^ 2 = 1 - (d : ℝ) / n := by
+                field_simp [hn_ne_real]
+                ring
+              have h_right :
+                  ((n : ℝ) - e) ^ 2 / n ^ 2 = (1 - (e : ℝ) / n) ^ 2 := by
+                field_simp [hn_ne_real]
+              simpa [h_left, h_right] using h_div
+            have hbase_nonneg : (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
+              have h_div'_q :
+                  (1 - (d / n : ℚ)) ≤ (1 - (e / n : ℚ)) ^ 2 := by
+                have h_div'_real :
+                    ((1 - (d / n : ℚ)) : ℝ) ≤ ((1 - (e / n : ℚ)) ^ 2 : ℝ) := by
+                  simpa using h_div'
+                exact_mod_cast h_div'_real
+              have htmp_q :
+                  (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
+                linarith [h_div'_q]
+              have h_eq_q :
+                  (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) =
+                    D0 - 2 * E0 + E0 ^ 2 := by
+                ring
+              simpa [h_eq_q] using htmp_q
+            have hden_lb : (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ Den := by
+              by_cases he0 : e = 0
+              · subst he0
+                have hD0_ge : (1 : ℚ) / n ≤ D0 := by
+                  have hd_ge1 : (1 : ℚ) ≤ (d : ℚ) := by exact_mod_cast d_not_small
+                  exact (div_le_div_of_nonneg_right hd_ge1 hn_nonneg)
+                have hmul : (n : ℚ) ≤ q * (n : ℚ) ^ 2 := by
+                  have hq_ge1 : (1 : ℚ) ≤ q := by linarith [q_not_small]
+                  have hn_ge1 : (1 : ℚ) ≤ n := by exact_mod_cast n_not_small
+                  calc
+                    (n : ℚ) ≤ (n : ℚ) * (n : ℚ) := by nlinarith [hn_ge1]
+                    _ ≤ q * (n : ℚ) * (n : ℚ) := by
+                      have hnn_nonneg : (0 : ℚ) ≤ (n : ℚ) * (n : ℚ) := by
+                        exact mul_nonneg (le_of_lt hn_pos) (le_of_lt hn_pos)
+                      simpa [mul_comm, mul_left_comm, mul_assoc] using
+                        (mul_le_mul_of_nonneg_right hq_ge1 hnn_nonneg)
+                    _ = q * (n : ℚ) ^ 2 := by ring
+                have hpos1 : (0 : ℚ) < q * (n : ℚ) ^ 2 := by
+                  exact mul_pos hq_pos (pow_pos hn_pos _)
+                have hpos2 : (0 : ℚ) < (n : ℚ) := hn_pos
+                have h1 : (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ (1 : ℚ) / n := by
+                  exact (div_le_div_iff₀ hpos1 hpos2).2 (by simpa using hmul)
+                have hden : (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ D0 :=
+                  le_trans h1 hD0_ge
+                simpa [D0, E0, Den] using hden
+              · have he_pos_nat : 0 < e := Nat.pos_of_ne_zero he0
+                have he_pos : (0 : ℚ) < (e : ℚ) := by exact_mod_cast he_pos_nat
+                have hE0_pos : (0 : ℚ) < E0 := by exact div_pos he_pos hn_pos
+                have hE0_ge : (1 : ℚ) / n ≤ E0 := by
+                  have he_ge1 : (1 : ℚ) ≤ (e : ℚ) := by
+                    exact_mod_cast (Nat.succ_le_iff).2 he_pos_nat
+                  exact (div_le_div_of_nonneg_right he_ge1 hn_nonneg)
+                have hE0_sq_ge : (1 : ℚ) / (n : ℚ) ^ 2 ≤ E0 ^ 2 := by
+                  have h1 : (0 : ℚ) ≤ (1 : ℚ) / n := by
+                    exact div_nonneg (by norm_num) hn_nonneg
+                  have h := mul_self_le_mul_self h1 hE0_ge
+                  simpa [pow_two, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using h
+                have h_expand : Den = (D0 - 2 * E0 + E0 ^ 2) + (frac - 1) * E0 ^ 2 := by
+                  ring
+                have hden_ge :
+                    (frac - 1) * E0 ^ 2 ≤ Den := by
+                  have htmp :
+                      (frac - 1) * E0 ^ 2 ≤
+                        (D0 - 2 * E0 + E0 ^ 2) + (frac - 1) * E0 ^ 2 := by
+                    linarith [hbase_nonneg]
+                  simpa [h_expand] using htmp
+                have hden_ge' : (frac - 1) / (n : ℚ) ^ 2 ≤ Den := by
+                  have h1 :
+                      (frac - 1) * ((1 : ℚ) / (n : ℚ) ^ 2) ≤
+                        (frac - 1) * E0 ^ 2 := by
+                    exact mul_le_mul_of_nonneg_left hE0_sq_ge (le_of_lt hfrac1_pos)
+                  have h1' :
+                      (frac - 1) / (n : ℚ) ^ 2 =
+                        (frac - 1) * ((1 : ℚ) / (n : ℚ) ^ 2) := by
+                    simp [div_eq_mul_inv]
+                  exact le_trans (by simpa [h1'] using h1) hden_ge
+                have hfrac1_ge : (1 : ℚ) / q ≤ frac - 1 := by
+                  have hq1_le_q : (q - 1 : ℚ) ≤ q := by linarith
+                  have h1 : (1 : ℚ) / q ≤ (1 : ℚ) / (q - 1) := by
+                    exact (one_div_le_one_div_of_le hq1_pos hq1_le_q)
+                  have hfrac1 : frac - 1 = (1 : ℚ) / (q - 1) := by
+                    field_simp [frac, hq1_ne]
+                  simpa [hfrac1] using h1
+                have hfrac1_ge' :
+                    (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ (frac - 1) / (n : ℚ) ^ 2 := by
+                  have hn2_nonneg : (0 : ℚ) ≤ (n : ℚ) ^ 2 := by
+                    exact sq_nonneg (n : ℚ)
+                  have h1 := div_le_div_of_nonneg_right hfrac1_ge hn2_nonneg
+                  have h1' : (1 : ℚ) / (q * (n : ℚ) ^ 2) = (1 : ℚ) / q / (n : ℚ) ^ 2 := by
+                    field_simp [hq_ne]
+                  simpa [h1'] using h1
+                exact le_trans hfrac1_ge' hden_ge'
+            have hnum_nonneg : (0 : ℚ) ≤ d / n := by
+              have hd0 : (0 : ℚ) ≤ (d : ℚ) := by exact_mod_cast (Nat.zero_le d)
+              exact div_nonneg hd0 hn_nonneg
+            have hden_pos : (0 : ℚ) < (1 : ℚ) / (q * (n : ℚ) ^ 2) := by
+              have hpos : (0 : ℚ) < q * (n : ℚ) ^ 2 := by
+                exact mul_pos hq_pos (pow_pos hn_pos _)
+              exact one_div_pos.mpr hpos
+            have hstep :
+                (d / n) / Den ≤ (d / n) / ((1 : ℚ) / (q * (n : ℚ) ^ 2)) := by
+              exact div_le_div_of_nonneg_left hnum_nonneg hden_pos hden_lb
+            calc
+              (d / n) / (d / n - 2 * e / n + frac * (e / n) ^ 2)
+                  = (d / n) / Den := by simp [Den, D0, E0, mul_div_assoc]
+              _ ≤ (d / n) / ((1 : ℚ) / (q * (n : ℚ) ^ 2)) := hstep
+              _ = q * d * n := by
+                    field_simp [hq_ne, hn_pos.ne']
+                    ring
+
+          -- Apply the steps to close the goal
+          rw [term_simplification]
+          apply le_trans worst_case_bound
+          exact final_calc
+
+
+        exact le_trans current_bound last_bound
 
 end JohnsonBound
