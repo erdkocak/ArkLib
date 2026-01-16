@@ -294,7 +294,7 @@ theorem johnson_bound [Field F]
     (johnson_condition_strong_implies_2_le_B_card h_condition)
     (johnson_condition_strong_implies_2_le_F_card h_condition)
 
-set_option maxHeartbeats 2000000 in
+set_option maxHeartbeats 1200000 in
 -- Proof is large; raise the heartbeat limit to avoid timeouts.
 /-- Alphabet-free Johnson bound from [codingtheory].
 -/
@@ -936,6 +936,43 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
             (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v := by
           simpa using johnson_result
 
+        have h_div' :
+            1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
+          have h_sqrt_le :
+              Real.sqrt ((n * (n - d)) : ℝ) ≤ (n : ℝ) - e := by
+            linarith [h]
+          have h_sqrt_nonneg :
+              (0 : ℝ) ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
+            exact Real.sqrt_nonneg _
+          have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
+            exact sub_nonneg.mpr (by exact_mod_cast d_le_n)
+          have h_nnd_nonneg : (0 : ℝ) ≤ (n : ℝ) * (n - d) := by
+            exact mul_nonneg (by exact_mod_cast (Nat.cast_nonneg n)) h_nd_nonneg
+          have h_sq_le :
+              (n * (n - d) : ℝ) ≤ ((n : ℝ) - e) ^ 2 := by
+            have h_sq := mul_self_le_mul_self h_sqrt_nonneg h_sqrt_le
+            have h_sq' :
+                (Real.sqrt (n * (n - d) : ℝ)) ^ 2 ≤ ((n : ℝ) - e) ^ 2 := by
+              rw [pow_two, pow_two]
+              exact h_sq
+            have h_sq'' := h_sq'
+            rw [Real.sq_sqrt h_nnd_nonneg] at h_sq''
+            exact h_sq''
+          have hn_pos_real : (0 : ℝ) < n := by
+            exact_mod_cast (Nat.succ_le_iff).1 n_not_small
+          have hn_ne_real : (n : ℝ) ≠ 0 := by exact ne_of_gt hn_pos_real
+          have h_div :
+              (n * (n - d) : ℝ) / n ^ 2 ≤ ((n : ℝ) - e) ^ 2 / n ^ 2 := by
+            exact (div_le_div_of_nonneg_right h_sq_le (by nlinarith [hn_pos_real]))
+          have h_left :
+              (n * (n - d) : ℝ) / n ^ 2 = 1 - (d : ℝ) / n := by
+            field_simp [hn_ne_real]
+            ring
+          have h_right :
+              ((n : ℝ) - e) ^ 2 / n ^ 2 = (1 - (e : ℝ) / n) ^ 2 := by
+            field_simp [hn_ne_real]
+          simpa [h_left, h_right] using h_div
+
         have last_bound :
             (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v ≤
             q * (d : ℚ) * (n : ℚ) := by
@@ -1107,43 +1144,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                   linarith [hneg.1, hfrac_pos]
               simpa [D1, E1, mul_div_assoc] using hdenJ''
 
-            have h_sqrt_le :
-                Real.sqrt ((n * (n - d)) : ℝ) ≤ (n : ℝ) - e := by
-              linarith [h]
-            have h_sqrt_nonneg :
-                (0 : ℝ) ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
-              exact Real.sqrt_nonneg _
-            have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
-              exact sub_nonneg.mpr (by exact_mod_cast d_le_n)
-            have h_nnd_nonneg : (0 : ℝ) ≤ (n : ℝ) * (n - d) := by
-              exact mul_nonneg (by exact_mod_cast (Nat.cast_nonneg n)) h_nd_nonneg
-            have h_sq_le :
-                (n * (n - d) : ℝ) ≤ ((n : ℝ) - e) ^ 2 := by
-              have h_sq := mul_self_le_mul_self h_sqrt_nonneg h_sqrt_le
-              have h_sq' :
-                  (Real.sqrt (n * (n - d) : ℝ)) ^ 2 ≤ ((n : ℝ) - e) ^ 2 := by
-                -- avoid simp rewriting the sqrt of a product
-                rw [pow_two, pow_two]
-                exact h_sq
-              have h_sq'' := h_sq'
-              rw [Real.sq_sqrt h_nnd_nonneg] at h_sq''
-              exact h_sq''
-            have hn_pos_real : (0 : ℝ) < n := by
-              exact_mod_cast (Nat.succ_le_iff).1 n_not_small
-            have hn_ne_real : (n : ℝ) ≠ 0 := by exact ne_of_gt hn_pos_real
-            have h_div' :
-                1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
-              have h_div :
-                  (n * (n - d) : ℝ) / n ^ 2 ≤ ((n : ℝ) - e) ^ 2 / n ^ 2 := by
-                exact (div_le_div_of_nonneg_right h_sq_le (by nlinarith [hn_pos_real]))
-              have h_left :
-                  (n * (n - d) : ℝ) / n ^ 2 = 1 - (d : ℝ) / n := by
-                field_simp [hn_ne_real]
-                ring
-              have h_right :
-                  ((n : ℝ) - e) ^ 2 / n ^ 2 = (1 - (e : ℝ) / n) ^ 2 := by
-                field_simp [hn_ne_real]
-              simpa [h_left, h_right] using h_div
             have hden0_nonneg :
                 (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
               have h_div'_q :
@@ -1284,42 +1284,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               have h := (one_lt_div hq1_pos).2 hq1_lt
               simpa [frac] using h
             have hfrac1_pos : (0 : ℚ) < frac - 1 := by linarith [hfrac_gt1]
-            have h_div' :
-                1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
-              have h_sqrt_le :
-                  Real.sqrt ((n * (n - d)) : ℝ) ≤ (n : ℝ) - e := by
-                linarith [h]
-              have h_sqrt_nonneg :
-                  (0 : ℝ) ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
-                exact Real.sqrt_nonneg _
-              have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
-                exact sub_nonneg.mpr (by exact_mod_cast d_le_n)
-              have h_nnd_nonneg : (0 : ℝ) ≤ (n : ℝ) * (n - d) := by
-                exact mul_nonneg (by exact_mod_cast (Nat.cast_nonneg n)) h_nd_nonneg
-              have h_sq_le :
-                  (n * (n - d) : ℝ) ≤ ((n : ℝ) - e) ^ 2 := by
-                have h_sq := mul_self_le_mul_self h_sqrt_nonneg h_sqrt_le
-                have h_sq' :
-                    (Real.sqrt (n * (n - d) : ℝ)) ^ 2 ≤ ((n : ℝ) - e) ^ 2 := by
-                  rw [pow_two, pow_two]
-                  exact h_sq
-                have h_sq'' := h_sq'
-                rw [Real.sq_sqrt h_nnd_nonneg] at h_sq''
-                exact h_sq''
-              have hn_pos_real : (0 : ℝ) < n := by
-                exact_mod_cast hn_pos_nat
-              have hn_ne_real : (n : ℝ) ≠ 0 := by exact ne_of_gt hn_pos_real
-              have h_div :
-                  (n * (n - d) : ℝ) / n ^ 2 ≤ ((n : ℝ) - e) ^ 2 / n ^ 2 := by
-                exact (div_le_div_of_nonneg_right h_sq_le (by nlinarith [hn_pos_real]))
-              have h_left :
-                  (n * (n - d) : ℝ) / n ^ 2 = 1 - (d : ℝ) / n := by
-                field_simp [hn_ne_real]
-                ring
-              have h_right :
-                  ((n : ℝ) - e) ^ 2 / n ^ 2 = (1 - (e : ℝ) / n) ^ 2 := by
-                field_simp [hn_ne_real]
-              simpa [h_left, h_right] using h_div
             have hbase_nonneg : (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
               have h_div'_q :
                   (1 - (d / n : ℚ)) ≤ (1 - (e / n : ℚ)) ^ 2 := by
