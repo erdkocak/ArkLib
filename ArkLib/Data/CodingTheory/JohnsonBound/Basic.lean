@@ -689,7 +689,18 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
         exact_mod_cast final
 
       -- expected case
-      · have h_johnson_strong : JohnsonConditionStrong B' v := by
+      · have d_le_n : d ≤ n := by
+          let S : Set ℕ :=
+            {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
+          obtain ⟨u, hu, v, hv, huv⟩ := Finset.one_lt_card.mp hB
+          have hdist_le : hammingDist u v ≤ n := by
+            simpa using (hammingDist_le_card_fintype (x := u) (y := v))
+          have hdist_in : hammingDist u v ∈ S := by
+            exact ⟨u, hu, v, hv, huv, rfl⟩
+          have hdist_ge : d ≤ hammingDist u v := by
+            simpa [d, S] using (Nat.sInf_le hdist_in)
+          exact le_trans hdist_ge hdist_le
+        have h_johnson_strong : JohnsonConditionStrong B' v := by
           have h_johnson_weak : JohnsonConditionWeak B e := by
             have h_muln : (e : ℚ) / n ≤ 1 - ((1 - (d : ℚ) / n) : ℝ).sqrt := by
               by_cases hn : n = 0
@@ -699,17 +710,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                   exact_mod_cast (Nat.cast_nonneg n)
                 have hn' : (n : ℝ) ≠ 0 := by
                   exact_mod_cast hn
-                have d_le_n : d ≤ n := by
-                  let S : Set ℕ :=
-                    {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
-                  obtain ⟨u, hu, v, hv, huv⟩ := Finset.one_lt_card.mp hB
-                  have hdist_le : hammingDist u v ≤ n := by
-                    simpa using (hammingDist_le_card_fintype (x := u) (y := v))
-                  have hdist_in : hammingDist u v ∈ S := by
-                    exact ⟨u, hu, v, hv, huv, rfl⟩
-                  have hdist_ge : d ≤ hammingDist u v := by
-                    simpa [d, S] using (Nat.sInf_le hdist_in)
-                  exact le_trans hdist_ge hdist_le
                 have h_div : (e : ℝ) / n ≤ (n - ((n * (n - d) : ℝ).sqrt)) / n := by
                   exact (div_le_div_of_nonneg_right (by simpa using h) hn_nonneg)
                 have h_div' : (e : ℝ) / n ≤ 1 - ((n * (n - d) : ℝ).sqrt) / n := by
@@ -762,17 +762,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               have hx0 : (0 : ℚ) ≤ d / n := by
                 exact div_nonneg (by exact_mod_cast (Nat.cast_nonneg d))
                   (by exact_mod_cast (Nat.cast_nonneg n))
-              have d_le_n : d ≤ n := by
-                let S : Set ℕ :=
-                  {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
-                obtain ⟨u, hu, v, hv, huv⟩ := Finset.one_lt_card.mp hB
-                have hdist_le : hammingDist u v ≤ n := by
-                  simpa using (hammingDist_le_card_fintype (x := u) (y := v))
-                have hdist_in : hammingDist u v ∈ S := by
-                  exact ⟨u, hu, v, hv, huv, rfl⟩
-                have hdist_ge : d ≤ hammingDist u v := by
-                  simpa [d, S] using (Nat.sInf_le hdist_in)
-                exact le_trans hdist_ge hdist_le
               have hx1 : d / n ≤ (1 : ℚ) := by
                 by_cases hn : n = 0
                 · simp [hn]
@@ -1054,17 +1043,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               simpa [D0, D1] using (div_le_div_of_nonneg_right d_ineq hn_nonneg)
             have hE : E1 ≤ E0 := by
               simpa [E1, E0] using (div_le_div_of_nonneg_right e_ineq hn_nonneg)
-            have d_le_n : d ≤ n := by
-              let S : Set ℕ :=
-                {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
-              obtain ⟨u, hu, v', hv', huv⟩ := Finset.one_lt_card.mp hB
-              have hdist_le : hammingDist u v' ≤ n := by
-                simpa using (hammingDist_le_card_fintype (x := u) (y := v'))
-              have hdist_in : hammingDist u v' ∈ S := by
-                exact ⟨u, hu, v', hv', huv, rfl⟩
-              have hdist_ge : d ≤ hammingDist u v' := by
-                simpa [d, S] using (Nat.sInf_le hdist_in)
-              exact le_trans hdist_ge hdist_le
             have h_sqrt_ge :
                 (n : ℝ) - d ≤ Real.sqrt ((n * (n - d)) : ℝ) := by
               have h_nd_nonneg : (0 : ℝ) ≤ (n : ℝ) - d := by
@@ -1306,17 +1284,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               have h := (one_lt_div hq1_pos).2 hq1_lt
               simpa [frac] using h
             have hfrac1_pos : (0 : ℚ) < frac - 1 := by linarith [hfrac_gt1]
-            have d_le_n : d ≤ n := by
-              let S : Set ℕ :=
-                {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
-              obtain ⟨u, hu, v', hv', huv⟩ := Finset.one_lt_card.mp hB
-              have hdist_le : hammingDist u v' ≤ n := by
-                simpa using (hammingDist_le_card_fintype (x := u) (y := v'))
-              have hdist_in : hammingDist u v' ∈ S := by
-                exact ⟨u, hu, v', hv', huv, rfl⟩
-              have hdist_ge : d ≤ hammingDist u v' := by
-                simpa [d, S] using (Nat.sInf_le hdist_in)
-              exact le_trans hdist_ge hdist_le
             have h_div' :
                 1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
               have h_sqrt_le :
