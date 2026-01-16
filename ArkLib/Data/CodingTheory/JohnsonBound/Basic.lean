@@ -295,7 +295,7 @@ theorem johnson_bound [Field F]
     (johnson_condition_strong_implies_2_le_F_card h_condition)
 
 set_option maxHeartbeats 1000000 in
--- Proof is large; raise the heartbeat limit to avoid timeouts.
+-- Large proof; bump heartbeats.
 /-- Alphabet-free Johnson bound from [codingtheory].
 -/
 theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
@@ -310,9 +310,11 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
   e ≤ n - ((n * (n - d)) : ℝ).sqrt
   →
   (B ∩ ({ x | Δ₀(x, v) ≤ e } : Finset _)).card ≤ q * d * n := by
+    -- the proof mostly organized as in the instructions in issue #235,
+    -- one major difference is the frac*d/n > 1 subcase which is not covered in the issue.
     intro d q frac h
     let B' := B ∩ ({ x | Δ₀(x, v) ≤ e } : Finset _)
-
+    -- Helper bounds on parameters.
     have q_not_small : q ≥ (2 : ℚ) := by
       have hF : (2 : ℕ) ≤ Fintype.card F := by
         classical
@@ -347,6 +349,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           exact this a ha b hb)
       omega
 
+    -- Lower bound on RHS for the small-cardinality case.
     have qdn_not_small : (q * d * n) ≥ 2 := by
       have hdq : (d : ℚ) ≥ (1 : ℚ) := by exact_mod_cast d_not_small
       have hnq : (n : ℚ) ≥ (1 : ℚ) := by exact_mod_cast n_not_small
@@ -355,7 +358,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
       simpa [mul_assoc] using this
 
     by_cases h_size : B'.card < 2
-    -- trivial case
+    -- Case: B'.card < 2
     · have hcard_nat : B'.card ≤ 1 := by exact Nat.le_of_lt_succ h_size
       have hcard : (B'.card : ℚ) ≤ (1 : ℚ) := by exact_mod_cast hcard_nat
       have rhs_ge_two : (2 : ℚ) ≤ q * (d : ℚ) * (n : ℚ) := by simpa [mul_assoc] using qdn_not_small
@@ -363,7 +366,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
         le_trans (by norm_num : (1 : ℚ) ≤ 2) rhs_ge_two
       exact le_trans hcard rhs_ge_one
 
-    -- non-trivial case
+    -- Case: B'.card ≥ 2
     · have hd_le_dB' : (d : ℚ) ≤ JohnsonBound.d B' := by
         have hB'_gt : 1 < B'.card := by omega
         let S : Set ℕ :=
@@ -398,7 +401,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           simpa [S', dmin] using (min_dist_le_d (B := B') (by simpa using hB'_gt))
         exact le_trans h_inf_q h_min
       by_cases h_d_close_n : q / (q - 1) * (d / n) > 1
-      -- case when d too big
+      -- Subcase: frac*d/n > 1
       · have hfrac_dB'_gt_one : q/(q-1) * (JohnsonBound.d B' / n) > 1 := by
           have hn_nonneg : (0 : ℚ) ≤ n := by
             exact_mod_cast (Nat.cast_nonneg n)
@@ -688,7 +691,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           exact le_trans le_q_times_n hstep
         exact_mod_cast final
 
-      -- expected case
+      -- Subcase: frac*d/n ≤ 1 (main case)
       · have d_le_n : d ≤ n := by
           let S : Set ℕ :=
             {d | ∃ u ∈ B, ∃ v ∈ B, u ≠ v ∧ hammingDist u v = d}
@@ -700,6 +703,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           have hdist_ge : d ≤ hammingDist u v := by
             simpa [d, S] using (Nat.sInf_le hdist_in)
           exact le_trans hdist_ge hdist_le
+        -- Helper positivity facts for the main-case algebra.
         have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
         have hn_pos : (0 : ℚ) < n := by exact_mod_cast hn_pos_nat
         have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
@@ -955,6 +959,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
             (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v := by
           simpa using johnson_result
 
+        -- Core inequality from the hypothesis (reused below).
         have h_div' :
             1 - (d : ℝ) / n ≤ (1 - (e : ℝ) / n) ^ 2 := by
           have h_sqrt_le :
@@ -1003,14 +1008,30 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           set D0 : ℚ := d / n
           set E0 : ℚ := e / n
           set Den : ℚ := D0 - 2 * E0 + frac * E0 ^ 2
-          -- 1. Expand JohnsonDenominator definition
+          have quad_nonneg : (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
+            have htmp_q :
+                (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
+              linarith [h_div'_q]
+            have h_eq_q :
+                (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) =
+                  D0 - 2 * E0 + E0 ^ 2 := by
+              ring
+            simpa [h_eq_q] using htmp_q
+          have frac_sub_one_eq : frac - 1 = (1 : ℚ) / (q - 1) := by
+            field_simp [frac, hq1_ne]
+          have one_div_q_le : (1 : ℚ) / q ≤ frac - 1 := by
+            have hq1_le_q : (q - 1 : ℚ) ≤ q := by linarith
+            have h1 : (1 : ℚ) / q ≤ (1 : ℚ) / (q - 1) := by
+              exact (one_div_le_one_div_of_le hq1_pos hq1_le_q)
+            simpa [frac_sub_one_eq] using h1
+          -- 1. Expand JohnsonDenominator.
           have denom_expansion : JohnsonDenominator B' v =
               frac * (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
               frac * (JohnsonBound.e B' v / n)^2) := by
             simp [JohnsonDenominator, q, frac, mul_div_assoc]
             ring
 
-          -- 2. Simplify the LHS fraction by cancelling 'frac'
+          -- 2. Cancel frac.
           have term_simplification : (frac * (JohnsonBound.d B') / (n : ℚ)) /
               JohnsonDenominator B' v =
               (JohnsonBound.d B' / n) /
@@ -1030,7 +1051,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                         (mul_div_mul_left (a := JohnsonBound.d B' / n) (b := D)
                           (c := frac) hfrac_ne)
 
-          -- 3. Establish monotonicity for e (worst case is larger e)
+          -- 3. Bound eB' by e.
           have e_ineq : JohnsonBound.e B' v ≤ e := by
             have hB'_pos : 0 < B'.card := by
               have hB'_ge2 : 2 ≤ B'.card := by
@@ -1066,13 +1087,11 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               simp [JohnsonBound.e, div_eq_mul_inv, mul_comm]
             simpa [h_e] using hdiv_le
 
-          -- 4. Establish monotonicity for d (worst case is smaller d)
+          -- 4. Bound dB' by d.
           have d_ineq : (d : ℚ) ≤ JohnsonBound.d B' := by
             simp[hd_le_dB']
 
-          -- 5. Substitute worst-case values d and e into the bound
-          -- Note: The function f(d, e) is decreasing in d and
-          -- increasing in e for the relevant range.
+          -- 5. Compare worst-case values (monotone).
           have worst_case_bound : (JohnsonBound.d B' / n) /
               (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
               frac * (JohnsonBound.e B' v / n)^2) ≤
@@ -1151,14 +1170,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
 
             have hden0_nonneg :
                 (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
-              have htmp_q :
-                  (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
-                linarith [h_div'_q]
-              have h_eq_q :
-                  (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) =
-                    D0 - 2 * E0 + E0 ^ 2 := by
-                ring
-              simpa [h_eq_q] using htmp_q
+              exact quad_nonneg
             have hden0_pos :
                 (0 : ℚ) < D0 - 2 * E0 + frac * E0 ^ 2 := by
               have h_expand :
@@ -1263,19 +1275,12 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               exact le_trans hstep1 hstep2
             simpa [D0, D1, E0, E1, mul_div_assoc] using hfinal
 
-          -- 6. Prove the final algebraic inequality
+          -- 6. Final algebraic bound.
           have final_calc : (d / n) / (d / n - 2 * e / n + frac * (e / n)^2) ≤
               q * d * n := by
             have hfrac1_pos : (0 : ℚ) < frac - 1 := by linarith [hfrac_gt1]
             have hbase_nonneg : (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
-              have htmp_q :
-                  (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
-                linarith [h_div'_q]
-              have h_eq_q :
-                  (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) =
-                    D0 - 2 * E0 + E0 ^ 2 := by
-                ring
-              simpa [h_eq_q] using htmp_q
+              exact quad_nonneg
             have hden_lb : (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ Den := by
               by_cases he0 : e = 0
               · subst he0
@@ -1332,16 +1337,9 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                         (frac - 1) * ((1 : ℚ) / (n : ℚ) ^ 2) := by
                     simp [div_eq_mul_inv]
                   exact le_trans (by simpa [h1'] using h1) hden_ge
-                have hfrac1_ge : (1 : ℚ) / q ≤ frac - 1 := by
-                  have hq1_le_q : (q - 1 : ℚ) ≤ q := by linarith
-                  have h1 : (1 : ℚ) / q ≤ (1 : ℚ) / (q - 1) := by
-                    exact (one_div_le_one_div_of_le hq1_pos hq1_le_q)
-                  have hfrac1 : frac - 1 = (1 : ℚ) / (q - 1) := by
-                    field_simp [frac, hq1_ne]
-                  simpa [hfrac1] using h1
                 have hfrac1_ge' :
                     (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ (frac - 1) / (n : ℚ) ^ 2 := by
-                  have h1 := div_le_div_of_nonneg_right hfrac1_ge hn2_nonneg
+                  have h1 := div_le_div_of_nonneg_right one_div_q_le hn2_nonneg
                   have h1' : (1 : ℚ) / (q * (n : ℚ) ^ 2) = (1 : ℚ) / q / (n : ℚ) ^ 2 := by
                     field_simp [hq_ne]
                   simpa [h1'] using h1
@@ -1364,11 +1362,10 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                     field_simp [hq_ne, hn_pos.ne']
                     ring
 
-          -- Apply the steps to close the goal
+          -- Combine the steps.
           rw [term_simplification]
           apply le_trans worst_case_bound
           exact final_calc
-
 
         exact le_trans current_bound last_bound
 
