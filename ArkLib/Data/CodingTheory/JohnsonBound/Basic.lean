@@ -294,7 +294,7 @@ theorem johnson_bound [Field F]
     (johnson_condition_strong_implies_2_le_B_card h_condition)
     (johnson_condition_strong_implies_2_le_F_card h_condition)
 
-set_option maxHeartbeats 1200000 in
+set_option maxHeartbeats 1000000 in
 -- Proof is large; raise the heartbeat limit to avoid timeouts.
 /-- Alphabet-free Johnson bound from [codingtheory].
 -/
@@ -705,12 +705,20 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
         have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
         have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
         have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+        have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
+        have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
         have hfrac_pos : (0 : ℚ) < frac := by
           exact div_pos hq_pos hq1_pos
         have hfrac_gt1 : (1 : ℚ) < frac := by
           have hq1_lt : (q - 1 : ℚ) < q := by linarith
           have h := (one_lt_div hq1_pos).2 hq1_lt
           simpa [frac] using h
+        have hfrac_ne : (frac : ℚ) ≠ 0 := by
+          simpa [frac] using (div_ne_zero hq_ne hq1_ne)
+        have hn2_nonneg : (0 : ℚ) ≤ (n : ℚ) ^ 2 := by
+          exact sq_nonneg (n : ℚ)
+        have hn2_pos : (0 : ℚ) < (n : ℚ) ^ 2 := by
+          exact pow_pos hn_pos _
         have h_johnson_strong : JohnsonConditionStrong B' v := by
           have h_johnson_weak : JohnsonConditionWeak B e := by
             have h_muln : (e : ℚ) / n ≤ 1 - ((1 - (d : ℚ) / n) : ℝ).sqrt := by
@@ -983,10 +991,18 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               ((n : ℝ) - e) ^ 2 / n ^ 2 = (1 - (e : ℝ) / n) ^ 2 := by
             field_simp [hn_ne_real]
           simpa [h_left, h_right] using h_div
+        have h_div'_q : (1 - (d / n : ℚ)) ≤ (1 - (e / n : ℚ)) ^ 2 := by
+          have h_div'_real :
+              ((1 - (d / n : ℚ)) : ℝ) ≤ ((1 - (e / n : ℚ)) ^ 2 : ℝ) := by
+            simpa using h_div'
+          exact_mod_cast h_div'_real
 
         have last_bound :
             (frac * (JohnsonBound.d B') / (n : ℚ)) / JohnsonDenominator B' v ≤
             q * (d : ℚ) * (n : ℚ) := by
+          set D0 : ℚ := d / n
+          set E0 : ℚ := e / n
+          set Den : ℚ := D0 - 2 * E0 + frac * E0 ^ 2
           -- 1. Expand JohnsonDenominator definition
           have denom_expansion : JohnsonDenominator B' v =
               frac * (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
@@ -1000,10 +1016,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               (JohnsonBound.d B' / n) /
               (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
               frac * (JohnsonBound.e B' v / n)^2) := by
-            have hfrac_ne : (frac : ℚ) ≠ 0 := by
-              have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
-              have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
-              simpa [frac] using (div_ne_zero hq_ne hq1_ne)
             set D : ℚ :=
               JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
                 frac * (JohnsonBound.e B' v / n) ^ 2
@@ -1067,8 +1079,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               (d / n) / (d / n - 2 * e / n + frac * (e / n)^2) := by
             set D1 : ℚ := JohnsonBound.d B' / n
             set E1 : ℚ := JohnsonBound.e B' v / n
-            set D0 : ℚ := d / n
-            set E0 : ℚ := e / n
             have hfrac_ge : (1 : ℚ) ≤ frac := by
               exact le_of_lt hfrac_gt1
             have hD : D0 ≤ D1 := by
@@ -1141,12 +1151,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
 
             have hden0_nonneg :
                 (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
-              have h_div'_q :
-                  (1 - (d / n : ℚ)) ≤ (1 - (e / n : ℚ)) ^ 2 := by
-                have h_div'_real :
-                    ((1 - (d / n : ℚ)) : ℝ) ≤ ((1 - (e / n : ℚ)) ^ 2 : ℝ) := by
-                  simpa using h_div'
-                exact_mod_cast h_div'_real
               have htmp_q :
                   (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
                 linarith [h_div'_q]
@@ -1262,19 +1266,8 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           -- 6. Prove the final algebraic inequality
           have final_calc : (d / n) / (d / n - 2 * e / n + frac * (e / n)^2) ≤
               q * d * n := by
-            set D0 : ℚ := d / n
-            set E0 : ℚ := e / n
-            set Den : ℚ := D0 - 2 * E0 + frac * E0 ^ 2
-            have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
-            have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
             have hfrac1_pos : (0 : ℚ) < frac - 1 := by linarith [hfrac_gt1]
             have hbase_nonneg : (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
-              have h_div'_q :
-                  (1 - (d / n : ℚ)) ≤ (1 - (e / n : ℚ)) ^ 2 := by
-                have h_div'_real :
-                    ((1 - (d / n : ℚ)) : ℝ) ≤ ((1 - (e / n : ℚ)) ^ 2 : ℝ) := by
-                  simpa using h_div'
-                exact_mod_cast h_div'_real
               have htmp_q :
                   (0 : ℚ) ≤ (1 - (e / n : ℚ)) ^ 2 - (1 - (d / n : ℚ)) := by
                 linarith [h_div'_q]
@@ -1301,7 +1294,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                         (mul_le_mul_of_nonneg_right hq_ge1 hnn_nonneg)
                     _ = q * (n : ℚ) ^ 2 := by ring
                 have hpos1 : (0 : ℚ) < q * (n : ℚ) ^ 2 := by
-                  exact mul_pos hq_pos (pow_pos hn_pos _)
+                  exact mul_pos hq_pos hn2_pos
                 have hpos2 : (0 : ℚ) < (n : ℚ) := hn_pos
                 have h1 : (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ (1 : ℚ) / n := by
                   exact (div_le_div_iff₀ hpos1 hpos2).2 (by simpa using hmul)
@@ -1348,8 +1341,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
                   simpa [hfrac1] using h1
                 have hfrac1_ge' :
                     (1 : ℚ) / (q * (n : ℚ) ^ 2) ≤ (frac - 1) / (n : ℚ) ^ 2 := by
-                  have hn2_nonneg : (0 : ℚ) ≤ (n : ℚ) ^ 2 := by
-                    exact sq_nonneg (n : ℚ)
                   have h1 := div_le_div_of_nonneg_right hfrac1_ge hn2_nonneg
                   have h1' : (1 : ℚ) / (q * (n : ℚ) ^ 2) = (1 : ℚ) / q / (n : ℚ) ^ 2 := by
                     field_simp [hq_ne]
@@ -1360,7 +1351,7 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               exact div_nonneg hd0 hn_nonneg
             have hden_pos : (0 : ℚ) < (1 : ℚ) / (q * (n : ℚ) ^ 2) := by
               have hpos : (0 : ℚ) < q * (n : ℚ) ^ 2 := by
-                exact mul_pos hq_pos (pow_pos hn_pos _)
+                exact mul_pos hq_pos hn2_pos
               exact one_div_pos.mpr hpos
             have hstep :
                 (d / n) / Den ≤ (d / n) / ((1 : ℚ) / (q * (n : ℚ) ^ 2)) := by
