@@ -700,6 +700,17 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
           have hdist_ge : d ≤ hammingDist u v := by
             simpa [d, S] using (Nat.sInf_le hdist_in)
           exact le_trans hdist_ge hdist_le
+        have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
+        have hn_pos : (0 : ℚ) < n := by exact_mod_cast hn_pos_nat
+        have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
+        have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
+        have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
+        have hfrac_pos : (0 : ℚ) < frac := by
+          exact div_pos hq_pos hq1_pos
+        have hfrac_gt1 : (1 : ℚ) < frac := by
+          have hq1_lt : (q - 1 : ℚ) < q := by linarith
+          have h := (one_lt_div hq1_pos).2 hq1_lt
+          simpa [frac] using h
         have h_johnson_strong : JohnsonConditionStrong B' v := by
           have h_johnson_weak : JohnsonConditionWeak B e := by
             have h_muln : (e : ℚ) / n ≤ 1 - ((1 - (d : ℚ) / n) : ℝ).sqrt := by
@@ -989,8 +1000,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
               (JohnsonBound.d B' / n) /
               (JohnsonBound.d B' / n - 2 * JohnsonBound.e B' v / n +
               frac * (JohnsonBound.e B' v / n)^2) := by
-            have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
-            have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
             have hfrac_ne : (frac : ℚ) ≠ 0 := by
               have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
               have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
@@ -1060,20 +1069,6 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
             set E1 : ℚ := JohnsonBound.e B' v / n
             set D0 : ℚ := d / n
             set E0 : ℚ := e / n
-            have hn_nonneg : (0 : ℚ) ≤ n := by
-              exact_mod_cast (Nat.cast_nonneg n)
-            have hn_pos : (0 : ℚ) < n := by
-              have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
-              exact_mod_cast hn_pos_nat
-            have hfrac_pos : (0 : ℚ) < frac := by
-              have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
-              have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
-              exact div_pos hq_pos hq1_pos
-            have hfrac_gt1 : (1 : ℚ) < frac := by
-              have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
-              have hq1_lt : (q - 1 : ℚ) < q := by linarith
-              have h := (one_lt_div hq1_pos).2 hq1_lt
-              simpa [frac] using h
             have hfrac_ge : (1 : ℚ) ≤ frac := by
               exact le_of_lt hfrac_gt1
             have hD : D0 ≤ D1 := by
@@ -1270,19 +1265,8 @@ theorem johnson_bound_alphabet_free [Field F] [DecidableEq F]
             set D0 : ℚ := d / n
             set E0 : ℚ := e / n
             set Den : ℚ := D0 - 2 * E0 + frac * E0 ^ 2
-            have hn_pos_nat : 0 < n := (Nat.succ_le_iff).1 n_not_small
-            have hn_pos : (0 : ℚ) < n := by exact_mod_cast hn_pos_nat
-            have hn_nonneg : (0 : ℚ) ≤ n := by exact_mod_cast (Nat.cast_nonneg n)
-            have hq_pos : (0 : ℚ) < q := by linarith [q_not_small]
-            have hq1_pos : (0 : ℚ) < q - 1 := by linarith [q_not_small]
             have hq_ne : (q : ℚ) ≠ 0 := by exact ne_of_gt hq_pos
             have hq1_ne : (q - 1 : ℚ) ≠ 0 := by exact ne_of_gt hq1_pos
-            have hfrac_pos : (0 : ℚ) < frac := by
-              exact div_pos hq_pos hq1_pos
-            have hfrac_gt1 : (1 : ℚ) < frac := by
-              have hq1_lt : (q - 1 : ℚ) < q := by linarith
-              have h := (one_lt_div hq1_pos).2 hq1_lt
-              simpa [frac] using h
             have hfrac1_pos : (0 : ℚ) < frac - 1 := by linarith [hfrac_gt1]
             have hbase_nonneg : (0 : ℚ) ≤ D0 - 2 * E0 + E0 ^ 2 := by
               have h_div'_q :
